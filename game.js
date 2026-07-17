@@ -188,6 +188,7 @@ champagneBtn.addEventListener('click', () => {
                 <p>ASSET: <span class="highlight">${c.asset}</span></p>
                 <p>STARTING: $<span class="highlight">${c.startCashStr}</span></p>
                 <p>FINAL: $<span class="highlight">${c.finalCashStr}</span></p>
+                <p>MAX DD: <span class="highlight">${c.mddStr}</span></p>
                 <p>PERIOD: <span class="highlight">${c.periodStr || '???'}</span></p>
                 <p>LVL RETURN: <span class="highlight">${c.levelRetStr}</span></p>
             </div>
@@ -318,6 +319,21 @@ function endLevel() {
     const levelRetStr = (levelReturn >= 0 ? '+' : '') + (levelReturn * 100).toFixed(2) + '%';
     document.getElementById('card-level-return').innerText = levelRetStr;
     
+    // Calculate Max Drawdown
+    let peak = totalHistory[0];
+    let maxDrawdown = 0;
+    for (let i = 0; i < totalHistory.length; i++) {
+        if (totalHistory[i] > peak) {
+            peak = totalHistory[i];
+        }
+        const dd = (peak - totalHistory[i]) / peak;
+        if (dd > maxDrawdown) {
+            maxDrawdown = dd;
+        }
+    }
+    const mddStr = '-' + (maxDrawdown * 100).toFixed(2) + '%';
+    document.getElementById('card-mdd').innerText = mddStr;
+    
     const cumReturn = ((cash - INITIAL_CASH) / INITIAL_CASH);
     const cumRetStr = (cumReturn >= 0 ? '+' : '') + (cumReturn * 100).toFixed(2) + '%';
     
@@ -349,6 +365,7 @@ function endLevel() {
             asset: currentAsset,
             startCashStr: `$${levelStartCash.toFixed(2)}`,
             finalCashStr: `$${cash.toFixed(2)}`,
+            mddStr: mddStr,
             periodStr: `${startDate} ~ ${endDate}`,
             levelRetStr: levelRetStr,
             cumRetStr: cumRetStr
