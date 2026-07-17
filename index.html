@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy K</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts for pixel style -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <!-- UI Overlay -->
+        <div id="ui-layer">
+            <div class="stats-box">
+                <div>LEVEL: <span id="level-display">1</span></div>
+                <div>CASH: $<span id="cash-display">10000.00</span></div>
+                <div>ASSET: $<span id="asset-display">0.00</span></div>
+                <div>TOTAL: $<span id="total-display">10000.00</span></div>
+                <div>RETURN: <span id="return-display" class="neutral">0.00%</span></div>
+                <div>TARGET TO BEAT: <span id="target-return-display">None</span></div>
+                <div style="margin-top:10px;">
+                    SPEED: <button id="speed-btn" style="padding: 2px 5px; font-size: 8px; margin:0; border:2px solid #fff; box-shadow:none;">1x (5s/day)</button>
+                </div>
+            </div>
+            
+            <div class="controls-hint">
+                <div class="key-hint"><span class="key">UP</span> BUY $1000</div>
+                <div class="key-hint"><span class="key">DOWN</span> SELL $1000</div>
+            </div>
+        </div>
+
+        <!-- Canvas for Candlesticks and Profit Line -->
+        <canvas id="game-canvas"></canvas>
+        
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen active">
+            <h1>FLAPPY K</h1>
+            <p>Trade the unknown K-line.</p>
+            <p>Buy low, sell high. Beat your own record.</p>
+            <button id="start-btn">PLAY</button>
+        </div>
+
+        <!-- Settlement Card Screen -->
+        <div id="settlement-screen" class="screen">
+            <div class="profit-card" id="profit-card">
+                <h2 id="card-title">PROFIT CARD (1)</h2>
+                <div class="card-details">
+                    <p>Asset: <span id="card-asset" class="highlight">???</span></p>
+                    <p>Period: <span id="card-period" class="highlight">???</span></p>
+                    <p>Initial: $10,000.00</p>
+                    <p>Final: $<span id="card-final">---</span></p>
+                    <p class="big-return" id="card-return">---%</p>
+                    <p id="card-status" class="status-msg"></p>
+                </div>
+            </div>
+            <button id="next-level-btn" style="display:none;">NEXT LEVEL</button>
+            <button id="restart-btn" style="display:none;">TRY AGAIN</button>
+        </div>
+    </div>
+
+    <!-- Data script -->
+    <script src="data.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>

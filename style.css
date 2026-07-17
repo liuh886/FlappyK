@@ -1,0 +1,189 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #1a1a1a;
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#game-container {
+    position: relative;
+    width: 800px;
+    height: 600px;
+    background-color: #0d1117;
+    border: 4px solid #fff;
+    box-shadow: 0 0 20px rgba(0,0,0,0.8);
+}
+
+#ui-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 15px;
+    pointer-events: none;
+    display: flex;
+    justify-content: space-between;
+    z-index: 10;
+}
+
+.stats-box {
+    background: rgba(0,0,0,0.7);
+    padding: 10px;
+    border: 2px solid #555;
+    font-size: 10px;
+    line-height: 1.8;
+}
+
+.controls-hint {
+    background: rgba(0,0,0,0.7);
+    padding: 10px;
+    border: 2px solid #555;
+    font-size: 10px;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.key-hint {
+    margin-bottom: 8px;
+}
+
+.key {
+    background: #fff;
+    color: #000;
+    padding: 4px 6px;
+    border-radius: 4px;
+    margin-right: 5px;
+}
+
+#game-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.screen.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+h1 {
+    font-size: 40px;
+    margin-bottom: 20px;
+    color: #f1c40f;
+    text-shadow: 4px 4px 0 #d35400;
+}
+
+p {
+    font-size: 12px;
+    line-height: 2;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+button {
+    margin-top: 30px;
+    padding: 15px 30px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 16px;
+    background-color: #2ecc71;
+    color: #fff;
+    border: 4px solid #fff;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #27ae60;
+}
+
+button:hover {
+    background-color: #27ae60;
+}
+
+button:active {
+    transform: translate(4px, 4px);
+    box-shadow: none;
+}
+
+/* Profit Card */
+.profit-card {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    border: 8px solid #FFF;
+    border-radius: 15px;
+    padding: 30px;
+    color: #000;
+    width: 450px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.5);
+    transform: scale(0.8);
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.screen.active .profit-card {
+    transform: scale(1);
+}
+
+.profit-card h2 {
+    font-size: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 4px dashed #000;
+    padding-bottom: 10px;
+}
+
+.card-details p {
+    text-align: left;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.highlight {
+    background: #000;
+    color: #0f0;
+    padding: 4px 8px;
+}
+
+.big-return {
+    font-size: 32px !important;
+    text-align: center !important;
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+.positive { color: #2ecc71; }
+.negative { color: #e74c3c; }
+.neutral { color: #fff; }
+.card-positive { color: #008000; text-shadow: 2px 2px 0 #fff; }
+.card-negative { color: #d30000; text-shadow: 2px 2px 0 #fff; }
+.card-neutral { color: #333; text-shadow: 2px 2px 0 #fff; }
+
+.status-msg {
+    margin-top: 20px;
+    font-size: 12px;
+    text-align: center !important;
+    font-weight: bold;
+}
