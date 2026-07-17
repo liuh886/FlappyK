@@ -93,15 +93,15 @@ speedBtn.addEventListener('click', () => {
     if (speedMultiplier === 1) {
         speedMultiplier = 10;
         TICK_RATE = 500;
-        speedBtn.innerText = "10x (0.5s/day)";
+        speedBtn.innerText = "10x (0.5s/day) [RIGHT]";
     } else if (speedMultiplier === 10) {
         speedMultiplier = 50;
         TICK_RATE = 100;
-        speedBtn.innerText = "50x (0.1s/day)";
+        speedBtn.innerText = "50x (0.1s/day) [RIGHT]";
     } else {
         speedMultiplier = 1;
         TICK_RATE = 5000;
-        speedBtn.innerText = "1x (5s/day)";
+        speedBtn.innerText = "1x (5s/day) [RIGHT]";
     }
     
     // Restart interval if playing
@@ -264,6 +264,8 @@ window.addEventListener('keydown', (e) => {
             updateUI();
             draw();
         }
+    } else if (e.key === 'ArrowRight') {
+        speedBtn.click();
     }
 });
 
