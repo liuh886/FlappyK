@@ -12,6 +12,12 @@ const VISIBLE_DAYS = 50; // Scroll view width
 let TICK_RATE = 1000;
 let speedMultiplier = 5;
 
+// Check if mobile for default speed
+if (window.matchMedia && window.matchMedia("(max-width: 768px)").matches) {
+    speedMultiplier = 10;
+    TICK_RATE = 500;
+}
+
 let level = 1;
 let targetReturn = 0; // The return to beat
 let currentAsset = "";
@@ -101,17 +107,19 @@ function stopAudio() {
 function changeSpeed(delta) {
     speedMultiplier += delta;
     if (speedMultiplier < 1) speedMultiplier = 1;
-    if (speedMultiplier > 100) speedMultiplier = 100;
+    if (speedMultiplier > 20) speedMultiplier = 20;
     
     TICK_RATE = 5000 / speedMultiplier;
-    speedBtn.innerText = speedMultiplier + "x [←/→]";
+    speedBtn.innerText = `${speedMultiplier}x [←/→]`;
     
-    // Restart interval if playing
     if (isPlaying) {
         clearInterval(gameInterval);
         gameInterval = setInterval(gameTick, TICK_RATE);
     }
 }
+
+// Initial Speed UI Sync
+speedBtn.innerText = `${speedMultiplier}x [←/→]`;
 
 // Speed Button
 speedBtn.addEventListener('click', () => {
@@ -526,10 +534,19 @@ function draw() {
         const lowY = getY(d.low);
         
         const isUp = d.close >= d.open;
-        ctx.fillStyle = isUp ? '#2ecc71' : '#e74c3c';
-        ctx.strokeStyle = isUp ? '#2ecc71' : '#e74c3c';
         
-        ctx.shadowColor = isUp ? '#2ecc71' : '#e74c3c';
+        let upColor = '#2ecc71';
+        let downColor = '#e74c3c';
+        if (currentMarket === 'ashare') {
+            upColor = '#e74c3c'; // Red for UP in A-shares
+            downColor = '#2ecc71'; // Green for DOWN in A-shares
+        }
+        
+        const color = isUp ? upColor : downColor;
+        
+        ctx.fillStyle = color;
+        ctx.strokeStyle = color;
+        ctx.shadowColor = color;
         ctx.shadowBlur = 5; // Glow effect
         
         // Draw wick
