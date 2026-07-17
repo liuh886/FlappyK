@@ -162,6 +162,9 @@ champagneBtn.addEventListener('click', () => {
             <h2>PROFIT CARD (${c.level})</h2>
             <div class="card-details">
                 <p>ASSET: <span class="highlight">${c.asset}</span></p>
+                <p>PERIOD: <span class="highlight">${c.periodStr || '???'}</span></p>
+                <p>CASH: <span class="highlight">${c.cashStr}</span></p>
+                <p>FINAL: <span class="highlight">${c.finalStr}</span></p>
                 <p>RETURN: <span class="highlight">${c.retStr}</span></p>
             </div>
             <div class="big-return card-positive">${c.retStr}</div>
@@ -270,15 +273,22 @@ function endLevel() {
     
     document.getElementById('card-title').innerText = `PROFIT CARD (${level})`;
     document.getElementById('card-asset').innerText = currentAsset;
+    document.getElementById('card-cash').innerText = `$${cash.toFixed(2)}`;
+    
+    // Evaluate Result
+    const finalReturn = ((finalTotal - INITIAL_CASH) / INITIAL_CASH);
+    const retStr = (finalReturn >= 0 ? '+' : '') + (finalReturn * 100).toFixed(2) + '%';
+    
+    const retElem = document.getElementById('card-return');
+    const smallRetElem = document.getElementById('card-small-return');
+    
+    retElem.innerText = retStr;
+    smallRetElem.innerText = retStr;
+    document.getElementById('card-final').innerText = finalTotal.toFixed(2);
     
     const startDate = currentData[0].date;
     const endDate = currentData[dayIndex].date;
     document.getElementById('card-period').innerText = `${startDate} to ${endDate}`;
-    
-    document.getElementById('card-final').innerText = finalTotal.toFixed(2);
-    
-    const retElem = document.getElementById('card-return');
-    retElem.innerText = (finalReturn * 100).toFixed(2) + "%";
     
     let isSuccess = false;
     if (level === 1) {
@@ -297,7 +307,10 @@ function endLevel() {
             level: level,
             market: currentMarket,
             asset: currentAsset,
-            retStr: retElem.innerText
+            cashStr: `$${cash.toFixed(2)}`,
+            finalStr: `$${finalTotal.toFixed(2)}`,
+            periodStr: `${startDate} ~ ${endDate}`,
+            retStr: retStr
         });
         
         if (level === 3) {
