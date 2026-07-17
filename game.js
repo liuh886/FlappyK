@@ -181,7 +181,13 @@ champagneBtn.addEventListener('click', () => {
 champagneSaveBtn.addEventListener('click', () => {
     html2canvas(champagneExportArea, {
         backgroundColor: '#0d1117',
-        scale: 2
+        scale: 2,
+        onclone: (clonedDoc) => {
+            const exportArea = clonedDoc.getElementById('champagne-export-area');
+            if (exportArea && exportArea.parentElement) {
+                exportArea.parentElement.style.transform = 'none';
+            }
+        }
     }).then(canvas => {
         const link = document.createElement('a');
         link.download = `FlappyK_Legend_Cards.png`;
