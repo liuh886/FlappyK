@@ -21,7 +21,8 @@ let dayIndex = 0;
 let cash = INITIAL_CASH;
 let shares = 0;
 let totalHistory = [];
-let actions = []; // Track buy/sell actions
+let actions = []; 
+let collectedCards = []; // Track buy/sell actions
 let gameInterval;
 let isPlaying = false;
 let currentPrice = 0;
@@ -41,8 +42,14 @@ const speedBtn = document.getElementById('speed-btn');
 
 const settlementScreen = document.getElementById('settlement-screen');
 const nextBtn = document.getElementById('next-level-btn');
+const champagneBtn = document.getElementById('champagne-btn');
 const saveBtn = document.getElementById('save-card-btn');
 const restartBtn = document.getElementById('restart-btn');
+
+const champagneScreen = document.getElementById('champagne-screen');
+const champagneExportArea = document.getElementById('champagne-export-area');
+const champagneSaveBtn = document.getElementById('champagne-save-btn');
+const champagneRestartBtn = document.getElementById('champagne-restart-btn');
 
 // Audio Context
 let audioCtx;
@@ -127,6 +134,7 @@ restartBtn.addEventListener('click', () => {
     settlementScreen.classList.remove('active');
     level = 1;
     targetReturn = 0;
+    collectedCards = [];
     startLevel();
 });
 
@@ -137,10 +145,52 @@ saveBtn.addEventListener('click', () => {
         scale: 2 // High resolution
     }).then(canvas => {
         const link = document.createElement('a');
-        link.download = `FlappyK_ProfitCard_Level${level-1}.png`; // Level has already been incremented, so use level-1
+        link.download = `FlappyK_ProfitCard_Level${level-1}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
     });
+});
+
+champagneBtn.addEventListener('click', () => {
+    settlementScreen.classList.remove('active');
+    
+    // Inject cards
+    let html = '';
+    collectedCards.forEach(c => {
+        html += `
+        <div class="profit-card card-theme-${c.market}" style="transform: scale(1); margin: 0;">
+            <h2>PROFIT CARD (${c.level})</h2>
+            <div class="card-details">
+                <p>ASSET: <span class="highlight">${c.asset}</span></p>
+                <p>RETURN: <span class="highlight">${c.retStr}</span></p>
+            </div>
+            <div class="big-return card-positive">${c.retStr}</div>
+            <div class="status-msg card-positive">SUCCESS!</div>
+        </div>
+        `;
+    });
+    champagneExportArea.innerHTML = html;
+    champagneScreen.classList.add('active');
+});
+
+champagneSaveBtn.addEventListener('click', () => {
+    html2canvas(champagneExportArea, {
+        backgroundColor: '#0d1117',
+        scale: 2
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `FlappyK_Legend_Cards.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
+});
+
+champagneRestartBtn.addEventListener('click', () => {
+    champagneScreen.classList.remove('active');
+    level = 1;
+    targetReturn = 0;
+    collectedCards = [];
+    startLevel();
 });
 
 function pickRandomData() {
@@ -242,8 +292,23 @@ function endLevel() {
         retElem.className = 'big-return card-positive';
         statusMsg.innerText = "SUCCESS! TARGET BEATEN.";
         statusMsg.className = 'status-msg card-positive';
-        nextBtn.style.display = 'block';
-        saveBtn.style.display = 'block';
+        
+        collectedCards.push({
+            level: level,
+            market: currentMarket,
+            asset: currentAsset,
+            retStr: retElem.innerText
+        });
+        
+        if (level === 3) {
+            nextBtn.style.display = 'none';
+            champagneBtn.style.display = 'block';
+            saveBtn.style.display = 'none'; // Hide single save to encourage full save
+        } else {
+            nextBtn.style.display = 'block';
+            champagneBtn.style.display = 'none';
+            saveBtn.style.display = 'block';
+        }
         restartBtn.style.display = 'none';
         
         // Update state for next level
@@ -254,6 +319,7 @@ function endLevel() {
         statusMsg.innerText = "FAILED TO BEAT TARGET.";
         statusMsg.className = 'status-msg card-negative';
         nextBtn.style.display = 'none';
+        champagneBtn.style.display = 'none';
         saveBtn.style.display = 'none';
         restartBtn.style.display = 'block';
     }
