@@ -18,19 +18,16 @@ body {
 #game-container {
     position: relative;
     width: 800px;
-    height: 600px;
     background-color: #0d1117;
     border: 4px solid #fff;
     box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    display: flex;
+    flex-direction: column;
 }
 
 #ui-layer {
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
     padding: 15px;
-    pointer-events: none;
     display: flex;
     justify-content: space-between;
     z-index: 10;
