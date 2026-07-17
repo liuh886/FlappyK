@@ -332,7 +332,6 @@ function endLevel() {
         }
     }
     const mddStr = '-' + (maxDrawdown * 100).toFixed(2) + '%';
-    document.getElementById('card-mdd').innerText = mddStr;
     
     const cumReturn = ((cash - INITIAL_CASH) / INITIAL_CASH);
     const cumRetStr = (cumReturn >= 0 ? '+' : '') + (cumReturn * 100).toFixed(2) + '%';
