@@ -15,6 +15,7 @@ let speedMultiplier = 1;
 let level = 1;
 let targetReturn = 0; // The return to beat
 let currentAsset = "";
+let currentMarket = "crypto";
 let currentData = [];
 let dayIndex = 0;
 let cash = INITIAL_CASH;
@@ -143,19 +144,18 @@ saveBtn.addEventListener('click', () => {
 });
 
 function pickRandomData() {
-    let market = 'crypto';
-    if (level === 1) market = 'crypto';
-    else if (level === 2) market = 'ashare';
-    else market = 'usstock';
+    if (level === 1) currentMarket = 'crypto';
+    else if (level === 2) currentMarket = 'ashare';
+    else currentMarket = 'usstock';
     
     // In case data failed to fetch, fallback
-    if (!stockData[market] || Object.keys(stockData[market]).length === 0) {
-        market = Object.keys(stockData).find(k => Object.keys(stockData[k]).length > 0);
+    if (!stockData[currentMarket] || Object.keys(stockData[currentMarket]).length === 0) {
+        currentMarket = Object.keys(stockData).find(k => Object.keys(stockData[k]).length > 0);
     }
     
-    const assets = Object.keys(stockData[market]);
+    const assets = Object.keys(stockData[currentMarket]);
     currentAsset = assets[Math.floor(Math.random() * assets.length)];
-    const data = stockData[market][currentAsset];
+    const data = stockData[currentMarket][currentAsset];
     
     // Pick a random starting point ensuring we have enough days
     const maxStart = data.length - DAYS_PER_LEVEL;
@@ -214,6 +214,10 @@ function endLevel() {
     
     // Show Settlement
     settlementScreen.classList.add('active');
+    const profitCard = document.getElementById('profit-card');
+    profitCard.className = 'profit-card'; // Reset base class
+    profitCard.classList.add(`card-theme-${currentMarket}`);
+    
     document.getElementById('card-title').innerText = `PROFIT CARD (${level})`;
     document.getElementById('card-asset').innerText = currentAsset;
     

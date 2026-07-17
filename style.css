@@ -127,9 +127,9 @@ button:active {
     box-shadow: none;
 }
 
-/* Profit Card */
+/* Profit Card Base */
 .profit-card {
-    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); /* Fallback */
     border: 8px solid #FFF;
     border-radius: 15px;
     padding: 30px;
@@ -139,6 +139,28 @@ button:active {
     transform: scale(0.8);
     transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+
+/* Market Themes */
+.card-theme-crypto {
+    background: linear-gradient(135deg, #2c3e50 0%, #8e44ad 100%);
+    border-color: #00ffff;
+    color: #fff;
+}
+.card-theme-crypto h2 { border-bottom-color: #00ffff; }
+
+.card-theme-ashare {
+    background: linear-gradient(135deg, #c0392b 0%, #f39c12 100%);
+    border-color: #fff;
+    color: #fff;
+}
+.card-theme-ashare h2 { border-bottom-color: #fff; }
+
+.card-theme-usstock {
+    background: linear-gradient(135deg, #116b47 0%, #2ecc71 100%);
+    border-color: #f1c40f;
+    color: #fff;
+}
+.card-theme-usstock h2 { border-bottom-color: #f1c40f; }
 
 .screen.active .profit-card {
     transform: scale(1);
