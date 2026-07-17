@@ -40,6 +40,7 @@ const speedBtn = document.getElementById('speed-btn');
 
 const settlementScreen = document.getElementById('settlement-screen');
 const nextBtn = document.getElementById('next-level-btn');
+const saveBtn = document.getElementById('save-card-btn');
 const restartBtn = document.getElementById('restart-btn');
 
 // Audio Context
@@ -128,10 +129,33 @@ restartBtn.addEventListener('click', () => {
     startLevel();
 });
 
+saveBtn.addEventListener('click', () => {
+    const card = document.getElementById('profit-card');
+    html2canvas(card, {
+        backgroundColor: null,
+        scale: 2 // High resolution
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `FlappyK_ProfitCard_Level${level-1}.png`; // Level has already been incremented, so use level-1
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
+});
+
 function pickRandomData() {
-    const assets = Object.keys(stockData);
+    let market = 'crypto';
+    if (level === 1) market = 'crypto';
+    else if (level === 2) market = 'ashare';
+    else market = 'usstock';
+    
+    // In case data failed to fetch, fallback
+    if (!stockData[market] || Object.keys(stockData[market]).length === 0) {
+        market = Object.keys(stockData).find(k => Object.keys(stockData[k]).length > 0);
+    }
+    
+    const assets = Object.keys(stockData[market]);
     currentAsset = assets[Math.floor(Math.random() * assets.length)];
-    const data = stockData[currentAsset];
+    const data = stockData[market][currentAsset];
     
     // Pick a random starting point ensuring we have enough days
     const maxStart = data.length - DAYS_PER_LEVEL;
@@ -215,6 +239,7 @@ function endLevel() {
         statusMsg.innerText = "SUCCESS! TARGET BEATEN.";
         statusMsg.className = 'status-msg card-positive';
         nextBtn.style.display = 'block';
+        saveBtn.style.display = 'block';
         restartBtn.style.display = 'none';
         
         // Update state for next level
@@ -225,6 +250,7 @@ function endLevel() {
         statusMsg.innerText = "FAILED TO BEAT TARGET.";
         statusMsg.className = 'status-msg card-negative';
         nextBtn.style.display = 'none';
+        saveBtn.style.display = 'none';
         restartBtn.style.display = 'block';
     }
 }
