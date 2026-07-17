@@ -7,6 +7,7 @@ canvas.height = 600;
 const INITIAL_CASH = 10000;
 const TRADE_AMOUNT = 1000;
 const DAYS_PER_LEVEL = 250;
+const VISIBLE_DAYS = 50; // Scroll view width
 let TICK_RATE = 5000; // Default 5s per day as requested
 let speedMultiplier = 1;
 
@@ -18,6 +19,7 @@ let dayIndex = 0;
 let cash = INITIAL_CASH;
 let shares = 0;
 let totalHistory = [];
+let actions = []; // Track buy/sell actions
 let gameInterval;
 let isPlaying = false;
 let currentPrice = 0;
@@ -144,6 +146,7 @@ function startLevel() {
     cash = INITIAL_CASH;
     shares = 0;
     totalHistory = [];
+    actions = [];
     isPlaying = true;
     
     levelDisp.innerText = level;
@@ -235,7 +238,10 @@ window.addEventListener('keydown', (e) => {
         if (cash >= TRADE_AMOUNT) {
             cash -= TRADE_AMOUNT;
             shares += TRADE_AMOUNT / currentPrice;
+            actions.push({ type: 'buy', day: dayIndex, price: currentPrice });
+            playActionSound('buy');
             updateUI();
+            draw();
         }
     } else if (e.key === 'ArrowDown') {
         // Sell $1000
@@ -243,12 +249,18 @@ window.addEventListener('keydown', (e) => {
         if (assetValue >= TRADE_AMOUNT - 0.01) { // Floating point tolerance
             cash += TRADE_AMOUNT;
             shares -= TRADE_AMOUNT / currentPrice;
+            actions.push({ type: 'sell', day: dayIndex, price: currentPrice });
+            playActionSound('sell');
             updateUI();
+            draw();
         } else if (assetValue > 0) {
             // Sell all remaining if less than $1000
             cash += assetValue;
             shares = 0;
+            actions.push({ type: 'sell', day: dayIndex, price: currentPrice });
+            playActionSound('sell');
             updateUI();
+            draw();
         }
     }
 });
@@ -272,16 +284,55 @@ function updateUI() {
     else returnDisp.className = 'neutral';
 }
 
+function playActionSound(type) {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    const now = audioCtx.currentTime;
+    if (type === 'buy') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, now);
+        osc.frequency.exponentialRampToValueAtTime(800, now + 0.1);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        osc.start(now);
+        osc.stop(now + 0.2);
+    } else {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(300, now);
+        osc.frequency.exponentialRampToValueAtTime(150, now + 0.1);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        osc.start(now);
+        osc.stop(now + 0.2);
+    }
+}
+
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
+    // Draw neon grid background
+    ctx.strokeStyle = 'rgba(46, 204, 113, 0.05)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < canvas.width; x += 40) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+    }
+    for (let y = 0; y < canvas.height; y += 40) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+    }
+    
     if (!currentData || currentData.length === 0) return;
     
-    // Determine Y scale based on visible data min/max
+    // Determine View Window (Scroll)
+    const startDay = Math.max(0, dayIndex - VISIBLE_DAYS + 1);
+    
     let minPrice = Infinity;
     let maxPrice = -Infinity;
     
-    for (let i = 0; i <= dayIndex; i++) {
+    for (let i = startDay; i <= dayIndex; i++) {
         const d = currentData[i];
         if (d.low < minPrice) minPrice = d.low;
         if (d.high > maxPrice) maxPrice = d.high;
@@ -291,17 +342,20 @@ function draw() {
     minPrice -= pricePadding;
     maxPrice += pricePadding;
     
-    const candleWidth = canvas.width / DAYS_PER_LEVEL;
+    const candleWidth = canvas.width / VISIBLE_DAYS;
     const chartHeight = canvas.height * 0.7; // Top 70% for K-line
     
     function getY(price) {
         return chartHeight - ((price - minPrice) / (maxPrice - minPrice) * chartHeight);
     }
     
+    ctx.shadowBlur = 0;
+    
     // Draw K-lines
-    for (let i = 0; i <= dayIndex; i++) {
+    for (let i = startDay; i <= dayIndex; i++) {
         const d = currentData[i];
-        const x = i * candleWidth;
+        const displayIdx = i - startDay;
+        const x = displayIdx * candleWidth;
         
         const openY = getY(d.open);
         const closeY = getY(d.close);
@@ -311,6 +365,9 @@ function draw() {
         const isUp = d.close >= d.open;
         ctx.fillStyle = isUp ? '#2ecc71' : '#e74c3c';
         ctx.strokeStyle = isUp ? '#2ecc71' : '#e74c3c';
+        
+        ctx.shadowColor = isUp ? '#2ecc71' : '#e74c3c';
+        ctx.shadowBlur = 5; // Glow effect
         
         // Draw wick
         ctx.beginPath();
@@ -322,15 +379,33 @@ function draw() {
         const bodyY = Math.min(openY, closeY);
         const bodyH = Math.max(Math.abs(closeY - openY), 1);
         ctx.fillRect(x + candleWidth*0.1, bodyY, candleWidth*0.8, bodyH);
+        
+        ctx.shadowBlur = 0; // reset
+    }
+    
+    // Draw Actions (Emojis)
+    ctx.font = "20px Arial";
+    ctx.textAlign = "center";
+    for (const action of actions) {
+        if (action.day >= startDay && action.day <= dayIndex) {
+            const displayIdx = action.day - startDay;
+            const x = displayIdx * candleWidth + candleWidth/2;
+            const y = getY(action.price);
+            
+            if (action.type === 'buy') {
+                ctx.fillText("👏", x, y + 25); // Below candle
+            } else {
+                ctx.fillText("🤷", x, y - 10); // Above candle
+            }
+        }
     }
     
     // Draw Total Return Curve (Bottom 30%)
     const curveTop = canvas.height * 0.75;
     const curveHeight = canvas.height * 0.2;
     
-    // Determine Min/Max for return curve
-    let minTotal = Math.min(INITIAL_CASH, ...totalHistory);
-    let maxTotal = Math.max(INITIAL_CASH, ...totalHistory);
+    let minTotal = Math.min(INITIAL_CASH, ...totalHistory.slice(startDay));
+    let maxTotal = Math.max(INITIAL_CASH, ...totalHistory.slice(startDay));
     const totalPadding = (maxTotal - minTotal) * 0.1 || 100;
     minTotal -= totalPadding;
     maxTotal += totalPadding;
@@ -359,15 +434,27 @@ function draw() {
     // Draw curve
     if (totalHistory.length > 0) {
         ctx.strokeStyle = '#f1c40f';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
+        ctx.shadowColor = '#f1c40f';
+        ctx.shadowBlur = 10;
         ctx.beginPath();
-        // Start at origin (day 0)
-        ctx.moveTo(candleWidth/2, getTotalY(totalHistory[0])); 
         
-        for (let i = 1; i < totalHistory.length; i++) {
-            ctx.lineTo((i * candleWidth) + candleWidth/2, getTotalY(totalHistory[i]));
+        let started = false;
+        for (let i = startDay; i <= dayIndex; i++) {
+            if (i < totalHistory.length) {
+                const displayIdx = i - startDay;
+                const tx = (displayIdx * candleWidth) + candleWidth/2;
+                const ty = getTotalY(totalHistory[i]);
+                if (!started) {
+                    ctx.moveTo(tx, ty);
+                    started = true;
+                } else {
+                    ctx.lineTo(tx, ty);
+                }
+            }
         }
         ctx.stroke();
         ctx.lineWidth = 1;
+        ctx.shadowBlur = 0;
     }
 }
