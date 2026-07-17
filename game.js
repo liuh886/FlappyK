@@ -9,8 +9,8 @@ const TRADE_AMOUNT = 1000;
 const FEE = 1; // $1 fee per transaction
 const DAYS_PER_LEVEL = 250;
 const VISIBLE_DAYS = 50; // Scroll view width
-let TICK_RATE = 5000; // Default 5s per day as requested
-let speedMultiplier = 1;
+let TICK_RATE = 1000;
+let speedMultiplier = 5;
 
 let level = 1;
 let targetReturn = 0; // The return to beat
