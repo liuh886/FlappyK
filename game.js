@@ -22,10 +22,11 @@ let cash = INITIAL_CASH;
 let shares = 0;
 let totalHistory = [];
 let actions = []; 
-let collectedCards = []; // Track buy/sell actions
+let collectedCards = [];
 let gameInterval;
 let isPlaying = false;
 let currentPrice = 0;
+let levelStartCash = INITIAL_CASH;
 
 // UI Elements
 const levelDisp = document.getElementById('level-display');
@@ -162,12 +163,13 @@ champagneBtn.addEventListener('click', () => {
             <h2>PROFIT CARD (${c.level})</h2>
             <div class="card-details">
                 <p>ASSET: <span class="highlight">${c.asset}</span></p>
+                <p>STARTING: $<span class="highlight">${c.startCashStr}</span></p>
+                <p>FINAL: $<span class="highlight">${c.finalCashStr}</span></p>
                 <p>PERIOD: <span class="highlight">${c.periodStr || '???'}</span></p>
-                <p>CASH: <span class="highlight">${c.cashStr}</span></p>
-                <p>FINAL: <span class="highlight">${c.finalStr}</span></p>
-                <p>RETURN: <span class="highlight">${c.retStr}</span></p>
+                <p>LVL RETURN: <span class="highlight">${c.levelRetStr}</span></p>
             </div>
-            <div class="big-return card-positive">${c.retStr}</div>
+            <div class="big-return card-positive">${c.cumRetStr}</div>
+            <div style="font-size: 10px; text-align:center;">(CUMULATIVE RETURN)</div>
             <div class="status-msg card-positive">SUCCESS!</div>
         </div>
         `;
@@ -220,18 +222,22 @@ function pickRandomData() {
 function startLevel() {
     currentData = pickRandomData();
     dayIndex = 0;
-    cash = INITIAL_CASH;
+    
+    if (level === 1) {
+        cash = INITIAL_CASH;
+    }
+    levelStartCash = cash;
     shares = 0;
     totalHistory = [];
     actions = [];
     isPlaying = true;
     
     levelDisp.innerText = level;
-    targetDisp.innerText = level === 1 ? "ANY PROFIT (>0%)" : `>${(targetReturn * 100).toFixed(2)}%`;
+    targetDisp.innerText = level === 1 ? "ANY PROFIT" : `> CUMULATIVE ${(targetReturn * 100).toFixed(2)}%`;
     
     // Add initial state to history
     currentPrice = currentData[0].close;
-    totalHistory.push(INITIAL_CASH);
+    totalHistory.push(cash);
     
     updateUI();
     draw(); 
@@ -261,9 +267,9 @@ function endLevel() {
     isPlaying = false;
     stopAudio();
     
-    // Calculate final
-    const finalTotal = cash + (shares * currentPrice);
-    const finalReturn = (finalTotal - INITIAL_CASH) / INITIAL_CASH;
+    // Liquidate remaining shares
+    cash += shares * currentPrice;
+    shares = 0;
     
     // Show Settlement
     settlementScreen.classList.add('active');
@@ -273,31 +279,34 @@ function endLevel() {
     
     document.getElementById('card-title').innerText = `PROFIT CARD (${level})`;
     document.getElementById('card-asset').innerText = currentAsset;
-    document.getElementById('card-cash').innerText = `$${cash.toFixed(2)}`;
+    document.getElementById('card-start-cash').innerText = levelStartCash.toFixed(2);
+    document.getElementById('card-final-cash').innerText = cash.toFixed(2);
     
     // Evaluate Result
-    const finalReturn = ((finalTotal - INITIAL_CASH) / INITIAL_CASH);
-    const retStr = (finalReturn >= 0 ? '+' : '') + (finalReturn * 100).toFixed(2) + '%';
+    const levelReturn = ((cash - levelStartCash) / levelStartCash);
+    const levelRetStr = (levelReturn >= 0 ? '+' : '') + (levelReturn * 100).toFixed(2) + '%';
+    document.getElementById('card-level-return').innerText = levelRetStr;
     
-    const retElem = document.getElementById('card-return');
-    const smallRetElem = document.getElementById('card-small-return');
+    const cumReturn = ((cash - INITIAL_CASH) / INITIAL_CASH);
+    const cumRetStr = (cumReturn >= 0 ? '+' : '') + (cumReturn * 100).toFixed(2) + '%';
     
-    retElem.innerText = retStr;
-    smallRetElem.innerText = retStr;
-    document.getElementById('card-final').innerText = finalTotal.toFixed(2);
+    document.getElementById('card-return').innerText = cumRetStr;
+    document.getElementById('card-small-return').innerText = cumRetStr;
+    document.getElementById('card-final').innerText = cash.toFixed(2);
     
     const startDate = currentData[0].date;
     const endDate = currentData[dayIndex].date;
-    document.getElementById('card-period').innerText = `${startDate} to ${endDate}`;
+    document.getElementById('card-period').innerText = `${startDate} ~ ${endDate}`;
     
     let isSuccess = false;
     if (level === 1) {
-        isSuccess = finalReturn > 0;
+        isSuccess = cumReturn > 0;
     } else {
-        isSuccess = finalReturn > targetReturn;
+        isSuccess = cumReturn > targetReturn;
     }
     
     const statusMsg = document.getElementById('card-status');
+    const retElem = document.getElementById('card-return');
     if (isSuccess) {
         retElem.className = 'big-return card-positive';
         statusMsg.innerText = "SUCCESS! TARGET BEATEN.";
@@ -307,10 +316,11 @@ function endLevel() {
             level: level,
             market: currentMarket,
             asset: currentAsset,
-            cashStr: `$${cash.toFixed(2)}`,
-            finalStr: `$${finalTotal.toFixed(2)}`,
+            startCashStr: `$${levelStartCash.toFixed(2)}`,
+            finalCashStr: `$${cash.toFixed(2)}`,
             periodStr: `${startDate} ~ ${endDate}`,
-            retStr: retStr
+            levelRetStr: levelRetStr,
+            cumRetStr: cumRetStr
         });
         
         if (level === 3) {
@@ -518,8 +528,8 @@ function draw() {
     const curveTop = canvas.height * 0.75;
     const curveHeight = canvas.height * 0.2;
     
-    let minTotal = Math.min(INITIAL_CASH, ...totalHistory.slice(startDay));
-    let maxTotal = Math.max(INITIAL_CASH, ...totalHistory.slice(startDay));
+    let minTotal = Math.min(levelStartCash, ...totalHistory.slice(startDay));
+    let maxTotal = Math.max(levelStartCash, ...totalHistory.slice(startDay));
     const totalPadding = (maxTotal - minTotal) * 0.1 || 100;
     minTotal -= totalPadding;
     maxTotal += totalPadding;
@@ -536,7 +546,7 @@ function draw() {
     ctx.stroke();
     
     // Draw initial cash reference line
-    const refY = getTotalY(INITIAL_CASH);
+    const refY = getTotalY(levelStartCash);
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
     ctx.setLineDash([5, 5]);
     ctx.beginPath();
