@@ -354,45 +354,78 @@ function endLevel() {
     }
 }
 
+function handleBuy() {
+    if (!isPlaying) return;
+    // Buy $1000
+    if (cash >= TRADE_AMOUNT + FEE) {
+        cash -= (TRADE_AMOUNT + FEE);
+        shares += TRADE_AMOUNT / currentPrice;
+        actions.push({ type: 'buy', day: dayIndex, price: currentPrice });
+        playActionSound('buy');
+        updateUI();
+        draw();
+    }
+}
+
+function handleSell() {
+    if (!isPlaying) return;
+    // Sell $1000
+    const assetValue = shares * currentPrice;
+    if (assetValue >= TRADE_AMOUNT - 0.01) { // Floating point tolerance
+        cash += (TRADE_AMOUNT - FEE);
+        shares -= TRADE_AMOUNT / currentPrice;
+        actions.push({ type: 'sell', day: dayIndex, price: currentPrice });
+        playActionSound('sell');
+        updateUI();
+        draw();
+    } else if (assetValue > FEE) {
+        // Sell all remaining if less than $1000
+        cash += (assetValue - FEE);
+        shares = 0;
+        actions.push({ type: 'sell', day: dayIndex, price: currentPrice });
+        playActionSound('sell');
+        updateUI();
+        draw();
+    }
+}
+
 // Input Handling
 window.addEventListener('keydown', (e) => {
     if (!isPlaying) return;
     
     if (e.key === 'ArrowUp') {
-        // Buy $1000
-        if (cash >= TRADE_AMOUNT + FEE) {
-            cash -= (TRADE_AMOUNT + FEE);
-            shares += TRADE_AMOUNT / currentPrice;
-            actions.push({ type: 'buy', day: dayIndex, price: currentPrice });
-            playActionSound('buy');
-            updateUI();
-            draw();
-        }
+        handleBuy();
     } else if (e.key === 'ArrowDown') {
-        // Sell $1000
-        const assetValue = shares * currentPrice;
-        if (assetValue >= TRADE_AMOUNT - 0.01) { // Floating point tolerance
-            cash += (TRADE_AMOUNT - FEE);
-            shares -= TRADE_AMOUNT / currentPrice;
-            actions.push({ type: 'sell', day: dayIndex, price: currentPrice });
-            playActionSound('sell');
-            updateUI();
-            draw();
-        } else if (assetValue > FEE) {
-            // Sell all remaining if less than $1000
-            cash += (assetValue - FEE);
-            shares = 0;
-            actions.push({ type: 'sell', day: dayIndex, price: currentPrice });
-            playActionSound('sell');
-            updateUI();
-            draw();
-        }
+        handleSell();
     } else if (e.key === 'ArrowRight') {
         changeSpeed(1); // Accelerate
     } else if (e.key === 'ArrowLeft') {
         changeSpeed(-1); // Decelerate
     }
 });
+
+// Mobile / Virtual Buttons Handling
+const btnBuy = document.getElementById('btn-buy');
+const btnSell = document.getElementById('btn-sell');
+const btnSpeedUp = document.getElementById('btn-speed-up');
+const btnSpeedDown = document.getElementById('btn-speed-down');
+
+if (btnBuy) {
+    btnBuy.addEventListener('touchstart', (e) => { e.preventDefault(); handleBuy(); });
+    btnBuy.addEventListener('mousedown', (e) => { e.preventDefault(); handleBuy(); });
+}
+if (btnSell) {
+    btnSell.addEventListener('touchstart', (e) => { e.preventDefault(); handleSell(); });
+    btnSell.addEventListener('mousedown', (e) => { e.preventDefault(); handleSell(); });
+}
+if (btnSpeedUp) {
+    btnSpeedUp.addEventListener('touchstart', (e) => { e.preventDefault(); changeSpeed(1); });
+    btnSpeedUp.addEventListener('mousedown', (e) => { e.preventDefault(); changeSpeed(1); });
+}
+if (btnSpeedDown) {
+    btnSpeedDown.addEventListener('touchstart', (e) => { e.preventDefault(); changeSpeed(-1); });
+    btnSpeedDown.addEventListener('mousedown', (e) => { e.preventDefault(); changeSpeed(-1); });
+}
 
 function updateUI() {
     if (!currentData || !currentData[dayIndex]) return;

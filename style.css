@@ -206,3 +206,79 @@ button:active {
     text-align: center !important;
     font-weight: bold;
 }
+
+/* Mobile Controls */
+#mobile-controls {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    width: 100%;
+    display: none;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 50;
+    pointer-events: none;
+}
+
+.mobile-btn {
+    pointer-events: auto;
+    font-family: 'Press Start 2P', monospace;
+    border: 4px solid #fff;
+    background: #0d1117;
+    color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 0 #fff;
+    text-transform: uppercase;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.mobile-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 #fff !important;
+}
+
+.action-btn {
+    width: 80px;
+    height: 80px;
+    font-size: 14px;
+    margin: 0 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
+.buy-btn {
+    border-color: #2ecc71;
+    color: #2ecc71;
+    box-shadow: 0 4px 0 #2ecc71;
+}
+
+.sell-btn {
+    border-color: #e74c3c;
+    color: #e74c3c;
+    box-shadow: 0 4px 0 #e74c3c;
+}
+
+.small-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 12px;
+}
+
+.dpad-center {
+    display: flex;
+}
+
+@media (max-width: 768px) {
+    #mobile-controls {
+        display: flex;
+    }
+    .controls-hint {
+        display: none;
+    }
+}
