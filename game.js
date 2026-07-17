@@ -6,6 +6,7 @@ canvas.height = 600;
 // Game Config
 const INITIAL_CASH = 10000;
 const TRADE_AMOUNT = 1000;
+const FEE = 1; // $1 fee per transaction
 const DAYS_PER_LEVEL = 250;
 const VISIBLE_DAYS = 50; // Scroll view width
 let TICK_RATE = 5000; // Default 5s per day as requested
@@ -26,6 +27,7 @@ let currentPrice = 0;
 
 // UI Elements
 const levelDisp = document.getElementById('level-display');
+const dayDisp = document.getElementById('day-display');
 const cashDisp = document.getElementById('cash-display');
 const assetDisp = document.getElementById('asset-display');
 const totalDisp = document.getElementById('total-display');
@@ -235,8 +237,8 @@ window.addEventListener('keydown', (e) => {
     
     if (e.key === 'ArrowUp') {
         // Buy $1000
-        if (cash >= TRADE_AMOUNT) {
-            cash -= TRADE_AMOUNT;
+        if (cash >= TRADE_AMOUNT + FEE) {
+            cash -= (TRADE_AMOUNT + FEE);
             shares += TRADE_AMOUNT / currentPrice;
             actions.push({ type: 'buy', day: dayIndex, price: currentPrice });
             playActionSound('buy');
@@ -247,15 +249,15 @@ window.addEventListener('keydown', (e) => {
         // Sell $1000
         const assetValue = shares * currentPrice;
         if (assetValue >= TRADE_AMOUNT - 0.01) { // Floating point tolerance
-            cash += TRADE_AMOUNT;
+            cash += (TRADE_AMOUNT - FEE);
             shares -= TRADE_AMOUNT / currentPrice;
             actions.push({ type: 'sell', day: dayIndex, price: currentPrice });
             playActionSound('sell');
             updateUI();
             draw();
-        } else if (assetValue > 0) {
+        } else if (assetValue > FEE) {
             // Sell all remaining if less than $1000
-            cash += assetValue;
+            cash += (assetValue - FEE);
             shares = 0;
             actions.push({ type: 'sell', day: dayIndex, price: currentPrice });
             playActionSound('sell');
@@ -273,6 +275,7 @@ function updateUI() {
     const total = cash + assetValue;
     const ret = (total - INITIAL_CASH) / INITIAL_CASH * 100;
     
+    if (dayDisp) dayDisp.innerText = (dayIndex + 1);
     cashDisp.innerText = cash.toFixed(2);
     assetDisp.innerText = assetValue.toFixed(2);
     totalDisp.innerText = total.toFixed(2);
