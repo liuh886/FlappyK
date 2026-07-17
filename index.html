@@ -81,15 +81,17 @@
     </div>
 
     <!-- Champagne Screen -->
-    <div id="champagne-screen" class="screen">
-        <h1 style="color: #f1c40f; text-shadow: 4px 4px 0 #d35400;">WALL STREET LEGEND 🍾</h1>
-        <p>You conquered Crypto, A-Shares, and US Stocks!</p>
-        <div style="transform: scale(0.45); transform-origin: top center; margin-top: 20px; width: 100%; display: flex; justify-content: center;">
-            <div id="champagne-export-area" style="display:flex; gap:30px; padding:40px; background:#0d1117; border: 8px solid #f1c40f; width: 1500px; justify-content: center; align-items: center;">
+    <div id="champagne-screen" class="screen" style="flex-direction: column; overflow-y: auto; align-items: center; justify-content: flex-start; padding: 40px 0;">
+        <h1 style="color: #f1c40f; text-shadow: 4px 4px 0 #d35400; text-align: center; font-size: 24px;">WALL STREET LEGEND 🍾</h1>
+        <p style="text-align: center; margin: 15px 0;">You conquered Crypto, A-Shares, and US Stocks!</p>
+        
+        <div id="champagne-export-wrapper" style="width: 100%; display: flex; justify-content: center;">
+            <div id="champagne-export-area" class="export-area">
                 <!-- Cards injected here -->
             </div>
         </div>
-        <div style="margin-top: -200px; z-index: 30;">
+        
+        <div class="action-buttons">
             <button id="champagne-save-btn" style="background-color: #3498db; box-shadow: 4px 4px 0 #2980b9;">SHARE & SAVE ALL</button>
             <button id="champagne-restart-btn">PLAY AGAIN</button>
         </div>

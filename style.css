@@ -207,6 +207,26 @@ button:active {
     font-weight: bold;
 }
 
+.export-area {
+    display: flex;
+    gap: 30px;
+    padding: 40px;
+    background: #0d1117;
+    border: 8px solid #f1c40f;
+    justify-content: center;
+    align-items: center;
+    width: max-content;
+    transform: scale(0.6);
+    transform-origin: top center;
+}
+
+.action-buttons {
+    margin-top: -150px;
+    z-index: 30;
+    display: flex;
+    gap: 20px;
+}
+
 /* Mobile Controls */
 #mobile-controls {
     position: absolute;
@@ -298,5 +318,36 @@ button:active {
     }
     .controls-hint {
         display: none;
+    }
+    
+    .profit-card {
+        width: 100%;
+        max-width: 320px;
+        padding: 20px;
+        border-width: 4px;
+    }
+    .profit-card h2 { font-size: 16px; margin-bottom: 10px; }
+    .card-details p { font-size: 12px; margin-bottom: 8px; }
+    .big-return { font-size: 24px !important; margin-top: 10px; }
+    
+    .export-area {
+        flex-direction: column;
+        width: 100%;
+        box-sizing: border-box;
+        transform: scale(1);
+        gap: 15px;
+        padding: 20px;
+        border-width: 4px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        margin-top: 20px;
+        gap: 10px;
+        width: 90%;
+    }
+    .action-buttons button {
+        width: 100%;
+        margin: 0;
     }
 }
