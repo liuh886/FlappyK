@@ -275,8 +275,26 @@ button:active {
 }
 
 @media (max-width: 768px) {
+    body {
+        align-items: flex-start;
+    }
+    #game-container {
+        width: 100%;
+        height: 100dvh;
+        border: none;
+        box-shadow: none;
+    }
+    #game-canvas {
+        flex: 1;
+        height: auto;
+    }
     #mobile-controls {
         display: flex;
+        position: relative;
+        bottom: auto;
+        left: auto;
+        padding: 10px 0 20px 0;
+        flex-shrink: 0;
     }
     .controls-hint {
         display: none;

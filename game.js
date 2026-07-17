@@ -1,7 +1,22 @@
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
-canvas.width = 800;
-canvas.height = 600;
+
+function resizeCanvas() {
+    if (window.matchMedia("(max-width: 768px)").matches) {
+        canvas.width = canvas.clientWidth || window.innerWidth;
+        canvas.height = canvas.clientHeight || (window.innerHeight * 0.6);
+    } else {
+        canvas.width = 800;
+        canvas.height = 600;
+    }
+    if (isPlaying) draw();
+}
+
+window.addEventListener('resize', resizeCanvas);
+setTimeout(resizeCanvas, 100);
+
+// Set initial size
+resizeCanvas();
 
 // Game Config
 const INITIAL_CASH = 10000;
@@ -248,6 +263,8 @@ function startLevel() {
     
     levelDisp.innerText = level;
     targetDisp.innerText = level === 1 ? "ANY PROFIT" : `> CUMULATIVE ${(targetReturn * 100).toFixed(2)}%`;
+    
+    resizeCanvas(); // Ensure canvas is sized correctly before drawing
     
     // Add initial state to history
     currentPrice = currentData[0].close;
