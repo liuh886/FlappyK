@@ -9,14 +9,8 @@ function resizeCanvas() {
         canvas.width = 800;
         canvas.height = 600;
     }
-    if (isPlaying) draw();
+    if (typeof isPlaying !== 'undefined' && isPlaying) draw();
 }
-
-window.addEventListener('resize', resizeCanvas);
-setTimeout(resizeCanvas, 100);
-
-// Set initial size
-resizeCanvas();
 
 // Game Config
 const INITIAL_CASH = 10000;
@@ -46,6 +40,12 @@ let actions = [];
 let collectedCards = [];
 let gameInterval;
 let isPlaying = false;
+
+window.addEventListener('resize', resizeCanvas);
+setTimeout(resizeCanvas, 100);
+
+// Set initial size
+resizeCanvas();
 let currentPrice = 0;
 let levelStartCash = INITIAL_CASH;
 
