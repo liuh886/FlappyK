@@ -1,29 +1,77 @@
-.start-data-note {
-    margin: 4px 0 2px;
-    padding: 7px 10px;
-    border: 2px solid #00ffff;
-    background: rgba(0, 255, 255, 0.08);
-    color: #00ffff;
-    font-size: 8px;
-    line-height: 1.6;
-    letter-spacing: 0.04em;
+#start-screen {
+    overflow: hidden;
 }
 
-.start-exit-hint {
-    margin: 2px 0 0;
-    color: rgba(255, 255, 255, 0.55);
+.start-data-ticker {
+    position: absolute;
+    right: 0;
+    bottom: 10px;
+    left: 0;
+    overflow: hidden;
+    padding: 5px 0;
+    color: rgba(255, 255, 255, 0.34);
     font-size: 7px;
-    line-height: 1.6;
+    line-height: 1;
+    letter-spacing: 0.09em;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.start-data-ticker::before,
+.start-data-ticker::after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 1;
+    width: 54px;
+    content: '';
+    pointer-events: none;
+}
+
+.start-data-ticker::before {
+    left: 0;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.86), transparent);
+}
+
+.start-data-ticker::after {
+    right: 0;
+    background: linear-gradient(270deg, rgba(0, 0, 0, 0.86), transparent);
+}
+
+.start-data-ticker-track {
+    display: flex;
+    width: max-content;
+    animation: start-data-scroll 18s linear infinite;
+}
+
+.start-data-ticker-track span {
+    padding-right: 72px;
+}
+
+@keyframes start-data-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .start-data-ticker-track {
+        width: 100%;
+        justify-content: center;
+        animation: none;
+    }
+
+    .start-data-ticker-track span {
+        padding-right: 0;
+    }
+
+    .start-data-ticker-track span[aria-hidden="true"] {
+        display: none;
+    }
 }
 
 @media (max-width: 768px) {
-    .start-data-note {
-        max-width: 84%;
-        font-size: 7px;
-        padding: 6px 8px;
-    }
-
-    .start-exit-hint {
-        display: none;
+    .start-data-ticker {
+        bottom: max(8px, env(safe-area-inset-bottom));
+        font-size: 6px;
     }
 }
