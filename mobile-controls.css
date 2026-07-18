@@ -1,0 +1,10 @@
+/* Mobile trading controls are visible by default and hidden only on settlement. */
+@media (max-width: 768px) {
+    #mobile-controls {
+        display: flex !important;
+    }
+
+    #settlement-screen.active ~ #mobile-controls {
+        display: none !important;
+    }
+}
