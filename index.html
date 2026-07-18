@@ -6,6 +6,7 @@
     <title>Flappy K</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="card-export.css">
+    <link rel="stylesheet" href="legend-ticker.css">
     <!-- Google Fonts for pixel style -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
@@ -73,8 +74,8 @@
                 <button id="btn-speed-down" class="mobile-btn small-btn">◀</button>
             </div>
             <div class="dpad-center">
-                <button id="btn-buy" class="mobile-btn action-btn buy-btn">BUY<br>▲</button>
-                <button id="btn-sell" class="mobile-btn action-btn sell-btn">SELL<br>▼</button>
+                <button id="btn-buy" class="mobile-btn action-btn buy-btn" aria-label="Buy one thousand dollars"><span class="trade-emoji" aria-hidden="true">🦬</span><span>BUY</span></button>
+                <button id="btn-sell" class="mobile-btn action-btn sell-btn" aria-label="Sell one thousand dollars"><span class="trade-emoji" aria-hidden="true">🐻‍❄️</span><span>SELL</span></button>
             </div>
             <div class="dpad-right">
                 <button id="btn-speed-up" class="mobile-btn small-btn">▶</button>
@@ -85,7 +86,12 @@
     <!-- Champagne Screen -->
     <div id="champagne-screen" class="screen" style="flex-direction: column; overflow-y: auto; align-items: center; justify-content: flex-start; padding: 40px 0;">
         <h1 style="color: #f1c40f; text-shadow: 4px 4px 0 #d35400; text-align: center; font-size: 24px;">MARKET LEGEND 🍾</h1>
-        <p style="text-align: center; margin: 15px 0;">3 MARKETS CONQUERED</p>
+        <div id="legend-ticker" class="legend-ticker" aria-label="3 markets conquered">
+            <div class="legend-ticker-track">
+                <span class="legend-ticker-item">3 MARKETS CONQUERED</span>
+                <span class="legend-ticker-item" aria-hidden="true">3 MARKETS CONQUERED</span>
+            </div>
+        </div>
         
         <div id="champagne-export-wrapper" style="width: 100%; display: flex; justify-content: center;">
             <div id="champagne-export-area" class="export-area">
@@ -104,6 +110,7 @@
     <script src="data.js"></script>
     <script src="game.js"></script>
     <script src="results.js"></script>
+    <script src="legend-ticker.js"></script>
     <script src="card-export.js"></script>
 </body>
 </html>
