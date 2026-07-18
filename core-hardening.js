@@ -46,6 +46,16 @@
         return data.slice(startIndex, startIndex + DAYS_PER_LEVEL);
     };
 
+    const previousStartLevel = startLevel;
+    startLevel = function hardenedStartLevel() {
+        previousStartLevel();
+
+        if (levelDisp.textContent !== 'CUSTOM') {
+            const visibleGame = Math.min(Math.max(level, 1), 3);
+            levelDisp.textContent = `${visibleGame}/3`;
+        }
+    };
+
     function replaceControl(id, handler) {
         const original = document.getElementById(id);
         if (!original) return;
