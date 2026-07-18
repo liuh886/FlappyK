@@ -243,8 +243,12 @@
         if (!activeScore) return;
 
         const url = buildSubmissionUrl(activeScore);
-        const opened = window.open(url, '_blank', 'noopener');
-        if (!opened) window.location.href = url;
+        const opened = window.open(url, '_blank');
+        if (opened) {
+            opened.opener = null;
+        } else {
+            window.location.href = url;
+        }
 
         if (submitButton) submitButton.textContent = 'GITHUB OPENED';
         if (submitStatus) {
