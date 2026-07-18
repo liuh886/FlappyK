@@ -64,6 +64,13 @@ var finalReturn = 0;
             const totalReturnLabel = card.querySelector('.big-return + div');
             if (totalReturnLabel) totalReturnLabel.textContent = 'TOTAL RETURN';
         });
+
+        if (cards.length > 0 && !champagneExportArea.querySelector('.legend-watermark')) {
+            const watermark = document.createElement('div');
+            watermark.className = 'legend-watermark';
+            watermark.textContent = 'FlappyK by zhihao';
+            champagneExportArea.appendChild(watermark);
+        }
     }
 
     const legendObserver = new MutationObserver(polishLegendCards);
