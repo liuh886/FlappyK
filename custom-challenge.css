@@ -1,0 +1,141 @@
+.custom-challenge-screen {
+    z-index: 60;
+    padding: 24px;
+}
+
+.custom-challenge-panel {
+    width: min(520px, 94vw);
+    padding: 26px;
+    background: #0d1117;
+    border: 4px solid #00ffff;
+    box-shadow: 8px 8px 0 #8e44ad;
+}
+
+.custom-unlocked {
+    margin-bottom: 14px;
+    color: #00ffff;
+    font-size: 9px;
+    line-height: 1.6;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+.custom-challenge-panel h2 {
+    margin-bottom: 18px;
+    color: #f1c40f;
+    font-size: 22px;
+    line-height: 1.4;
+    text-align: center;
+    text-shadow: 3px 3px 0 #d35400;
+}
+
+.custom-challenge-panel > p {
+    margin-bottom: 22px;
+    color: #ddd;
+    font-size: 10px;
+}
+
+.custom-field {
+    display: block;
+    margin-top: 16px;
+    color: #f1c40f;
+    font-size: 10px;
+    line-height: 1.8;
+}
+
+.custom-field select {
+    width: 100%;
+    margin-top: 7px;
+    padding: 12px;
+    border: 3px solid #fff;
+    background: #000;
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.custom-field select:focus {
+    outline: 3px solid #00ffff;
+    outline-offset: 3px;
+}
+
+.custom-challenge-actions {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 8px;
+}
+
+.custom-challenge-actions button {
+    margin-top: 18px;
+}
+
+.custom-result-actions {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 10px;
+}
+
+.custom-result-actions button {
+    margin-top: 0;
+    padding: 12px 18px;
+    font-size: 11px;
+}
+
+.secondary-btn {
+    background: #333;
+    box-shadow: 4px 4px 0 #111;
+}
+
+.secondary-btn:hover {
+    background: #555;
+}
+
+#game-title {
+    user-select: none;
+}
+
+@media (max-width: 768px) {
+    .custom-challenge-screen {
+        padding: 16px;
+    }
+
+    .custom-challenge-panel {
+        padding: 20px 16px;
+        box-shadow: 5px 5px 0 #8e44ad;
+    }
+
+    .custom-challenge-panel h2 {
+        font-size: 17px;
+    }
+
+    .custom-challenge-panel > p,
+    .custom-field,
+    .custom-field select {
+        font-size: 8px;
+    }
+
+    .custom-challenge-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .custom-challenge-actions button {
+        width: min(90%, 320px);
+        margin-top: 8px;
+        font-size: 12px;
+    }
+
+    .custom-result-actions {
+        width: min(94%, 360px);
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .custom-result-actions button {
+        width: 100%;
+        font-size: 10px;
+    }
+}
