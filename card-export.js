@@ -216,10 +216,12 @@
     }
 
     function getProfitCardFilename(card) {
-        const title = card.querySelector('h2')?.textContent || '';
-        const levelMatch = title.match(/\((\d+)\)/);
-        const level = levelMatch ? levelMatch[1] : 'Result';
-        return `FlappyK_ProfitCard_Level${level}.png`;
+        if (card.dataset.resultMode === 'custom') {
+            return 'FlappyK_Custom_ProfitCard.png';
+        }
+
+        const completedLevel = card.dataset.completedLevel || 'Result';
+        return `FlappyK_ProfitCard_Level${completedLevel}.png`;
     }
 
     function installExportHandler(button, task) {
