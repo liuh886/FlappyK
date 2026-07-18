@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="card-export.css">
     <link rel="stylesheet" href="legend-ticker.css">
+    <link rel="stylesheet" href="custom-challenge.css">
     <!-- Google Fonts for pixel style -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
@@ -38,10 +39,34 @@
         
         <!-- Start Screen -->
         <div id="start-screen" class="screen active">
-            <h1>FLAPPY K</h1>
+            <h1 id="game-title">FLAPPY K</h1>
             <p>Trade the unknown K-line.</p>
             <p>Buy low. Sell high. Beat the target.</p>
             <button id="start-btn">PLAY</button>
+        </div>
+
+        <!-- QQQ Custom Challenge -->
+        <div id="custom-challenge-screen" class="screen custom-challenge-screen" role="dialog" aria-modal="true" aria-labelledby="custom-challenge-title">
+            <div class="custom-challenge-panel">
+                <div class="custom-unlocked">SECRET MODE UNLOCKED</div>
+                <h2 id="custom-challenge-title">QQQ CUSTOM</h2>
+                <p>Choose a market and asset. The 250-day window stays hidden.</p>
+
+                <label class="custom-field" for="custom-market-select">
+                    MARKET
+                    <select id="custom-market-select"></select>
+                </label>
+
+                <label class="custom-field" for="custom-asset-select">
+                    ASSET
+                    <select id="custom-asset-select"></select>
+                </label>
+
+                <div class="custom-challenge-actions">
+                    <button id="custom-start-btn">START CUSTOM</button>
+                    <button id="custom-cancel-btn" class="secondary-btn">BACK</button>
+                </div>
+            </div>
         </div>
 
         <!-- Settlement Card Screen -->
@@ -66,6 +91,10 @@
             <button id="champagne-btn" style="display:none; background-color: #f1c40f; color:#000; box-shadow: 4px 4px 0 #d35400;">POP CHAMPAGNE 🍾</button>
             <button id="save-card-btn" style="display:none; background-color: #3498db; box-shadow: 4px 4px 0 #2980b9;">SAVE CARD</button>
             <button id="restart-btn" style="display:none;">TRY AGAIN</button>
+            <div id="custom-result-actions" class="custom-result-actions" style="display:none;">
+                <button id="custom-retry-btn">RETRY WINDOW</button>
+                <button id="custom-change-btn" class="secondary-btn">CHANGE ASSET</button>
+            </div>
         </div>
 
         <!-- Mobile Controls -->
@@ -111,6 +140,7 @@
     <script src="game.js"></script>
     <script src="results.js"></script>
     <script src="legend-ticker.js"></script>
+    <script src="custom-challenge.js"></script>
     <script src="card-export.js"></script>
 </body>
 </html>
