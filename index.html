@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flappy K</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="card-export.css">
     <!-- Google Fonts for pixel style -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
@@ -19,12 +20,12 @@
                 <div>ASSET: $<span id="asset-display">0.00</span></div>
                 <div>TOTAL: $<span id="total-display">10000.00</span></div>
                 <div>RETURN: <span id="return-display" class="neutral">0.00%</span></div>
-                <div>TARGET TO BEAT: <span id="target-return-display">None</span></div>
+                <div>TARGET: <span id="target-return-display">ANY PROFIT</span></div>
             </div>
             
             <div class="controls-hint">
-                <div class="key-hint"><span class="key">UP</span> BUY $1000 (Fee $1)</div>
-                <div class="key-hint"><span class="key">DOWN</span> SELL $1000 (Fee $1)</div>
+                <div class="key-hint"><span class="key">UP</span> BUY $1K · $1 FEE</div>
+                <div class="key-hint"><span class="key">DOWN</span> SELL $1K · $1 FEE</div>
                 <div class="key-hint" style="margin-top:15px; color: #f1c40f;">
                     SPEED: <button id="speed-btn" style="padding: 2px 5px; font-size: 8px; margin:0; border:2px solid #fff; box-shadow:none; cursor:pointer; background: #000; color: #fff;">5x [←/→]</button>
                 </div>
@@ -38,7 +39,7 @@
         <div id="start-screen" class="screen active">
             <h1>FLAPPY K</h1>
             <p>Trade the unknown K-line.</p>
-            <p>Buy low, sell high. Beat your own record.</p>
+            <p>Buy low. Sell high. Beat the target.</p>
             <button id="start-btn">PLAY</button>
         </div>
 
@@ -52,11 +53,12 @@
                     <p>FINAL: $<span id="card-final-cash" class="highlight">---</span></p>
                     <p>PERIOD: <span id="card-period" class="highlight">???</span></p>
                     <p>LVL RETURN: <span id="card-level-return" class="highlight">---%</span></p>
+                    <p>EXCESS: <span id="card-excess-return" class="highlight">---%</span></p>
                     <div style="display:none;" id="card-small-return"></div>
                     <div style="display:none;" id="card-final"></div>
                 </div>
                 <div class="big-return" id="card-return">---%</div>
-                <div style="font-size: 10px; text-align:center;">(CUMULATIVE RETURN)</div>
+                <div style="font-size: 10px; text-align:center;">TOTAL RETURN</div>
                 <div id="card-status" class="status-msg"></div>
             </div>
             <button id="next-level-btn" style="display:none;">NEXT LEVEL</button>
@@ -82,8 +84,8 @@
 
     <!-- Champagne Screen -->
     <div id="champagne-screen" class="screen" style="flex-direction: column; overflow-y: auto; align-items: center; justify-content: flex-start; padding: 40px 0;">
-        <h1 style="color: #f1c40f; text-shadow: 4px 4px 0 #d35400; text-align: center; font-size: 24px;">WALL STREET LEGEND 🍾</h1>
-        <p style="text-align: center; margin: 15px 0;">You conquered Crypto, A-Shares, and US Stocks!</p>
+        <h1 style="color: #f1c40f; text-shadow: 4px 4px 0 #d35400; text-align: center; font-size: 24px;">MARKET LEGEND 🍾</h1>
+        <p style="text-align: center; margin: 15px 0;">3 MARKETS CONQUERED</p>
         
         <div id="champagne-export-wrapper" style="width: 100%; display: flex; justify-content: center;">
             <div id="champagne-export-area" class="export-area">
@@ -92,7 +94,7 @@
         </div>
         
         <div class="action-buttons">
-            <button id="champagne-save-btn" style="background-color: #3498db; box-shadow: 4px 4px 0 #2980b9;">SHARE & SAVE ALL</button>
+            <button id="champagne-save-btn" style="background-color: #3498db; box-shadow: 4px 4px 0 #2980b9;">SHARE / SAVE</button>
             <button id="champagne-restart-btn">PLAY AGAIN</button>
         </div>
     </div>
@@ -101,5 +103,7 @@
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script src="data.js"></script>
     <script src="game.js"></script>
+    <script src="results.js"></script>
+    <script src="card-export.js"></script>
 </body>
 </html>
