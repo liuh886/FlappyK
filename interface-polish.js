@@ -8,7 +8,7 @@
         if (!element) return;
 
         const text = String(element.textContent || '').trim();
-        if (/^PROFIT CARD(?:\s*\(\d+\))?$/.test(text)) {
+        if (text !== 'PROFIT CARD' && /^PROFIT CARD(?:\s*\(\d+\))?$/.test(text)) {
             element.textContent = 'PROFIT CARD';
         }
     };
