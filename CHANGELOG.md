@@ -33,8 +33,9 @@ All notable changes to FlappyK will be documented in this file.
 
 - Simplified game and result copy for a tighter arcade presentation.
 - Renamed the final achievement from Wall Street Legend to Market Legend to reflect all three markets.
+- Replaced the HUD's bare `LEVEL` number with explicit three-game progress: `GAME 1/3`, `GAME 2/3`, and `GAME 3/3`; Custom Challenge remains `GAME: CUSTOM`.
 - Removed repeated success text from individual cards in the final Legend view.
-- Renamed the visible secret-mode title to `CUSTOM CHALLENGE` and its HUD level label to `CUSTOM`; `QQQ` remains the unlock code and is also a selectable asset.
+- Renamed the visible secret-mode title to `CUSTOM CHALLENGE` and its HUD game label to `CUSTOM`; `QQQ` remains the unlock code and is also a selectable asset.
 - Replaced the bison buy artwork with a standard bull presented on a compact gold arcade badge.
 - Moved `REAL HISTORICAL K-LINES` into a low-emphasis scrolling footer on the home screen.
 - Restored manual progression after successful Levels 1 and 2: the Profit Card remains visible until the player clicks `NEXT LEVEL`.
