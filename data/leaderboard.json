@@ -1,4 +1,16 @@
 {
-  "updatedAt": null,
-  "entries": []
+  "updatedAt": "2026-07-18T15:06:07Z",
+  "entries": [
+    {
+      "player": "liuh886",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/7567311?v=4",
+      "excess": -214.102082,
+      "totalReturn": 74.847016,
+      "gameVersion": "0.1.0",
+      "submittedAt": "2026-07-18T15:06:07Z",
+      "issueNumber": 13,
+      "issueUrl": "https://github.com/liuh886/FlappyK/issues/13",
+      "rank": 1
+    }
+  ]
 }
