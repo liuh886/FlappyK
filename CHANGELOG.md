@@ -19,6 +19,8 @@ All notable changes to FlappyK will be documented in this file.
 - Stable high-resolution Profit Card exports independent of the responsive screen size.
 - Desktop horizontal Legend export and mobile vertical long-image export.
 - Native mobile file-sharing support with PNG download fallback.
+- A compact Ko-fi support link on the completed Market Legend screen.
+- A subtle `FlappyK by zhihao` attribution watermark in the visible and exported Legend card composition.
 - Data-generation metadata recording the refresh time, yfinance version, and adjustment policy.
 - Business Source License 1.1 for original code and documentation, with non-commercial production use permitted and conversion to Apache 2.0 on 2030-07-18.
 
