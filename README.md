@@ -18,7 +18,7 @@ It includes:
 - fixed $1,000 buy/sell actions with a $1 transaction fee;
 - level, cumulative, drawdown, and excess-return results;
 - themed Profit Cards and a final Market Legend card set;
-- a hidden `QQQ` custom challenge for choosing a market and asset;
+- a hidden custom challenge for choosing a market and asset;
 - desktop PNG download and supported mobile share-sheet export.
 
 ## Run locally
@@ -54,7 +54,7 @@ The market snapshot is stored locally in `data.js`. An internet connection is st
 4. In later levels, beat the cumulative-return checkpoint set by the previous completed level.
 5. Complete Crypto, A-Shares, and US Stocks to unlock the final Market Legend screen.
 
-## Hidden QQQ custom challenge
+## Hidden custom challenge
 
 Type `QQQ` while the start screen is active to open the custom challenge selector. On a touch device, long-press the `FLAPPY K` title and enter `QQQ`.
 
@@ -64,6 +64,8 @@ The custom challenge lets the player choose:
 - any bundled asset in the selected market.
 
 The asset is chosen by the player, but the 250-day historical window remains random and hidden until settlement. A custom result can be saved, replayed on the same window, or restarted with another asset. Custom runs are isolated from the normal three-stage progression and do not alter Market Legend records.
+
+The unlock code is not displayed as the challenge name. Once opened, the mode is shown simply as `CUSTOM CHALLENGE`, and the HUD uses `LEVEL: CUSTOM`.
 
 ## Result metrics
 
@@ -131,7 +133,7 @@ The bundled data is a historical gameplay snapshot, not a real-time market feed.
 - `style.css` — pixel-arcade layout and card themes;
 - `game.js` — market playback and trading state;
 - `results.js` — settlement metrics and Legend result presentation;
-- `custom-challenge.js` / `custom-challenge.css` — hidden QQQ market and asset selector;
+- `custom-challenge.js` / `custom-challenge.css` — hidden market and asset selector;
 - `card-export.js` / `card-export.css` — stable desktop/mobile image generation;
 - `data.js` — embedded historical market snapshot;
 - `fetch_all_data.py` — adjusted market-data refresh script;
@@ -139,4 +141,14 @@ The bundled data is a historical gameplay snapshot, not a real-time market feed.
 
 ## License
 
-No open-source license has been selected yet. Public access to the source code does not by itself grant permission to reuse, modify, or redistribute it.
+FlappyK's original software and documentation are licensed under the **Business Source License 1.1 (BSL 1.1)**.
+
+Before **2030-07-18**:
+
+- personal, educational, academic research, evaluation, and other non-commercial production use is permitted;
+- commercial production use requires a separate commercial license from the Licensor;
+- BSL 1.1 is source-available but is not an Open Source license.
+
+On **2030-07-18**, or earlier if required by BSL 1.1, the Licensed Work converts to the **Apache License 2.0**.
+
+The license applies to the original FlappyK software and documentation. It does not relicense `data.js`, generated market data, third-party libraries, fonts, or other third-party material; those remain subject to their respective upstream terms. See [`LICENSE`](LICENSE) for the complete terms.
