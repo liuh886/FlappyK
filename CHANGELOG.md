@@ -15,17 +15,19 @@ All notable changes to FlappyK will be documented in this file.
 - Final Market Legend screen with a combined three-card result.
 - Scrolling Legend summary with total gain, total trading days, and compounded excess return against the three underlying market paths.
 - Distinct bison and polar-bear trade markers for buy and sell actions.
-- Hidden `QQQ` custom challenge with market and asset selection, random hidden 250-day windows, same-window retry, and isolated results.
+- Hidden custom challenge, unlocked with `QQQ`, with market and asset selection, random hidden 250-day windows, same-window retry, and isolated results.
 - Stable high-resolution Profit Card exports independent of the responsive screen size.
 - Desktop horizontal Legend export and mobile vertical long-image export.
 - Native mobile file-sharing support with PNG download fallback.
 - Data-generation metadata recording the refresh time, yfinance version, and adjustment policy.
+- Business Source License 1.1 for original code and documentation, with non-commercial production use permitted and conversion to Apache 2.0 on 2030-07-18.
 
 ### Changed
 
 - Simplified game and result copy for a tighter arcade presentation.
 - Renamed the final achievement from Wall Street Legend to Market Legend to reflect all three markets.
 - Removed repeated success text from individual cards in the final Legend view.
+- Renamed the visible secret-mode title to `CUSTOM CHALLENGE` and its HUD level label to `CUSTOM`; `QQQ` remains only the unlock code.
 - Made equity price adjustment explicit with `auto_adjust=True`, `back_adjust=False`, `actions=True`, and `repair=True`.
 - Pinned the data-refresh environment to `yfinance==1.5.1`.
 
@@ -44,5 +46,4 @@ All notable changes to FlappyK will be documented in this file.
 - No automated browser test suite or CI checks yet.
 - Mobile share-sheet behavior depends on the browser and operating system.
 - The currently bundled `data.js` predates embedded adjustment metadata and should be regenerated before an audit-grade release.
-- No open-source license has been selected.
-- Bundled historical data remains subject to upstream data-source terms.
+- Bundled historical data remains subject to upstream data-source terms and is excluded from the BSL license grant.
