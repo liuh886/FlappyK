@@ -36,6 +36,10 @@ jobs:
           node --check interface-polish.js
           node --check ui-polish.js
           node --check card-export.js
+          node --check tests/ui-regression.test.js
+
+      - name: Run UI regression checks
+        run: node tests/ui-regression.test.js
 
       - name: Check Python syntax
         run: |

@@ -34,12 +34,13 @@ All notable changes to FlappyK will be documented in this file.
 - Renamed the visible secret-mode title to `CUSTOM CHALLENGE` and its HUD level label to `CUSTOM`; `QQQ` remains the unlock code and is also a selectable asset.
 - Replaced the bison buy artwork with a standard bull presented on a compact gold arcade badge.
 - Added a home-screen notice that gameplay uses real historical K-lines rather than live market data.
-- Successful Levels 1 and 2 now advance automatically after a short Profit Card pause; `NEXT LEVEL` remains available for immediate progression.
+- Restored manual progression after successful Levels 1 and 2: the Profit Card remains visible until the player clicks `NEXT LEVEL`.
 - Made equity price adjustment explicit with `auto_adjust=True`, `back_adjust=False`, `actions=True`, and `repair=True`.
 - Pinned the data-refresh environment to `yfinance==1.5.1`.
 
 ### Fixed
 
+- Fixed a repeated Profit Card title mutation loop that could prevent the settlement screen from rendering.
 - Fixed the undefined `finalReturn` reference that prevented reliable progression to the next level.
 - Fixed next-level target inheritance so it uses the completed cumulative return.
 - Fixed mobile card captures inheriting viewport width, screen scaling, scroll state, and responsive transforms.
