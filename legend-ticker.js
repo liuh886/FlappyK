@@ -9,53 +9,6 @@
         return Number.isFinite(parsed) ? parsed / 100 : 0;
     }
 
-    function updateTradeButtons() {
-        const buyButton = document.getElementById('btn-buy');
-        const sellButton = document.getElementById('btn-sell');
-
-        if (buyButton) {
-            buyButton.innerHTML = '<span class="trade-emoji" aria-hidden="true">🦬</span><span>BUY</span>';
-            buyButton.setAttribute('aria-label', 'Buy one thousand dollars');
-        }
-
-        if (sellButton) {
-            sellButton.innerHTML = '<span class="trade-emoji" aria-hidden="true">🐻‍❄️</span><span>SELL</span>';
-            sellButton.setAttribute('aria-label', 'Sell one thousand dollars');
-        }
-    }
-
-    function installCanvasEmojiMap() {
-        if (typeof ctx === 'undefined' || !ctx || typeof ctx.fillText !== 'function') return;
-
-        const originalFillText = ctx.fillText.bind(ctx);
-        const emojiFont = '22px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
-
-        ctx.fillText = function mappedFillText(text, x, y, maxWidth) {
-            const replacement = text === '👏'
-                ? '🦬'
-                : text === '🤷'
-                    ? '🐻‍❄️'
-                    : null;
-
-            if (!replacement) {
-                return maxWidth === undefined
-                    ? originalFillText(text, x, y)
-                    : originalFillText(text, x, y, maxWidth);
-            }
-
-            const previousFont = this.font;
-            this.font = emojiFont;
-
-            try {
-                return maxWidth === undefined
-                    ? originalFillText(replacement, x, y)
-                    : originalFillText(replacement, x, y, maxWidth);
-            } finally {
-                this.font = previousFont;
-            }
-        };
-    }
-
     function attachCompletedLevelMetrics() {
         const previousEndLevel = endLevel;
 
@@ -121,8 +74,6 @@
         });
     }
 
-    updateTradeButtons();
-    installCanvasEmojiMap();
     attachCompletedLevelMetrics();
 
     if (typeof champagneBtn !== 'undefined' && champagneBtn) {
