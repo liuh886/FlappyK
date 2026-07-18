@@ -1,0 +1,78 @@
+.trade-emoji {
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+    font-size: 24px;
+    line-height: 1;
+}
+
+.legend-ticker {
+    width: 100%;
+    overflow: hidden;
+    flex: 0 0 auto;
+    margin: 8px 0 10px;
+    background: #0d1117;
+    border-top: 2px solid #f1c40f;
+    border-bottom: 2px solid #f1c40f;
+}
+
+.legend-ticker-track {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+    animation: legend-ticker-scroll 20s linear infinite;
+}
+
+.legend-ticker-item {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 10px 64px 10px 0;
+    color: #f1c40f;
+    font-size: 10px;
+    line-height: 1.6;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.legend-ticker:hover .legend-ticker-track {
+    animation-play-state: paused;
+}
+
+@keyframes legend-ticker-scroll {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+@media (max-width: 768px) {
+    .trade-emoji {
+        font-size: 22px;
+    }
+
+    .legend-ticker {
+        margin: 6px 0 8px;
+    }
+
+    .legend-ticker-track {
+        animation-duration: 24s;
+    }
+
+    .legend-ticker-item {
+        padding: 9px 48px 9px 0;
+        font-size: 8px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .legend-ticker {
+        overflow-x: auto;
+    }
+
+    .legend-ticker-track {
+        animation: none;
+    }
+
+    .legend-ticker-item[aria-hidden="true"] {
+        display: none;
+    }
+}
