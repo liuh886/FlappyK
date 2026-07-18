@@ -13,6 +13,8 @@ All notable changes to FlappyK will be documented in this file.
 - Excess return defined as level portfolio return minus the underlying asset return over the same interval.
 - Themed Profit Cards for each completed market.
 - Final Market Legend screen with a combined three-card result.
+- Scrolling Legend summary with total gain, total trading days, and compounded excess return against the three underlying market paths.
+- Distinct bison and polar-bear trade markers for buy and sell actions.
 - Stable high-resolution Profit Card exports independent of the responsive screen size.
 - Desktop horizontal Legend export and mobile vertical long-image export.
 - Native mobile file-sharing support with PNG download fallback.
