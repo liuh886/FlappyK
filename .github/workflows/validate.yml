@@ -33,7 +33,7 @@ jobs:
           node --check legend-ticker.js
           node --check custom-challenge.js
           node --check experience.js
-          node --check interface-polish.js
+          node --check core-hardening.js
           node --check ui-polish.js
           node --check card-export.js
           node --check tests/ui-regression.test.js
@@ -63,6 +63,7 @@ jobs:
           grep -q '"QQQ"' fetch_all_data.py
           grep -q 'qqq-loader.js' index.html
           grep -q 'REAL HISTORICAL K-LINES' index.html
+          ! grep -q 'NOT LIVE DATA' index.html
 
       - name: Audit bundled equity split continuity
         run: python scripts/audit_bundled_data.py

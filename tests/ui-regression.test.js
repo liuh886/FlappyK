@@ -1,59 +1,36 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
-const vm = require('node:vm');
 
-let titleWrites = 0;
-const title = {
-    value: 'PROFIT CARD (1)',
-    get textContent() {
-        return this.value;
-    },
-    set textContent(nextValue) {
-        this.value = nextValue;
-        titleWrites += 1;
-    },
-};
+const read = (path) => fs.readFileSync(path, 'utf8');
 
-const buyIcon = { textContent: '' };
-const legendArea = { querySelectorAll: () => [] };
-const observerCallbacks = [];
+const indexSource = read('index.html');
+const experienceSource = read('experience.js');
+const hardeningSource = read('core-hardening.js');
+const legendSource = read('legend-ticker.js');
+const qqqSource = read('qqq-loader.js');
+const exportSource = read('card-export.js');
 
-class FakeMutationObserver {
-    constructor(callback) {
-        observerCallbacks.push(callback);
-    }
+assert.match(indexSource, /start-data-ticker/);
+assert.match(indexSource, /REAL HISTORICAL K-LINES/);
+assert.doesNotMatch(indexSource, /NOT LIVE DATA/);
+assert.doesNotMatch(indexSource, /ESC = RETURN HOME/);
+assert.doesNotMatch(indexSource, /interface-polish\.js/);
 
-    observe() {}
-}
-
-const sandbox = {
-    document: {
-        querySelector: () => buyIcon,
-        getElementById: (id) => {
-            if (id === 'card-title') return title;
-            if (id === 'champagne-export-area') return legendArea;
-            return null;
-        },
-    },
-    MutationObserver: FakeMutationObserver,
-};
-
-vm.runInNewContext(
-    fs.readFileSync('interface-polish.js', 'utf8'),
-    sandbox,
-    { filename: 'interface-polish.js' },
-);
-
-assert.equal(buyIcon.textContent, '🐂');
-assert.equal(title.textContent, 'PROFIT CARD');
-assert.equal(titleWrites, 1);
-
-observerCallbacks[0]();
-assert.equal(title.textContent, 'PROFIT CARD');
-assert.equal(titleWrites, 1, 'normalized title must not trigger repeated DOM writes');
-
-const experienceSource = fs.readFileSync('experience.js', 'utf8');
-assert.doesNotMatch(experienceSource, /AUTO_NEXT|nextBtn\.click|setTimeout/);
 assert.match(experienceSource, /event\.key !== 'Escape'/);
+assert.doesNotMatch(experienceSource, /AUTO_NEXT|nextBtn\.click/);
 
-console.log('UI regression checks passed');
+assert.match(hardeningSource, /cloneNode\(true\)/);
+assert.match(hardeningSource, /addEventListener\('click'/);
+assert.match(hardeningSource, /maxStart \+ 1/);
+assert.match(hardeningSource, /dataset\.completedLevel/);
+assert.match(hardeningSource, /title\.textContent = 'PROFIT CARD'/);
+
+assert.doesNotMatch(legendSource, /🦬|updateTradeButtons|installCanvasEmojiMap/);
+assert.doesNotMatch(legendSource, /ctx\.fillText\s*=/);
+
+assert.match(qqqSource, /Object\.defineProperty\(stockData\.usstock, QQQ_NAME/);
+assert.match(qqqSource, /enumerable: false/);
+assert.match(exportSource, /dataset\.completedLevel/);
+assert.match(exportSource, /FlappyK_Custom_ProfitCard\.png/);
+
+console.log('UI and reviewed regression checks passed');

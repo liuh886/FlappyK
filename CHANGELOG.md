@@ -33,7 +33,7 @@ All notable changes to FlappyK will be documented in this file.
 - Removed repeated success text from individual cards in the final Legend view.
 - Renamed the visible secret-mode title to `CUSTOM CHALLENGE` and its HUD level label to `CUSTOM`; `QQQ` remains the unlock code and is also a selectable asset.
 - Replaced the bison buy artwork with a standard bull presented on a compact gold arcade badge.
-- Added a home-screen notice that gameplay uses real historical K-lines rather than live market data.
+- Moved `REAL HISTORICAL K-LINES` into a low-emphasis scrolling footer on the home screen.
 - Restored manual progression after successful Levels 1 and 2: the Profit Card remains visible until the player clicks `NEXT LEVEL`.
 - Made equity price adjustment explicit with `auto_adjust=True`, `back_adjust=False`, `actions=True`, and `repair=True`.
 - Pinned the data-refresh environment to `yfinance==1.5.1`.
@@ -41,6 +41,12 @@ All notable changes to FlappyK will be documented in this file.
 ### Fixed
 
 - Fixed a repeated Profit Card title mutation loop that could prevent the settlement screen from rendering.
+- Fixed duplicate mobile trades caused by overlapping touch and mouse compatibility events.
+- Removed duplicate bison and Canvas text overrides that competed with the standard bull rendering.
+- Kept QQQ selectable in the custom challenge without adding it to the normal third-level random asset pool.
+- Fixed the normal random-window off-by-one error so the final legal 250-day window can be selected.
+- Excluded assets with fewer than 250 usable rows from normal random selection.
+- Preserved the completed level in Profit Card export filenames and added a dedicated custom-result filename.
 - Fixed the undefined `finalReturn` reference that prevented reliable progression to the next level.
 - Fixed next-level target inheritance so it uses the completed cumulative return.
 - Fixed mobile card captures inheriting viewport width, screen scaling, scroll state, and responsive transforms.
@@ -53,8 +59,10 @@ All notable changes to FlappyK will be documented in this file.
 
 ### Known limitations
 
-- No automated browser test suite or CI checks yet.
+- There is no full browser end-to-end suite yet; current CI covers syntax, static regressions, HTML parsing, and data audits.
+- Core gameplay still uses shared global state and order-dependent wrappers around `startLevel`, `endLevel`, and `pickRandomData`.
 - Mobile share-sheet behavior depends on the browser and operating system.
 - The currently bundled `data.js` predates embedded adjustment metadata and should be regenerated before an audit-grade release.
 - Supplemental QQQ loading depends on network access to the documented historical CSV source until `data.js` is regenerated with QQQ bundled.
+- `html2canvas` is loaded from a third-party CDN, so image export depends on that network resource.
 - Bundled historical data remains subject to upstream data-source terms and is excluded from the BSL license grant.
