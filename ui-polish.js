@@ -26,7 +26,7 @@
             this.stroke();
             this.font = '16px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
             this.textAlign = 'center';
-            drawOriginal('🐂', x, y, maxWidth);
+            drawOriginal('🐮', x, y, maxWidth);
             this.restore();
             return;
         }
