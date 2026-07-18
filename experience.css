@@ -2,6 +2,10 @@
     overflow: hidden;
 }
 
+.mobile-btn {
+    touch-action: manipulation;
+}
+
 .start-data-ticker {
     position: absolute;
     right: 0;
