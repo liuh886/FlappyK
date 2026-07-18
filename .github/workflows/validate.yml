@@ -35,19 +35,25 @@ jobs:
           node --check experience.js
           node --check core-hardening.js
           node --check ui-polish.js
+          node --check leaderboard.js
           node --check card-export.js
+          node --check scripts/leaderboard-ranking.js
           node --check tests/ui-regression.test.js
+          node --check tests/leaderboard-ranking.test.js
 
-      - name: Run UI regression checks
-        run: node tests/ui-regression.test.js
+      - name: Run regression checks
+        run: |
+          node tests/ui-regression.test.js
+          node tests/leaderboard-ranking.test.js
 
       - name: Check Python syntax
         run: |
           python -m py_compile fetch_all_data.py scripts/audit_bundled_data.py
 
-      - name: Check HTML structure
+      - name: Check HTML and leaderboard data
         run: |
           python - <<'PY'
+          import json
           from html.parser import HTMLParser
           from pathlib import Path
 
@@ -55,15 +61,24 @@ jobs:
               pass
 
           Parser().feed(Path("index.html").read_text(encoding="utf-8"))
-          print("index.html parsed successfully")
+          payload = json.loads(Path("data/leaderboard.json").read_text(encoding="utf-8"))
+          entries = payload.get("entries", [])
+          assert isinstance(entries, list)
+          assert len(entries) <= 10
+          print("index.html and leaderboard.json validated")
           PY
 
-      - name: Check QQQ integration
+      - name: Check QQQ and leaderboard integration
         run: |
           grep -q '"QQQ"' fetch_all_data.py
           grep -q 'qqq-loader.js' index.html
           grep -q 'REAL HISTORICAL K-LINES' index.html
           ! grep -q 'NOT LIVE DATA' index.html
+          grep -q 'leaderboard.js' index.html
+          grep -q 'leaderboard-open-btn' index.html
+          grep -q 'leaderboard-submit-btn' index.html
+          grep -q 'issues:' .github/workflows/leaderboard.yml
+          grep -q 'LEADERBOARD_LIMIT = 10' scripts/leaderboard-ranking.js
 
       - name: Audit bundled equity split continuity
         run: python scripts/audit_bundled_data.py
