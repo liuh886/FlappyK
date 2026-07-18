@@ -16,6 +16,8 @@ All notable changes to FlappyK will be documented in this file.
 - Scrolling Legend summary with total gain, total trading days, and compounded excess return against the three underlying market paths.
 - Distinct bull and polar-bear trade markers for buy and sell actions.
 - Hidden custom challenge, unlocked with `QQQ`, with market and asset selection, random hidden 250-day windows, same-window retry, and isolated results.
+- `QQQ` as a selectable US-market asset in the custom challenge, backed by real historical adjusted OHLC data.
+- `ESC` navigation that resets the active run and returns to the home screen.
 - Stable high-resolution Profit Card exports independent of the responsive screen size.
 - Desktop horizontal Legend export and mobile vertical long-image export.
 - Native mobile file-sharing support with PNG download fallback.
@@ -29,8 +31,10 @@ All notable changes to FlappyK will be documented in this file.
 - Simplified game and result copy for a tighter arcade presentation.
 - Renamed the final achievement from Wall Street Legend to Market Legend to reflect all three markets.
 - Removed repeated success text from individual cards in the final Legend view.
-- Renamed the visible secret-mode title to `CUSTOM CHALLENGE` and its HUD level label to `CUSTOM`; `QQQ` remains only the unlock code.
+- Renamed the visible secret-mode title to `CUSTOM CHALLENGE` and its HUD level label to `CUSTOM`; `QQQ` remains the unlock code and is also a selectable asset.
 - Replaced the bison buy artwork with a standard bull presented on a compact gold arcade badge.
+- Added a home-screen notice that gameplay uses real historical K-lines rather than live market data.
+- Successful Levels 1 and 2 now advance automatically after a short Profit Card pause; `NEXT LEVEL` remains available for immediate progression.
 - Made equity price adjustment explicit with `auto_adjust=True`, `back_adjust=False`, `actions=True`, and `repair=True`.
 - Pinned the data-refresh environment to `yfinance==1.5.1`.
 
@@ -51,4 +55,5 @@ All notable changes to FlappyK will be documented in this file.
 - No automated browser test suite or CI checks yet.
 - Mobile share-sheet behavior depends on the browser and operating system.
 - The currently bundled `data.js` predates embedded adjustment metadata and should be regenerated before an audit-grade release.
+- Supplemental QQQ loading depends on network access to the documented historical CSV source until `data.js` is regenerated with QQQ bundled.
 - Bundled historical data remains subject to upstream data-source terms and is excluded from the BSL license grant.
