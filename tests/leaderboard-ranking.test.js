@@ -1,5 +1,6 @@
 const assert = require('node:assert/strict');
 const {
+    isValidSubmittedScore,
     normalizeEntries,
     updateTop10,
 } = require('../scripts/leaderboard-ranking.js');
@@ -11,6 +12,11 @@ const baseEntries = Array.from({ length: 10 }, (_, index) => ({
     submittedAt: `2026-07-${String(index + 1).padStart(2, '0')}T00:00:00Z`,
     issueNumber: index + 1,
 }));
+
+assert.equal(isValidSubmittedScore(-214.102082, 74.847016), true);
+assert.equal(isValidSubmittedScore(Number.NaN, 10), false);
+assert.equal(isValidSubmittedScore(10, -100.01), false);
+assert.equal(isValidSubmittedScore(1_000_001, 10), false);
 
 const normalized = normalizeEntries(baseEntries);
 assert.equal(normalized.length, 10);
@@ -62,5 +68,15 @@ const betterPersonalScore = updateTop10(baseEntries, {
 assert.equal(betterPersonalScore.accepted, true);
 assert.equal(betterPersonalScore.rank, 1);
 assert.equal(betterPersonalScore.entries.filter((entry) => entry.player === 'player-10').length, 1);
+
+const emptyBoardNegativeScore = updateTop10([], {
+    player: 'liuh886',
+    excess: -214.102082,
+    totalReturn: 74.847016,
+    submittedAt: '2026-07-18T15:06:07Z',
+    issueNumber: 13,
+});
+assert.equal(emptyBoardNegativeScore.accepted, true);
+assert.equal(emptyBoardNegativeScore.rank, 1);
 
 console.log('Leaderboard ranking checks passed');
