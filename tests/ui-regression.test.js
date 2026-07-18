@@ -9,6 +9,8 @@ const hardeningSource = read('core-hardening.js');
 const legendSource = read('legend-ticker.js');
 const qqqSource = read('qqq-loader.js');
 const exportSource = read('card-export.js');
+const leaderboardSource = read('leaderboard.js');
+const leaderboardWorkflow = read('.github/workflows/leaderboard.yml');
 
 assert.match(indexSource, /start-data-ticker/);
 assert.match(indexSource, /REAL HISTORICAL K-LINES/);
@@ -33,4 +35,16 @@ assert.match(qqqSource, /enumerable: false/);
 assert.match(exportSource, /dataset\.completedLevel/);
 assert.match(exportSource, /FlappyK_Custom_ProfitCard\.png/);
 
-console.log('UI and reviewed regression checks passed');
+assert.match(indexSource, /leaderboard-open-btn/);
+assert.match(indexSource, /leaderboard-screen/);
+assert.match(indexSource, /leaderboard-submit-btn/);
+assert.match(indexSource, /leaderboard\.js/);
+assert.match(leaderboardSource, /TOTAL EXCESS/);
+assert.match(leaderboardSource, /collectedCards\.length !== 3/);
+assert.match(leaderboardSource, /issues\/new/);
+assert.match(leaderboardSource, /SUBMIT TOP 10/);
+assert.match(leaderboardWorkflow, /issues:/);
+assert.match(leaderboardWorkflow, /updateTop10/);
+assert.match(leaderboardWorkflow, /createOrUpdateFileContents/);
+
+console.log('UI, leaderboard, and reviewed regression checks passed');
