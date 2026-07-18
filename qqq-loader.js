@@ -28,8 +28,26 @@
             .filter((row) => row.date && [row.open, row.high, row.low, row.close].every(Number.isFinite));
     }
 
+    function syncOpenSelector() {
+        const marketSelect = document.getElementById('custom-market-select');
+        const assetSelect = document.getElementById('custom-asset-select');
+
+        if (!marketSelect || !assetSelect || marketSelect.value !== 'usstock') return;
+        if (Array.from(assetSelect.options).some((option) => option.value === QQQ_NAME)) return;
+
+        const option = document.createElement('option');
+        option.value = QQQ_NAME;
+        option.textContent = QQQ_NAME;
+        assetSelect.appendChild(option);
+
+        const sorted = Array.from(assetSelect.options)
+            .sort((left, right) => left.textContent.localeCompare(right.textContent));
+        assetSelect.replaceChildren(...sorted);
+    }
+
     async function loadQQQData() {
         if (stockData.usstock?.[QQQ_NAME]?.length >= MINIMUM_ROWS) {
+            syncOpenSelector();
             return stockData.usstock[QQQ_NAME];
         }
 
@@ -45,6 +63,7 @@
 
         stockData.usstock = stockData.usstock || {};
         stockData.usstock[QQQ_NAME] = rows;
+        syncOpenSelector();
 
         document.dispatchEvent(new CustomEvent('flappyk:data-updated', {
             detail: { market: 'usstock', asset: QQQ_NAME, rows: rows.length },
@@ -52,6 +71,9 @@
 
         return rows;
     }
+
+    document.getElementById('custom-market-select')
+        ?.addEventListener('change', () => window.setTimeout(syncOpenSelector, 0));
 
     window.qqqDataReady = loadQQQData().catch((error) => {
         console.warn('FlappyK could not load supplemental QQQ data:', error);
