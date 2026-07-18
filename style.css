@@ -92,6 +92,10 @@ body {
     pointer-events: auto;
 }
 
+#champagne-screen {
+    z-index: 100;
+}
+
 h1 {
     font-size: 40px;
     margin-bottom: 20px;
@@ -272,6 +276,24 @@ button:active {
     gap: 5px;
 }
 
+.trade-emoji {
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+    line-height: 1;
+}
+
+.buy-btn .trade-emoji {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff3a0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff7b2 0%, #f1c40f 48%, #b8860b 100%);
+    box-shadow: 0 0 0 2px rgba(241, 196, 15, 0.28), 0 3px 0 #8a6508;
+    font-size: 19px;
+}
+
 .buy-btn {
     border-color: #2ecc71;
     color: #2ecc71;
@@ -316,10 +338,41 @@ button:active {
         padding: 10px 0 20px 0;
         flex-shrink: 0;
     }
+    #start-screen.active ~ #mobile-controls,
+    #custom-challenge-screen.active ~ #mobile-controls,
+    #settlement-screen.active ~ #mobile-controls {
+        display: none;
+    }
     .controls-hint {
         display: none;
     }
     
+    #settlement-screen {
+        justify-content: flex-start;
+        overflow-y: auto;
+        padding: 12px 12px 24px;
+    }
+
+    #settlement-screen .profit-card {
+        flex-shrink: 0;
+        margin-top: 8px;
+    }
+
+    #settlement-screen > button {
+        width: auto;
+        min-width: 176px;
+        max-width: 82vw;
+        margin-top: 10px;
+        padding: 10px 16px;
+        border-width: 3px;
+        font-size: 10px;
+        line-height: 1.35;
+    }
+
+    #settlement-screen #champagne-btn {
+        font-size: 9px;
+    }
+
     .profit-card {
         width: 100%;
         max-width: 320px;
