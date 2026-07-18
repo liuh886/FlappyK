@@ -28,11 +28,22 @@
             .filter((row) => row.date && [row.open, row.high, row.low, row.close].every(Number.isFinite));
     }
 
+    function installCustomOnlyQQQ(rows) {
+        stockData.usstock = stockData.usstock || {};
+        Object.defineProperty(stockData.usstock, QQQ_NAME, {
+            value: rows,
+            enumerable: false,
+            configurable: true,
+            writable: true,
+        });
+    }
+
     function syncOpenSelector() {
         const marketSelect = document.getElementById('custom-market-select');
         const assetSelect = document.getElementById('custom-asset-select');
 
         if (!marketSelect || !assetSelect || marketSelect.value !== 'usstock') return;
+        if (!stockData.usstock?.[QQQ_NAME]?.length) return;
         if (Array.from(assetSelect.options).some((option) => option.value === QQQ_NAME)) return;
 
         const option = document.createElement('option');
@@ -46,9 +57,11 @@
     }
 
     async function loadQQQData() {
-        if (stockData.usstock?.[QQQ_NAME]?.length >= MINIMUM_ROWS) {
+        const bundledRows = stockData.usstock?.[QQQ_NAME];
+        if (bundledRows?.length >= MINIMUM_ROWS) {
+            installCustomOnlyQQQ(bundledRows);
             syncOpenSelector();
-            return stockData.usstock[QQQ_NAME];
+            return bundledRows;
         }
 
         const response = await fetch(QQQ_SOURCE_URL, { cache: 'force-cache' });
@@ -61,8 +74,7 @@
             throw new Error(`QQQ data contains only ${rows.length} valid rows`);
         }
 
-        stockData.usstock = stockData.usstock || {};
-        stockData.usstock[QQQ_NAME] = rows;
+        installCustomOnlyQQQ(rows);
         syncOpenSelector();
 
         document.dispatchEvent(new CustomEvent('flappyk:data-updated', {
@@ -72,8 +84,14 @@
         return rows;
     }
 
-    document.getElementById('custom-market-select')
-        ?.addEventListener('change', () => window.setTimeout(syncOpenSelector, 0));
+    const marketSelect = document.getElementById('custom-market-select');
+    const assetSelect = document.getElementById('custom-asset-select');
+
+    marketSelect?.addEventListener('change', () => window.setTimeout(syncOpenSelector, 0));
+
+    if (assetSelect) {
+        new MutationObserver(syncOpenSelector).observe(assetSelect, { childList: true });
+    }
 
     window.qqqDataReady = loadQQQData().catch((error) => {
         console.warn('FlappyK could not load supplemental QQQ data:', error);
