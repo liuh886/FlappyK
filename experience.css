@@ -1,0 +1,29 @@
+.start-data-note {
+    margin: 4px 0 2px;
+    padding: 7px 10px;
+    border: 2px solid #00ffff;
+    background: rgba(0, 255, 255, 0.08);
+    color: #00ffff;
+    font-size: 8px;
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+}
+
+.start-exit-hint {
+    margin: 2px 0 0;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 7px;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .start-data-note {
+        max-width: 84%;
+        font-size: 7px;
+        padding: 6px 8px;
+    }
+
+    .start-exit-hint {
+        display: none;
+    }
+}
