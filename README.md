@@ -18,6 +18,7 @@ It includes:
 - fixed $1,000 buy/sell actions with a $1 transaction fee;
 - level, cumulative, drawdown, and excess-return results;
 - themed Profit Cards and a final Market Legend card set;
+- a global Excess Top 10 leaderboard;
 - a hidden custom challenge for choosing a market and asset;
 - desktop PNG download and supported mobile share-sheet export.
 
@@ -35,16 +36,17 @@ Open `http://localhost:8000` in a browser.
 
 A local web server is recommended instead of opening `index.html` directly because browser download and share APIs behave more consistently in a local HTTP context.
 
-The market snapshot is stored locally in `data.js`. An internet connection is still used for the Google pixel font and the `html2canvas` CDN dependency.
+The market snapshot is stored locally in `data.js`. An internet connection is still used for the Google pixel font, the `html2canvas` CDN dependency, supplemental QQQ history, and the live leaderboard JSON.
 
 ## Controls
 
 | Action | Desktop | Mobile |
 | --- | --- | --- |
-| Buy $1,000 | `↑` | `🦬 BUY` |
+| Buy $1,000 | `↑` | `🐂 BUY` |
 | Sell $1,000 | `↓` | `🐻‍❄️ SELL` |
 | Slow down | `←` | `◀` |
 | Speed up | `→` | `▶` |
+| Return home | `ESC` | reload / browser navigation |
 
 ## Game loop
 
@@ -53,6 +55,23 @@ The market snapshot is stored locally in `data.js`. An internet connection is st
 3. Finish Level 1 with a positive cumulative return.
 4. In later levels, beat the cumulative-return checkpoint set by the previous completed level.
 5. Complete Crypto, A-Shares, and US Stocks to unlock the final Market Legend screen.
+6. Submit a qualifying total Excess score to the global Top 10.
+
+## Excess Top 10 leaderboard
+
+The home screen includes a `LEADERBOARD` button that reads the current global Top 10 from `data/leaderboard.json`.
+
+Only complete normal three-market runs are eligible. The ranking metric is total compounded **Excess Return** across the three revealed market paths. Custom challenge results do not enter the global leaderboard.
+
+After reaching the Market Legend screen, the game compares the score with the current tenth-place cutoff:
+
+- a likely Top 10 result displays `SUBMIT TOP 10`;
+- lower results are not sent to GitHub;
+- if the leaderboard cannot be loaded, GitHub Actions performs the final eligibility check.
+
+Submission uses a prefilled GitHub Issue. The player clicks the in-game button and then confirms the already-completed Issue form. GitHub Actions uses the Issue author as the player identity, keeps only that user's personal best, sorts by Excess Return, and writes no more than ten entries to `data/leaderboard.json`. Non-qualifying Issues are automatically closed without changing the leaderboard.
+
+The leaderboard is intentionally honor-based. The Action validates the score format and Top 10 rules, but it does not replay the full trade history or prevent a determined user from modifying browser-side values.
 
 ## Hidden custom challenge
 
@@ -63,7 +82,7 @@ The custom challenge lets the player choose:
 - Crypto, A-Shares, or US Stocks;
 - any bundled asset in the selected market.
 
-The asset is chosen by the player, but the 250-day historical window remains random and hidden until settlement. A custom result can be saved, replayed on the same window, or restarted with another asset. Custom runs are isolated from the normal three-stage progression and do not alter Market Legend records.
+The asset is chosen by the player, but the 250-day historical window remains random and hidden until settlement. A custom result can be saved, replayed on the same window, or restarted with another asset. Custom runs are isolated from the normal three-stage progression and do not alter Market Legend or leaderboard records.
 
 The unlock code is not displayed as the challenge name. Once opened, the mode is shown simply as `CUSTOM CHALLENGE`, and the HUD uses `LEVEL: CUSTOM`.
 
@@ -72,10 +91,11 @@ The unlock code is not displayed as the challenge name. Once opened, the mode is
 - **Level Return**: return earned during the current level.
 - **Total Return**: cumulative return from the original $10,000 starting balance.
 - **Underlying Return**: natural price change of the revealed asset over the same historical interval.
-- **Excess**: `Level Return - Underlying Return`.
+- **Excess**: `Level Return - Underlying Return` on an individual Profit Card.
+- **Total Excess**: cumulative game return minus the compounded return of the three underlying market paths; this is the leaderboard metric.
 - **Max DD**: maximum peak-to-trough decline in portfolio value during the level.
 
-Excess return is shown for comparison only. It does not currently change the level pass/fail rule.
+Excess return does not change the level pass/fail rule. It is used for the global leaderboard after the player completes all three markets.
 
 ## Result cards
 
@@ -122,8 +142,9 @@ The bundled data is a historical gameplay snapshot, not a real-time market feed.
 - long-only trading with cash; no shorting, leverage, or order types;
 - fixed trade size and fee model;
 - random historical-window selection;
-- no leaderboard, seeded daily challenge, or persistent profile;
-- no automated browser test suite yet;
+- honor-based leaderboard submissions require a GitHub account and one final confirmation;
+- no persistent player profile beyond the GitHub username stored in the Top 10;
+- no automated browser end-to-end suite yet;
 - mobile system share behavior still depends on browser and operating-system support;
 - not intended for investment decisions.
 
@@ -133,6 +154,10 @@ The bundled data is a historical gameplay snapshot, not a real-time market feed.
 - `style.css` — pixel-arcade layout and card themes;
 - `game.js` — market playback and trading state;
 - `results.js` — settlement metrics and Legend result presentation;
+- `leaderboard.js` / `leaderboard.css` — Top 10 display, qualification check, and prefilled score submission;
+- `data/leaderboard.json` — the current maximum ten leaderboard records;
+- `.github/workflows/leaderboard.yml` — Issue validation and automatic Top 10 update;
+- `scripts/leaderboard-ranking.js` — deterministic ranking and one-best-score-per-player rules;
 - `custom-challenge.js` / `custom-challenge.css` — hidden market and asset selector;
 - `card-export.js` / `card-export.css` — stable desktop/mobile image generation;
 - `data.js` — embedded historical market snapshot;
