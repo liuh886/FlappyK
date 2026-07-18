@@ -42,7 +42,7 @@ All notable changes to FlappyK will be documented in this file.
 - Fixed duplicate screenshot generation caused by overlapping export listeners.
 - Fixed duplicated dollar signs in Legend Card starting and final values.
 - Improved long asset-name wrapping in generated images.
-- Hid mobile trading controls whenever start, custom-selector, settlement, or Legend overlays are active.
+- Restored mobile virtual controls during normal gameplay and limited their hidden state to the Profit Card settlement screen.
 - Reduced mobile settlement action sizing and enabled vertical scrolling so `NEXT LEVEL` and `TRY AGAIN` remain reachable.
 - Removed reliance on version-dependent yfinance adjustment defaults for future data refreshes.
 
