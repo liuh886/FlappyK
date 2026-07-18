@@ -1,6 +1,43 @@
 (() => {
     'use strict';
 
+    let customSelectionPending = false;
+
+    document.getElementById('custom-start-btn')?.addEventListener('click', () => {
+        customSelectionPending = true;
+    }, { capture: true });
+
+    document.getElementById('custom-retry-btn')?.addEventListener('click', () => {
+        customSelectionPending = true;
+    }, { capture: true });
+
+    const previousPickRandomData = pickRandomData;
+    pickRandomData = function hardenedPickRandomData() {
+        if (customSelectionPending) {
+            customSelectionPending = false;
+            return previousPickRandomData();
+        }
+
+        if (level === 1) currentMarket = 'crypto';
+        else if (level === 2) currentMarket = 'ashare';
+        else currentMarket = 'usstock';
+
+        const eligibleAssets = Object.keys(stockData[currentMarket] || {})
+            .filter((asset) => Array.isArray(stockData[currentMarket][asset]))
+            .filter((asset) => stockData[currentMarket][asset].length >= DAYS_PER_LEVEL);
+
+        if (eligibleAssets.length === 0) {
+            throw new Error(`No ${currentMarket} asset has ${DAYS_PER_LEVEL} usable days`);
+        }
+
+        currentAsset = eligibleAssets[Math.floor(Math.random() * eligibleAssets.length)];
+        const data = stockData[currentMarket][currentAsset];
+        const maxStart = data.length - DAYS_PER_LEVEL;
+        const startIndex = Math.floor(Math.random() * (maxStart + 1));
+
+        return data.slice(startIndex, startIndex + DAYS_PER_LEVEL);
+    };
+
     function replaceControl(id, handler) {
         const original = document.getElementById(id);
         if (!original) return;
