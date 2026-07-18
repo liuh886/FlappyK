@@ -14,7 +14,7 @@ All notable changes to FlappyK will be documented in this file.
 - Themed Profit Cards for each completed market.
 - Final Market Legend screen with a combined three-card result.
 - Scrolling Legend summary with total gain, total trading days, and compounded excess return against the three underlying market paths.
-- Distinct bison and polar-bear trade markers for buy and sell actions.
+- Distinct bull and polar-bear trade markers for buy and sell actions.
 - Hidden custom challenge, unlocked with `QQQ`, with market and asset selection, random hidden 250-day windows, same-window retry, and isolated results.
 - Stable high-resolution Profit Card exports independent of the responsive screen size.
 - Desktop horizontal Legend export and mobile vertical long-image export.
@@ -30,6 +30,7 @@ All notable changes to FlappyK will be documented in this file.
 - Renamed the final achievement from Wall Street Legend to Market Legend to reflect all three markets.
 - Removed repeated success text from individual cards in the final Legend view.
 - Renamed the visible secret-mode title to `CUSTOM CHALLENGE` and its HUD level label to `CUSTOM`; `QQQ` remains only the unlock code.
+- Replaced the bison buy artwork with a standard bull presented on a compact gold arcade badge.
 - Made equity price adjustment explicit with `auto_adjust=True`, `back_adjust=False`, `actions=True`, and `repair=True`.
 - Pinned the data-refresh environment to `yfinance==1.5.1`.
 
@@ -41,6 +42,8 @@ All notable changes to FlappyK will be documented in this file.
 - Fixed duplicate screenshot generation caused by overlapping export listeners.
 - Fixed duplicated dollar signs in Legend Card starting and final values.
 - Improved long asset-name wrapping in generated images.
+- Hid mobile trading controls whenever start, custom-selector, settlement, or Legend overlays are active.
+- Reduced mobile settlement action sizing and enabled vertical scrolling so `NEXT LEVEL` and `TRY AGAIN` remain reachable.
 - Removed reliance on version-dependent yfinance adjustment defaults for future data refreshes.
 
 ### Known limitations
