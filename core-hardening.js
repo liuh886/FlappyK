@@ -11,6 +11,14 @@
         customSelectionPending = true;
     }, { capture: true });
 
+    document.getElementById('custom-cancel-btn')?.addEventListener('click', () => {
+        customSelectionPending = false;
+    }, { capture: true });
+
+    document.getElementById('custom-change-btn')?.addEventListener('click', () => {
+        customSelectionPending = false;
+    }, { capture: true });
+
     const previousPickRandomData = pickRandomData;
     pickRandomData = function hardenedPickRandomData() {
         if (customSelectionPending) {
