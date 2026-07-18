@@ -42,7 +42,7 @@
     line-height: 1;
 }
 
-#champagne-export-area {
+.export-area {
     position: relative;
     padding-bottom: 64px;
 }
@@ -70,7 +70,7 @@
         font-size: 8px;
     }
 
-    #champagne-export-area {
+    .export-area {
         padding-bottom: 44px;
     }
 
