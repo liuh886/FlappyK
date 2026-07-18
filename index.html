@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="custom-challenge.css">
     <link rel="stylesheet" href="support-button.css">
     <link rel="stylesheet" href="experience.css">
+    <link rel="stylesheet" href="leaderboard.css">
     <!-- Google Fonts for pixel style -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
@@ -45,12 +46,26 @@
             <h1 id="game-title">FLAPPY K</h1>
             <p>Trade the unknown K-line.</p>
             <p>Buy low. Sell high. Beat the target.</p>
-            <button id="start-btn">PLAY</button>
+            <div class="start-actions">
+                <button id="start-btn">PLAY</button>
+                <button id="leaderboard-open-btn" class="leaderboard-home-btn">LEADERBOARD</button>
+            </div>
             <div class="start-data-ticker" aria-label="Real historical K-lines">
                 <div class="start-data-ticker-track">
                     <span>REAL HISTORICAL K-LINES</span>
                     <span aria-hidden="true">REAL HISTORICAL K-LINES</span>
                 </div>
+            </div>
+        </div>
+
+        <!-- Excess Leaderboard -->
+        <div id="leaderboard-screen" class="screen" role="dialog" aria-modal="true" aria-labelledby="leaderboard-title">
+            <div class="leaderboard-panel">
+                <h2 id="leaderboard-title">EXCESS TOP 10</h2>
+                <p class="leaderboard-subtitle">GLOBAL · HONOR-BASED · ONE BEST SCORE PER GITHUB PLAYER</p>
+                <div id="leaderboard-status" class="leaderboard-status">LOADING TOP 10...</div>
+                <div id="leaderboard-rows" class="leaderboard-table" aria-live="polite"></div>
+                <button id="leaderboard-close-btn">BACK</button>
             </div>
         </div>
 
@@ -139,8 +154,10 @@
         
         <div class="action-buttons">
             <button id="champagne-save-btn" style="background-color: #3498db; box-shadow: 4px 4px 0 #2980b9;">SHARE / SAVE</button>
+            <button id="leaderboard-submit-btn" style="display:none;">SUBMIT TOP 10</button>
             <button id="champagne-restart-btn">PLAY AGAIN</button>
         </div>
+        <div id="leaderboard-submit-status" class="leaderboard-submit-status" aria-live="polite"></div>
         <a class="support-button" href="https://ko-fi.com/zhihao" target="_blank" rel="noopener noreferrer" aria-label="Support FlappyK on Ko-fi">
             <span class="support-button-icon" aria-hidden="true">☕</span>
             <span>SUPPORT FLAPPYK</span>
@@ -158,6 +175,7 @@
     <script src="experience.js"></script>
     <script src="core-hardening.js"></script>
     <script src="ui-polish.js"></script>
+    <script src="leaderboard.js"></script>
     <script src="card-export.js"></script>
 </body>
 </html>
