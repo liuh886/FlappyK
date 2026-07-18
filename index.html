@@ -24,7 +24,7 @@
                 <div>ASSET: $<span id="asset-display">0.00</span></div>
                 <div>TOTAL: $<span id="total-display">10000.00</span></div>
                 <div>RETURN: <span id="return-display" class="neutral">0.00%</span></div>
-                <div>TARGET: <span id="target-return-display">ANY PROFIT</span></div>
+                <div style="display:none;" aria-hidden="true">TARGET: <span id="target-return-display">ANY PROFIT</span></div>
             </div>
             
             <div class="controls-hint">
@@ -74,7 +74,7 @@
         <!-- Settlement Card Screen -->
         <div id="settlement-screen" class="screen">
             <div class="profit-card" id="profit-card">
-                <h2 id="card-title">PROFIT CARD (1)</h2>
+                <h2 id="card-title">PROFIT CARD</h2>
                 <div class="card-details">
                     <p>ASSET: <span id="card-asset" class="highlight">???</span></p>
                     <p>STARTING: $<span id="card-start-cash" class="highlight">---</span></p>
@@ -147,6 +147,7 @@
     <script src="results.js"></script>
     <script src="legend-ticker.js"></script>
     <script src="custom-challenge.js"></script>
+    <script src="interface-polish.js"></script>
     <script src="ui-polish.js"></script>
     <script src="card-export.js"></script>
 </body>
