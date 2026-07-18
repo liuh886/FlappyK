@@ -14,6 +14,9 @@ All notable changes to FlappyK will be documented in this file.
 - Themed Profit Cards for each completed market.
 - Final Market Legend screen with a combined three-card result.
 - Scrolling Legend summary with total gain, total trading days, and compounded excess return against the three underlying market paths.
+- Global honor-based Excess Top 10 leaderboard powered only by GitHub Pages, Issues, and Actions.
+- One-click prefilled GitHub score submission for qualifying completed three-market runs.
+- Home-screen leaderboard viewer backed by a live `leaderboard.json` file.
 - Distinct bull and polar-bear trade markers for buy and sell actions.
 - Hidden custom challenge, unlocked with `QQQ`, with market and asset selection, random hidden 250-day windows, same-window retry, and isolated results.
 - `QQQ` as a selectable US-market asset in the custom challenge, backed by real historical adjusted OHLC data.
@@ -59,7 +62,9 @@ All notable changes to FlappyK will be documented in this file.
 
 ### Known limitations
 
-- There is no full browser end-to-end suite yet; current CI covers syntax, static regressions, HTML parsing, and data audits.
+- Leaderboard submissions are honor-based: GitHub Actions validates format and Top 10 eligibility but does not replay the full trade history.
+- A GitHub account and one final confirmation on the prefilled Issue page are required to submit a leaderboard score.
+- There is no full browser end-to-end suite yet; current CI covers syntax, static regressions, HTML parsing, leaderboard ranking, and data audits.
 - Core gameplay still uses shared global state and order-dependent wrappers around `startLevel`, `endLevel`, and `pickRandomData`.
 - Mobile share-sheet behavior depends on the browser and operating system.
 - The currently bundled `data.js` predates embedded adjustment metadata and should be regenerated before an audit-grade release.

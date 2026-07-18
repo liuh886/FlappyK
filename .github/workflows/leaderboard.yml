@@ -1,0 +1,142 @@
+name: Update Excess Leaderboard
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: flappyk-top10-leaderboard
+  cancel-in-progress: false
+
+jobs:
+  process-score:
+    if: startsWith(github.event.issue.title, '[FLAPPYK SCORE]')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate score and update Top 10
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('node:fs');
+            const path = require('node:path');
+            const { updateTop10 } = require(path.join(process.cwd(), 'scripts/leaderboard-ranking.js'));
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const issue = context.payload.issue;
+            const defaultBranch = context.payload.repository.default_branch;
+            const leaderboardPath = 'data/leaderboard.json';
+
+            async function closeWithComment(message) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: issue.number,
+                body: message,
+              });
+
+              await github.rest.issues.update({
+                owner,
+                repo,
+                issue_number: issue.number,
+                state: 'closed',
+                state_reason: 'completed',
+              });
+            }
+
+            if (issue.user?.type !== 'User') {
+              await closeWithComment('Score rejected: leaderboard submissions require a GitHub user account.');
+              return;
+            }
+
+            const body = String(issue.body || '');
+            const marker = body.match(/<!--\s*FLAPPYK_SCORE_V1\s+EXCESS=([+-]?\d+(?:\.\d+)?)\s+TOTAL_RETURN=([+-]?\d+(?:\.\d+)?)\s+GAME_VERSION=([A-Za-z0-9._-]+)\s*-->/);
+
+            if (!marker) {
+              await closeWithComment('Score rejected: the machine-readable FlappyK score block is missing or invalid.');
+              return;
+            }
+
+            const excess = Number(marker[1]);
+            const totalReturn = Number(marker[2]);
+            const gameVersion = marker[3];
+
+            if (!Number.isFinite(excess)
+                || !Number.isFinite(totalReturn)
+                || excess < -100
+                || excess > 100000
+                || totalReturn < -100
+                || totalReturn > 100000) {
+              await closeWithComment('Score rejected: the submitted values are outside the accepted numeric range.');
+              return;
+            }
+
+            const currentFile = await github.rest.repos.getContent({
+              owner,
+              repo,
+              path: leaderboardPath,
+              ref: defaultBranch,
+            });
+
+            if (Array.isArray(currentFile.data) || currentFile.data.type !== 'file') {
+              throw new Error('Leaderboard path did not resolve to a file');
+            }
+
+            const currentPayload = JSON.parse(
+              Buffer.from(currentFile.data.content, 'base64').toString('utf8')
+            );
+            const currentEntries = Array.isArray(currentPayload)
+              ? currentPayload
+              : currentPayload.entries;
+
+            const candidate = {
+              player: issue.user.login,
+              avatarUrl: issue.user.avatar_url,
+              excess,
+              totalReturn,
+              gameVersion,
+              submittedAt: issue.created_at,
+              issueNumber: issue.number,
+              issueUrl: issue.html_url,
+            };
+
+            const result = updateTop10(currentEntries, candidate);
+
+            if (!result.accepted) {
+              const cutoff = Number.isFinite(result.cutoff)
+                ? `${result.cutoff >= 0 ? '+' : ''}${result.cutoff.toFixed(2)}%`
+                : 'not available';
+              const message = result.reason === 'not_personal_best'
+                ? `Score received, but it does not beat your current personal best. The leaderboard was not changed.`
+                : `Score received, but it is below the current Top 10 cutoff (${cutoff}). It was not recorded.`;
+              await closeWithComment(message);
+              return;
+            }
+
+            const nextPayload = {
+              updatedAt: new Date().toISOString(),
+              entries: result.entries,
+            };
+            const encoded = Buffer.from(`${JSON.stringify(nextPayload, null, 2)}\n`).toString('base64');
+
+            await github.rest.repos.createOrUpdateFileContents({
+              owner,
+              repo,
+              path: leaderboardPath,
+              message: `chore: update excess leaderboard (#${issue.number})`,
+              content: encoded,
+              sha: currentFile.data.sha,
+              branch: defaultBranch,
+            });
+
+            await closeWithComment(
+              `🏆 Score accepted. **${candidate.excess >= 0 ? '+' : ''}${candidate.excess.toFixed(2)}% Excess** is now ranked **#${result.rank}** in the FlappyK Top 10.`
+            );
