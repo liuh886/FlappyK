@@ -27,7 +27,10 @@ jobs:
           script: |
             const fs = require('node:fs');
             const path = require('node:path');
-            const { updateTop10 } = require(path.join(process.cwd(), 'scripts/leaderboard-ranking.js'));
+            const {
+              isValidSubmittedScore,
+              updateTop10,
+            } = require(path.join(process.cwd(), 'scripts/leaderboard-ranking.js'));
 
             const owner = context.repo.owner;
             const repo = context.repo.repo;
@@ -69,12 +72,7 @@ jobs:
             const totalReturn = Number(marker[2]);
             const gameVersion = marker[3];
 
-            if (!Number.isFinite(excess)
-                || !Number.isFinite(totalReturn)
-                || excess < -100
-                || excess > 100000
-                || totalReturn < -100
-                || totalReturn > 100000) {
+            if (!isValidSubmittedScore(excess, totalReturn)) {
               await closeWithComment('Score rejected: the submitted values are outside the accepted numeric range.');
               return;
             }
