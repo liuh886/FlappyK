@@ -1,10 +1,19 @@
 'use strict';
 
 const LEADERBOARD_LIMIT = 10;
+const MAX_ABSOLUTE_SCORE = 1_000_000;
 
 function finiteNumber(value, fallback = 0) {
     const number = Number(value);
     return Number.isFinite(number) ? number : fallback;
+}
+
+function isValidSubmittedScore(excess, totalReturn) {
+    return Number.isFinite(excess)
+        && Number.isFinite(totalReturn)
+        && Math.abs(excess) <= MAX_ABSOLUTE_SCORE
+        && totalReturn >= -100
+        && totalReturn <= MAX_ABSOLUTE_SCORE;
 }
 
 function compareEntries(left, right) {
@@ -67,7 +76,9 @@ function updateTop10(entries, candidate) {
 
 module.exports = {
     LEADERBOARD_LIMIT,
+    MAX_ABSOLUTE_SCORE,
     compareEntries,
+    isValidSubmittedScore,
     normalizeEntries,
     updateTop10,
 };
