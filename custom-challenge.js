@@ -206,7 +206,7 @@
         originalStartLevel();
 
         if (customState.active) {
-            levelDisp.innerText = 'Q';
+            levelDisp.innerText = 'CUSTOM';
             targetDisp.innerText = 'ANY PROFIT';
         }
     };
