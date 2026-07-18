@@ -137,12 +137,12 @@ for symbol in ashare_symbols:
         print(f"Failed to fetch {symbol}: {error}")
 
 
-# 3. Fetch US Stocks using explicit adjusted yfinance OHLC.
+# 3. Fetch US Stocks and ETFs using explicit adjusted yfinance OHLC.
 us_symbols = [
     "AAPL", "MSFT", "TSLA", "AMZN", "NVDA",
     "GOOGL", "META", "BRK-B", "LLY", "V",
     "JPM", "WMT", "JNJ", "MA", "PG",
-    "AVGO", "HD", "COST",
+    "AVGO", "HD", "COST", "QQQ",
 ]
 us_names = {
     "AAPL": "Apple (US)",
@@ -163,6 +163,7 @@ us_names = {
     "AVGO": "Broadcom (US)",
     "HD": "Home Depot (US)",
     "COST": "Costco (US)",
+    "QQQ": "QQQ",
 }
 
 for symbol in us_symbols:
