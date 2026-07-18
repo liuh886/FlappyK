@@ -17,6 +17,8 @@ assert.match(indexSource, /REAL HISTORICAL K-LINES/);
 assert.doesNotMatch(indexSource, /NOT LIVE DATA/);
 assert.doesNotMatch(indexSource, /ESC = RETURN HOME/);
 assert.doesNotMatch(indexSource, /interface-polish\.js/);
+assert.match(indexSource, /GAME: <span id="level-display">1\/3<\/span>/);
+assert.doesNotMatch(indexSource, /LEVEL: <span id="level-display">/);
 
 assert.match(experienceSource, /event\.key !== 'Escape'/);
 assert.doesNotMatch(experienceSource, /AUTO_NEXT|nextBtn\.click/);
@@ -26,6 +28,8 @@ assert.match(hardeningSource, /addEventListener\('click'/);
 assert.match(hardeningSource, /maxStart \+ 1/);
 assert.match(hardeningSource, /dataset\.completedLevel/);
 assert.match(hardeningSource, /title\.textContent = 'PROFIT CARD'/);
+assert.match(hardeningSource, /levelDisp\.textContent = `\$\{visibleGame\}\/3`/);
+assert.match(hardeningSource, /levelDisp\.textContent !== 'CUSTOM'/);
 
 assert.doesNotMatch(legendSource, /🦬|updateTradeButtons|installCanvasEmojiMap/);
 assert.doesNotMatch(legendSource, /ctx\.fillText\s*=/);
