@@ -42,11 +42,40 @@
     line-height: 1;
 }
 
+#champagne-export-area {
+    position: relative;
+    padding-bottom: 64px;
+}
+
+.legend-watermark {
+    position: absolute;
+    left: 50%;
+    bottom: 18px;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.42);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    line-height: 1;
+    letter-spacing: 0.8px;
+    white-space: nowrap;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.55);
+    pointer-events: none;
+}
+
 @media (max-width: 768px) {
     .support-button {
         max-width: 90%;
         margin: 6px 0 24px;
         padding: 9px 12px;
         font-size: 8px;
+    }
+
+    #champagne-export-area {
+        padding-bottom: 44px;
+    }
+
+    .legend-watermark {
+        bottom: 14px;
+        font-size: 7px;
     }
 }
