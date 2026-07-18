@@ -27,10 +27,12 @@ jobs:
 
       - name: Check JavaScript syntax
         run: |
+          node --check qqq-loader.js
           node --check game.js
           node --check results.js
           node --check legend-ticker.js
           node --check custom-challenge.js
+          node --check experience.js
           node --check interface-polish.js
           node --check ui-polish.js
           node --check card-export.js
@@ -51,6 +53,12 @@ jobs:
           Parser().feed(Path("index.html").read_text(encoding="utf-8"))
           print("index.html parsed successfully")
           PY
+
+      - name: Check QQQ integration
+        run: |
+          grep -q '"QQQ"' fetch_all_data.py
+          grep -q 'qqq-loader.js' index.html
+          grep -q 'REAL HISTORICAL K-LINES' index.html
 
       - name: Audit bundled equity split continuity
         run: python scripts/audit_bundled_data.py
