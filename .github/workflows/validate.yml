@@ -34,18 +34,22 @@ jobs:
           node --check custom-challenge.js
           node --check experience.js
           node --check core-hardening.js
+          node --check friend-challenge.js
           node --check ui-polish.js
           node --check leaderboard.js
           node --check share-challenge.js
           node --check card-export.js
           node --check scripts/leaderboard-ranking.js
+          node --check scripts/friend-challenge-codec.js
           node --check tests/ui-regression.test.js
           node --check tests/leaderboard-ranking.test.js
+          node --check tests/friend-challenge.test.js
 
       - name: Run regression checks
         run: |
           node tests/ui-regression.test.js
           node tests/leaderboard-ranking.test.js
+          node tests/friend-challenge.test.js
 
       - name: Check Python syntax
         run: |
@@ -69,12 +73,15 @@ jobs:
           print("index.html and leaderboard.json validated")
           PY
 
-      - name: Check QQQ, sharing, and leaderboard integration
+      - name: Check QQQ, challenge, sharing, and leaderboard integration
         run: |
           grep -q '"QQQ"' fetch_all_data.py
           grep -q 'qqq-loader.js' index.html
           grep -q 'REAL HISTORICAL K-LINES' index.html
           ! grep -q 'NOT LIVE DATA' index.html
+          grep -q 'scripts/friend-challenge-codec.js' index.html
+          grep -q 'friend-challenge.js' index.html
+          grep -q 'friend-challenge-result' index.html
           grep -q 'share-challenge.js' index.html
           grep -q 'challenge-share-btn' index.html
           grep -q 'property="og:image"' index.html

@@ -7,7 +7,7 @@ All notable changes to FlappyK will be documented in this file.
 ### Added
 
 - First complete three-market game loop covering Crypto, A-Shares, and US Stocks.
-- Historical candlestick playback with keyboard and mobile trading controls.
+- Historical OHLC candlestick playback with keyboard and mobile trading controls.
 - Fixed-size $1,000 buy/sell actions and $1 transaction fees.
 - Level return, cumulative total return, maximum drawdown, and excess-return metrics.
 - Excess return defined as level portfolio return minus the underlying asset return over the same interval.
@@ -18,6 +18,8 @@ All notable changes to FlappyK will be documented in this file.
 - One-click prefilled GitHub score submission for qualifying completed three-market runs.
 - Home-screen leaderboard viewer backed by a live `leaderboard.json` file.
 - Challenge-oriented result sharing with score-aware text, a game link, a generated result image, and copy/download fallbacks.
+- Reproducible friend-challenge links that restore the same Crypto, A-share, and US-stock windows without revealing them before play.
+- Friend-challenge result comparison showing player Excess, challenger target, and the winning or losing margin.
 - Static Open Graph and Twitter Card metadata for richer shared-link previews.
 - Distinct bull and polar-bear trade markers for buy and sell actions.
 - Hidden custom challenge, unlocked with `QQQ`, with market and asset selection, random hidden 250-day windows, same-window retry, and isolated results.
@@ -37,12 +39,14 @@ All notable changes to FlappyK will be documented in this file.
 - Renamed the final achievement from Wall Street Legend to Market Legend to reflect all three markets.
 - Replaced the HUD's bare `LEVEL` number with explicit three-game progress: `GAME 1/3`, `GAME 2/3`, and `GAME 3/3`; Custom Challenge remains `GAME: CUSTOM`.
 - Split the final Legend action into `CHALLENGE A FRIEND` and `SAVE RESULT` so sharing and downloading have distinct intent.
+- Upgraded `CHALLENGE A FRIEND` from a generic game link to a compact same-markets, same-windows challenge URL.
 - Added a share-only challenge headline to exported Legend images: three hidden markets, Total Excess, and `CAN YOU BEAT ME?`.
+- Changed the friend challenge action to `CHALLENGE BACK` after completing an incoming challenge.
 - Removed repeated success text from individual cards in the final Legend view.
 - Renamed the visible secret-mode title to `CUSTOM CHALLENGE` and its HUD game label to `CUSTOM`; `QQQ` remains the unlock code and is also a selectable asset.
 - Replaced the bison buy artwork with a standard bull presented on a compact gold arcade badge.
 - Moved `REAL HISTORICAL K-LINES` into a low-emphasis scrolling footer on the home screen.
-- Restored manual progression after successful Levels 1 and 2: the Profit Card remains visible until the player clicks `NEXT LEVEL`.
+- Restored manual progression after successful Games 1 and 2: the Profit Card remains visible until the player clicks `NEXT LEVEL`.
 - Made equity price adjustment explicit with `auto_adjust=True`, `back_adjust=False`, `actions=True`, and `repair=True`.
 - Pinned the data-refresh environment to `yfinance==1.5.1`.
 
@@ -51,12 +55,12 @@ All notable changes to FlappyK will be documented in this file.
 - Fixed a repeated Profit Card title mutation loop that could prevent the settlement screen from rendering.
 - Fixed duplicate mobile trades caused by overlapping touch and mouse compatibility events.
 - Removed duplicate bison and Canvas text overrides that competed with the standard bull rendering.
-- Kept QQQ selectable in the custom challenge without adding it to the normal third-level random asset pool.
+- Kept QQQ selectable in the custom challenge without adding it to the normal third-game random asset pool.
 - Fixed the normal random-window off-by-one error so the final legal 250-day window can be selected.
 - Excluded assets with fewer than 250 usable rows from normal random selection.
-- Preserved the completed level in Profit Card export filenames and added a dedicated custom-result filename.
-- Fixed the undefined `finalReturn` reference that prevented reliable progression to the next level.
-- Fixed next-level target inheritance so it uses the completed cumulative return.
+- Preserved the completed game in Profit Card export filenames and added a dedicated custom-result filename.
+- Fixed the undefined `finalReturn` reference that prevented reliable progression to the next game.
+- Fixed next-game target inheritance so it uses the completed cumulative return.
 - Fixed mobile card captures inheriting viewport width, screen scaling, scroll state, and responsive transforms.
 - Fixed duplicate screenshot generation caused by overlapping export listeners.
 - Fixed duplicated dollar signs in Legend Card starting and final values.
@@ -69,8 +73,9 @@ All notable changes to FlappyK will be documented in this file.
 
 - Leaderboard submissions are honor-based: GitHub Actions validates format and Top 10 eligibility but does not replay the full trade history.
 - A GitHub account and one final confirmation on the prefilled Issue page are required to submit a leaderboard score.
+- Friend challenge links are intentionally lightweight and unsigned; their embedded target score can be edited by a determined user.
 - Shared-link preview images are static; player-specific scores are carried in the generated result image and share text instead.
-- There is no full browser end-to-end suite yet; current CI covers syntax, static regressions, HTML parsing, leaderboard ranking, and data audits.
+- There is no full browser end-to-end suite yet; current CI covers syntax, static regressions, HTML parsing, challenge-codec behavior, leaderboard ranking, and data audits.
 - Core gameplay still uses shared global state and order-dependent wrappers around `startLevel`, `endLevel`, and `pickRandomData`.
 - Mobile share-sheet behavior depends on the browser and operating system.
 - The currently bundled `data.js` predates embedded adjustment metadata and should be regenerated before an audit-grade release.

@@ -6,6 +6,7 @@ const read = (path) => fs.readFileSync(path, 'utf8');
 const indexSource = read('index.html');
 const experienceSource = read('experience.js');
 const hardeningSource = read('core-hardening.js');
+const friendSource = read('friend-challenge.js');
 const legendSource = read('legend-ticker.js');
 const qqqSource = read('qqq-loader.js');
 const exportSource = read('card-export.js');
@@ -53,7 +54,22 @@ assert.match(shareSource, /CAN YOU BEAT ME\?/);
 assert.match(shareSource, /navigator\.share/);
 assert.match(shareSource, /navigator\.clipboard\.writeText/);
 assert.match(shareSource, /stopImmediatePropagation/);
+assert.match(shareSource, /FlappyKFriendChallenge\?\.buildChallengeUrl/);
 assert.match(ogImageSource, /CAN YOU BEAT THE MARKET\?/);
+
+assert.match(indexSource, /scripts\/friend-challenge-codec\.js/);
+assert.match(indexSource, /friend-challenge\.js/);
+assert.match(indexSource, /friend-challenge-result/);
+assert.match(friendSource, /#challenge=/);
+assert.match(friendSource, /SAME 3 HIDDEN MARKETS/);
+assert.match(friendSource, /resolveDescriptor/);
+assert.match(friendSource, /data\.findIndex/);
+assert.match(friendSource, /captureNormalDescriptor/);
+assert.match(friendSource, /CHALLENGE BACK/);
+assert.match(friendSource, /WON BY/);
+assert.match(friendSource, /LOST BY/);
+assert.match(friendSource, /buildChallengeUrl/);
+assert.doesNotMatch(friendSource, /localStorage|fetch\(/);
 
 assert.match(indexSource, /leaderboard-open-btn/);
 assert.match(indexSource, /leaderboard-screen/);
@@ -67,4 +83,4 @@ assert.match(leaderboardWorkflow, /issues:/);
 assert.match(leaderboardWorkflow, /updateTop10/);
 assert.match(leaderboardWorkflow, /createOrUpdateFileContents/);
 
-console.log('UI, sharing, leaderboard, and reviewed regression checks passed');
+console.log('UI, friend challenge, sharing, leaderboard, and reviewed regression checks passed');
