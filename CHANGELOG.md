@@ -17,6 +17,8 @@ All notable changes to FlappyK will be documented in this file.
 - Global honor-based Excess Top 10 leaderboard powered only by GitHub Pages, Issues, and Actions.
 - One-click prefilled GitHub score submission for qualifying completed three-market runs.
 - Home-screen leaderboard viewer backed by a live `leaderboard.json` file.
+- Challenge-oriented result sharing with score-aware text, a game link, a generated result image, and copy/download fallbacks.
+- Static Open Graph and Twitter Card metadata for richer shared-link previews.
 - Distinct bull and polar-bear trade markers for buy and sell actions.
 - Hidden custom challenge, unlocked with `QQQ`, with market and asset selection, random hidden 250-day windows, same-window retry, and isolated results.
 - `QQQ` as a selectable US-market asset in the custom challenge, backed by real historical adjusted OHLC data.
@@ -34,6 +36,8 @@ All notable changes to FlappyK will be documented in this file.
 - Simplified game and result copy for a tighter arcade presentation.
 - Renamed the final achievement from Wall Street Legend to Market Legend to reflect all three markets.
 - Replaced the HUD's bare `LEVEL` number with explicit three-game progress: `GAME 1/3`, `GAME 2/3`, and `GAME 3/3`; Custom Challenge remains `GAME: CUSTOM`.
+- Split the final Legend action into `CHALLENGE A FRIEND` and `SAVE RESULT` so sharing and downloading have distinct intent.
+- Added a share-only challenge headline to exported Legend images: three hidden markets, Total Excess, and `CAN YOU BEAT ME?`.
 - Removed repeated success text from individual cards in the final Legend view.
 - Renamed the visible secret-mode title to `CUSTOM CHALLENGE` and its HUD game label to `CUSTOM`; `QQQ` remains the unlock code and is also a selectable asset.
 - Replaced the bison buy artwork with a standard bull presented on a compact gold arcade badge.
@@ -65,6 +69,7 @@ All notable changes to FlappyK will be documented in this file.
 
 - Leaderboard submissions are honor-based: GitHub Actions validates format and Top 10 eligibility but does not replay the full trade history.
 - A GitHub account and one final confirmation on the prefilled Issue page are required to submit a leaderboard score.
+- Shared-link preview images are static; player-specific scores are carried in the generated result image and share text instead.
 - There is no full browser end-to-end suite yet; current CI covers syntax, static regressions, HTML parsing, leaderboard ranking, and data audits.
 - Core gameplay still uses shared global state and order-dependent wrappers around `startLevel`, `endLevel`, and `pickRandomData`.
 - Mobile share-sheet behavior depends on the browser and operating system.
