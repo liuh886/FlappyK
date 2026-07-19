@@ -234,11 +234,16 @@
 
         const target = Number(state.invite.t);
         const margin = score.excess - target;
-        const won = margin > 0;
         const tied = Math.abs(margin) < 0.005;
+        const won = !tied && margin > 0;
+        const outcomeClass = tied
+            ? 'friend-challenge-result--tied'
+            : won
+                ? 'friend-challenge-result--won'
+                : 'friend-challenge-result--lost';
 
         challengeResult.hidden = false;
-        challengeResult.className = `friend-challenge-result ${won ? 'friend-challenge-result--won' : 'friend-challenge-result--lost'}`;
+        challengeResult.className = `friend-challenge-result ${outcomeClass}`;
         challengeResult.innerHTML = [
             '<strong>FRIEND CHALLENGE</strong>',
             `<span>YOU ${formatPercent(score.excess)}</span>`,
