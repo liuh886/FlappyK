@@ -2,6 +2,7 @@
     'use strict';
 
     const SITE_URL = 'https://liuh886.github.io/FlappyK/';
+    const scoreApi = window.FlappyKLegendScore;
     const challengeButton = document.getElementById('challenge-share-btn');
     const saveButton = document.getElementById('champagne-save-btn');
     const exportArea = document.getElementById('champagne-export-area');
@@ -11,38 +12,9 @@
 
     let preparedChallengeShare = null;
 
-    function parseReturn(value) {
-        const parsed = Number.parseFloat(String(value || '').replace('%', ''));
-        return Number.isFinite(parsed) ? parsed / 100 : 0;
-    }
-
-    function calculateLegendScore() {
-        if (!Array.isArray(collectedCards) || collectedCards.length !== 3) return null;
-
-        let benchmarkGrowth = 1;
-        collectedCards.forEach((card) => {
-            const levelReturn = Number.isFinite(card.levelReturn)
-                ? card.levelReturn
-                : parseReturn(card.levelRetStr);
-            const excessReturn = Number.isFinite(card.excessReturn)
-                ? card.excessReturn
-                : parseReturn(card.excessRetStr);
-            const marketReturn = Number.isFinite(card.marketReturn)
-                ? card.marketReturn
-                : levelReturn - excessReturn;
-            benchmarkGrowth *= (1 + marketReturn);
-        });
-
-        const totalReturn = Number(finalReturn) * 100;
-        const excess = (Number(finalReturn) - (benchmarkGrowth - 1)) * 100;
-        return Number.isFinite(totalReturn) && Number.isFinite(excess)
-            ? { totalReturn, excess }
-            : null;
-    }
-
-    function formatPercent(value) {
-        return `${value >= 0 ? '+' : ''}${Number(value).toFixed(2)}%`;
-    }
+    const calculateLegendScore = () => scoreApi?.calculate(collectedCards, finalReturn) || null;
+    const formatPercent = (value) => scoreApi?.formatPercent(value)
+        || `${value >= 0 ? '+' : ''}${Number(value).toFixed(2)}%`;
 
     function stripIds(root) {
         root.removeAttribute('id');
@@ -77,12 +49,8 @@
     }
 
     async function renderLegend(score, { challengeHeadline = true } = {}) {
-        if (!exportArea || exportArea.children.length === 0) {
-            throw new Error('Legend cards have not been rendered');
-        }
-        if (typeof window.html2canvas !== 'function') {
-            throw new Error('html2canvas is not available');
-        }
+        if (!exportArea || exportArea.children.length === 0) throw new Error('Legend cards have not been rendered');
+        if (typeof window.html2canvas !== 'function') throw new Error('html2canvas is not available');
 
         const stage = document.createElement('div');
         stage.className = 'challenge-export-stage';
@@ -124,10 +92,9 @@
 
     function canvasToBlob(canvas) {
         return new Promise((resolve, reject) => {
-            canvas.toBlob((blob) => {
-                if (blob) resolve(blob);
-                else reject(new Error('PNG generation returned an empty file'));
-            }, 'image/png');
+            canvas.toBlob((blob) => blob
+                ? resolve(blob)
+                : reject(new Error('PNG generation returned an empty file')), 'image/png');
         });
     }
 
@@ -158,14 +125,8 @@
         const text = `I traded 3 hidden historical markets and finished with ${scoreText} Excess. Can you beat me?`;
         const url = window.FlappyKFriendChallenge?.buildChallengeUrl(score) || SITE_URL;
         const filename = `FlappyK_Challenge_${scoreText.replace(/[+%]/g, '').replace('-', 'minus-')}.png`;
-        const file = typeof File === 'function'
-            ? new File([blob], filename, { type: 'image/png' })
-            : null;
-        const shareData = {
-            title: 'FlappyK — Can You Beat a Hidden Market?',
-            text,
-            url,
-        };
+        const file = typeof File === 'function' ? new File([blob], filename, { type: 'image/png' }) : null;
+        const shareData = { title: 'FlappyK — Can You Beat a Hidden Market?', text, url };
 
         if (file && typeof navigator.canShare === 'function') {
             try {
@@ -200,25 +161,21 @@
 
     async function shareChallenge(blob, score) {
         const prepared = buildPreparedChallenge(blob, score);
-
         if (typeof navigator.share === 'function') {
             try {
                 await navigator.share(prepared.shareData);
                 return 'shared';
             } catch (error) {
                 if (error?.name === 'AbortError') return 'cancelled';
-
                 if (error?.name === 'NotAllowedError' && challengeButton) {
                     preparedChallengeShare = prepared;
                     challengeButton.disabled = false;
                     challengeButton.textContent = 'TAP TO SHARE';
                     return 'prepared';
                 }
-
                 console.warn('Native challenge share failed; using fallback.', error);
             }
         }
-
         await fallbackChallengeShare(prepared);
         return 'fallback';
     }
@@ -226,13 +183,9 @@
     async function sharePreparedChallenge() {
         const prepared = preparedChallengeShare;
         if (!prepared || !challengeButton) return;
-
         challengeButton.disabled = true;
         challengeButton.textContent = 'SHARING...';
-
         try {
-            // The call happens synchronously on the second tap, preserving the
-            // transient user activation required by stricter mobile browsers.
             const sharePromise = navigator.share(prepared.shareData);
             await sharePromise;
         } catch (error) {
@@ -269,31 +222,25 @@
     challengeButton?.addEventListener('click', (event) => {
         event.preventDefault();
         event.stopImmediatePropagation();
-
         if (preparedChallengeShare) {
             sharePreparedChallenge();
             return;
         }
-
         withBusyButton(challengeButton, 'PREPARING...', async () => {
             const score = calculateLegendScore();
             if (!score) throw new Error('Completed three-game score is unavailable');
-            const canvas = await renderLegend(score, { challengeHeadline: true });
-            const blob = await canvasToBlob(canvas);
+            const blob = await canvasToBlob(await renderLegend(score, { challengeHeadline: true }));
             return shareChallenge(blob, score);
         });
     }, true);
 
-    // Register before card-export.js so SAVE RESULT is always a direct download,
-    // while single Profit Cards keep their existing native-share behavior.
     saveButton?.addEventListener('click', (event) => {
         event.preventDefault();
         event.stopImmediatePropagation();
         withBusyButton(saveButton, 'SAVING...', async () => {
             const score = calculateLegendScore();
             if (!score) throw new Error('Completed three-game score is unavailable');
-            const canvas = await renderLegend(score, { challengeHeadline: false });
-            const blob = await canvasToBlob(canvas);
+            const blob = await canvasToBlob(await renderLegend(score, { challengeHeadline: false }));
             downloadBlob(blob, 'FlappyK_Legend_Result.png');
         });
     }, true);
@@ -301,8 +248,5 @@
     legendOpenButton?.addEventListener('click', clearPreparedChallengeShare, { capture: true });
     legendRestartButton?.addEventListener('click', clearPreparedChallengeShare, { capture: true });
 
-    window.FlappyKShare = {
-        calculateLegendScore,
-        formatPercent,
-    };
+    window.FlappyKShare = { calculateLegendScore, formatPercent };
 })();
