@@ -3,10 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flappy K</title>
+    <title>FlappyK — Can You Beat a Hidden Market?</title>
+    <meta name="description" content="Trade three unknown historical markets and rank by Excess Return.">
+    <link rel="canonical" href="https://liuh886.github.io/FlappyK/">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://liuh886.github.io/FlappyK/">
+    <meta property="og:title" content="FlappyK — Can You Beat a Hidden Market?">
+    <meta property="og:description" content="Trade three unknown historical markets and rank by Excess Return.">
+    <meta property="og:image" content="https://liuh886.github.io/FlappyK/og-image.svg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="FlappyK — Can You Beat a Hidden Market?">
+    <meta name="twitter:description" content="Trade three unknown historical markets and rank by Excess Return.">
+    <meta name="twitter:image" content="https://liuh886.github.io/FlappyK/og-image.svg">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="mobile-controls.css">
     <link rel="stylesheet" href="card-export.css">
+    <link rel="stylesheet" href="share-challenge.css">
     <link rel="stylesheet" href="legend-ticker.css">
     <link rel="stylesheet" href="custom-challenge.css">
     <link rel="stylesheet" href="support-button.css">
@@ -153,7 +165,8 @@
         </div>
         
         <div class="action-buttons">
-            <button id="champagne-save-btn" style="background-color: #3498db; box-shadow: 4px 4px 0 #2980b9;">SHARE / SAVE</button>
+            <button id="challenge-share-btn">CHALLENGE A FRIEND</button>
+            <button id="champagne-save-btn">SAVE RESULT</button>
             <button id="leaderboard-submit-btn" style="display:none;">SUBMIT TOP 10</button>
             <button id="champagne-restart-btn">PLAY AGAIN</button>
         </div>
@@ -176,6 +189,7 @@
     <script src="core-hardening.js"></script>
     <script src="ui-polish.js"></script>
     <script src="leaderboard.js"></script>
+    <script src="share-challenge.js"></script>
     <script src="card-export.js"></script>
 </body>
 </html>
