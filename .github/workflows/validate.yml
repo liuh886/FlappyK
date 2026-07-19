@@ -25,9 +25,17 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Generate raster social preview
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends librsvg2-bin
+          rsvg-convert -w 1200 -h 630 og-image.svg -o og-image.png
+
       - name: Check JavaScript syntax
         run: |
           node --check qqq-loader.js
+          node --check scripts/friend-challenge-codec.js
+          node --check scripts/legend-score.js
           node --check game.js
           node --check results.js
           node --check legend-ticker.js
@@ -40,22 +48,23 @@ jobs:
           node --check share-challenge.js
           node --check card-export.js
           node --check scripts/leaderboard-ranking.js
-          node --check scripts/friend-challenge-codec.js
           node --check tests/ui-regression.test.js
           node --check tests/leaderboard-ranking.test.js
           node --check tests/friend-challenge.test.js
+          node --check tests/legend-score.test.js
 
       - name: Run regression checks
         run: |
           node tests/ui-regression.test.js
           node tests/leaderboard-ranking.test.js
           node tests/friend-challenge.test.js
+          node tests/legend-score.test.js
 
       - name: Check Python syntax
         run: |
           python -m py_compile fetch_all_data.py scripts/audit_bundled_data.py
 
-      - name: Check HTML and leaderboard data
+      - name: Check HTML, social preview, and leaderboard data
         run: |
           python - <<'PY'
           import json
@@ -70,7 +79,13 @@ jobs:
           entries = payload.get("entries", [])
           assert isinstance(entries, list)
           assert len(entries) <= 10
-          print("index.html and leaderboard.json validated")
+
+          image = Path("og-image.png").read_bytes()
+          assert image[:8] == b"\x89PNG\r\n\x1a\n"
+          width = int.from_bytes(image[16:20], "big")
+          height = int.from_bytes(image[20:24], "big")
+          assert (width, height) == (1200, 630), (width, height)
+          print("index.html, og-image.png, and leaderboard.json validated")
           PY
 
       - name: Check QQQ, challenge, sharing, and leaderboard integration
@@ -80,11 +95,12 @@ jobs:
           grep -q 'REAL HISTORICAL K-LINES' index.html
           ! grep -q 'NOT LIVE DATA' index.html
           grep -q 'scripts/friend-challenge-codec.js' index.html
+          grep -q 'scripts/legend-score.js' index.html
           grep -q 'friend-challenge.js' index.html
           grep -q 'friend-challenge-result' index.html
           grep -q 'share-challenge.js' index.html
           grep -q 'challenge-share-btn' index.html
-          grep -q 'property="og:image"' index.html
+          grep -q 'og-image.png' index.html
           grep -q 'leaderboard.js' index.html
           grep -q 'leaderboard-open-btn' index.html
           grep -q 'leaderboard-submit-btn' index.html

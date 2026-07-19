@@ -78,6 +78,15 @@
     color: #7ee787;
 }
 
+.friend-challenge-result--tied {
+    border-color: #f1c40f;
+    box-shadow: 5px 5px 0 #9b7c0a;
+}
+
+.friend-challenge-result--tied em {
+    color: #ffe88a;
+}
+
 @media (max-width: 768px) {
     .friend-challenge-invite {
         margin-top: 12px;
