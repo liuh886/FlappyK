@@ -60,6 +60,8 @@ assert.match(shareSource, /navigator\.share/);
 assert.match(shareSource, /navigator\.clipboard\.writeText/);
 assert.match(shareSource, /stopImmediatePropagation/);
 assert.match(shareSource, /FlappyKFriendChallenge\?\.buildChallengeUrl/);
+assert.match(shareSource, /FlappyKFriendChallenge\?\.isActive\(\)/);
+assert.match(shareSource, /function currentChallengeLabel\(\)/);
 assert.match(shareSource, /renderLegend\(score, \{ challengeHeadline: false \}\)/);
 assert.match(shareSource, /FlappyK_Legend_Result\.png/);
 assert.match(shareSource, /NotAllowedError/);
