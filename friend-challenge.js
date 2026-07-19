@@ -4,6 +4,7 @@
     const SITE_URL = 'https://liuh886.github.io/FlappyK/';
     const DATASET_VERSION = 'snapshot-2026-07-18';
     const codec = window.FlappyKChallengeCodec;
+    const scoreApi = window.FlappyKLegendScore;
 
     if (!codec) {
         console.warn('FlappyK friend challenge codec is unavailable.');
@@ -24,28 +25,29 @@
         customLaunchPending: false,
     };
 
-    function formatPercent(value) {
-        const number = Number(value);
-        return `${number >= 0 ? '+' : ''}${number.toFixed(2)}%`;
-    }
+    const formatPercent = (value) => scoreApi?.formatPercent(value)
+        || `${Number(value) >= 0 ? '+' : ''}${Number(value).toFixed(2)}%`;
 
     function getChallengeToken() {
-        const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
-        return params.get('challenge');
+        const queryToken = new URLSearchParams(window.location.search).get('challenge');
+        if (queryToken) return queryToken;
+        return new URLSearchParams(window.location.hash.replace(/^#/, '')).get('challenge');
     }
 
-    function removeChallengeHash() {
+    function removeChallengeToken() {
         if (!getChallengeToken()) return;
-        window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
+        const url = new URL(window.location.href);
+        url.searchParams.delete('challenge');
+        if (new URLSearchParams(url.hash.replace(/^#/, '')).has('challenge')) url.hash = '';
+        const clean = `${url.pathname}${url.search}${url.hash}`;
+        window.history.replaceState(null, '', clean || window.location.pathname);
     }
 
     function resolveDescriptor(descriptor) {
         const data = stockData?.[descriptor.m]?.[descriptor.a];
         if (!Array.isArray(data)) return null;
-
         const startIndex = data.findIndex((row) => row?.date === descriptor.s);
         if (startIndex < 0 || startIndex + DAYS_PER_LEVEL > data.length) return null;
-
         return {
             market: descriptor.m,
             asset: descriptor.a,
@@ -54,14 +56,12 @@
         };
     }
 
-    function validateAgainstDataset(payload) {
-        return payload.g.every((descriptor) => Boolean(resolveDescriptor(descriptor)));
-    }
+    const validateAgainstDataset = (payload) =>
+        payload.g.every((descriptor) => Boolean(resolveDescriptor(descriptor)));
 
     function ensureInvitePanel() {
         let panel = document.getElementById('friend-challenge-invite');
         if (panel) return panel;
-
         panel = document.createElement('div');
         panel.id = 'friend-challenge-invite';
         panel.className = 'friend-challenge-invite';
@@ -72,7 +72,6 @@
     function applyInviteVisual(payload) {
         const panel = ensureInvitePanel();
         if (!panel) return;
-
         const legacy = payload.d && payload.d !== DATASET_VERSION;
         panel.innerHTML = [
             '<strong>FRIEND CHALLENGE</strong>',
@@ -81,7 +80,6 @@
             legacy ? '<small>LEGACY SNAPSHOT · RESTORED BY ASSET + DATE</small>' : '',
         ].join('');
         panel.classList.toggle('friend-challenge-invite--legacy', Boolean(legacy));
-
         if (startButton) startButton.textContent = 'PLAY CHALLENGE';
         document.title = 'Friend Challenge · FlappyK';
     }
@@ -112,7 +110,7 @@
         const payload = codec.decodeChallenge(token);
         if (!payload || !validateAgainstDataset(payload)) {
             state.invite = null;
-            removeChallengeHash();
+            removeChallengeToken();
             clearInviteVisual();
             window.alert('This friend challenge is invalid or no longer matches the bundled market snapshot.');
             return;
@@ -125,13 +123,11 @@
 
     function beginRunFromStart() {
         hideChallengeResult();
-
         if (state.invite) {
             state.active = true;
             state.descriptors = state.invite.g.map((game) => ({ ...game }));
             return;
         }
-
         state.active = false;
         state.descriptors = [];
     }
@@ -140,7 +136,7 @@
         state.active = false;
         state.invite = null;
         state.descriptors = [];
-        removeChallengeHash();
+        removeChallengeToken();
         clearInviteVisual();
         hideChallengeResult();
     }
@@ -149,26 +145,18 @@
         if (level < 1 || level > 3 || !Array.isArray(data) || data.length === 0) return;
         const startDate = data[0]?.date;
         if (!/^\d{4}-\d{2}-\d{2}$/.test(String(startDate || ''))) return;
-
-        state.descriptors[level - 1] = {
-            m: currentMarket,
-            a: currentAsset,
-            s: startDate,
-        };
+        state.descriptors[level - 1] = { m: currentMarket, a: currentAsset, s: startDate };
     }
 
     document.getElementById('custom-start-btn')?.addEventListener('click', () => {
         state.customLaunchPending = true;
     }, { capture: true });
-
     document.getElementById('custom-retry-btn')?.addEventListener('click', () => {
         state.customLaunchPending = true;
     }, { capture: true });
-
     document.getElementById('custom-cancel-btn')?.addEventListener('click', () => {
         state.customLaunchPending = false;
     }, { capture: true });
-
     document.getElementById('custom-change-btn')?.addEventListener('click', () => {
         state.customLaunchPending = false;
     }, { capture: true });
@@ -185,7 +173,6 @@
         if (state.active && state.invite) {
             const descriptor = state.descriptors[level - 1];
             const resolved = descriptor && resolveDescriptor(descriptor);
-
             if (resolved) {
                 currentMarket = resolved.market;
                 currentAsset = resolved.asset;
@@ -195,7 +182,7 @@
             state.active = false;
             state.invite = null;
             state.descriptors = [];
-            removeChallengeHash();
+            removeChallengeToken();
             clearInviteVisual();
             window.alert('This friend challenge could not be restored. A new random run will start instead.');
         }
@@ -203,7 +190,6 @@
         const wasCustomLaunch = state.customLaunchPending;
         const data = previousPickRandomData();
         state.customLaunchPending = false;
-
         if (!wasCustomLaunch) captureNormalDescriptor(data);
         return data;
     };
@@ -211,16 +197,16 @@
     function buildChallengeUrl(score) {
         const games = state.descriptors.slice(0, 3);
         if (games.length !== 3 || games.some((game) => !game)) return SITE_URL;
-
         const payload = {
             v: codec.CHALLENGE_VERSION,
             d: DATASET_VERSION,
             g: games.map((game) => ({ m: game.m, a: game.a, s: game.s })),
             t: Number(Number(score?.excess).toFixed(6)),
         };
-
         if (!codec.validateChallengeShape(payload)) return SITE_URL;
-        return `${SITE_URL}#challenge=${codec.encodeChallenge(payload)}`;
+        const url = new URL(SITE_URL);
+        url.searchParams.set('challenge', codec.encodeChallenge(payload));
+        return url.toString();
     }
 
     function renderChallengeResult() {
@@ -228,8 +214,7 @@
             hideChallengeResult();
             return;
         }
-
-        const score = window.FlappyKShare?.calculateLegendScore();
+        const score = scoreApi?.calculate(collectedCards, finalReturn);
         if (!score) return;
 
         const target = Number(state.invite.t);
@@ -250,7 +235,6 @@
             `<span>TARGET ${formatPercent(target)}</span>`,
             `<em>${tied ? 'TIE GAME' : won ? `WON BY ${formatPercent(Math.abs(margin))}` : `LOST BY ${formatPercent(Math.abs(margin))}`}</em>`,
         ].join('');
-
         if (challengeShareButton) challengeShareButton.textContent = 'CHALLENGE BACK';
     }
 
@@ -259,6 +243,11 @@
     }
 
     window.addEventListener('hashchange', () => {
+        state.active = false;
+        hideChallengeResult();
+        loadInviteFromLocation();
+    });
+    window.addEventListener('popstate', () => {
         state.active = false;
         hideChallengeResult();
         loadInviteFromLocation();
