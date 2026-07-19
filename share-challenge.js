@@ -142,7 +142,6 @@
             text,
             url,
             shareData,
-            originalLabel: challengeButton?.textContent || 'CHALLENGE A FRIEND',
         };
     }
 
@@ -151,12 +150,17 @@
         await copyFallback(prepared.text, prepared.url);
     }
 
+    function currentChallengeLabel() {
+        return window.FlappyKFriendChallenge?.isActive()
+            ? 'CHALLENGE BACK'
+            : 'CHALLENGE A FRIEND';
+    }
+
     function clearPreparedChallengeShare() {
-        if (preparedChallengeShare && challengeButton) {
-            challengeButton.textContent = preparedChallengeShare.originalLabel;
-            challengeButton.disabled = false;
-        }
         preparedChallengeShare = null;
+        if (!challengeButton) return;
+        challengeButton.disabled = false;
+        challengeButton.textContent = currentChallengeLabel();
     }
 
     async function shareChallenge(blob, score) {
@@ -194,9 +198,7 @@
                 await fallbackChallengeShare(prepared);
             }
         } finally {
-            preparedChallengeShare = null;
-            challengeButton.disabled = false;
-            challengeButton.textContent = prepared.originalLabel;
+            clearPreparedChallengeShare();
         }
     }
 
