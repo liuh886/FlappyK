@@ -25,6 +25,7 @@
     }
 
     function finiteOrNull(value) {
+        if (value === null || value === undefined || value === '') return null;
         const number = Number(value);
         return Number.isFinite(number) ? number : null;
     }
@@ -160,7 +161,7 @@
         if (!resultBanner) return;
         resultBanner.replaceChildren();
         resultBanner.hidden = false;
-        resultBanner.classList.toggle('personal-best-result--new', result.isNewBest);
+        resultBanner.classList.toggle('local-record-result--new', result.isNewBest);
 
         const title = document.createElement('strong');
         title.textContent = result.isNewBest ? 'NEW PERSONAL BEST' : 'PERSONAL RECORD';
