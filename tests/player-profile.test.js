@@ -64,9 +64,14 @@ const cards = [
 const signature = profileApi.buildRunSignature(cards, 0.1234);
 assert.equal(signature, profileApi.buildRunSignature(cards, 0.1234));
 assert.notEqual(signature, profileApi.buildRunSignature(cards, 0.1235));
+assert.equal(profileApi.buildRunSignature(cards.slice(0, 2), 0.1234), '');
 
 assert.throws(
     () => profileApi.applyCompletedRun(empty, { excess: Number.NaN, games: [] }),
+    /complete three-game score/
+);
+assert.throws(
+    () => profileApi.applyCompletedRun(empty, { excess: 1, games: [{ excess: 1 }] }),
     /complete three-game score/
 );
 
