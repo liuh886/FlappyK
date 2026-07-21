@@ -4,6 +4,7 @@
     const STORAGE_KEY = 'flappyk_daily_record_v1';
     const DATASET_VERSION = 'snapshot-2026-07-18';
     const SITE_URL = 'https://liuh886.github.io/FlappyK/';
+    const DEFAULT_TITLE = 'FlappyK — Can You Beat a Hidden Market?';
     const core = window.FlappyKDailyRunCore;
     const codec = window.FlappyKChallengeCodec;
     const scoreApi = window.FlappyKLegendScore;
@@ -116,7 +117,11 @@
         state.active = false;
         state.lastRecordedSignature = '';
         hideDailyResult();
-        document.title = 'FlappyK — Can You Beat a Hidden Market?';
+    }
+
+    function exitDailyMode() {
+        resetDailyMode();
+        document.title = DEFAULT_TITLE;
     }
 
     function startDailyRun() {
@@ -148,7 +153,7 @@
                 return resolved.data;
             }
 
-            resetDailyMode();
+            exitDailyMode();
             window.alert('Today’s Daily Run could not be restored. A random run will start instead.');
         }
         return previousPickRandomData();
@@ -225,7 +230,7 @@
     }, { capture: true });
     startButton?.addEventListener('click', resetDailyMode, { capture: true });
     customStartButton?.addEventListener('click', resetDailyMode, { capture: true });
-    playAgainButton?.addEventListener('click', resetDailyMode, { capture: true });
+    playAgainButton?.addEventListener('click', exitDailyMode, { capture: true });
     legendButton?.addEventListener('click', recordDailyCompletion);
 
     window.addEventListener('popstate', renderDailySummary);
