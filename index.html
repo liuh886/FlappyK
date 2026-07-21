@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="experience.css">
     <link rel="stylesheet" href="leaderboard.css">
     <link rel="stylesheet" href="local-records.css">
+    <link rel="stylesheet" href="daily-run.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -63,11 +64,17 @@
             <p>Beat the market to pass each game.</p>
             <div class="start-actions">
                 <button id="start-btn">PLAY</button>
+                <button id="daily-run-btn">DAILY RUN</button>
                 <button id="leaderboard-open-btn" class="leaderboard-home-btn">LEADERBOARD</button>
             </div>
             <div id="personal-profile-summary" class="local-records-summary" aria-live="polite">
                 <span>YOUR BEST <strong>---%</strong></span>
                 <span>RUNS 0</span>
+            </div>
+            <div id="daily-run-summary" class="daily-run-summary" aria-live="polite">
+                <strong>DAILY RUN</strong>
+                <span>SAME MARKETS FOR EVERYONE</span>
+                <small>DAILY STREAK 0</small>
             </div>
             <div class="start-data-ticker" aria-label="Real historical K-lines">
                 <div class="start-data-ticker-track">
@@ -154,6 +161,7 @@
                 <span class="legend-ticker-item" aria-hidden="true">3 MARKETS CONQUERED</span>
             </div>
         </div>
+        <div id="daily-run-result" class="daily-run-result" hidden aria-live="polite"></div>
         <div id="personal-best-result" class="local-record-result" hidden aria-live="polite"></div>
         <div id="friend-challenge-result" class="friend-challenge-result" hidden aria-live="polite"></div>
         <div id="champagne-export-wrapper" style="width: 100%; display: flex; justify-content: center;">
@@ -177,6 +185,7 @@
     <script src="qqq-loader.js"></script>
     <script src="scripts/friend-challenge-codec.js"></script>
     <script src="scripts/legend-score.js"></script>
+    <script src="scripts/daily-run-core.js"></script>
     <script src="game.js"></script>
     <script src="scripts/market-pass-rule.js"></script>
     <script src="results.js"></script>
@@ -186,6 +195,7 @@
     <script src="core-hardening.js"></script>
     <script src="scripts/market-goal-ui.js"></script>
     <script src="friend-challenge.js"></script>
+    <script src="daily-run.js"></script>
     <script src="scripts/game-pacing.js"></script>
     <script src="ui-polish.js"></script>
     <script src="leaderboard.js"></script>
