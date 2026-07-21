@@ -43,6 +43,27 @@ A local web server is recommended instead of opening `index.html` directly becau
 
 The market snapshot is stored locally in `data.js`. An internet connection is still used for the Google pixel font, the `html2canvas` CDN dependency, supplemental QQQ history, and the live leaderboard JSON.
 
+## Tests
+
+The existing Node and Python checks validate score calculations, challenge encoding, Daily Run determinism, local records, data continuity, and static integration. A Playwright Chromium smoke suite validates the most fragile browser-level flows:
+
+- first-run onboarding continues the selected entry;
+- the `BEAT THE MARKET` goal appears after launch;
+- pause freezes day progression and resume restarts it;
+- Daily Run creates three deterministic descriptors;
+- Daily Run produces a `?challenge=` URL;
+- the challenge link restores the same three hidden windows.
+
+Run the browser suite locally with:
+
+```bash
+npm ci
+npx playwright install chromium
+npm run test:e2e
+```
+
+GitHub Actions installs Chromium with its Linux dependencies and runs this browser job separately from static and data validation. Failure traces and screenshots are retained as workflow artifacts.
+
 ## Controls
 
 | Action | Desktop | Mobile |
@@ -225,7 +246,7 @@ The bundled data is a historical gameplay snapshot, not a real-time market feed.
 - unsigned friend-challenge target scores;
 - honor-based leaderboard submissions require a GitHub account and one final confirmation;
 - local onboarding, Personal Best, and Daily Streak do not sync across browsers or devices;
-- no automated browser end-to-end suite yet;
+- the browser suite covers critical entry and restoration flows but does not automate a complete three-game trade-through;
 - native link-share behavior still depends on the browser and operating system, with clipboard/prompt fallback;
 - not intended for investment decisions.
 
@@ -249,6 +270,9 @@ The bundled data is a historical gameplay snapshot, not a real-time market feed.
 - `leaderboard.js` / `leaderboard.css` — Top 10 display, qualification check, and prefilled score submission;
 - `data/leaderboard.json` — the current maximum ten leaderboard records;
 - `.github/workflows/leaderboard.yml` — Issue validation and automatic Top 10 update;
+- `.github/workflows/validate.yml` — static, data, and Chromium smoke validation;
+- `playwright.config.cjs` / `tests/e2e/product-flow.spec.js` — browser-level onboarding, pacing, Daily Run, and challenge restoration checks;
+- `package.json` / `package-lock.json` — pinned Playwright test dependency and scripts;
 - `scripts/leaderboard-ranking.js` — deterministic ranking and one-best-score-per-player rules;
 - `custom-challenge.js` / `custom-challenge.css` — hidden market and asset selector;
 - `card-export.js` / `card-export.css` — stable single-card desktop/mobile image generation;
