@@ -6,11 +6,7 @@
     const challengeButton = document.getElementById('challenge-share-btn');
     const saveButton = document.getElementById('champagne-save-btn');
     const exportArea = document.getElementById('champagne-export-area');
-    const legendOpenButton = document.getElementById('champagne-btn');
-    const legendRestartButton = document.getElementById('champagne-restart-btn');
     const mobileViewport = window.matchMedia('(max-width: 768px)');
-
-    let preparedChallengeShare = null;
 
     const calculateLegendScore = () => scoreApi?.calculate(collectedCards, finalReturn) || null;
     const formatPercent = (value) => scoreApi?.formatPercent(value)
@@ -31,24 +27,12 @@
         });
     }
 
-    function addChallengeHeadline(root, score) {
-        root.querySelector('.legend-share-cta')?.remove();
-        const headline = document.createElement('div');
-        headline.className = 'legend-share-cta';
-        headline.innerHTML = [
-            '<span>I TRADED 3 HIDDEN MARKETS</span>',
-            `<strong>${formatPercent(score.excess)} EXCESS</strong>`,
-            '<span>CAN YOU BEAT ME?</span>',
-        ].join('');
-        root.prepend(headline);
-    }
-
     async function waitForLayout() {
         if (document.fonts?.ready) await document.fonts.ready;
         await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     }
 
-    async function renderLegend(score, { challengeHeadline = true } = {}) {
+    async function renderLegend() {
         if (!exportArea || exportArea.children.length === 0) throw new Error('Legend cards have not been rendered');
         if (typeof window.html2canvas !== 'function') throw new Error('html2canvas is not available');
 
@@ -62,7 +46,6 @@
         const clone = exportArea.cloneNode(true);
         stripIds(clone);
         normalizeLegendCurrency(clone);
-        if (challengeHeadline) addChallengeHeadline(clone, score);
         surface.appendChild(clone);
         stage.appendChild(surface);
         document.body.appendChild(stage);
@@ -110,96 +93,46 @@
         window.setTimeout(() => URL.revokeObjectURL(objectUrl), 30000);
     }
 
-    async function copyFallback(text, url) {
-        const payload = `${text}\n${url}`;
-        try {
-            await navigator.clipboard.writeText(payload);
-            window.alert('Challenge text and link copied. The result image was also saved.');
-        } catch (error) {
-            window.prompt('Copy this challenge:', payload);
-        }
-    }
-
-    function buildPreparedChallenge(blob, score) {
+    function buildChallengeShare(score) {
         const scoreText = formatPercent(score.excess);
-        const text = `I traded 3 hidden historical markets and finished with ${scoreText} Excess. Can you beat me?`;
         const url = window.FlappyKFriendChallenge?.buildChallengeUrl(score) || SITE_URL;
-        const filename = `FlappyK_Challenge_${scoreText.replace(/[+%]/g, '').replace('-', 'minus-')}.png`;
-        const file = typeof File === 'function' ? new File([blob], filename, { type: 'image/png' }) : null;
-        const shareData = { title: 'FlappyK — Can You Beat a Hidden Market?', text, url };
-
-        if (file && typeof navigator.canShare === 'function') {
-            try {
-                if (navigator.canShare({ files: [file] })) shareData.files = [file];
-            } catch (error) {
-                console.warn('File sharing capability check failed.', error);
-            }
-        }
+        if (url === SITE_URL) throw new Error('Friend challenge URL is unavailable');
 
         return {
-            blob,
-            filename,
-            text,
             url,
-            shareData,
+            shareData: {
+                title: 'FlappyK — Friend Challenge',
+                text: `I finished 3 hidden historical markets with ${scoreText} Excess. Can you beat me on the same markets?`,
+                url,
+            },
         };
     }
 
-    async function fallbackChallengeShare(prepared) {
-        downloadBlob(prepared.blob, prepared.filename);
-        await copyFallback(prepared.text, prepared.url);
+    async function copyChallengeLink(url) {
+        try {
+            await navigator.clipboard.writeText(url);
+            window.alert('Challenge link copied. Send it to a friend to play the same 3 hidden markets.');
+            return 'copied';
+        } catch (error) {
+            window.prompt('Copy this friend challenge link:', url);
+            return 'prompted';
+        }
     }
 
-    function currentChallengeLabel() {
-        return window.FlappyKFriendChallenge?.isActive()
-            ? 'CHALLENGE BACK'
-            : 'CHALLENGE A FRIEND';
-    }
+    async function shareChallengeLink(score) {
+        const challenge = buildChallengeShare(score);
 
-    function clearPreparedChallengeShare() {
-        preparedChallengeShare = null;
-        if (!challengeButton) return;
-        challengeButton.disabled = false;
-        challengeButton.textContent = currentChallengeLabel();
-    }
-
-    async function shareChallenge(blob, score) {
-        const prepared = buildPreparedChallenge(blob, score);
         if (typeof navigator.share === 'function') {
             try {
-                await navigator.share(prepared.shareData);
+                await navigator.share(challenge.shareData);
                 return 'shared';
             } catch (error) {
                 if (error?.name === 'AbortError') return 'cancelled';
-                if (error?.name === 'NotAllowedError' && challengeButton) {
-                    preparedChallengeShare = prepared;
-                    challengeButton.disabled = false;
-                    challengeButton.textContent = 'TAP TO SHARE';
-                    return 'prepared';
-                }
-                console.warn('Native challenge share failed; using fallback.', error);
+                console.warn('Native link sharing failed; copying the challenge URL.', error);
             }
         }
-        await fallbackChallengeShare(prepared);
-        return 'fallback';
-    }
 
-    async function sharePreparedChallenge() {
-        const prepared = preparedChallengeShare;
-        if (!prepared || !challengeButton) return;
-        challengeButton.disabled = true;
-        challengeButton.textContent = 'SHARING...';
-        try {
-            const sharePromise = navigator.share(prepared.shareData);
-            await sharePromise;
-        } catch (error) {
-            if (!error || error.name !== 'AbortError') {
-                console.warn('Prepared native share failed; using fallback.', error);
-                await fallbackChallengeShare(prepared);
-            }
-        } finally {
-            clearPreparedChallengeShare();
-        }
+        return copyChallengeLink(challenge.url);
     }
 
     async function withBusyButton(button, busyLabel, task) {
@@ -208,15 +141,14 @@
         button.dataset.challengeBusy = 'true';
         button.disabled = true;
         button.textContent = busyLabel;
-        let preservePreparedLabel = false;
         try {
-            preservePreparedLabel = (await task()) === 'prepared';
+            await task();
         } catch (error) {
-            console.error('Challenge share failed:', error);
-            window.alert('The challenge could not be prepared. Please try again.');
+            console.error('Challenge action failed:', error);
+            window.alert('The challenge link could not be prepared. Please try again.');
         } finally {
             button.disabled = false;
-            if (!preservePreparedLabel) button.textContent = original;
+            button.textContent = original;
             delete button.dataset.challengeBusy;
         }
     }
@@ -224,15 +156,10 @@
     challengeButton?.addEventListener('click', (event) => {
         event.preventDefault();
         event.stopImmediatePropagation();
-        if (preparedChallengeShare) {
-            sharePreparedChallenge();
-            return;
-        }
-        withBusyButton(challengeButton, 'PREPARING...', async () => {
+        withBusyButton(challengeButton, 'SHARING...', async () => {
             const score = calculateLegendScore();
             if (!score) throw new Error('Completed three-game score is unavailable');
-            const blob = await canvasToBlob(await renderLegend(score, { challengeHeadline: true }));
-            return shareChallenge(blob, score);
+            await shareChallengeLink(score);
         });
     }, true);
 
@@ -242,13 +169,10 @@
         withBusyButton(saveButton, 'SAVING...', async () => {
             const score = calculateLegendScore();
             if (!score) throw new Error('Completed three-game score is unavailable');
-            const blob = await canvasToBlob(await renderLegend(score, { challengeHeadline: false }));
+            const blob = await canvasToBlob(await renderLegend());
             downloadBlob(blob, 'FlappyK_Legend_Result.png');
         });
     }, true);
-
-    legendOpenButton?.addEventListener('click', clearPreparedChallengeShare, { capture: true });
-    legendRestartButton?.addEventListener('click', clearPreparedChallengeShare, { capture: true });
 
     window.FlappyKShare = { calculateLegendScore, formatPercent };
 })();
