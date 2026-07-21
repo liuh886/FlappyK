@@ -36,6 +36,8 @@ jobs:
           node --check qqq-loader.js
           node --check scripts/friend-challenge-codec.js
           node --check scripts/legend-score.js
+          node --check scripts/market-pass-rule.js
+          node --check scripts/market-goal-ui.js
           node --check game.js
           node --check results.js
           node --check legend-ticker.js
@@ -52,6 +54,7 @@ jobs:
           node --check tests/leaderboard-ranking.test.js
           node --check tests/friend-challenge.test.js
           node --check tests/legend-score.test.js
+          node --check tests/market-pass-rule.test.js
 
       - name: Run regression checks
         run: |
@@ -59,6 +62,7 @@ jobs:
           node tests/leaderboard-ranking.test.js
           node tests/friend-challenge.test.js
           node tests/legend-score.test.js
+          node tests/market-pass-rule.test.js
 
       - name: Check Python syntax
         run: |
@@ -96,6 +100,9 @@ jobs:
           ! grep -q 'NOT LIVE DATA' index.html
           grep -q 'scripts/friend-challenge-codec.js' index.html
           grep -q 'scripts/legend-score.js' index.html
+          grep -q 'scripts/market-pass-rule.js' index.html
+          grep -q 'BEAT THE MARKET' index.html
+          grep -q 'card-market-return' index.html
           grep -q 'friend-challenge.js' index.html
           grep -q 'friend-challenge-result' index.html
           grep -q 'share-challenge.js' index.html
