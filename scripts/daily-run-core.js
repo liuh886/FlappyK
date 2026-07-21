@@ -59,7 +59,7 @@
             const assets = Object.keys(marketData)
                 .filter((asset) => Array.isArray(marketData[asset]))
                 .filter((asset) => marketData[asset].length >= daysPerGame)
-                .sort((left, right) => left.localeCompare(right, 'en'));
+                .sort();
 
             if (assets.length === 0) {
                 throw new Error(`No ${market} asset has ${daysPerGame} usable days`);
