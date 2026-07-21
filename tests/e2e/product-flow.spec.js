@@ -109,10 +109,11 @@ test('Daily Run is deterministic and produces a restorable friend challenge link
     window.FlappyKFriendChallenge.buildChallengeUrl({ excess: 12.34 })
   );
   expect(challengeUrl).toContain('?challenge=');
+  const localChallengeUrl = `/${new URL(challengeUrl).search}`;
 
   const challengePage = await context.newPage();
   await preparePage(challengePage);
-  await challengePage.goto(challengeUrl);
+  await challengePage.goto(localChallengeUrl);
 
   await expect(challengePage.getByRole('button', { name: 'PLAY CHALLENGE' })).toBeVisible();
   await expect(challengePage.locator('#friend-challenge-invite')).toContainText('SAME 3 HIDDEN MARKETS');
