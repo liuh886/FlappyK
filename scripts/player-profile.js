@@ -49,7 +49,10 @@
 
     function applyCompletedRun(currentProfile, score) {
         const profile = normalizeProfile(currentProfile);
-        if (!score || !Number.isFinite(Number(score.excess)) || !Array.isArray(score.games)) {
+        if (!score
+            || !Number.isFinite(Number(score.excess))
+            || !Array.isArray(score.games)
+            || score.games.length !== 3) {
             throw new TypeError('A complete three-game score is required');
         }
 
@@ -83,7 +86,7 @@
     }
 
     function buildRunSignature(cards, cumulativeReturn) {
-        if (!Array.isArray(cards)) return '';
+        if (!Array.isArray(cards) || cards.length !== 3) return '';
         const cardSignature = cards.map((card) => [
             card?.market,
             card?.asset,
@@ -112,6 +115,7 @@
     const homeSummary = document.getElementById('personal-profile-summary');
     const resultBanner = document.getElementById('personal-best-result');
     const legendButton = document.getElementById('champagne-btn');
+    const playAgainButton = document.getElementById('champagne-restart-btn');
     let profile = loadProfile();
     let lastRecordedSignature = '';
 
@@ -181,6 +185,14 @@
         resultBanner.append(title, score, detail);
     }
 
+    function resetRunRecording() {
+        lastRecordedSignature = '';
+        if (!resultBanner) return;
+        resultBanner.hidden = true;
+        resultBanner.replaceChildren();
+        resultBanner.classList.remove('local-record-result--new');
+    }
+
     function recordCompletedRun() {
         const score = scoreApi?.calculate(collectedCards, finalReturn);
         if (!score) return;
@@ -201,6 +213,7 @@
     }
 
     legendButton?.addEventListener('click', recordCompletedRun);
+    playAgainButton?.addEventListener('click', resetRunRecording, { capture: true });
     renderHomeSummary();
 
     window.FlappyKLocalProfile = {
