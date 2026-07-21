@@ -18,7 +18,8 @@ It includes:
 - fixed $1,000 buy/sell actions with a $1 transaction fee;
 - one clear pass rule: finish each game with positive Excess Return;
 - player, market, cumulative, drawdown, and excess-return results;
-- browser-local Personal Best and completed-run tracking without login;
+- a deterministic Daily Run shared by all players for the same UTC date;
+- browser-local Personal Best, Daily Streak, and completed-run tracking without login;
 - themed Profit Cards and a final Market Legend card set;
 - a global Excess Top 10 leaderboard;
 - reproducible same-market, same-window friend challenges;
@@ -70,6 +71,27 @@ The rule is intentionally symmetric:
 - losing money can still pass if the hidden market fell further and the player achieved positive Excess Return;
 - exactly matching the market does not pass.
 
+## Daily Run
+
+`DAILY RUN` gives every player the same three hidden assets and starting dates for a given UTC calendar day.
+
+The selection is produced locally from:
+
+- the UTC date;
+- a deterministic seeded random generator;
+- a sorted list of eligible assets in each market;
+- the current bundled market snapshot.
+
+No server is required. A Daily Run still uses the normal positive-Excess pass rule and remains eligible for Personal Best, friend sharing, and the global Top 10.
+
+The browser stores:
+
+- the best Total Excess achieved for each recent Daily Run date;
+- the most recently completed UTC date;
+- the current consecutive-day Daily Streak.
+
+Replaying the same day's run can improve the local daily best but does not increase the streak more than once that day. Missing a UTC calendar day resets the next completed streak to one.
+
 ## Local personal records
 
 FlappyK stores a minimal player record in the current browser only:
@@ -81,7 +103,7 @@ FlappyK stores a minimal player record in the current browser only:
 
 The home screen shows `YOUR BEST` and completed `RUNS`. The Market Legend screen announces `NEW PERSONAL BEST` when a completed run improves the stored score.
 
-No account or server is involved. Clearing site storage, using a private window, or opening FlappyK in another browser creates a separate local record. Storage errors do not block gameplay.
+No account or server is involved. Clearing site storage, using a private window, or opening FlappyK in another browser creates separate Personal Best and Daily Run records. Storage errors do not block gameplay.
 
 ## Friend challenges
 
@@ -101,7 +123,7 @@ When a friend opens the link, the start screen displays the target Excess and ch
 - the challenger target;
 - the winning or losing margin.
 
-A completed incoming challenge can be shared again with `CHALLENGE BACK`, using the same three hidden windows but the new player's score as the target.
+A completed incoming challenge can be shared again with `CHALLENGE BACK`, using the same three hidden windows but the new player's score as the target. Completed Daily Runs also generate valid friend-challenge links for that day's exact windows.
 
 Challenge links use asset names and starting dates rather than array positions, making them more resilient to future data regeneration. If a link cannot be restored against the current bundled snapshot, FlappyK rejects it and starts a normal random run instead.
 
@@ -111,7 +133,7 @@ Friend challenges are intentionally lightweight and unsigned. They do not requir
 
 The home screen includes a `LEADERBOARD` button that reads the current global Top 10 from `data/leaderboard.json`.
 
-Only complete normal three-market runs and reproducible friend-challenge runs are eligible. The ranking metric is total compounded **Excess Return** across the three revealed market paths. Custom challenge results do not enter the global leaderboard.
+Complete normal, Daily Run, and reproducible friend-challenge runs are eligible. The ranking metric is total compounded **Excess Return** across the three revealed market paths. Custom challenge results do not enter the global leaderboard.
 
 After reaching the Market Legend screen, the game compares the score with the current tenth-place cutoff:
 
@@ -132,7 +154,7 @@ The custom challenge lets the player choose:
 - Crypto, A-Shares, or US Stocks;
 - any bundled asset in the selected market.
 
-The asset is chosen by the player, but the 250-day historical window remains random and hidden until settlement. The same positive-Excess pass rule applies. A custom result can be saved, replayed on the same window, or restarted with another asset. Custom runs are isolated from the normal three-game progression and do not alter Market Legend, local completed-run records, or leaderboard records.
+The asset is chosen by the player, but the 250-day historical window remains random and hidden until settlement. The same positive-Excess pass rule applies. A custom result can be saved, replayed on the same window, or restarted with another asset. Custom runs are isolated from the normal three-game progression and do not alter Market Legend, local completed-run records, Daily Streak, or leaderboard records.
 
 The unlock code is not displayed as the challenge name. Once opened, the mode is shown simply as `CUSTOM CHALLENGE`, and the HUD uses `GAME: CUSTOM`.
 
@@ -142,7 +164,7 @@ The unlock code is not displayed as the challenge name. Once opened, the mode is
 - **Market Return**: natural price change of the revealed asset over the same historical interval.
 - **Excess**: `Player Return - Market Return`; positive Excess is required to pass each game.
 - **Total Return**: cumulative return from the original $10,000 starting balance.
-- **Total Excess**: cumulative game return minus the compounded return of the three underlying market paths; this is the local Personal Best, leaderboard, and friend-challenge metric.
+- **Total Excess**: cumulative game return minus the compounded return of the three underlying market paths; this is the local Personal Best, Daily best, leaderboard, and friend-challenge metric.
 - **Max DD**: maximum peak-to-trough decline in portfolio value during the game.
 
 ## Result sharing
@@ -188,9 +210,10 @@ The bundled data is a historical gameplay snapshot, not a real-time market feed.
 - long-only trading with cash; no shorting, leverage, or order types;
 - fixed trade size and fee model;
 - random historical-window selection for normal runs;
+- Daily Run consistency assumes players are using the same bundled data snapshot;
 - unsigned friend-challenge target scores;
 - honor-based leaderboard submissions require a GitHub account and one final confirmation;
-- local personal records do not sync across browsers or devices;
+- local Personal Best and Daily Streak do not sync across browsers or devices;
 - no automated browser end-to-end suite yet;
 - native link-share behavior still depends on the browser and operating system, with clipboard/prompt fallback;
 - not intended for investment decisions.
@@ -201,8 +224,10 @@ The bundled data is a historical gameplay snapshot, not a real-time market feed.
 - `style.css` — pixel-arcade layout and card themes;
 - `game.js` — market playback and trading state;
 - `scripts/market-pass-rule.js` — shared Player Return, Market Return, Excess, and pass calculation;
-- `scripts/market-goal-ui.js` — final HUD goal consistency across normal, friend, and custom modes;
+- `scripts/market-goal-ui.js` — final HUD goal consistency across normal, friend, Daily, and custom modes;
 - `scripts/game-pacing.js` — 15x default playback, pause/resume controls, and automatic tab-hide pausing;
+- `scripts/daily-run-core.js` — deterministic daily descriptors, UTC date helpers, and streak calculations;
+- `daily-run.js` / `daily-run.css` — Daily Run mode, results, sharing bridge, and browser-local daily record UI;
 - `scripts/player-profile.js` / `local-records.css` — browser-local Personal Best and completed-run UI;
 - `results.js` — settlement metrics and Legend result presentation;
 - `friend-challenge.js` / `friend-challenge.css` — challenge restoration, run recording, and result comparison;
