@@ -36,6 +36,7 @@ jobs:
           node --check qqq-loader.js
           node --check scripts/friend-challenge-codec.js
           node --check scripts/legend-score.js
+          node --check scripts/daily-run-core.js
           node --check scripts/market-pass-rule.js
           node --check scripts/market-goal-ui.js
           node --check scripts/game-pacing.js
@@ -47,6 +48,7 @@ jobs:
           node --check experience.js
           node --check core-hardening.js
           node --check friend-challenge.js
+          node --check daily-run.js
           node --check ui-polish.js
           node --check leaderboard.js
           node --check share-challenge.js
@@ -58,6 +60,7 @@ jobs:
           node --check tests/legend-score.test.js
           node --check tests/market-pass-rule.test.js
           node --check tests/player-profile.test.js
+          node --check tests/daily-run.test.js
 
       - name: Run regression checks
         run: |
@@ -67,6 +70,7 @@ jobs:
           node tests/legend-score.test.js
           node tests/market-pass-rule.test.js
           node tests/player-profile.test.js
+          node tests/daily-run.test.js
 
       - name: Check Python syntax
         run: |
@@ -96,7 +100,7 @@ jobs:
           print("index.html, og-image.png, and leaderboard.json validated")
           PY
 
-      - name: Check QQQ, challenge, sharing, pacing, records, and leaderboard integration
+      - name: Check QQQ, daily, challenge, sharing, pacing, records, and leaderboard integration
         run: |
           grep -q '"QQQ"' fetch_all_data.py
           grep -q 'qqq-loader.js' index.html
@@ -104,6 +108,12 @@ jobs:
           ! grep -q 'NOT LIVE DATA' index.html
           grep -q 'scripts/friend-challenge-codec.js' index.html
           grep -q 'scripts/legend-score.js' index.html
+          grep -q 'scripts/daily-run-core.js' index.html
+          grep -q 'daily-run.js' index.html
+          grep -q 'daily-run.css' index.html
+          grep -q 'daily-run-btn' index.html
+          grep -q 'daily-run-summary' index.html
+          grep -q 'daily-run-result' index.html
           grep -q 'scripts/market-pass-rule.js' index.html
           grep -q 'scripts/game-pacing.js' index.html
           grep -q 'scripts/player-profile.js' index.html
