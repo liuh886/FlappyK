@@ -6,6 +6,8 @@ const read = (path) => fs.readFileSync(path, 'utf8');
 const indexSource = read('index.html');
 const experienceSource = read('experience.js');
 const hardeningSource = read('core-hardening.js');
+const onboardingSource = read('onboarding.js');
+const onboardingCssSource = read('onboarding.css');
 const friendSource = read('friend-challenge.js');
 const friendCssSource = read('friend-challenge.css');
 const scoreSource = read('scripts/legend-score.js');
@@ -35,6 +37,22 @@ assert.ok(indexSource.includes('Trade 3 hidden historical markets.'));
 assert.ok(indexSource.includes('Beat the market to pass each game.'));
 assert.ok(indexSource.includes('id="card-market-return"'));
 assert.equal(indexSource.includes('ANY PROFIT'), false);
+
+assert.ok(indexSource.includes('onboarding.css'));
+assert.ok(indexSource.includes('id="onboarding-screen"'));
+assert.ok(indexSource.includes('id="onboarding-start-btn"'));
+assert.ok(indexSource.includes('POSITIVE EXCESS PASSES.'));
+assert.ok(indexSource.includes('onboarding.js'));
+assert.ok(indexSource.indexOf('onboarding.js') < indexSource.indexOf('friend-challenge.js'));
+assert.ok(indexSource.indexOf('onboarding.js') < indexSource.indexOf('daily-run.js'));
+assert.ok(onboardingSource.includes("const STORAGE_KEY = 'flappyk_onboarding_seen_v1'"));
+assert.ok(onboardingSource.includes("button.addEventListener('click', interceptFirstLaunch, { capture: true })"));
+assert.ok(onboardingSource.includes('event.stopImmediatePropagation()'));
+assert.ok(onboardingSource.includes('button?.click()'));
+assert.ok(onboardingSource.includes('window.localStorage.getItem'));
+assert.ok(onboardingSource.includes('window.localStorage.setItem'));
+assert.ok(onboardingCssSource.includes('.onboarding-screen'));
+assert.ok(onboardingCssSource.includes('.onboarding-panel'));
 
 assert.ok(experienceSource.includes("event.key !== 'Escape'"));
 assert.equal(experienceSource.includes('AUTO_NEXT'), false);
@@ -190,4 +208,4 @@ assert.ok(leaderboardWorkflow.includes('issues:'));
 assert.ok(leaderboardWorkflow.includes('updateTop10'));
 assert.ok(leaderboardWorkflow.includes('createOrUpdateFileContents'));
 
-console.log('UI, beat-the-market rule, pacing, Daily Run, local records, sharing, and leaderboard checks passed');
+console.log('UI, onboarding, beat-the-market rule, pacing, Daily Run, local records, sharing, and leaderboard checks passed');

@@ -47,6 +47,7 @@ jobs:
           node --check custom-challenge.js
           node --check experience.js
           node --check core-hardening.js
+          node --check onboarding.js
           node --check friend-challenge.js
           node --check daily-run.js
           node --check ui-polish.js
@@ -100,12 +101,17 @@ jobs:
           print("index.html, og-image.png, and leaderboard.json validated")
           PY
 
-      - name: Check QQQ, daily, challenge, sharing, pacing, records, and leaderboard integration
+      - name: Check onboarding, daily, challenge, sharing, pacing, records, and leaderboard integration
         run: |
           grep -q '"QQQ"' fetch_all_data.py
           grep -q 'qqq-loader.js' index.html
           grep -q 'REAL HISTORICAL K-LINES' index.html
           ! grep -q 'NOT LIVE DATA' index.html
+          grep -q 'onboarding.js' index.html
+          grep -q 'onboarding.css' index.html
+          grep -q 'onboarding-screen' index.html
+          grep -q 'onboarding-start-btn' index.html
+          grep -q 'POSITIVE EXCESS PASSES' index.html
           grep -q 'scripts/friend-challenge-codec.js' index.html
           grep -q 'scripts/legend-score.js' index.html
           grep -q 'scripts/daily-run-core.js' index.html
