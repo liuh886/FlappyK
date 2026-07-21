@@ -21,7 +21,7 @@ It includes:
 - a global Excess Top 10 leaderboard;
 - reproducible same-market, same-window friend challenges;
 - a hidden custom challenge for choosing a market and asset;
-- result sharing and PNG export.
+- friend-challenge link sharing and PNG result export.
 
 ## Run locally
 
@@ -35,7 +35,7 @@ python -m http.server 8000
 
 Open `http://localhost:8000` in a browser.
 
-A local web server is recommended instead of opening `index.html` directly because browser download, URL-fragment, clipboard, and share APIs behave more consistently in a local HTTP context.
+A local web server is recommended instead of opening `index.html` directly because browser download, URL-query, clipboard, and share APIs behave more consistently in a local HTTP context.
 
 The market snapshot is stored locally in `data.js`. An internet connection is still used for the Google pixel font, the `html2canvas` CDN dependency, supplemental QQQ history, and the live leaderboard JSON.
 
@@ -60,7 +60,7 @@ The market snapshot is stored locally in `data.js`. An internet connection is st
 
 ## Friend challenges
 
-`CHALLENGE A FRIEND` generates a compact URL fragment containing:
+`CHALLENGE A FRIEND` generates a compact URL query parameter containing:
 
 - the three market categories;
 - the three selected asset names;
@@ -126,10 +126,10 @@ Excess return does not change the game pass/fail rule. It is used for the global
 
 The final Market Legend screen separates two actions:
 
-- `CHALLENGE A FRIEND` — generates a score-aware result image, challenge text, and friend-challenge URL;
-- `SAVE RESULT` — directly downloads the generated result image.
+- `CHALLENGE A FRIEND` — shares the reproducible friend-challenge URL through the native link share sheet, or copies the URL on browsers without link sharing;
+- `SAVE RESULT` — directly renders and downloads the Market Legend PNG.
 
-Supported browsers use the native share sheet. Other environments save the image and copy the challenge text and URL. Shared link previews use a static Open Graph image, while the generated result image contains the player-specific Total Excess.
+The friend-challenge action never attaches a PNG file. This keeps the shared item clickable and ensures the receiver opens the same three hidden markets and 250-day windows. Shared links use the static Open Graph image for their preview; player-specific Total Excess remains encoded in the challenge URL and is shown on the receiving start screen.
 
 ## Data
 
@@ -169,7 +169,7 @@ The bundled data is a historical gameplay snapshot, not a real-time market feed.
 - honor-based leaderboard submissions require a GitHub account and one final confirmation;
 - no persistent player profile beyond the GitHub username stored in the Top 10;
 - no automated browser end-to-end suite yet;
-- mobile system share behavior still depends on the browser and operating system;
+- native link-share behavior still depends on the browser and operating system, with clipboard/prompt fallback;
 - not intended for investment decisions.
 
 ## Project structure
@@ -180,7 +180,8 @@ The bundled data is a historical gameplay snapshot, not a real-time market feed.
 - `results.js` — settlement metrics and Legend result presentation;
 - `friend-challenge.js` / `friend-challenge.css` — challenge restoration, run recording, and result comparison;
 - `scripts/friend-challenge-codec.js` — compact versioned challenge encoding and validation;
-- `share-challenge.js` / `share-challenge.css` — challenge image, text, link, native-share, clipboard, and download flows;
+- `share-challenge.js` — friend-challenge link sharing plus final Legend PNG saving;
+- `share-challenge.css` — stable off-screen Legend export layout;
 - `leaderboard.js` / `leaderboard.css` — Top 10 display, qualification check, and prefilled score submission;
 - `data/leaderboard.json` — the current maximum ten leaderboard records;
 - `.github/workflows/leaderboard.yml` — Issue validation and automatic Top 10 update;
