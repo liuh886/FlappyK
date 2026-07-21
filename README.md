@@ -18,6 +18,7 @@ It includes:
 - fixed $1,000 buy/sell actions with a $1 transaction fee;
 - one clear pass rule: finish each game with positive Excess Return;
 - player, market, cumulative, drawdown, and excess-return results;
+- browser-local Personal Best and completed-run tracking without login;
 - themed Profit Cards and a final Market Legend card set;
 - a global Excess Top 10 leaderboard;
 - reproducible same-market, same-window friend challenges;
@@ -36,7 +37,7 @@ python -m http.server 8000
 
 Open `http://localhost:8000` in a browser.
 
-A local web server is recommended instead of opening `index.html` directly because browser download, URL-query, clipboard, and share APIs behave more consistently in a local HTTP context.
+A local web server is recommended instead of opening `index.html` directly because browser download, URL-query, clipboard, storage, and share APIs behave more consistently in a local HTTP context.
 
 The market snapshot is stored locally in `data.js`. An internet connection is still used for the Google pixel font, the `html2canvas` CDN dependency, supplemental QQQ history, and the live leaderboard JSON.
 
@@ -68,6 +69,19 @@ The rule is intentionally symmetric:
 - making money is not enough if the hidden market gained more;
 - losing money can still pass if the hidden market fell further and the player achieved positive Excess Return;
 - exactly matching the market does not pass.
+
+## Local personal records
+
+FlappyK stores a minimal player record in the current browser only:
+
+- best completed-run Total Excess;
+- number of completed three-market runs;
+- number of markets beaten;
+- best individual Excess for Crypto, A-Shares, and US Stocks.
+
+The home screen shows `YOUR BEST` and completed `RUNS`. The Market Legend screen announces `NEW PERSONAL BEST` when a completed run improves the stored score.
+
+No account or server is involved. Clearing site storage, using a private window, or opening FlappyK in another browser creates a separate local record. Storage errors do not block gameplay.
 
 ## Friend challenges
 
@@ -118,7 +132,7 @@ The custom challenge lets the player choose:
 - Crypto, A-Shares, or US Stocks;
 - any bundled asset in the selected market.
 
-The asset is chosen by the player, but the 250-day historical window remains random and hidden until settlement. The same positive-Excess pass rule applies. A custom result can be saved, replayed on the same window, or restarted with another asset. Custom runs are isolated from the normal three-game progression and do not alter Market Legend or leaderboard records.
+The asset is chosen by the player, but the 250-day historical window remains random and hidden until settlement. The same positive-Excess pass rule applies. A custom result can be saved, replayed on the same window, or restarted with another asset. Custom runs are isolated from the normal three-game progression and do not alter Market Legend, local completed-run records, or leaderboard records.
 
 The unlock code is not displayed as the challenge name. Once opened, the mode is shown simply as `CUSTOM CHALLENGE`, and the HUD uses `GAME: CUSTOM`.
 
@@ -128,7 +142,7 @@ The unlock code is not displayed as the challenge name. Once opened, the mode is
 - **Market Return**: natural price change of the revealed asset over the same historical interval.
 - **Excess**: `Player Return - Market Return`; positive Excess is required to pass each game.
 - **Total Return**: cumulative return from the original $10,000 starting balance.
-- **Total Excess**: cumulative game return minus the compounded return of the three underlying market paths; this is the leaderboard and friend-challenge metric.
+- **Total Excess**: cumulative game return minus the compounded return of the three underlying market paths; this is the local Personal Best, leaderboard, and friend-challenge metric.
 - **Max DD**: maximum peak-to-trough decline in portfolio value during the game.
 
 ## Result sharing
@@ -176,7 +190,7 @@ The bundled data is a historical gameplay snapshot, not a real-time market feed.
 - random historical-window selection for normal runs;
 - unsigned friend-challenge target scores;
 - honor-based leaderboard submissions require a GitHub account and one final confirmation;
-- no persistent player profile beyond the GitHub username stored in the Top 10;
+- local personal records do not sync across browsers or devices;
 - no automated browser end-to-end suite yet;
 - native link-share behavior still depends on the browser and operating system, with clipboard/prompt fallback;
 - not intended for investment decisions.
@@ -189,6 +203,7 @@ The bundled data is a historical gameplay snapshot, not a real-time market feed.
 - `scripts/market-pass-rule.js` — shared Player Return, Market Return, Excess, and pass calculation;
 - `scripts/market-goal-ui.js` — final HUD goal consistency across normal, friend, and custom modes;
 - `scripts/game-pacing.js` — 15x default playback, pause/resume controls, and automatic tab-hide pausing;
+- `scripts/player-profile.js` / `local-records.css` — browser-local Personal Best and completed-run UI;
 - `results.js` — settlement metrics and Legend result presentation;
 - `friend-challenge.js` / `friend-challenge.css` — challenge restoration, run recording, and result comparison;
 - `scripts/friend-challenge-codec.js` — compact versioned challenge encoding and validation;
