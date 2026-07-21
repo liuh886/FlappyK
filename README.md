@@ -14,6 +14,7 @@ It includes:
 
 - three games: Crypto, A-Shares, and US Stocks;
 - historical OHLC candlestick playback;
+- a one-time first-run guide explaining controls, hidden information, and the positive-Excess pass rule;
 - faster 15x default playback with keyboard and mobile pause controls;
 - fixed $1,000 buy/sell actions with a $1 transaction fee;
 - one clear pass rule: finish each game with positive Excess Return;
@@ -54,6 +55,16 @@ The market snapshot is stored locally in `data.js`. An internet connection is st
 | Return home | `ESC` | reload / browser navigation |
 
 Playback starts at 15x. Switching away from the browser tab pauses an active game automatically so the hidden market does not continue without the player.
+
+## First run
+
+Before the first `PLAY`, `DAILY RUN`, or incoming friend challenge, FlappyK shows one compact guide:
+
+1. buy or sell fixed $1,000 positions while the 250-day chart moves;
+2. the asset name and historical period remain hidden until settlement;
+3. Player Return must exceed Market Return, so only positive Excess passes.
+
+After the player confirms the guide, FlappyK continues through the exact entry that was originally selected. The guide is then hidden on later visits using a browser-local preference. Clearing site storage or using another browser causes it to appear again. Failure to save the preference does not block gameplay.
 
 ## Game loop
 
@@ -213,7 +224,7 @@ The bundled data is a historical gameplay snapshot, not a real-time market feed.
 - Daily Run consistency assumes players are using the same bundled data snapshot;
 - unsigned friend-challenge target scores;
 - honor-based leaderboard submissions require a GitHub account and one final confirmation;
-- local Personal Best and Daily Streak do not sync across browsers or devices;
+- local onboarding, Personal Best, and Daily Streak do not sync across browsers or devices;
 - no automated browser end-to-end suite yet;
 - native link-share behavior still depends on the browser and operating system, with clipboard/prompt fallback;
 - not intended for investment decisions.
@@ -225,6 +236,7 @@ The bundled data is a historical gameplay snapshot, not a real-time market feed.
 - `game.js` — market playback and trading state;
 - `scripts/market-pass-rule.js` — shared Player Return, Market Return, Excess, and pass calculation;
 - `scripts/market-goal-ui.js` — final HUD goal consistency across normal, friend, Daily, and custom modes;
+- `onboarding.js` / `onboarding.css` — one-time first-run explanation and entry preservation;
 - `scripts/game-pacing.js` — 15x default playback, pause/resume controls, and automatic tab-hide pausing;
 - `scripts/daily-run-core.js` — deterministic daily descriptors, UTC date helpers, and streak calculations;
 - `daily-run.js` / `daily-run.css` — Daily Run mode, results, sharing bridge, and browser-local daily record UI;
