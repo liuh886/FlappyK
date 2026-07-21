@@ -46,7 +46,10 @@
                 <div class="key-hint"><span class="key">UP</span> BUY $1K · $1 FEE</div>
                 <div class="key-hint"><span class="key">DOWN</span> SELL $1K · $1 FEE</div>
                 <div class="key-hint" style="margin-top:15px; color: #f1c40f;">
-                    SPEED: <button id="speed-btn" style="padding: 2px 5px; font-size: 8px; margin:0; border:2px solid #fff; box-shadow:none; cursor:pointer; background: #000; color: #fff;">5x [←/→]</button>
+                    SPEED: <button id="speed-btn" style="padding: 2px 5px; font-size: 8px; margin:0; border:2px solid #fff; box-shadow:none; cursor:pointer; background: #000; color: #fff;">15x [←/→]</button>
+                </div>
+                <div class="key-hint" style="margin-top:8px;">
+                    <button id="pause-btn" style="padding: 4px 7px; font-size: 8px; margin:0; border:2px solid #fff; box-shadow:none; cursor:pointer; background:#000; color:#fff;">PAUSE [SPACE]</button>
                 </div>
             </div>
         </div>
@@ -129,6 +132,7 @@
 
         <div id="mobile-controls">
             <div class="dpad-left"><button id="btn-speed-down" class="mobile-btn small-btn">◀</button></div>
+            <div class="dpad-pause"><button id="btn-pause" class="mobile-btn small-btn" aria-label="Pause game">Ⅱ</button></div>
             <div class="dpad-center">
                 <button id="btn-buy" class="mobile-btn action-btn buy-btn" aria-label="Buy one thousand dollars"><span class="trade-emoji" aria-hidden="true">🐂</span><span>BUY</span></button>
                 <button id="btn-sell" class="mobile-btn action-btn sell-btn" aria-label="Sell one thousand dollars"><span class="trade-emoji" aria-hidden="true">🐻‍❄️</span><span>SELL</span></button>
@@ -176,6 +180,7 @@
     <script src="core-hardening.js"></script>
     <script src="scripts/market-goal-ui.js"></script>
     <script src="friend-challenge.js"></script>
+    <script src="scripts/game-pacing.js"></script>
     <script src="ui-polish.js"></script>
     <script src="leaderboard.js"></script>
     <script src="share-challenge.js"></script>

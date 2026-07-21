@@ -11,6 +11,7 @@ const friendCssSource = read('friend-challenge.css');
 const scoreSource = read('scripts/legend-score.js');
 const marketPassSource = read('scripts/market-pass-rule.js');
 const marketGoalSource = read('scripts/market-goal-ui.js');
+const pacingSource = read('scripts/game-pacing.js');
 const resultsSource = read('results.js');
 const legendSource = read('legend-ticker.js');
 const qqqSource = read('qqq-loader.js');
@@ -56,6 +57,17 @@ assert.ok(marketGoalSource.includes("targetDisp.textContent = 'BEAT THE MARKET'"
 assert.ok(resultsSource.includes('window.FlappyKMarketPassRule'));
 assert.ok(resultsSource.includes('performance.isSuccess'));
 assert.ok(resultsSource.includes('legend-market-return'));
+
+assert.ok(indexSource.includes('scripts/game-pacing.js'));
+assert.ok(indexSource.includes('id="pause-btn"'));
+assert.ok(indexSource.includes('id="btn-pause"'));
+assert.ok(indexSource.indexOf('friend-challenge.js') < indexSource.indexOf('scripts/game-pacing.js'));
+assert.ok(pacingSource.includes('const DEFAULT_SPEED = 15'));
+assert.ok(pacingSource.includes("event.code !== 'Space'"));
+assert.ok(pacingSource.includes("document.addEventListener('visibilitychange'"));
+assert.ok(pacingSource.includes('gameInterval = setInterval(gameTick, TICK_RATE)'));
+assert.ok(pacingSource.includes('isPlaying = false'));
+assert.ok(pacingSource.includes('isPlaying = true'));
 
 assert.equal(legendSource.includes('🦬'), false);
 assert.equal(legendSource.includes('installCanvasEmojiMap'), false);
@@ -135,4 +147,4 @@ assert.ok(leaderboardWorkflow.includes('issues:'));
 assert.ok(leaderboardWorkflow.includes('updateTop10'));
 assert.ok(leaderboardWorkflow.includes('createOrUpdateFileContents'));
 
-console.log('UI, beat-the-market pass rule, friend challenge sharing, leaderboard, and reviewed regression checks passed');
+console.log('UI, beat-the-market rule, faster pacing, pause controls, sharing, and leaderboard checks passed');

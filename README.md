@@ -14,7 +14,7 @@ It includes:
 
 - three games: Crypto, A-Shares, and US Stocks;
 - historical OHLC candlestick playback;
-- keyboard and mobile controls;
+- faster 15x default playback with keyboard and mobile pause controls;
 - fixed $1,000 buy/sell actions with a $1 transaction fee;
 - one clear pass rule: finish each game with positive Excess Return;
 - player, market, cumulative, drawdown, and excess-return results;
@@ -48,7 +48,10 @@ The market snapshot is stored locally in `data.js`. An internet connection is st
 | Sell $1,000 | `↓` | `🐻‍❄️ SELL` |
 | Slow down | `←` | `◀` |
 | Speed up | `→` | `▶` |
+| Pause / resume | `Space` | `Ⅱ / ▶` |
 | Return home | `ESC` | reload / browser navigation |
+
+Playback starts at 15x. Switching away from the browser tab pauses an active game automatically so the hidden market does not continue without the player.
 
 ## Game loop
 
@@ -185,6 +188,7 @@ The bundled data is a historical gameplay snapshot, not a real-time market feed.
 - `game.js` — market playback and trading state;
 - `scripts/market-pass-rule.js` — shared Player Return, Market Return, Excess, and pass calculation;
 - `scripts/market-goal-ui.js` — final HUD goal consistency across normal, friend, and custom modes;
+- `scripts/game-pacing.js` — 15x default playback, pause/resume controls, and automatic tab-hide pausing;
 - `results.js` — settlement metrics and Legend result presentation;
 - `friend-challenge.js` / `friend-challenge.css` — challenge restoration, run recording, and result comparison;
 - `scripts/friend-challenge-codec.js` — compact versioned challenge encoding and validation;
