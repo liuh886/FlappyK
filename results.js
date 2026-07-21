@@ -5,44 +5,54 @@ var finalReturn = 0;
 (() => {
     'use strict';
 
+    const ruleApi = window.FlappyKMarketPassRule;
     const formatReturn = (value) =>
         `${value >= 0 ? '+' : ''}${(value * 100).toFixed(2)}%`;
 
     const originalStartLevel = startLevel;
     startLevel = function resultsAwareStartLevel() {
         originalStartLevel();
-        targetDisp.innerText = level === 1
-            ? 'ANY PROFIT'
-            : `> ${(targetReturn * 100).toFixed(2)}%`;
+        targetDisp.innerText = 'BEAT THE MARKET';
     };
 
     const originalEndLevel = endLevel;
     endLevel = function resultsAwareEndLevel() {
         const completedLevel = level;
         const projectedCash = cash + (shares * currentPrice);
-        const levelReturn = (projectedCash - levelStartCash) / levelStartCash;
-        const startPrice = currentData[0].close;
-        const marketReturn = (currentPrice - startPrice) / startPrice;
-        const excessReturn = levelReturn - marketReturn;
-        const excessRetStr = formatReturn(excessReturn);
+        const performance = ruleApi.evaluate({
+            startCash: levelStartCash,
+            finalCash: projectedCash,
+            startPrice: currentData[0].close,
+            finalPrice: currentPrice,
+        });
+        const marketRetStr = formatReturn(performance.marketReturn);
+        const excessRetStr = formatReturn(performance.excessReturn);
 
-        // Fix the undefined `finalReturn` reference used by the original function.
         finalReturn = (projectedCash - INITIAL_CASH) / INITIAL_CASH;
 
         originalEndLevel();
+
+        const marketElement = document.getElementById('card-market-return');
+        if (marketElement) marketElement.innerText = marketRetStr;
 
         const excessElement = document.getElementById('card-excess-return');
         if (excessElement) excessElement.innerText = excessRetStr;
 
         const statusElement = document.getElementById('card-status');
         if (statusElement) {
-            statusElement.innerText = statusElement.classList.contains('card-positive')
-                ? 'TARGET BEATEN!'
-                : 'TARGET MISSED.';
+            statusElement.innerText = performance.isSuccess
+                ? 'MARKET BEATEN!'
+                : 'MARKET WON.';
+            statusElement.className = performance.isSuccess
+                ? 'status-msg card-positive'
+                : 'status-msg card-negative';
         }
 
         const completedCard = collectedCards.find((card) => card.level === completedLevel);
-        if (completedCard) completedCard.excessRetStr = excessRetStr;
+        if (completedCard) {
+            completedCard.marketRetStr = marketRetStr;
+            completedCard.excessRetStr = excessRetStr;
+        }
     };
 
     function polishLegendCards() {
@@ -51,6 +61,13 @@ var finalReturn = 0;
         cards.forEach((card, index) => {
             const details = card.querySelector('.card-details');
             const cardData = collectedCards[index];
+
+            if (details && cardData && !details.querySelector('.legend-market-return')) {
+                const row = document.createElement('p');
+                row.className = 'legend-market-return';
+                row.innerHTML = `MARKET RETURN: <span class="highlight">${cardData.marketRetStr || '---%'}</span>`;
+                details.appendChild(row);
+            }
 
             if (details && cardData && !details.querySelector('.legend-excess-return')) {
                 const row = document.createElement('p');

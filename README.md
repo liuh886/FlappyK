@@ -2,7 +2,7 @@
 
 A small browser trading game built around one question:
 
-> Can you trade an unknown historical K-line without knowing the asset or period?
+> Can you beat an unknown historical market without knowing the asset or period?
 
 FlappyK keeps its deliberately simple pixel-arcade style. You trade fixed-size positions, move through three market games, and reveal the asset and historical period only when each game ends.
 
@@ -16,7 +16,8 @@ It includes:
 - historical OHLC candlestick playback;
 - keyboard and mobile controls;
 - fixed $1,000 buy/sell actions with a $1 transaction fee;
-- game, cumulative, drawdown, and excess-return results;
+- one clear pass rule: finish each game with positive Excess Return;
+- player, market, cumulative, drawdown, and excess-return results;
 - themed Profit Cards and a final Market Legend card set;
 - a global Excess Top 10 leaderboard;
 - reproducible same-market, same-window friend challenges;
@@ -53,10 +54,17 @@ The market snapshot is stored locally in `data.js`. An internet connection is st
 
 1. Start with $10,000.
 2. Trade an unidentified 250-day historical window.
-3. Finish Game 1 with a positive cumulative return.
-4. In later games, beat the cumulative-return checkpoint set by the previous completed game.
-5. Complete Crypto, A-Shares, and US Stocks to unlock the final Market Legend screen.
-6. Share a same-market, same-window challenge or submit a qualifying Total Excess score to the global Top 10.
+3. At settlement, FlappyK reveals the asset and compares Player Return with Market Return.
+4. Pass only when `Player Return - Market Return > 0`.
+5. Repeat the same rule across Crypto, A-Shares, and US Stocks.
+6. Complete all three markets to unlock the final Market Legend screen.
+7. Share a same-market, same-window challenge or submit a qualifying Total Excess score to the global Top 10.
+
+The rule is intentionally symmetric:
+
+- making money is not enough if the hidden market gained more;
+- losing money can still pass if the hidden market fell further and the player achieved positive Excess Return;
+- exactly matching the market does not pass.
 
 ## Friend challenges
 
@@ -107,20 +115,18 @@ The custom challenge lets the player choose:
 - Crypto, A-Shares, or US Stocks;
 - any bundled asset in the selected market.
 
-The asset is chosen by the player, but the 250-day historical window remains random and hidden until settlement. A custom result can be saved, replayed on the same window, or restarted with another asset. Custom runs are isolated from the normal three-game progression and do not alter Market Legend or leaderboard records.
+The asset is chosen by the player, but the 250-day historical window remains random and hidden until settlement. The same positive-Excess pass rule applies. A custom result can be saved, replayed on the same window, or restarted with another asset. Custom runs are isolated from the normal three-game progression and do not alter Market Legend or leaderboard records.
 
 The unlock code is not displayed as the challenge name. Once opened, the mode is shown simply as `CUSTOM CHALLENGE`, and the HUD uses `GAME: CUSTOM`.
 
 ## Result metrics
 
-- **Game Return**: return earned during the current game.
+- **Player Return**: return earned during the current game.
+- **Market Return**: natural price change of the revealed asset over the same historical interval.
+- **Excess**: `Player Return - Market Return`; positive Excess is required to pass each game.
 - **Total Return**: cumulative return from the original $10,000 starting balance.
-- **Underlying Return**: natural price change of the revealed asset over the same historical interval.
-- **Excess**: `Game Return - Underlying Return` on an individual Profit Card.
 - **Total Excess**: cumulative game return minus the compounded return of the three underlying market paths; this is the leaderboard and friend-challenge metric.
 - **Max DD**: maximum peak-to-trough decline in portfolio value during the game.
-
-Excess return does not change the game pass/fail rule. It is used for the global leaderboard and friend-challenge comparison after the player completes all three markets.
 
 ## Result sharing
 
@@ -177,6 +183,8 @@ The bundled data is a historical gameplay snapshot, not a real-time market feed.
 - `index.html` — game screens and controls;
 - `style.css` — pixel-arcade layout and card themes;
 - `game.js` — market playback and trading state;
+- `scripts/market-pass-rule.js` — shared Player Return, Market Return, Excess, and pass calculation;
+- `scripts/market-goal-ui.js` — final HUD goal consistency across normal, friend, and custom modes;
 - `results.js` — settlement metrics and Legend result presentation;
 - `friend-challenge.js` / `friend-challenge.css` — challenge restoration, run recording, and result comparison;
 - `scripts/friend-challenge-codec.js` — compact versioned challenge encoding and validation;

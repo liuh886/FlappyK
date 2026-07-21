@@ -40,7 +40,7 @@
                 <div>ASSET: $<span id="asset-display">0.00</span></div>
                 <div>TOTAL: $<span id="total-display">10000.00</span></div>
                 <div>RETURN: <span id="return-display" class="neutral">0.00%</span></div>
-                <div style="display:none;" aria-hidden="true">TARGET: <span id="target-return-display">ANY PROFIT</span></div>
+                <div>GOAL: <span id="target-return-display">BEAT THE MARKET</span></div>
             </div>
             <div class="controls-hint">
                 <div class="key-hint"><span class="key">UP</span> BUY $1K · $1 FEE</div>
@@ -55,8 +55,8 @@
 
         <div id="start-screen" class="screen active">
             <h1 id="game-title">FLAPPY K</h1>
-            <p>Trade the unknown K-line.</p>
-            <p>Buy low. Sell high. Beat the target.</p>
+            <p>Trade 3 hidden historical markets.</p>
+            <p>Beat the market to pass each game.</p>
             <div class="start-actions">
                 <button id="start-btn">PLAY</button>
                 <button id="leaderboard-open-btn" class="leaderboard-home-btn">LEADERBOARD</button>
@@ -107,7 +107,8 @@
                     <p>STARTING: $<span id="card-start-cash" class="highlight">---</span></p>
                     <p>FINAL: $<span id="card-final-cash" class="highlight">---</span></p>
                     <p>PERIOD: <span id="card-period" class="highlight">???</span></p>
-                    <p>LVL RETURN: <span id="card-level-return" class="highlight">---%</span></p>
+                    <p>PLAYER RETURN: <span id="card-level-return" class="highlight">---%</span></p>
+                    <p>MARKET RETURN: <span id="card-market-return" class="highlight">---%</span></p>
                     <p>EXCESS: <span id="card-excess-return" class="highlight">---%</span></p>
                     <div style="display:none;" id="card-small-return"></div>
                     <div style="display:none;" id="card-final"></div>
@@ -167,11 +168,13 @@
     <script src="scripts/friend-challenge-codec.js"></script>
     <script src="scripts/legend-score.js"></script>
     <script src="game.js"></script>
+    <script src="scripts/market-pass-rule.js"></script>
     <script src="results.js"></script>
     <script src="legend-ticker.js"></script>
     <script src="custom-challenge.js"></script>
     <script src="experience.js"></script>
     <script src="core-hardening.js"></script>
+    <script src="scripts/market-goal-ui.js"></script>
     <script src="friend-challenge.js"></script>
     <script src="ui-polish.js"></script>
     <script src="leaderboard.js"></script>
