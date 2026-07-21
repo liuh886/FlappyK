@@ -55,6 +55,8 @@ jobs:
           node --check share-challenge.js
           node --check card-export.js
           node --check scripts/leaderboard-ranking.js
+          node --check playwright.config.cjs
+          node --check tests/e2e/product-flow.spec.js
           node --check tests/ui-regression.test.js
           node --check tests/leaderboard-ranking.test.js
           node --check tests/friend-challenge.test.js
@@ -143,3 +145,42 @@ jobs:
 
       - name: Audit bundled equity split continuity
         run: python scripts/audit_bundled_data.py
+
+  browser-smoke:
+    needs: static-and-data
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install test dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser smoke tests
+        run: npm run test:e2e
+
+      - name: Upload browser failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7
