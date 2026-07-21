@@ -12,6 +12,8 @@ const scoreSource = read('scripts/legend-score.js');
 const marketPassSource = read('scripts/market-pass-rule.js');
 const marketGoalSource = read('scripts/market-goal-ui.js');
 const pacingSource = read('scripts/game-pacing.js');
+const profileSource = read('scripts/player-profile.js');
+const profileCssSource = read('local-records.css');
 const resultsSource = read('results.js');
 const legendSource = read('legend-ticker.js');
 const qqqSource = read('qqq-loader.js');
@@ -68,6 +70,22 @@ assert.ok(pacingSource.includes("document.addEventListener('visibilitychange'"))
 assert.ok(pacingSource.includes('gameInterval = setInterval(gameTick, TICK_RATE)'));
 assert.ok(pacingSource.includes('isPlaying = false'));
 assert.ok(pacingSource.includes('isPlaying = true'));
+
+assert.ok(indexSource.includes('local-records.css'));
+assert.ok(indexSource.includes('id="personal-profile-summary"'));
+assert.ok(indexSource.includes('id="personal-best-result"'));
+assert.ok(indexSource.includes('scripts/player-profile.js'));
+assert.ok(indexSource.indexOf('card-export.js') < indexSource.indexOf('scripts/player-profile.js'));
+assert.ok(profileSource.includes("const STORAGE_KEY = 'flappyk_player_profile_v1'"));
+assert.ok(profileSource.includes('window.localStorage.getItem'));
+assert.ok(profileSource.includes('window.localStorage.setItem'));
+assert.ok(profileSource.includes('lastRecordedSignature'));
+assert.ok(profileSource.includes('NEW PERSONAL BEST'));
+assert.ok(profileSource.includes('FIRST COMPLETED RUN'));
+assert.ok(profileSource.includes('scoreApi?.calculate(collectedCards, finalReturn)'));
+assert.ok(profileSource.includes("legendButton?.addEventListener('click', recordCompletedRun)"));
+assert.ok(profileCssSource.includes('.local-records-summary'));
+assert.ok(profileCssSource.includes('.local-record-result--new'));
 
 assert.equal(legendSource.includes('🦬'), false);
 assert.equal(legendSource.includes('installCanvasEmojiMap'), false);
@@ -147,4 +165,4 @@ assert.ok(leaderboardWorkflow.includes('issues:'));
 assert.ok(leaderboardWorkflow.includes('updateTop10'));
 assert.ok(leaderboardWorkflow.includes('createOrUpdateFileContents'));
 
-console.log('UI, beat-the-market rule, faster pacing, pause controls, sharing, and leaderboard checks passed');
+console.log('UI, beat-the-market rule, pacing, local records, sharing, and leaderboard checks passed');
