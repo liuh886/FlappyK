@@ -28,6 +28,7 @@
     <link rel="stylesheet" href="support-button.css">
     <link rel="stylesheet" href="experience.css">
     <link rel="stylesheet" href="leaderboard.css">
+    <link rel="stylesheet" href="local-records.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -63,6 +64,10 @@
             <div class="start-actions">
                 <button id="start-btn">PLAY</button>
                 <button id="leaderboard-open-btn" class="leaderboard-home-btn">LEADERBOARD</button>
+            </div>
+            <div id="personal-profile-summary" class="local-records-summary" aria-live="polite">
+                <span>YOUR BEST <strong>---%</strong></span>
+                <span>RUNS 0</span>
             </div>
             <div class="start-data-ticker" aria-label="Real historical K-lines">
                 <div class="start-data-ticker-track">
@@ -149,6 +154,7 @@
                 <span class="legend-ticker-item" aria-hidden="true">3 MARKETS CONQUERED</span>
             </div>
         </div>
+        <div id="personal-best-result" class="local-record-result" hidden aria-live="polite"></div>
         <div id="friend-challenge-result" class="friend-challenge-result" hidden aria-live="polite"></div>
         <div id="champagne-export-wrapper" style="width: 100%; display: flex; justify-content: center;">
             <div id="champagne-export-area" class="export-area"></div>
@@ -185,5 +191,6 @@
     <script src="leaderboard.js"></script>
     <script src="share-challenge.js"></script>
     <script src="card-export.js"></script>
+    <script src="scripts/player-profile.js"></script>
 </body>
 </html>

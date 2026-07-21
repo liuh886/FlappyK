@@ -39,6 +39,7 @@ jobs:
           node --check scripts/market-pass-rule.js
           node --check scripts/market-goal-ui.js
           node --check scripts/game-pacing.js
+          node --check scripts/player-profile.js
           node --check game.js
           node --check results.js
           node --check legend-ticker.js
@@ -56,6 +57,7 @@ jobs:
           node --check tests/friend-challenge.test.js
           node --check tests/legend-score.test.js
           node --check tests/market-pass-rule.test.js
+          node --check tests/player-profile.test.js
 
       - name: Run regression checks
         run: |
@@ -64,6 +66,7 @@ jobs:
           node tests/friend-challenge.test.js
           node tests/legend-score.test.js
           node tests/market-pass-rule.test.js
+          node tests/player-profile.test.js
 
       - name: Check Python syntax
         run: |
@@ -93,7 +96,7 @@ jobs:
           print("index.html, og-image.png, and leaderboard.json validated")
           PY
 
-      - name: Check QQQ, challenge, sharing, pacing, and leaderboard integration
+      - name: Check QQQ, challenge, sharing, pacing, records, and leaderboard integration
         run: |
           grep -q '"QQQ"' fetch_all_data.py
           grep -q 'qqq-loader.js' index.html
@@ -103,6 +106,10 @@ jobs:
           grep -q 'scripts/legend-score.js' index.html
           grep -q 'scripts/market-pass-rule.js' index.html
           grep -q 'scripts/game-pacing.js' index.html
+          grep -q 'scripts/player-profile.js' index.html
+          grep -q 'local-records.css' index.html
+          grep -q 'personal-profile-summary' index.html
+          grep -q 'personal-best-result' index.html
           grep -q 'pause-btn' index.html
           grep -q 'btn-pause' index.html
           grep -q 'BEAT THE MARKET' index.html
