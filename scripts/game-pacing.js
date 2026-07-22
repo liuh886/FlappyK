@@ -7,9 +7,15 @@
     const mobileControls = document.getElementById('mobile-controls');
     const pauseButton = document.getElementById('pause-btn');
     const backButton = document.getElementById('game-back-btn');
-    const mobileViewport = window.matchMedia('(max-width: 768px)');
+    const compactViewport = window.matchMedia('(max-width: 1024px)');
+    const coarsePointer = window.matchMedia('(pointer: coarse)');
     let paused = false;
     let gameActive = false;
+
+    function shouldShowVirtualControls() {
+        const hasTouch = Number(navigator.maxTouchPoints || 0) > 0;
+        return gameActive && (compactViewport.matches || coarsePointer.matches || hasTouch);
+    }
 
     function syncControlVisibility() {
         if (topControls) {
@@ -17,7 +23,7 @@
             topControls.setAttribute('aria-hidden', String(!gameActive));
         }
         if (mobileControls) {
-            const showMobileControls = gameActive && mobileViewport.matches;
+            const showMobileControls = shouldShowVirtualControls();
             mobileControls.hidden = !showMobileControls;
             mobileControls.setAttribute('aria-hidden', String(!showMobileControls));
         }
@@ -44,6 +50,7 @@
         clearInterval(gameInterval);
         stopAudio();
         syncPauseControl();
+        syncControlVisibility();
         return true;
     }
 
@@ -55,6 +62,7 @@
         clearInterval(gameInterval);
         gameInterval = setInterval(gameTick, TICK_RATE);
         syncPauseControl();
+        syncControlVisibility();
         return true;
     }
 
@@ -121,11 +129,15 @@
         if (document.hidden) pauseGame();
     });
 
-    if (typeof mobileViewport.addEventListener === 'function') {
-        mobileViewport.addEventListener('change', syncControlVisibility);
-    } else if (typeof mobileViewport.addListener === 'function') {
-        mobileViewport.addListener(syncControlVisibility);
-    }
+    [compactViewport, coarsePointer].forEach((mediaQuery) => {
+        if (typeof mediaQuery.addEventListener === 'function') {
+            mediaQuery.addEventListener('change', syncControlVisibility);
+        } else if (typeof mediaQuery.addListener === 'function') {
+            mediaQuery.addListener(syncControlVisibility);
+        }
+    });
+    window.addEventListener('resize', syncControlVisibility);
+    window.addEventListener('orientationchange', syncControlVisibility);
 
     setGameActive(false);
     syncPauseControl();
@@ -137,5 +149,6 @@
         toggle: togglePause,
         returnHome,
         syncControls: syncControlVisibility,
+        shouldShowVirtualControls,
     };
 })();
