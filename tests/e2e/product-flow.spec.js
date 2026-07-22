@@ -64,6 +64,7 @@ test('first launch explains the rule, starts the game, and pause freezes progres
   await expect(page.getByRole('button', { name: 'PLAY', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'DAILY RUN', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'LEADERBOARD', exact: true })).toBeVisible();
+  await expect(page.locator('#game-top-controls')).toBeHidden();
   await expect(page.locator('#pause-btn')).toBeHidden();
 
   await page.getByRole('button', { name: 'PLAY', exact: true }).click();
@@ -76,17 +77,21 @@ test('first launch explains the rule, starts the game, and pause freezes progres
   await expect(page.locator('#start-screen')).not.toHaveClass(/active/);
   await expect(page.locator('#target-return-display')).toHaveText('BEAT THE MARKET');
   await expect.poll(() => page.evaluate(() => window.FlappyKOnboarding.hasSeen())).toBe(true);
+  await expect(page.locator('#game-top-controls')).toBeVisible();
   await expect(page.locator('#pause-btn')).toBeVisible();
+  await expect(page.locator('#pause-btn')).toHaveText('');
 
   await page.locator('#pause-btn').click();
-  await expect(page.locator('#pause-btn')).toContainText('RESUME');
+  await expect(page.locator('#pause-btn')).toHaveText('');
+  await expect(page.locator('#pause-btn')).toHaveAttribute('aria-label', 'Resume game');
   await expect(page.locator('#pause-btn')).toHaveAttribute('aria-pressed', 'true');
   const pausedDay = Number(await page.locator('#day-display').textContent());
   await page.waitForTimeout(750);
   await expect(page.locator('#day-display')).toHaveText(String(pausedDay));
 
   await page.locator('#pause-btn').click();
-  await expect(page.locator('#pause-btn')).toContainText('PAUSE');
+  await expect(page.locator('#pause-btn')).toHaveText('');
+  await expect(page.locator('#pause-btn')).toHaveAttribute('aria-label', 'Pause game');
   await expect(page.locator('#pause-btn')).toHaveAttribute('aria-pressed', 'false');
   await expect.poll(async () => Number(await page.locator('#day-display').textContent())).toBeGreaterThan(pausedDay);
 });
@@ -136,13 +141,15 @@ test('Daily Run is deterministic and produces a restorable friend challenge link
   expect(restored).toEqual(descriptors);
 });
 
-test('mobile gameplay is viewport-locked with one top-right pause control', async ({ page }) => {
+test('mobile gameplay keeps virtual keys and top-right navigation visible', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await preparePage(page);
   await markOnboardingSeen(page);
   await page.goto('/');
 
+  await expect(page.locator('#game-top-controls')).toBeHidden();
   await expect(page.locator('#pause-btn')).toBeHidden();
+  await expect(page.locator('#game-back-btn')).toBeHidden();
   await expect(page.locator('#mobile-controls')).toBeHidden();
 
   const initialShell = await page.evaluate(() => {
@@ -161,14 +168,28 @@ test('mobile gameplay is viewport-locked with one top-right pause control', asyn
   expect(Math.abs(initialShell.containerHeight - initialShell.innerHeight)).toBeLessThanOrEqual(1);
 
   await page.getByRole('button', { name: 'PLAY', exact: true }).click();
+  await expect(page.locator('#game-top-controls')).toBeVisible();
   await expect(page.locator('#pause-btn')).toBeVisible();
+  await expect(page.locator('#game-back-btn')).toBeVisible();
   await expect(page.locator('#mobile-controls')).toBeVisible();
-  await expect(page.locator('.dpad-pause')).toBeHidden();
+  await expect(page.locator('#mobile-controls')).not.toHaveAttribute('hidden', '');
+  await expect(page.locator('#btn-buy')).toBeVisible();
+  await expect(page.locator('#btn-sell')).toBeVisible();
+  await expect(page.locator('#btn-speed-down')).toBeVisible();
+  await expect(page.locator('#btn-speed-up')).toBeVisible();
+  await expect(page.locator('.dpad-pause')).toHaveCount(0);
+  await expect(page.locator('#pause-btn')).toHaveText('');
+
+  const controlsDisplay = await page.locator('#mobile-controls').evaluate((element) => getComputedStyle(element).display);
+  expect(controlsDisplay).toBe('flex');
+
+  const topControlsBox = await page.locator('#game-top-controls').boundingBox();
+  expect(topControlsBox).not.toBeNull();
+  expect(topControlsBox.x).toBeGreaterThan(315);
+  expect(topControlsBox.y).toBeLessThan(50);
 
   const pauseBox = await page.locator('#pause-btn').boundingBox();
   expect(pauseBox).not.toBeNull();
-  expect(pauseBox.x).toBeGreaterThan(340);
-  expect(pauseBox.y).toBeLessThan(50);
   expect(pauseBox.width).toBeLessThanOrEqual(30);
   expect(pauseBox.height).toBeLessThanOrEqual(30);
 
@@ -176,9 +197,13 @@ test('mobile gameplay is viewport-locked with one top-right pause control', asyn
   await page.waitForTimeout(100);
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
 
-  await page.locator('#pause-btn').click();
-  await expect(page.locator('#pause-btn')).toHaveAttribute('aria-label', 'Resume game');
-  await page.evaluate(() => endLevel());
-  await expect(page.locator('#pause-btn')).toBeHidden();
+  page.once('dialog', (dialog) => dialog.accept());
+  await Promise.all([
+    page.waitForNavigation(),
+    page.locator('#game-back-btn').click(),
+  ]);
+
+  await expect(page.locator('#start-screen')).toHaveClass(/active/);
+  await expect(page.locator('#game-top-controls')).toBeHidden();
   await expect(page.locator('#mobile-controls')).toBeHidden();
 });
