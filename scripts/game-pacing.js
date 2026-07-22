@@ -2,17 +2,23 @@
     'use strict';
 
     const DEFAULT_SPEED = 15;
+    const gameContainer = document.getElementById('game-container');
     const pauseButton = document.getElementById('pause-btn');
-    const mobilePauseButton = document.getElementById('btn-pause');
     let paused = false;
 
-    function syncPauseControls() {
+    pauseButton?.parentElement?.classList.add('pause-control-slot');
+
+    function setGameActive(active) {
+        gameContainer?.classList.toggle('game-active', Boolean(active));
+    }
+
+    function syncPauseControl() {
+        if (!pauseButton) return;
         const label = paused ? 'RESUME' : 'PAUSE';
-        if (pauseButton) pauseButton.textContent = `${label} [SPACE]`;
-        if (mobilePauseButton) {
-            mobilePauseButton.textContent = paused ? '▶' : 'Ⅱ';
-            mobilePauseButton.setAttribute('aria-label', paused ? 'Resume game' : 'Pause game');
-        }
+        pauseButton.textContent = label;
+        pauseButton.setAttribute('aria-label', paused ? 'Resume game' : 'Pause game');
+        pauseButton.setAttribute('aria-pressed', String(paused));
+        pauseButton.setAttribute('title', `${paused ? 'Resume' : 'Pause'} [Space]`);
     }
 
     function pauseGame() {
@@ -21,7 +27,7 @@
         isPlaying = false;
         clearInterval(gameInterval);
         stopAudio();
-        syncPauseControls();
+        syncPauseControl();
         return true;
     }
 
@@ -32,7 +38,7 @@
         startAudio();
         clearInterval(gameInterval);
         gameInterval = setInterval(gameTick, TICK_RATE);
-        syncPauseControls();
+        syncPauseControl();
         return true;
     }
 
@@ -49,15 +55,20 @@
     startLevel = function pacedStartLevel() {
         paused = false;
         previousStartLevel();
-        syncPauseControls();
+        setGameActive(true);
+        syncPauseControl();
+    };
+
+    const previousEndLevel = endLevel;
+    endLevel = function pacedEndLevel() {
+        paused = false;
+        const result = previousEndLevel();
+        setGameActive(false);
+        syncPauseControl();
+        return result;
     };
 
     pauseButton?.addEventListener('click', (event) => {
-        event.preventDefault();
-        togglePause();
-    });
-
-    mobilePauseButton?.addEventListener('click', (event) => {
         event.preventDefault();
         togglePause();
     });
@@ -73,7 +84,8 @@
         if (document.hidden) pauseGame();
     });
 
-    syncPauseControls();
+    setGameActive(false);
+    syncPauseControl();
     window.FlappyKPacing = {
         get paused() { return paused; },
         pause: pauseGame,
