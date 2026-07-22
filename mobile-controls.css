@@ -56,6 +56,12 @@ body {
     display: none !important;
 }
 
+@media (min-width: 769px) {
+    .controls-hint {
+        padding-top: 40px;
+    }
+}
+
 @media (max-width: 768px) {
     html,
     body {
