@@ -1,0 +1,50 @@
+#game-container.game-active .game-pause-button {
+    display: inline-flex;
+}
+
+.game-pause-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 15;
+    display: none;
+    width: 30px;
+    height: 30px;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff;
+    border-radius: 5px;
+    background: rgba(13, 17, 23, 0.88);
+    color: #fff;
+    box-shadow: 2px 2px 0 rgba(255, 255, 255, 0.7);
+    font-size: 10px;
+    line-height: 1;
+}
+
+.game-pause-button:hover {
+    background: #1f2937;
+}
+
+.game-pause-button:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+}
+
+.controls-hint {
+    padding-top: 40px;
+}
+
+@media (max-width: 768px) {
+    .game-pause-button {
+        position: fixed;
+        top: max(8px, env(safe-area-inset-top));
+        right: max(8px, env(safe-area-inset-right));
+        z-index: 60;
+        width: 28px;
+        height: 28px;
+        border-width: 2px;
+        font-size: 9px;
+    }
+}
