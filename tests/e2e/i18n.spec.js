@@ -21,18 +21,22 @@ test('language toggle switches, persists, and translates dynamic home UI', async
   });
   await page.goto('/');
 
+  const languageToggle = page.locator('#language-toggle-btn');
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-  await expect(page.getByRole('button', { name: '中文', exact: true })).toBeVisible();
+  await expect(languageToggle).toBeVisible();
+  await expect(languageToggle).toHaveText('中文');
+  await expect(languageToggle).toHaveAttribute('aria-label', '切换至中文');
   await expect(page.getByRole('button', { name: 'PLAY', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'DAILY RUN', exact: true })).toBeVisible();
 
   await Promise.all([
     page.waitForNavigation(),
-    page.getByRole('button', { name: '中文', exact: true }).click(),
+    languageToggle.click(),
   ]);
 
   await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
-  await expect(page.getByRole('button', { name: 'EN', exact: true })).toBeVisible();
+  await expect(page.locator('#language-toggle-btn')).toHaveText('EN');
+  await expect(page.locator('#language-toggle-btn')).toHaveAttribute('aria-label', 'Switch to English');
   await expect(page.getByRole('button', { name: '开始游戏', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: /每日挑战|重玩今日挑战/ })).toBeVisible();
   await expect(page.getByRole('button', { name: '排行榜', exact: true })).toBeVisible();
@@ -47,7 +51,7 @@ test('language toggle switches, persists, and translates dynamic home UI', async
 
   await Promise.all([
     page.waitForNavigation(),
-    page.getByRole('button', { name: 'EN', exact: true }).click(),
+    page.locator('#language-toggle-btn').click(),
   ]);
 
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
