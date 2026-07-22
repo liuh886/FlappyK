@@ -11,6 +11,46 @@ async function preparePage(page) {
   }));
 }
 
+async function installSilentAudio(page) {
+  await page.addInitScript(() => {
+    class SilentAudioContext {
+      constructor() {
+        this.currentTime = 0;
+        this.state = 'running';
+        this.destination = {};
+      }
+      createOscillator() {
+        return {
+          type: 'square',
+          frequency: {
+            value: 0,
+            setValueAtTime() {},
+            exponentialRampToValueAtTime() {},
+          },
+          connect() {},
+          start() {},
+          stop() {},
+        };
+      }
+      createGain() {
+        return {
+          gain: {
+            setValueAtTime() {},
+            exponentialRampToValueAtTime() {},
+          },
+          connect() {},
+        };
+      }
+      resume() {
+        this.state = 'running';
+        return Promise.resolve();
+      }
+    }
+    window.AudioContext = SilentAudioContext;
+    window.webkitAudioContext = SilentAudioContext;
+  });
+}
+
 test('language toggle switches, persists, and translates dynamic home UI', async ({ page }) => {
   await preparePage(page);
   await page.addInitScript(() => {
@@ -57,4 +97,25 @@ test('language toggle switches, persists, and translates dynamic home UI', async
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(page.getByRole('button', { name: 'PLAY', exact: true })).toBeVisible();
   await expect.poll(() => page.evaluate(() => window.localStorage.getItem('flappyk_language_v1'))).toBe('en');
+});
+
+test('Chinese mobile gameplay shows virtual keys, pause, and return controls', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await preparePage(page);
+  await installSilentAudio(page);
+  await page.addInitScript(() => {
+    window.localStorage.setItem('flappyk_language_v1', 'zh');
+    window.localStorage.setItem('flappyk_onboarding_seen_v1', '1');
+  });
+  await page.goto('/');
+
+  await page.getByRole('button', { name: '开始游戏', exact: true }).click();
+  await expect(page.locator('#mobile-controls')).toBeVisible();
+  await expect(page.locator('#btn-buy')).toBeVisible();
+  await expect(page.locator('#btn-sell')).toBeVisible();
+  await expect(page.locator('#pause-btn')).toBeVisible();
+  await expect(page.locator('#pause-btn')).toHaveText('');
+  await expect(page.locator('#pause-btn')).toHaveAttribute('aria-label', '暂停游戏');
+  await expect(page.locator('#game-back-btn')).toBeVisible();
+  await expect(page.locator('#game-back-btn')).toHaveAttribute('aria-label', '返回首页');
 });
