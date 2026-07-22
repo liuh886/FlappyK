@@ -6,7 +6,13 @@
     const pauseButton = document.getElementById('pause-btn');
     let paused = false;
 
-    pauseButton?.parentElement?.classList.add('pause-control-slot');
+    if (gameContainer && pauseButton && pauseButton.parentElement !== gameContainer) {
+        const previousSlot = pauseButton.parentElement;
+        gameContainer.appendChild(pauseButton);
+        if (previousSlot?.classList.contains('key-hint') && previousSlot.childElementCount === 0) {
+            previousSlot.remove();
+        }
+    }
 
     function setGameActive(active) {
         gameContainer?.classList.toggle('game-active', Boolean(active));
