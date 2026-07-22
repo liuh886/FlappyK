@@ -37,6 +37,8 @@ jobs:
           node --check scripts/friend-challenge-codec.js
           node --check scripts/legend-score.js
           node --check scripts/daily-run-core.js
+          node --check scripts/i18n-core.js
+          node --check scripts/i18n.js
           node --check scripts/market-pass-rule.js
           node --check scripts/market-goal-ui.js
           node --check scripts/game-pacing.js
@@ -57,6 +59,7 @@ jobs:
           node --check scripts/leaderboard-ranking.js
           node --check playwright.config.cjs
           node --check tests/e2e/product-flow.spec.js
+          node --check tests/e2e/i18n.spec.js
           node --check tests/ui-regression.test.js
           node --check tests/leaderboard-ranking.test.js
           node --check tests/friend-challenge.test.js
@@ -64,6 +67,7 @@ jobs:
           node --check tests/market-pass-rule.test.js
           node --check tests/player-profile.test.js
           node --check tests/daily-run.test.js
+          node --check tests/i18n.test.js
 
       - name: Run regression checks
         run: |
@@ -74,6 +78,7 @@ jobs:
           node tests/market-pass-rule.test.js
           node tests/player-profile.test.js
           node tests/daily-run.test.js
+          node tests/i18n.test.js
 
       - name: Check Python syntax
         run: |
@@ -103,7 +108,7 @@ jobs:
           print("index.html, og-image.png, and leaderboard.json validated")
           PY
 
-      - name: Check onboarding, daily, challenge, sharing, pacing, records, and leaderboard integration
+      - name: Check onboarding, daily, challenge, sharing, pacing, records, language, and leaderboard integration
         run: |
           grep -q '"QQQ"' fetch_all_data.py
           grep -q 'qqq-loader.js' index.html
@@ -117,6 +122,11 @@ jobs:
           grep -q 'scripts/friend-challenge-codec.js' index.html
           grep -q 'scripts/legend-score.js' index.html
           grep -q 'scripts/daily-run-core.js' index.html
+          grep -q 'scripts/i18n-core.js' index.html
+          grep -q 'scripts/i18n.js' index.html
+          grep -q 'i18n.css' index.html
+          grep -q 'flappyk_language_v1' scripts/i18n-core.js
+          grep -q 'language-toggle-btn' scripts/i18n.js
           grep -q 'daily-run.js' index.html
           grep -q 'daily-run.css' index.html
           grep -q 'daily-run-btn' index.html
