@@ -1,34 +1,69 @@
+:root {
+    --font-pixel: 'Press Start 2P', monospace;
+    --font-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-zh-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei UI', 'Microsoft YaHei', 'Noto Sans CJK SC', 'Source Han Sans SC', 'WenQuanYi Micro Hei', sans-serif;
+    --font-numeric: ui-monospace, 'SFMono-Regular', 'Roboto Mono', 'Cascadia Mono', 'Segoe UI Mono', Consolas, monospace;
+}
+
 #language-toggle-btn {
     position: absolute;
     top: max(10px, env(safe-area-inset-top));
     right: max(10px, env(safe-area-inset-right));
     z-index: 35;
-    min-width: 54px;
-    height: 30px;
+    min-width: 58px;
+    height: 32px;
     margin: 0;
-    padding: 0 8px;
-    border: 2px solid #fff;
-    border-radius: 5px;
-    background: rgba(13, 17, 23, 0.9);
+    padding: 0 10px;
+    border: 2px solid rgba(255, 255, 255, 0.84);
+    border-radius: 999px;
+    background: rgba(13, 17, 23, 0.82);
     color: #fff;
-    box-shadow: 2px 2px 0 rgba(255, 255, 255, 0.7);
-    font-size: 9px;
+    box-shadow: 0 3px 0 rgba(255, 255, 255, 0.38);
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 750;
     line-height: 1;
+    letter-spacing: 0.02em;
+    backdrop-filter: blur(8px);
 }
 
 #language-toggle-btn:hover {
     background: #1f2937;
+    border-color: #f1c40f;
 }
 
 #language-toggle-btn:active {
-    transform: translate(2px, 2px);
-    box-shadow: none;
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 html[lang='zh-CN'] body,
 html[lang='zh-CN'] button,
-html[lang='zh-CN'] select {
-    font-family: 'Press Start 2P', 'Noto Sans SC', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+html[lang='zh-CN'] select,
+html[lang='zh-CN'] input,
+html[lang='zh-CN'] textarea {
+    font-family: var(--font-zh-ui);
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Keep the brand and numerical readouts crisp without forcing pixel metrics onto Chinese copy. */
+html[lang='zh-CN'] #game-title,
+html[lang='zh-CN'] .start-data-ticker,
+html[lang='zh-CN'] .legend-ticker {
+    font-family: var(--font-pixel);
+}
+
+html[lang='zh-CN'] .stats-box span,
+html[lang='zh-CN'] .highlight,
+html[lang='zh-CN'] .big-return,
+html[lang='zh-CN'] .leaderboard-rank,
+html[lang='zh-CN'] .leaderboard-excess,
+html[lang='zh-CN'] #speed-btn {
+    font-family: var(--font-numeric);
+    font-variant-numeric: tabular-nums;
 }
 
 html[lang='zh-CN'] p,
@@ -37,39 +72,97 @@ html[lang='zh-CN'] .stats-box,
 html[lang='zh-CN'] .controls-hint,
 html[lang='zh-CN'] .leaderboard-panel,
 html[lang='zh-CN'] .onboarding-panel,
-html[lang='zh-CN'] .profit-card {
-    letter-spacing: 0;
+html[lang='zh-CN'] .profit-card,
+html[lang='zh-CN'] .custom-challenge-panel {
+    letter-spacing: 0.015em;
+}
+
+html[lang='zh-CN'] h1:not(#game-title),
+html[lang='zh-CN'] h2,
+html[lang='zh-CN'] h3,
+html[lang='zh-CN'] button {
+    font-weight: 750;
+}
+
+html[lang='zh-CN'] #start-screen > p {
+    max-width: 620px;
+    font-size: 14px;
+    line-height: 1.7;
 }
 
 html[lang='zh-CN'] .stats-box,
 html[lang='zh-CN'] .controls-hint {
-    font-size: 9px;
+    font-size: 11px;
+    line-height: 1.75;
 }
 
 html[lang='zh-CN'] .onboarding-rule span,
 html[lang='zh-CN'] .friend-challenge-invite,
 html[lang='zh-CN'] .daily-run-summary,
-html[lang='zh-CN'] .local-records-summary {
+html[lang='zh-CN'] .local-records-summary,
+html[lang='zh-CN'] .leaderboard-status,
+html[lang='zh-CN'] .leaderboard-subtitle {
     line-height: 1.65;
+}
+
+html[lang='zh-CN'] .onboarding-rule span {
+    font-size: 12px;
+}
+
+html[lang='zh-CN'] .card-details p {
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+html[lang='zh-CN'] .status-msg {
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+html[lang='zh-CN'] .screen button,
+html[lang='zh-CN'] .onboarding-panel button,
+html[lang='zh-CN'] .leaderboard-panel button,
+html[lang='zh-CN'] .custom-challenge-panel button,
+html[lang='zh-CN'] .action-buttons button {
+    font-size: 13px;
+    line-height: 1.25;
 }
 
 @media (max-width: 768px) {
     #language-toggle-btn {
         top: max(8px, env(safe-area-inset-top));
         right: max(8px, env(safe-area-inset-right));
-        min-width: 48px;
-        height: 28px;
-        padding: 0 6px;
-        font-size: 8px;
+        min-width: 52px;
+        height: 30px;
+        padding: 0 8px;
+        font-size: 10px;
     }
 
     html[lang='zh-CN'] #start-screen > p {
         max-width: 88vw;
+        font-size: 12px;
+        line-height: 1.65;
+    }
+
+    html[lang='zh-CN'] .stats-box {
         font-size: 10px;
-        line-height: 1.7;
+        line-height: 1.65;
     }
 
     html[lang='zh-CN'] .onboarding-rule span {
-        font-size: 9px;
+        font-size: 11px;
+        line-height: 1.65;
+    }
+
+    html[lang='zh-CN'] .screen button,
+    html[lang='zh-CN'] .onboarding-panel button,
+    html[lang='zh-CN'] .leaderboard-panel button,
+    html[lang='zh-CN'] .custom-challenge-panel button,
+    html[lang='zh-CN'] .action-buttons button {
+        font-size: 12px;
+    }
+
+    html[lang='zh-CN'] .leaderboard-row {
+        font-size: 10px;
     }
 }
