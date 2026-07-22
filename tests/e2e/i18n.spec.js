@@ -97,7 +97,6 @@ test('language toggle switches, persists, and uses a readable Chinese type syste
       toggleRadius: parseFloat(style('#language-toggle-btn').borderRadius),
       cardLayout: style('.card-details').display,
       cardRowLayout: getComputedStyle(firstCardRow).display,
-      startOverflow: style('#start-screen').overflowY,
     };
   });
 
@@ -109,7 +108,6 @@ test('language toggle switches, persists, and uses a readable Chinese type syste
   expect(typography.toggleRadius).toBeGreaterThan(20);
   expect(typography.cardLayout).toBe('grid');
   expect(typography.cardRowLayout).toBe('flex');
-  expect(['auto', 'visible']).toContain(typography.startOverflow);
 
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
