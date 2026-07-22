@@ -1,0 +1,75 @@
+#language-toggle-btn {
+    position: absolute;
+    top: max(10px, env(safe-area-inset-top));
+    right: max(10px, env(safe-area-inset-right));
+    z-index: 35;
+    min-width: 54px;
+    height: 30px;
+    margin: 0;
+    padding: 0 8px;
+    border: 2px solid #fff;
+    border-radius: 5px;
+    background: rgba(13, 17, 23, 0.9);
+    color: #fff;
+    box-shadow: 2px 2px 0 rgba(255, 255, 255, 0.7);
+    font-size: 9px;
+    line-height: 1;
+}
+
+#language-toggle-btn:hover {
+    background: #1f2937;
+}
+
+#language-toggle-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+}
+
+html[lang='zh-CN'] body,
+html[lang='zh-CN'] button,
+html[lang='zh-CN'] select {
+    font-family: 'Press Start 2P', 'Noto Sans SC', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+}
+
+html[lang='zh-CN'] p,
+html[lang='zh-CN'] button,
+html[lang='zh-CN'] .stats-box,
+html[lang='zh-CN'] .controls-hint,
+html[lang='zh-CN'] .leaderboard-panel,
+html[lang='zh-CN'] .onboarding-panel,
+html[lang='zh-CN'] .profit-card {
+    letter-spacing: 0;
+}
+
+html[lang='zh-CN'] .stats-box,
+html[lang='zh-CN'] .controls-hint {
+    font-size: 9px;
+}
+
+html[lang='zh-CN'] .onboarding-rule span,
+html[lang='zh-CN'] .friend-challenge-invite,
+html[lang='zh-CN'] .daily-run-summary,
+html[lang='zh-CN'] .local-records-summary {
+    line-height: 1.65;
+}
+
+@media (max-width: 768px) {
+    #language-toggle-btn {
+        top: max(8px, env(safe-area-inset-top));
+        right: max(8px, env(safe-area-inset-right));
+        min-width: 48px;
+        height: 28px;
+        padding: 0 6px;
+        font-size: 8px;
+    }
+
+    html[lang='zh-CN'] #start-screen > p {
+        max-width: 88vw;
+        font-size: 10px;
+        line-height: 1.7;
+    }
+
+    html[lang='zh-CN'] .onboarding-rule span {
+        font-size: 9px;
+    }
+}
