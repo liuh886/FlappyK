@@ -64,6 +64,7 @@ test('first launch explains the rule, starts the game, and pause freezes progres
   await expect(page.getByRole('button', { name: 'PLAY', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'DAILY RUN', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'LEADERBOARD', exact: true })).toBeVisible();
+  await expect(page.locator('#pause-btn')).toBeHidden();
 
   await page.getByRole('button', { name: 'PLAY', exact: true }).click();
   await expect(page.locator('#onboarding-screen')).toBeVisible();
@@ -75,15 +76,18 @@ test('first launch explains the rule, starts the game, and pause freezes progres
   await expect(page.locator('#start-screen')).not.toHaveClass(/active/);
   await expect(page.locator('#target-return-display')).toHaveText('BEAT THE MARKET');
   await expect.poll(() => page.evaluate(() => window.FlappyKOnboarding.hasSeen())).toBe(true);
+  await expect(page.locator('#pause-btn')).toBeVisible();
 
   await page.locator('#pause-btn').click();
   await expect(page.locator('#pause-btn')).toContainText('RESUME');
+  await expect(page.locator('#pause-btn')).toHaveAttribute('aria-pressed', 'true');
   const pausedDay = Number(await page.locator('#day-display').textContent());
   await page.waitForTimeout(750);
   await expect(page.locator('#day-display')).toHaveText(String(pausedDay));
 
   await page.locator('#pause-btn').click();
   await expect(page.locator('#pause-btn')).toContainText('PAUSE');
+  await expect(page.locator('#pause-btn')).toHaveAttribute('aria-pressed', 'false');
   await expect.poll(async () => Number(await page.locator('#day-display').textContent())).toBeGreaterThan(pausedDay);
 });
 
@@ -119,13 +123,62 @@ test('Daily Run is deterministic and produces a restorable friend challenge link
   await expect(challengePage.locator('#friend-challenge-invite')).toContainText('SAME 3 HIDDEN MARKETS');
   await expect(challengePage.locator('#daily-run-btn')).toBeHidden();
   await expect(challengePage.locator('#daily-run-summary')).toBeHidden();
+  await expect(challengePage.locator('#pause-btn')).toBeHidden();
 
   await challengePage.getByRole('button', { name: 'PLAY CHALLENGE' }).click();
   await expect.poll(() => challengePage.evaluate(() => window.FlappyKFriendChallenge.isActive())).toBe(true);
   await expect.poll(() => challengePage.evaluate(() => window.FlappyKFriendChallenge.getDescriptors().length)).toBe(3);
   await expect(challengePage.locator('#target-return-display')).toHaveText('BEAT THE MARKET');
+  await expect(challengePage.locator('#pause-btn')).toBeVisible();
   await challengePage.locator('#pause-btn').click();
 
   const restored = await challengePage.evaluate(() => window.FlappyKFriendChallenge.getDescriptors());
   expect(restored).toEqual(descriptors);
+});
+
+test('mobile gameplay is viewport-locked with one top-right pause control', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await preparePage(page);
+  await markOnboardingSeen(page);
+  await page.goto('/');
+
+  await expect(page.locator('#pause-btn')).toBeHidden();
+  await expect(page.locator('#mobile-controls')).toBeHidden();
+
+  const initialShell = await page.evaluate(() => {
+    const container = document.getElementById('game-container').getBoundingClientRect();
+    return {
+      bodyPosition: getComputedStyle(document.body).position,
+      scrollHeight: document.scrollingElement.scrollHeight,
+      innerHeight: window.innerHeight,
+      containerTop: container.top,
+      containerHeight: container.height,
+    };
+  });
+  expect(initialShell.bodyPosition).toBe('fixed');
+  expect(initialShell.scrollHeight).toBeLessThanOrEqual(initialShell.innerHeight + 1);
+  expect(Math.abs(initialShell.containerTop)).toBeLessThanOrEqual(1);
+  expect(Math.abs(initialShell.containerHeight - initialShell.innerHeight)).toBeLessThanOrEqual(1);
+
+  await page.getByRole('button', { name: 'PLAY', exact: true }).click();
+  await expect(page.locator('#pause-btn')).toBeVisible();
+  await expect(page.locator('#mobile-controls')).toBeVisible();
+  await expect(page.locator('.dpad-pause')).toBeHidden();
+
+  const pauseBox = await page.locator('#pause-btn').boundingBox();
+  expect(pauseBox).not.toBeNull();
+  expect(pauseBox.x).toBeGreaterThan(340);
+  expect(pauseBox.y).toBeLessThan(50);
+  expect(pauseBox.width).toBeLessThanOrEqual(30);
+  expect(pauseBox.height).toBeLessThanOrEqual(30);
+
+  await page.mouse.wheel(0, 800);
+  await page.waitForTimeout(100);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+
+  await page.locator('#pause-btn').click();
+  await expect(page.locator('#pause-btn')).toHaveAttribute('aria-label', 'Resume game');
+  await page.evaluate(() => endLevel());
+  await expect(page.locator('#pause-btn')).toBeHidden();
+  await expect(page.locator('#mobile-controls')).toBeHidden();
 });
