@@ -50,6 +50,7 @@ assert.ok(cssSource.includes("'Noto Sans CJK SC'"));
 assert.ok(cssSource.includes("html[lang='zh-CN'] #game-title"));
 assert.ok(cssSource.includes('font-family: var(--font-zh-ui)'));
 assert.ok(cssSource.includes('font-family: var(--font-numeric)'));
+assert.ok(cssSource.includes('border-radius: 999px'));
 assert.equal(
     cssSource.includes("font-family: 'Press Start 2P', 'Noto Sans SC'"),
     false,
@@ -61,6 +62,6 @@ assert.ok(visualSource.includes('display: grid'));
 assert.ok(visualSource.includes('.card-details p {'));
 assert.ok(visualSource.includes('justify-content: space-between'));
 assert.ok(visualSource.includes(':focus-visible'));
-assert.ok(visualSource.includes('border-radius: 999px'));
+assert.ok(visualSource.includes('backdrop-filter: blur(8px)'));
 
 console.log('Chinese-English i18n, typography, and visual polish checks passed');
