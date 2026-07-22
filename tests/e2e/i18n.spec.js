@@ -14,7 +14,9 @@ async function preparePage(page) {
 test('language toggle switches, persists, and translates dynamic home UI', async ({ page }) => {
   await preparePage(page);
   await page.addInitScript(() => {
-    window.localStorage.setItem('flappyk_language_v1', 'en');
+    if (!window.localStorage.getItem('flappyk_language_v1')) {
+      window.localStorage.setItem('flappyk_language_v1', 'en');
+    }
     window.localStorage.setItem('flappyk_onboarding_seen_v1', '1');
   });
   await page.goto('/');
