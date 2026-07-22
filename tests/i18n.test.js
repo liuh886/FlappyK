@@ -17,6 +17,11 @@ assert.equal(i18n.translateText('DAILY STREAK 4', 'zh'), '连续挑战 4 天');
 assert.equal(i18n.translateText('YOU +12.34%', 'zh'), '你：+12.34%');
 assert.equal(i18n.translateText('WON BY +3.20%', 'zh'), '领先 +3.20%');
 assert.equal(i18n.translateText('+8.88% EXCESS', 'zh'), '+8.88% 超额收益');
+assert.equal(i18n.translateText('Return to home', 'zh'), '返回首页');
+assert.equal(
+    i18n.translateText('Exit this run and return to home? Current progress will be lost.', 'zh'),
+    '退出当前游戏并返回首页？当前进度将丢失。'
+);
 assert.equal(
     i18n.translateText('I finished 3 hidden historical markets with +8.88% Excess. Can you beat me on the same markets?', 'zh'),
     '我完成了 3 个隐藏历史市场，超额收益为 +8.88%。你能在相同行情中击败我吗？'

@@ -3,25 +3,35 @@
 
     const DEFAULT_SPEED = 15;
     const gameContainer = document.getElementById('game-container');
+    const topControls = document.getElementById('game-top-controls');
+    const mobileControls = document.getElementById('mobile-controls');
     const pauseButton = document.getElementById('pause-btn');
+    const backButton = document.getElementById('game-back-btn');
+    const mobileViewport = window.matchMedia('(max-width: 768px)');
     let paused = false;
+    let gameActive = false;
 
-    if (gameContainer && pauseButton && pauseButton.parentElement !== gameContainer) {
-        const previousSlot = pauseButton.parentElement;
-        gameContainer.appendChild(pauseButton);
-        if (previousSlot?.classList.contains('key-hint') && previousSlot.childElementCount === 0) {
-            previousSlot.remove();
+    function syncControlVisibility() {
+        if (topControls) {
+            topControls.hidden = !gameActive;
+            topControls.setAttribute('aria-hidden', String(!gameActive));
+        }
+        if (mobileControls) {
+            const showMobileControls = gameActive && mobileViewport.matches;
+            mobileControls.hidden = !showMobileControls;
+            mobileControls.setAttribute('aria-hidden', String(!showMobileControls));
         }
     }
 
     function setGameActive(active) {
-        gameContainer?.classList.toggle('game-active', Boolean(active));
+        gameActive = Boolean(active);
+        gameContainer?.classList.toggle('game-active', gameActive);
+        syncControlVisibility();
     }
 
     function syncPauseControl() {
         if (!pauseButton) return;
-        const label = paused ? 'RESUME' : 'PAUSE';
-        pauseButton.textContent = label;
+        pauseButton.textContent = '';
         pauseButton.setAttribute('aria-label', paused ? 'Resume game' : 'Pause game');
         pauseButton.setAttribute('aria-pressed', String(paused));
         pauseButton.setAttribute('title', `${paused ? 'Resume' : 'Pause'} [Space]`);
@@ -53,6 +63,20 @@
         return pauseGame();
     }
 
+    function returnHome() {
+        if (!gameActive) return false;
+        const wasPaused = paused;
+        if (!wasPaused) pauseGame();
+        const confirmed = window.confirm('Exit this run and return to home? Current progress will be lost.');
+        if (confirmed) {
+            setGameActive(false);
+            window.location.reload();
+            return true;
+        }
+        if (!wasPaused) resumeGame();
+        return false;
+    }
+
     if (Number.isFinite(speedMultiplier) && speedMultiplier !== DEFAULT_SPEED) {
         changeSpeed(DEFAULT_SPEED - speedMultiplier);
     }
@@ -76,7 +100,14 @@
 
     pauseButton?.addEventListener('click', (event) => {
         event.preventDefault();
+        event.stopPropagation();
         togglePause();
+    });
+
+    backButton?.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        returnHome();
     });
 
     document.addEventListener('keydown', (event) => {
@@ -90,12 +121,21 @@
         if (document.hidden) pauseGame();
     });
 
+    if (typeof mobileViewport.addEventListener === 'function') {
+        mobileViewport.addEventListener('change', syncControlVisibility);
+    } else if (typeof mobileViewport.addListener === 'function') {
+        mobileViewport.addListener(syncControlVisibility);
+    }
+
     setGameActive(false);
     syncPauseControl();
     window.FlappyKPacing = {
         get paused() { return paused; },
+        get active() { return gameActive; },
         pause: pauseGame,
         resume: resumeGame,
         toggle: togglePause,
+        returnHome,
+        syncControls: syncControlVisibility,
     };
 })();
