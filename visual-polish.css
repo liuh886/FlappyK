@@ -1,0 +1,330 @@
+:root {
+    --ui-bg: #0b1118;
+    --ui-panel: rgba(13, 21, 31, 0.92);
+    --ui-panel-soft: rgba(17, 24, 39, 0.78);
+    --ui-border: rgba(148, 163, 184, 0.42);
+    --ui-border-strong: rgba(255, 255, 255, 0.76);
+    --ui-muted: #a7b0bf;
+    --ui-yellow: #f4cc3a;
+    --ui-green: #32d17d;
+    --ui-cyan: #41dbea;
+    --ui-radius: 10px;
+    --ui-shadow: 0 10px 32px rgba(0, 0, 0, 0.34);
+}
+
+body {
+    background:
+        radial-gradient(circle at 50% 12%, rgba(65, 219, 234, 0.08), transparent 34%),
+        linear-gradient(180deg, #151b23 0%, #090d12 100%);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
+
+#game-container {
+    border-color: rgba(255, 255, 255, 0.84);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 18px 56px rgba(0, 0, 0, 0.52);
+}
+
+.screen {
+    background:
+        radial-gradient(circle at 50% 35%, rgba(31, 41, 55, 0.46), transparent 48%),
+        rgba(5, 8, 12, 0.92);
+}
+
+#start-screen {
+    padding: 72px 28px 50px;
+}
+
+#start-screen h1 {
+    margin-bottom: 18px;
+    line-height: 1.2;
+}
+
+#start-screen > p {
+    max-width: 650px;
+    color: rgba(255, 255, 255, 0.82);
+}
+
+.start-actions {
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.start-actions button,
+.onboarding-panel button,
+.leaderboard-panel button,
+.custom-challenge-panel button,
+#settlement-screen > button,
+.action-buttons button {
+    min-height: 44px;
+    margin-top: 20px;
+    padding: 12px 22px;
+    border-width: 3px;
+    border-radius: 8px;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.36), 0 0 0 1px rgba(255, 255, 255, 0.18);
+    transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+}
+
+.start-actions button:hover,
+.onboarding-panel button:hover,
+.leaderboard-panel button:hover,
+.custom-challenge-panel button:hover,
+#settlement-screen > button:hover,
+.action-buttons button:hover {
+    filter: brightness(1.08);
+}
+
+.start-actions button:active,
+.onboarding-panel button:active,
+.leaderboard-panel button:active,
+.custom-challenge-panel button:active,
+#settlement-screen > button:active,
+.action-buttons button:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.28);
+}
+
+.stats-box,
+.controls-hint,
+.local-records-summary,
+.daily-run-summary {
+    border-color: var(--ui-border);
+    border-radius: var(--ui-radius);
+    background: var(--ui-panel-soft);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(8px);
+}
+
+.stats-box {
+    min-width: 192px;
+    padding: 12px 14px;
+}
+
+.stats-box span {
+    font-variant-numeric: tabular-nums;
+}
+
+.controls-hint {
+    padding: 12px 14px;
+}
+
+.key {
+    border-radius: 6px;
+    box-shadow: 0 2px 0 rgba(255, 255, 255, 0.22);
+}
+
+#speed-btn {
+    border-color: rgba(255, 255, 255, 0.7) !important;
+    border-radius: 6px !important;
+    background: rgba(15, 23, 42, 0.94) !important;
+}
+
+.onboarding-panel,
+.leaderboard-panel,
+.custom-challenge-panel {
+    border-width: 3px;
+    border-radius: 14px;
+    background: var(--ui-panel);
+    box-shadow: var(--ui-shadow), 0 0 0 1px rgba(244, 204, 58, 0.14);
+}
+
+.onboarding-panel {
+    padding: 28px;
+}
+
+.onboarding-rules {
+    gap: 14px;
+}
+
+.onboarding-rule {
+    border-color: rgba(100, 116, 139, 0.46);
+    border-radius: 9px;
+    background: rgba(17, 24, 39, 0.82);
+}
+
+.onboarding-rule strong {
+    display: inline-flex;
+    width: 28px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(65, 219, 234, 0.5);
+    border-radius: 7px;
+    background: rgba(65, 219, 234, 0.08);
+}
+
+.leaderboard-panel {
+    scrollbar-color: rgba(244, 204, 58, 0.58) rgba(17, 24, 39, 0.5);
+}
+
+.leaderboard-row {
+    border-bottom-color: rgba(148, 163, 184, 0.18);
+}
+
+.leaderboard-row:hover {
+    background: rgba(255, 255, 255, 0.035);
+}
+
+.local-records-summary,
+.daily-run-summary {
+    padding: 9px 13px;
+}
+
+.profit-card {
+    border-width: 5px;
+    border-radius: 16px;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.42), inset 0 0 24px rgba(255, 255, 255, 0.14);
+}
+
+.profit-card h2 {
+    margin-bottom: 18px;
+    border-bottom-width: 2px;
+    line-height: 1.35;
+}
+
+.card-details {
+    display: grid;
+    gap: 10px;
+}
+
+.card-details p {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 0;
+}
+
+.highlight {
+    min-width: 108px;
+    border-radius: 5px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.big-return {
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+.status-msg {
+    line-height: 1.45;
+}
+
+.local-record-result,
+.daily-run-result,
+.friend-challenge-result {
+    border-radius: 10px;
+    backdrop-filter: blur(8px);
+}
+
+#champagne-screen .action-buttons {
+    align-items: stretch;
+}
+
+.support-button {
+    border-radius: 8px;
+}
+
+:focus-visible {
+    outline: 3px solid var(--ui-cyan);
+    outline-offset: 3px;
+}
+
+@media (max-width: 768px) {
+    #game-container {
+        border-radius: 0;
+    }
+
+    #start-screen {
+        justify-content: flex-start;
+        padding: max(58px, calc(env(safe-area-inset-top) + 48px)) 18px max(42px, calc(env(safe-area-inset-bottom) + 32px));
+        overflow-y: auto;
+    }
+
+    #start-screen h1 {
+        margin-top: 2vh;
+        margin-bottom: 12px;
+        font-size: clamp(30px, 10vw, 40px);
+    }
+
+    #start-screen > p {
+        font-size: 11px;
+        line-height: 1.6;
+    }
+
+    .start-actions {
+        width: min(320px, 92vw);
+        margin-top: 4px;
+    }
+
+    .start-actions button,
+    .onboarding-panel button,
+    .leaderboard-panel button,
+    .custom-challenge-panel button,
+    #settlement-screen > button,
+    .action-buttons button {
+        min-height: 42px;
+        padding: 10px 16px;
+        border-width: 3px;
+        border-radius: 8px;
+    }
+
+    .stats-box {
+        min-width: 0;
+        padding: 9px 10px;
+        border-radius: 8px;
+    }
+
+    .onboarding-panel,
+    .leaderboard-panel,
+    .custom-challenge-panel {
+        border-radius: 12px;
+    }
+
+    .onboarding-panel {
+        padding: 20px 14px;
+    }
+
+    .onboarding-rule {
+        gap: 9px;
+        border-radius: 8px;
+    }
+
+    .profit-card {
+        border-width: 4px;
+        border-radius: 13px;
+    }
+
+    .card-details {
+        gap: 8px;
+    }
+
+    .card-details p {
+        gap: 8px;
+    }
+
+    .highlight {
+        min-width: 96px;
+        padding: 4px 6px;
+    }
+
+    .local-records-summary,
+    .daily-run-summary {
+        width: min(320px, 92vw);
+        border-radius: 8px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .start-actions button,
+    .onboarding-panel button,
+    .leaderboard-panel button,
+    .custom-challenge-panel button,
+    #settlement-screen > button,
+    .action-buttons button {
+        transition: none;
+    }
+}
