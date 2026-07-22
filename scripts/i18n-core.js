@@ -115,6 +115,8 @@
         '(CUMULATIVE RETURN)': '（累计收益）',
         'Pause game': '暂停游戏',
         'Resume game': '继续游戏',
+        'Return to home': '返回首页',
+        'Exit this run and return to home? Current progress will be lost.': '退出当前游戏并返回首页？当前进度将丢失。',
         'Buy one thousand dollars': '买入一千美元',
         'Sell one thousand dollars': '卖出一千美元',
         'Real historical K-lines': '真实历史 K 线',
