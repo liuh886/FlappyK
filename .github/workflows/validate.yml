@@ -138,8 +138,11 @@ jobs:
           grep -q 'local-records.css' index.html
           grep -q 'personal-profile-summary' index.html
           grep -q 'personal-best-result' index.html
+          grep -q 'game-top-controls' index.html
           grep -q 'pause-btn' index.html
-          grep -q 'btn-pause' index.html
+          grep -q 'game-back-btn' index.html
+          grep -q 'mobile-controls" hidden' index.html
+          ! grep -q 'btn-pause' index.html
           grep -q 'BEAT THE MARKET' index.html
           grep -q 'card-market-return' index.html
           grep -q 'friend-challenge.js' index.html
