@@ -51,7 +51,7 @@ async function installSilentAudio(page) {
   });
 }
 
-test('language toggle switches, persists, and translates dynamic home UI', async ({ page }) => {
+test('language toggle switches, persists, and uses a readable Chinese type system', async ({ page }) => {
   await preparePage(page);
   await page.addInitScript(() => {
     if (!window.localStorage.getItem('flappyk_language_v1')) {
@@ -84,6 +84,30 @@ test('language toggle switches, persists, and translates dynamic home UI', async
   await expect(page.locator('#daily-run-summary')).toContainText('连续挑战');
   await expect(page).toHaveTitle('FlappyK — 你能跑赢隐藏市场吗？');
   await expect.poll(() => page.evaluate(() => window.localStorage.getItem('flappyk_language_v1'))).toBe('zh');
+
+  const typography = await page.evaluate(() => {
+    const style = (selector) => getComputedStyle(document.querySelector(selector));
+    const firstCardRow = document.querySelector('.card-details p');
+    return {
+      bodyFamily: style('body').fontFamily,
+      titleFamily: style('#game-title').fontFamily,
+      startButtonFamily: style('#start-btn').fontFamily,
+      startButtonSize: parseFloat(style('#start-btn').fontSize),
+      startButtonWeight: Number(style('#start-btn').fontWeight),
+      toggleRadius: parseFloat(style('#language-toggle-btn').borderRadius),
+      cardLayout: style('.card-details').display,
+      cardRowLayout: getComputedStyle(firstCardRow).display,
+    };
+  });
+
+  expect(typography.bodyFamily).not.toContain('Press Start 2P');
+  expect(typography.startButtonFamily).not.toContain('Press Start 2P');
+  expect(typography.titleFamily).toContain('Press Start 2P');
+  expect(typography.startButtonSize).toBeGreaterThanOrEqual(12);
+  expect(typography.startButtonWeight).toBeGreaterThanOrEqual(700);
+  expect(typography.toggleRadius).toBeGreaterThan(20);
+  expect(typography.cardLayout).toBe('grid');
+  expect(typography.cardRowLayout).toBe('flex');
 
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
@@ -118,4 +142,15 @@ test('Chinese mobile gameplay shows virtual keys, pause, and return controls', a
   await expect(page.locator('#pause-btn')).toHaveAttribute('aria-label', '暂停游戏');
   await expect(page.locator('#game-back-btn')).toBeVisible();
   await expect(page.locator('#game-back-btn')).toHaveAttribute('aria-label', '返回首页');
+
+  const mobileTypography = await page.evaluate(() => ({
+    buyFamily: getComputedStyle(document.getElementById('btn-buy')).fontFamily,
+    buySize: parseFloat(getComputedStyle(document.getElementById('btn-buy')).fontSize),
+    statsFamily: getComputedStyle(document.querySelector('.stats-box')).fontFamily,
+    statsSize: parseFloat(getComputedStyle(document.querySelector('.stats-box')).fontSize),
+  }));
+  expect(mobileTypography.buyFamily).not.toContain('Press Start 2P');
+  expect(mobileTypography.buySize).toBeGreaterThanOrEqual(12);
+  expect(mobileTypography.statsFamily).not.toContain('Press Start 2P');
+  expect(mobileTypography.statsSize).toBeGreaterThanOrEqual(10);
 });

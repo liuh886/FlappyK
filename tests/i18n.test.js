@@ -31,6 +31,7 @@ assert.equal(i18n.translateText('Unknown asset name', 'zh'), 'Unknown asset name
 const indexSource = fs.readFileSync('index.html', 'utf8');
 const browserSource = fs.readFileSync('scripts/i18n.js', 'utf8');
 const cssSource = fs.readFileSync('i18n.css', 'utf8');
+const visualSource = fs.readFileSync('visual-polish.css', 'utf8');
 
 assert.ok(indexSource.includes('i18n.css'));
 assert.ok(indexSource.includes('scripts/i18n-core.js'));
@@ -41,7 +42,26 @@ assert.ok(browserSource.includes("window.localStorage.setItem(core.STORAGE_KEY")
 assert.ok(browserSource.includes("button.id = 'language-toggle-btn'"));
 assert.ok(browserSource.includes('new MutationObserver'));
 assert.ok(browserSource.includes('patchNativeShare'));
-assert.ok(cssSource.includes('#language-toggle-btn'));
-assert.ok(cssSource.includes("html[lang='zh-CN']"));
+assert.ok(cssSource.startsWith("@import url('./visual-polish.css');"));
+assert.ok(cssSource.includes('--font-zh-ui'));
+assert.ok(cssSource.includes("'PingFang SC'"));
+assert.ok(cssSource.includes("'Microsoft YaHei UI'"));
+assert.ok(cssSource.includes("'Noto Sans CJK SC'"));
+assert.ok(cssSource.includes("html[lang='zh-CN'] #game-title"));
+assert.ok(cssSource.includes('font-family: var(--font-zh-ui)'));
+assert.ok(cssSource.includes('font-family: var(--font-numeric)'));
+assert.ok(cssSource.includes('border-radius: 999px'));
+assert.equal(
+    cssSource.includes("font-family: 'Press Start 2P', 'Noto Sans SC'"),
+    false,
+    'Chinese UI must not force the pixel font before CJK fallbacks'
+);
+assert.ok(visualSource.includes('--ui-panel'));
+assert.ok(visualSource.includes('.card-details {'));
+assert.ok(visualSource.includes('display: grid'));
+assert.ok(visualSource.includes('.card-details p {'));
+assert.ok(visualSource.includes('justify-content: space-between'));
+assert.ok(visualSource.includes(':focus-visible'));
+assert.ok(visualSource.includes('backdrop-filter: blur(8px)'));
 
-console.log('Chinese-English i18n core and integration checks passed');
+console.log('Chinese-English i18n, typography, and visual polish checks passed');
