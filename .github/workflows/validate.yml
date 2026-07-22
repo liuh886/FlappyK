@@ -60,7 +60,9 @@ jobs:
           node --check playwright.config.cjs
           node --check tests/e2e/product-flow.spec.js
           node --check tests/e2e/i18n.spec.js
+          node --check tests/e2e/mobile-controls-wide.spec.js
           node --check tests/ui-regression.test.js
+          node --check tests/mobile-controls-layout.test.js
           node --check tests/leaderboard-ranking.test.js
           node --check tests/friend-challenge.test.js
           node --check tests/legend-score.test.js
@@ -72,6 +74,7 @@ jobs:
       - name: Run regression checks
         run: |
           node tests/ui-regression.test.js
+          node tests/mobile-controls-layout.test.js
           node tests/leaderboard-ranking.test.js
           node tests/friend-challenge.test.js
           node tests/legend-score.test.js
