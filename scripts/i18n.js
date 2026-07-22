@@ -46,11 +46,24 @@
         });
     }
 
+    function replaceLeadingLabel(element, label) {
+        if (!(element instanceof Element)) return;
+        const textNode = Array.from(element.childNodes).find((node) => node.nodeType === Node.TEXT_NODE);
+        if (textNode && textNode.nodeValue !== label) textNode.nodeValue = label;
+    }
+
+    function applyContextualTranslations() {
+        if (language !== 'zh') return;
+        document.querySelectorAll('.card-details p:first-child')
+            .forEach((row) => replaceLeadingLabel(row, '标的： '));
+    }
+
     function applyTranslations(root = document.documentElement) {
         if (language !== 'zh' || !root) return;
 
         if (root.nodeType === Node.TEXT_NODE) {
             translateTextNode(root);
+            applyContextualTranslations();
             return;
         }
 
@@ -65,6 +78,7 @@
         if (root.querySelectorAll) {
             root.querySelectorAll('*').forEach(translateElementAttributes);
         }
+        applyContextualTranslations();
     }
 
     function saveLanguage(nextLanguage) {
@@ -143,6 +157,7 @@
         mutations.forEach((mutation) => {
             if (mutation.type === 'characterData') {
                 translateTextNode(mutation.target);
+                applyContextualTranslations();
                 return;
             }
             mutation.addedNodes.forEach(applyTranslations);
