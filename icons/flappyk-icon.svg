@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">FlappyK app icon</title>
+  <desc id="desc">Pixel-style K-line chart forming the letter K on a dark game background.</desc>
+  <rect width="512" height="512" rx="96" fill="#0d1117"/>
+  <rect x="38" y="38" width="436" height="436" rx="70" fill="none" stroke="#f1c40f" stroke-width="18"/>
+  <g fill="#2ecc71">
+    <rect x="106" y="294" width="34" height="92" rx="5"/>
+    <rect x="171" y="238" width="34" height="118" rx="5"/>
+    <rect x="236" y="265" width="34" height="80" rx="5"/>
+    <rect x="301" y="176" width="34" height="142" rx="5"/>
+    <rect x="366" y="112" width="34" height="174" rx="5"/>
+  </g>
+  <g stroke="#41dbea" stroke-width="12" stroke-linecap="square" stroke-linejoin="miter" fill="none">
+    <path d="M112 340 L188 286 L252 306 L318 228 L390 150"/>
+  </g>
+  <g fill="#ffffff">
+    <rect x="112" y="112" width="40" height="286"/>
+    <rect x="152" y="235" width="55" height="42"/>
+    <rect x="197" y="193" width="46" height="42"/>
+    <rect x="197" y="277" width="46" height="42"/>
+    <rect x="237" y="151" width="46" height="42"/>
+    <rect x="237" y="319" width="46" height="42"/>
+  </g>
+</svg>
