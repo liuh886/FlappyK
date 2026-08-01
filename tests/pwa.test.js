@@ -1,0 +1,57 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+
+const manifest = JSON.parse(fs.readFileSync('manifest.webmanifest', 'utf8'));
+const indexSource = fs.readFileSync('index.html', 'utf8');
+const serviceWorkerSource = fs.readFileSync('sw.js', 'utf8');
+const pwaSource = fs.readFileSync('pwa.js', 'utf8');
+
+assert.equal(manifest.id, './');
+assert.equal(manifest.start_url, './?source=pwa');
+assert.equal(manifest.scope, './');
+assert.equal(manifest.display, 'standalone');
+assert.ok(manifest.display_override.includes('fullscreen'));
+assert.equal(manifest.theme_color, '#0d1117');
+assert.equal(manifest.background_color, '#0d1117');
+assert.equal(manifest.prefer_related_applications, false);
+
+const iconMap = new Map(manifest.icons.map((icon) => [icon.sizes, icon]));
+assert.equal(iconMap.get('192x192')?.src, 'icons/icon-192.png');
+assert.equal(iconMap.get('512x512')?.src, 'icons/icon-512.png');
+assert.ok(manifest.icons.some((icon) => icon.purpose === 'maskable'));
+
+function pngSize(path) {
+    const bytes = fs.readFileSync(path);
+    assert.deepEqual([...bytes.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
+    return [bytes.readUInt32BE(16), bytes.readUInt32BE(20)];
+}
+
+assert.deepEqual(pngSize('icons/favicon-32.png'), [32, 32]);
+assert.deepEqual(pngSize('icons/apple-touch-icon-180.png'), [180, 180]);
+assert.deepEqual(pngSize('icons/icon-192.png'), [192, 192]);
+assert.deepEqual(pngSize('icons/icon-512.png'), [512, 512]);
+assert.deepEqual(pngSize('icons/icon-maskable-512.png'), [512, 512]);
+
+assert.ok(indexSource.includes('rel="manifest" href="manifest.webmanifest"'));
+assert.ok(indexSource.includes('name="theme-color" content="#0d1117"'));
+assert.ok(indexSource.includes('rel="apple-touch-icon"'));
+assert.ok(indexSource.includes('visual-polish.css'));
+assert.ok(indexSource.includes('pwa.css'));
+assert.ok(indexSource.includes('pwa.js'));
+
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v1'"));
+assert.ok(serviceWorkerSource.includes("'./data.js'"));
+assert.ok(serviceWorkerSource.includes("'./manifest.webmanifest'"));
+assert.ok(serviceWorkerSource.includes("'./icons/icon-512.png'"));
+assert.ok(serviceWorkerSource.includes("request.mode === 'navigate'"));
+assert.ok(serviceWorkerSource.includes("caches.match('./index.html')"));
+assert.ok(serviceWorkerSource.includes('self.skipWaiting()'));
+assert.ok(serviceWorkerSource.includes('self.clients.claim()'));
+
+assert.ok(pwaSource.includes("navigator.serviceWorker.register('./sw.js'"));
+assert.ok(pwaSource.includes("window.addEventListener('beforeinstallprompt'"));
+assert.ok(pwaSource.includes("window.addEventListener('appinstalled'"));
+assert.ok(pwaSource.includes("button.id = 'pwa-install-btn'"));
+assert.ok(pwaSource.includes('添加到主屏幕'));
+
+console.log('PWA manifest, icons, install UI, and offline shell checks passed');
