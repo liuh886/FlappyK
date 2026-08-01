@@ -56,6 +56,9 @@ jobs:
           node --check leaderboard.js
           node --check share-challenge.js
           node --check card-export.js
+          node --check pwa.js
+          node --check analytics.js
+          node --check sw.js
           node --check scripts/leaderboard-ranking.js
           node --check playwright.config.cjs
           node --check tests/e2e/product-flow.spec.js
@@ -111,7 +114,7 @@ jobs:
           print("index.html, og-image.png, and leaderboard.json validated")
           PY
 
-      - name: Check onboarding, daily, challenge, sharing, pacing, records, language, and leaderboard integration
+      - name: Check onboarding, daily, challenge, sharing, pacing, records, language, analytics, and leaderboard integration
         run: |
           grep -q '"QQQ"' fetch_all_data.py
           grep -q 'qqq-loader.js' index.html
@@ -156,6 +159,11 @@ jobs:
           grep -q 'leaderboard.js' index.html
           grep -q 'leaderboard-open-btn' index.html
           grep -q 'leaderboard-submit-btn' index.html
+          grep -q 'analytics.js' pwa.js
+          grep -q './analytics.js' sw.js
+          grep -q 'G-ZW4437KBXE' analytics.js
+          grep -q "track('play_start')" analytics.js
+          grep -q "track('run_complete'" analytics.js
           grep -q 'issues:' .github/workflows/leaderboard.yml
           grep -q 'LEADERBOARD_LIMIT = 10' scripts/leaderboard-ranking.js
 
