@@ -1,0 +1,25 @@
+#pwa-install-btn {
+    display: none;
+    background: #0f766e;
+    box-shadow: 4px 4px 0 #115e59;
+}
+
+#pwa-install-btn[data-ready='true'] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#pwa-install-btn:hover {
+    background: #0d9488;
+}
+
+html.pwa-standalone #pwa-install-btn {
+    display: none !important;
+}
+
+@media (max-width: 768px) {
+    #pwa-install-btn[data-ready='true'] {
+        display: flex;
+    }
+}
