@@ -1,5 +1,5 @@
-const APP_CACHE = 'flappyk-app-v1';
-const RUNTIME_CACHE = 'flappyk-runtime-v1';
+const APP_CACHE = 'flappyk-app-v2';
+const RUNTIME_CACHE = 'flappyk-runtime-v2';
 
 const APP_SHELL = [
     './',
@@ -46,6 +46,7 @@ const APP_SHELL = [
     './card-export.js',
     './scripts/player-profile.js',
     './pwa.js',
+    './analytics.js',
     './data/leaderboard.json',
     './og-image.png',
     './icons/flappyk-icon.svg',
