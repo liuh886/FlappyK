@@ -15,10 +15,12 @@ assert.equal(manifest.theme_color, '#0d1117');
 assert.equal(manifest.background_color, '#0d1117');
 assert.equal(manifest.prefer_related_applications, false);
 
-const iconMap = new Map(manifest.icons.map((icon) => [icon.sizes, icon]));
-assert.equal(iconMap.get('192x192')?.src, 'icons/icon-192.png');
-assert.equal(iconMap.get('512x512')?.src, 'icons/icon-512.png');
-assert.ok(manifest.icons.some((icon) => icon.purpose === 'maskable'));
+const regular192 = manifest.icons.find((icon) => icon.sizes === '192x192' && icon.purpose === 'any');
+const regular512 = manifest.icons.find((icon) => icon.sizes === '512x512' && icon.purpose === 'any');
+const maskable512 = manifest.icons.find((icon) => icon.sizes === '512x512' && icon.purpose === 'maskable');
+assert.equal(regular192?.src, 'icons/icon-192.png');
+assert.equal(regular512?.src, 'icons/icon-512.png');
+assert.equal(maskable512?.src, 'icons/icon-maskable-512.png');
 
 function pngSize(path) {
     const bytes = fs.readFileSync(path);
