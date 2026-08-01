@@ -159,7 +159,13 @@
         withBusyButton(challengeButton, 'SHARING...', async () => {
             const score = calculateLegendScore();
             if (!score) throw new Error('Completed three-game score is unavailable');
-            await shareChallengeLink(score);
+            const shareMethod = await shareChallengeLink(score);
+            if (shareMethod !== 'cancelled') {
+                window.FlappyKAnalytics?.track?.('challenge_share', {
+                    share_method: shareMethod,
+                    total_excess_pct: Number(Number(score.excess).toFixed(2)),
+                });
+            }
         });
     }, true);
 
