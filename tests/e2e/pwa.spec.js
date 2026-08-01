@@ -65,11 +65,23 @@ test('PWA registers, controls the page, and reloads offline', async ({ page, con
   await context.setOffline(true);
   await page.reload({ waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('button', { name: 'PLAY', exact: true })).toBeVisible();
-  await expect.poll(() => page.evaluate(() => Object.keys(window.stockData?.crypto || {}).length)).toBeGreaterThan(0);
+  await expect.poll(() => page.evaluate(() => (
+    typeof stockData !== 'undefined'
+      ? Object.keys(stockData.crypto || {}).length
+      : 0
+  ))).toBeGreaterThan(0);
 
   await page.getByRole('button', { name: 'PLAY', exact: true }).click();
   await expect(page.locator('#start-screen')).not.toHaveClass(/active/);
   await expect(page.locator('#target-return-display')).toHaveText('BEAT THE MARKET');
+  await expect.poll(() => page.evaluate(() => (
+    typeof currentData !== 'undefined' && Array.isArray(currentData)
+      ? currentData.length
+      : 0
+  ))).toBe(250);
+  await expect.poll(() => page.evaluate(() => (
+    typeof isPlaying !== 'undefined' ? isPlaying : false
+  ))).toBe(true);
 
   await context.setOffline(false);
 });
