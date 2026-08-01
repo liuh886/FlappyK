@@ -87,4 +87,12 @@
         isStandalone,
         get deferredInstallPrompt() { return deferredInstallPrompt; },
     };
+
+    if (!document.getElementById('flappyk-analytics-loader')) {
+        const analyticsScript = document.createElement('script');
+        analyticsScript.id = 'flappyk-analytics-loader';
+        analyticsScript.src = './analytics.js';
+        analyticsScript.async = true;
+        document.head.appendChild(analyticsScript);
+    }
 })();
