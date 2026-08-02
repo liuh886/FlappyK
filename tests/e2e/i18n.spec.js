@@ -51,7 +51,7 @@ async function installSilentAudio(page) {
   });
 }
 
-test('language toggle switches, persists, and uses a Chinese arcade type system', async ({ page }) => {
+test('language toggle switches, persists, and uses split Chinese display and reading type', async ({ page }) => {
   await preparePage(page);
   await page.addInitScript(() => {
     if (!window.localStorage.getItem('flappyk_language_v1')) {
@@ -95,7 +95,9 @@ test('language toggle switches, persists, and uses a Chinese arcade type system'
       startButtonSize: parseFloat(style('#start-btn').fontSize),
       startButtonWeight: Number(style('#start-btn').fontWeight),
       statsFamily: style('.stats-box').fontFamily,
+      statsSize: parseFloat(style('.stats-box').fontSize),
       paragraphFamily: style('#start-screen > p').fontFamily,
+      paragraphSize: parseFloat(style('#start-screen > p').fontSize),
       toggleRadius: parseFloat(style('#language-toggle-btn').borderRadius),
       cardLayout: style('.card-details').display,
       cardRowLayout: getComputedStyle(firstCardRow).display,
@@ -105,11 +107,13 @@ test('language toggle switches, persists, and uses a Chinese arcade type system'
   expect(typography.bodyFamily).not.toContain('Press Start 2P');
   expect(typography.bodyFamily).not.toContain('ZCOOL QingKe HuangYou');
   expect(typography.paragraphFamily).not.toContain('ZCOOL QingKe HuangYou');
+  expect(typography.statsFamily).not.toContain('ZCOOL QingKe HuangYou');
   expect(typography.startButtonFamily).toContain('ZCOOL QingKe HuangYou');
-  expect(typography.statsFamily).toContain('ZCOOL QingKe HuangYou');
   expect(typography.titleFamily).toContain('Press Start 2P');
   expect(typography.startButtonSize).toBeGreaterThanOrEqual(14);
   expect(typography.startButtonWeight).toBeLessThanOrEqual(500);
+  expect(typography.statsSize).toBeGreaterThanOrEqual(14);
+  expect(typography.paragraphSize).toBeGreaterThanOrEqual(16);
   expect(typography.toggleRadius).toBeGreaterThan(20);
   expect(typography.cardLayout).toBe('grid');
   expect(typography.cardRowLayout).toBe('flex');
@@ -128,7 +132,7 @@ test('language toggle switches, persists, and uses a Chinese arcade type system'
   await expect.poll(() => page.evaluate(() => window.localStorage.getItem('flappyk_language_v1'))).toBe('en');
 });
 
-test('Chinese mobile gameplay shows virtual keys, pause, return, and arcade UI type', async ({ page }) => {
+test('Chinese mobile gameplay shows virtual keys, pause, return, and a readable HUD', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await preparePage(page);
   await installSilentAudio(page);
@@ -156,6 +160,6 @@ test('Chinese mobile gameplay shows virtual keys, pause, return, and arcade UI t
   }));
   expect(mobileTypography.buyFamily).toContain('ZCOOL QingKe HuangYou');
   expect(mobileTypography.buySize).toBeGreaterThanOrEqual(14);
-  expect(mobileTypography.statsFamily).toContain('ZCOOL QingKe HuangYou');
+  expect(mobileTypography.statsFamily).not.toContain('ZCOOL QingKe HuangYou');
   expect(mobileTypography.statsSize).toBeGreaterThanOrEqual(11);
 });
