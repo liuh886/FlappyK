@@ -31,17 +31,24 @@ assert.ok(membershipSource.includes("flowType: 'pkce'"));
 assert.ok(membershipSource.includes('Authorization: `Bearer ${token}`'));
 
 assert.ok(experienceSource.includes("utilityBar.id = 'home-utility-bar'"));
-assert.ok(experienceSource.includes("document.body.appendChild(utilityBar)"));
+assert.ok(experienceSource.includes("const host = document.getElementById('game-container') || document.body"));
+assert.ok(experienceSource.includes('host.appendChild(utilityBar)'));
+assert.ok(!experienceSource.includes('document.body.appendChild(utilityBar)'));
 assert.ok(experienceSource.includes("guestAction: '登录并保存成绩'"));
 assert.ok(experienceSource.includes("membership.open?.()"));
 assert.ok(experienceSource.includes("window.addEventListener('flappyk:run-completed'"));
 assert.ok(experienceSource.includes('syncUtilityVisibility'));
 assert.ok(membershipStyles.includes('.home-utility-bar'));
+assert.ok(membershipStyles.includes('max-width: calc(100% - 24px)'));
 assert.ok(membershipStyles.includes('.membership-result-prompt'));
 assert.ok(membershipStyles.includes('.membership-result-action'));
-assert.ok(i18nStyles.includes("@media (min-width: 769px)"));
+assert.ok(membershipStyles.includes('max-height: calc(100dvh'));
+assert.ok(i18nStyles.includes('--font-zh-unified'));
+assert.ok(i18nStyles.includes('font-family: var(--font-zh-unified) !important'));
+assert.ok(!i18nStyles.includes('--font-zh-display'));
+assert.ok(!i18nStyles.includes('--font-zh-ui'));
 assert.ok(i18nStyles.includes("html[lang='zh-CN'] .stats-box"));
-assert.ok(i18nStyles.includes('font-size: 14px'));
+assert.ok(i18nStyles.includes('font-size: 15px'));
 
 assert.ok(hookSource.includes("getElementById('champagne-btn')"));
 assert.ok(hookSource.includes('isConfigured'));
@@ -70,4 +77,4 @@ assert.ok(migrationSource.includes('grant select on public.entitlements to authe
 assert.ok(!migrationSource.includes('grant insert on public.entitlements to authenticated'));
 assert.ok(!migrationSource.includes('grant update on public.entitlements to authenticated'));
 
-console.log('Membership configuration, coordinated account UI, result guidance, sync contract, and RLS boundary validated');
+console.log('Membership configuration, in-window account UI, unified Chinese typography, result guidance, sync contract, and RLS boundary validated');
