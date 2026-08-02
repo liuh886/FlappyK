@@ -4,6 +4,9 @@
     const membership = window.FlappyKMembership;
     if (!membership?.isConfigured?.()) return;
 
+    let normalizingLauncher = false;
+    let launcherObserver = null;
+
     function isChinese() {
         return document.documentElement.dataset.flappykLanguage === 'zh'
             || document.documentElement.lang.toLowerCase().startsWith('zh');
@@ -12,7 +15,8 @@
     function getCopy() {
         return isChinese()
             ? {
-                utilityLabel: '账户与语言',
+                utilityLabel: '语言与账户',
+                accountLabel: '账户',
                 guestKicker: '成绩保护',
                 guestTitle: '登录后保留这次通关',
                 guestCopy: '本次三市场成绩已暂存在这台设备中。现在登录，系统会把它同步到你的账户。',
@@ -27,7 +31,8 @@
                 errorAction: '查看账户状态',
             }
             : {
-                utilityLabel: 'Account and language',
+                utilityLabel: 'Language and account',
+                accountLabel: 'ACCOUNT',
                 guestKicker: 'PROTECT THIS RUN',
                 guestTitle: 'Sign in to keep this result',
                 guestCopy: 'This three-market result is temporarily stored on this device. Sign in now to sync it to your account.',
@@ -41,6 +46,52 @@
                 errorCopy: 'The account service is temporarily unavailable. Sign in again later to continue syncing.',
                 errorAction: 'CHECK ACCOUNT STATUS',
             };
+    }
+
+    function normalizeLauncher() {
+        const launcher = document.querySelector('.membership-launcher');
+        if (!launcher || normalizingLauncher) return;
+
+        const copy = getCopy();
+        const state = membership.getState?.() || {};
+        const signedIn = Boolean(state.user);
+        const tier = state.isPro ? 'PRO' : signedIn ? 'FREE' : '';
+        const currentLabel = launcher.querySelector('.membership-launcher-label')?.textContent || '';
+        const currentTier = launcher.querySelector('.membership-launcher-tier')?.textContent || '';
+
+        if (currentLabel === copy.accountLabel
+            && currentTier === tier
+            && launcher.dataset.accountState === (signedIn ? 'signed-in' : 'guest')) return;
+
+        normalizingLauncher = true;
+        const label = document.createElement('span');
+        label.className = 'membership-launcher-label';
+        label.textContent = copy.accountLabel;
+
+        const tierBadge = document.createElement('span');
+        tierBadge.className = 'membership-launcher-tier';
+        tierBadge.textContent = tier;
+        tierBadge.hidden = !tier;
+
+        launcher.replaceChildren(label, tierBadge);
+        launcher.dataset.accountState = signedIn ? 'signed-in' : 'guest';
+        launcher.setAttribute('aria-label', tier
+            ? `${copy.accountLabel} · ${tier}`
+            : copy.accountLabel);
+        normalizingLauncher = false;
+    }
+
+    function observeLauncher() {
+        const launcher = document.querySelector('.membership-launcher');
+        if (!launcher || launcherObserver) return;
+        launcherObserver = new MutationObserver(normalizeLauncher);
+        launcherObserver.observe(launcher, {
+            attributes: true,
+            attributeFilter: ['data-tier'],
+            childList: true,
+            characterData: true,
+            subtree: true,
+        });
     }
 
     function syncUtilityVisibility() {
@@ -68,13 +119,16 @@
 
         if (utilityBar.parentElement !== host) host.appendChild(utilityBar);
         utilityBar.setAttribute('aria-label', getCopy().utilityLabel);
-        if (launcher.parentElement !== utilityBar) utilityBar.appendChild(launcher);
-        if (languageToggle && languageToggle.parentElement !== utilityBar) {
-            utilityBar.appendChild(languageToggle);
-        }
+
+        // Language is the secondary utility; account remains the conventional right-most control.
+        if (languageToggle) utilityBar.appendChild(languageToggle);
+        utilityBar.appendChild(launcher);
+
         [launcher, languageToggle].filter(Boolean).forEach((control) => {
             control.style.boxSizing = 'border-box';
         });
+        normalizeLauncher();
+        observeLauncher();
         syncUtilityVisibility();
         return Boolean(languageToggle);
     }
@@ -144,6 +198,7 @@
         prompt.querySelector('[data-membership-result-copy]').textContent = view.body;
         prompt.querySelector('[data-membership-result-action]').textContent = view.action;
         prompt.hidden = false;
+        normalizeLauncher();
         syncUtilityVisibility();
     }
 
@@ -170,6 +225,7 @@
 
     window.FlappyKMembershipExperience = {
         installUtilityBar,
+        normalizeLauncher,
         renderResultPrompt,
         syncUtilityVisibility,
     };
