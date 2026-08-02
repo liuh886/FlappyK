@@ -88,11 +88,49 @@
         get deferredInstallPrompt() { return deferredInstallPrompt; },
     };
 
-    if (!document.getElementById('flappyk-analytics-loader')) {
-        const analyticsScript = document.createElement('script');
-        analyticsScript.id = 'flappyk-analytics-loader';
-        analyticsScript.src = './analytics.js';
-        analyticsScript.async = true;
-        document.head.appendChild(analyticsScript);
+    function loadScript(id, src) {
+        const existing = document.getElementById(id);
+        if (existing) {
+            return existing.dataset.loaded === 'true'
+                ? Promise.resolve(existing)
+                : new Promise((resolve, reject) => {
+                    existing.addEventListener('load', () => resolve(existing), { once: true });
+                    existing.addEventListener('error', reject, { once: true });
+                });
+        }
+
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.id = id;
+            script.src = src;
+            script.async = true;
+            script.addEventListener('load', () => {
+                script.dataset.loaded = 'true';
+                resolve(script);
+            }, { once: true });
+            script.addEventListener('error', reject, { once: true });
+            document.head.appendChild(script);
+        });
     }
+
+    function ensureStylesheet(id, href) {
+        if (document.getElementById(id)) return;
+        const link = document.createElement('link');
+        link.id = id;
+        link.rel = 'stylesheet';
+        link.href = href;
+        document.head.appendChild(link);
+    }
+
+    void loadScript('flappyk-analytics-loader', './analytics.js').catch((error) => {
+        console.warn('FlappyK analytics could not be loaded.', error);
+    });
+
+    ensureStylesheet('flappyk-membership-styles', './membership.css');
+    void loadScript('flappyk-membership-config', './membership-config.js')
+        .then(() => loadScript('flappyk-membership-client', './membership.js'))
+        .then(() => loadScript('flappyk-membership-run-hook', './membership-run-hook.js'))
+        .catch((error) => {
+            console.warn('FlappyK membership could not be loaded. Guest play is unaffected.', error);
+        });
 })();

@@ -1,5 +1,5 @@
-const APP_CACHE = 'flappyk-app-v2';
-const RUNTIME_CACHE = 'flappyk-runtime-v2';
+const APP_CACHE = 'flappyk-app-v3';
+const RUNTIME_CACHE = 'flappyk-runtime-v3';
 
 const APP_SHELL = [
     './',
@@ -21,6 +21,7 @@ const APP_SHELL = [
     './i18n.css',
     './visual-polish.css',
     './pwa.css',
+    './membership.css',
     './data.js',
     './qqq-loader.js',
     './scripts/friend-challenge-codec.js',
@@ -47,6 +48,9 @@ const APP_SHELL = [
     './scripts/player-profile.js',
     './pwa.js',
     './analytics.js',
+    './membership-config.js',
+    './membership.js',
+    './membership-run-hook.js',
     './data/leaderboard.json',
     './og-image.png',
     './icons/flappyk-icon.svg',

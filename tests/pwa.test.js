@@ -42,9 +42,13 @@ assert.ok(indexSource.includes('visual-polish.css'));
 assert.ok(indexSource.includes('pwa.css'));
 assert.ok(indexSource.includes('pwa.js'));
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v2'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v3'"));
 assert.ok(serviceWorkerSource.includes("'./data.js'"));
 assert.ok(serviceWorkerSource.includes("'./analytics.js'"));
+assert.ok(serviceWorkerSource.includes("'./membership-config.js'"));
+assert.ok(serviceWorkerSource.includes("'./membership.js'"));
+assert.ok(serviceWorkerSource.includes("'./membership-run-hook.js'"));
+assert.ok(serviceWorkerSource.includes("'./membership.css'"));
 assert.ok(serviceWorkerSource.includes("'./manifest.webmanifest'"));
 assert.ok(serviceWorkerSource.includes("'./icons/icon-512.png'"));
 assert.ok(serviceWorkerSource.includes("request.mode === 'navigate'"));
@@ -56,7 +60,9 @@ assert.ok(pwaSource.includes("navigator.serviceWorker.register('./sw.js'"));
 assert.ok(pwaSource.includes("window.addEventListener('beforeinstallprompt'"));
 assert.ok(pwaSource.includes("window.addEventListener('appinstalled'"));
 assert.ok(pwaSource.includes("button.id = 'pwa-install-btn'"));
-assert.ok(pwaSource.includes("analyticsScript.src = './analytics.js'"));
+assert.ok(pwaSource.includes("loadScript('flappyk-analytics-loader', './analytics.js')"));
+assert.ok(pwaSource.includes("loadScript('flappyk-membership-config', './membership-config.js')"));
+assert.ok(pwaSource.includes("ensureStylesheet('flappyk-membership-styles', './membership.css')"));
 assert.ok(pwaSource.includes('添加到主屏幕'));
 
 assert.ok(analyticsSource.includes("const MEASUREMENT_ID = 'G-ZW4437KBXE'"));
@@ -65,4 +71,4 @@ assert.ok(analyticsSource.includes("track('level_complete'"));
 assert.ok(analyticsSource.includes("track('run_complete'"));
 assert.ok(analyticsSource.includes("track('pwa_install'"));
 
-console.log('PWA manifest, icons, install UI, analytics, and offline shell checks passed');
+console.log('PWA manifest, icons, install UI, analytics, membership shell, and offline cache checks passed');
