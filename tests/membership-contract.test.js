@@ -68,7 +68,8 @@ assert.ok(pwaSource.includes("'./membership-experience.js'"));
 assert.ok(pwaSource.includes("'./membership-run-hook.js'"));
 assert.ok(pwaSource.includes("'./membership.css'"));
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v4'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v5'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v5'"));
 assert.ok(serviceWorkerSource.includes("'./membership-config.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership-experience.js'"));
@@ -84,4 +85,4 @@ assert.ok(migrationSource.includes('grant select on public.entitlements to authe
 assert.ok(!migrationSource.includes('grant insert on public.entitlements to authenticated'));
 assert.ok(!migrationSource.includes('grant update on public.entitlements to authenticated'));
 
-console.log('Membership configuration, right-most account badge, hidden Chinese goal row, result guidance, sync contract, and RLS boundary validated');
+console.log('Membership configuration, right-most account badge, hidden Chinese goal row, refreshed PWA shell, result guidance, sync contract, and RLS boundary validated');
