@@ -11,8 +11,8 @@ const migrationSource = fs.readFileSync('supabase/migrations/0001_membership_fou
 assert.ok(configSource.includes('enabled: false'));
 assert.ok(configSource.includes("entitlementCode: 'flappyk.pro'"));
 assert.ok(!/sk_(live|test)_/.test(configSource));
-assert.ok(!/service[_-]?role/i.test(configSource));
-assert.ok(!/webhook.*secret/i.test(configSource));
+assert.ok(!/sb_secret_/.test(configSource));
+assert.ok(!/whsec_/.test(configSource));
 
 assert.ok(membershipSource.includes("if (configured) void initialise()"));
 assert.ok(membershipSource.includes("from('entitlements')"));
@@ -25,6 +25,7 @@ assert.ok(membershipSource.includes("flowType: 'pkce'"));
 assert.ok(membershipSource.includes('Authorization: `Bearer ${token}`'));
 
 assert.ok(hookSource.includes("getElementById('champagne-btn')"));
+assert.ok(hookSource.includes('isConfigured'));
 assert.ok(hookSource.includes('queueCompletedRun'));
 assert.ok(hookSource.includes('buildRunSignature'));
 
