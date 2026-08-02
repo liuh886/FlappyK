@@ -142,7 +142,7 @@ test('install prompt exposes a home-screen install action', async ({ page }) => 
   await expect(installButton).toHaveAttribute('data-ready', 'true');
 });
 
-test('account tools stay inside the game window and completed runs prompt sign-in', async ({ page }) => {
+test('account stays right-most inside the game window and completed runs prompt sign-in', async ({ page }) => {
   await preparePage(page);
   await page.goto('/');
 
@@ -153,17 +153,23 @@ test('account tools stay inside the game window and completed runs prompt sign-i
   const accountButton = utilityBar.locator('.membership-launcher');
   const languageButton = utilityBar.locator('#language-toggle-btn');
   await expect(utilityBar).toBeVisible();
-  await expect(accountButton).toHaveText('ACCOUNT');
+  await expect(accountButton.locator('.membership-launcher-label')).toHaveText('ACCOUNT');
+  await expect(accountButton.locator('.membership-launcher-tier')).toBeHidden();
   await expect(languageButton).toHaveText('中文');
 
   const positions = await page.evaluate(() => {
     const container = document.getElementById('game-container').getBoundingClientRect();
-    const utility = document.getElementById('home-utility-bar').getBoundingClientRect();
+    const utilityElement = document.getElementById('home-utility-bar');
+    const utility = utilityElement.getBoundingClientRect();
     const account = document.querySelector('.membership-launcher').getBoundingClientRect();
     const language = document.getElementById('language-toggle-btn').getBoundingClientRect();
     return {
-      parentId: document.getElementById('home-utility-bar').parentElement?.id,
+      parentId: utilityElement.parentElement?.id,
+      childOrder: Array.from(utilityElement.children).map((element) => (
+        element.id || element.className
+      )),
       accountLeft: account.left,
+      accountRight: account.right,
       languageLeft: language.left,
       topDelta: Math.abs(account.top - language.top),
       insideLeft: utility.left >= container.left,
@@ -172,7 +178,9 @@ test('account tools stay inside the game window and completed runs prompt sign-i
     };
   });
   expect(positions.parentId).toBe('game-container');
-  expect(positions.accountLeft).toBeLessThan(positions.languageLeft);
+  expect(positions.childOrder).toEqual(['language-toggle-btn', 'membership-launcher']);
+  expect(positions.languageLeft).toBeLessThan(positions.accountLeft);
+  expect(positions.accountRight).toBeGreaterThan(positions.languageLeft);
   expect(positions.topDelta).toBeLessThan(2);
   expect(positions.insideLeft).toBe(true);
   expect(positions.insideRight).toBe(true);
@@ -207,7 +215,7 @@ test('account tools stay inside the game window and completed runs prompt sign-i
   await expect(page.locator('.membership-backdrop')).toBeVisible();
 });
 
-test('Chinese desktop UI uses one larger, consistent typeface', async ({ page }) => {
+test('Chinese desktop UI uses one larger, consistent typeface without a repeated goal row', async ({ page }) => {
   await preparePage(page);
   await page.addInitScript(() => {
     window.localStorage.setItem('flappyk_language_v1', 'zh');
@@ -223,6 +231,7 @@ test('Chinese desktop UI uses one larger, consistent typeface', async ({ page })
     const intro = getComputedStyle(document.querySelector('#start-screen > p'));
     const playButton = getComputedStyle(document.getElementById('start-btn'));
     const accountButton = getComputedStyle(document.querySelector('.membership-launcher'));
+    const goalRow = document.getElementById('target-return-display').parentElement;
     return {
       statsSize: stats.fontSize,
       statsFamily: stats.fontFamily,
@@ -231,6 +240,7 @@ test('Chinese desktop UI uses one larger, consistent typeface', async ({ page })
       introFamily: intro.fontFamily,
       buttonFamily: playButton.fontFamily,
       accountFamily: accountButton.fontFamily,
+      goalRowDisplay: getComputedStyle(goalRow).display,
     };
   });
 
@@ -241,6 +251,7 @@ test('Chinese desktop UI uses one larger, consistent typeface', async ({ page })
   expect(typography.introFamily).toBe(typography.statsFamily);
   expect(typography.buttonFamily).toBe(typography.statsFamily);
   expect(typography.accountFamily).toBe(typography.statsFamily);
+  expect(typography.goalRowDisplay).toBe('none');
 
   await showCompletedRunScreen(page);
   await page.evaluate(() => {
@@ -270,19 +281,25 @@ test('mobile account controls and dialog remain inside the viewport', async ({ p
 
   await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
   await expect(page.locator('#home-utility-bar')).toBeVisible();
-  await expect(page.locator('.membership-launcher')).toHaveText('账户');
+  await expect(page.locator('.membership-launcher-label')).toHaveText('账户');
+  await expect(page.locator('.membership-launcher-tier')).toBeHidden();
 
   const utilityBounds = await page.evaluate(() => {
     const viewport = { width: window.innerWidth, height: window.innerHeight };
     const container = document.getElementById('game-container').getBoundingClientRect();
-    const utility = document.getElementById('home-utility-bar').getBoundingClientRect();
+    const utilityElement = document.getElementById('home-utility-bar');
+    const utility = utilityElement.getBoundingClientRect();
+    const account = document.querySelector('.membership-launcher').getBoundingClientRect();
+    const language = document.getElementById('language-toggle-btn').getBoundingClientRect();
     return {
-      parentId: document.getElementById('home-utility-bar').parentElement?.id,
+      parentId: utilityElement.parentElement?.id,
+      accountRightMost: account.right > language.right,
       insideContainer: utility.left >= container.left && utility.right <= container.right,
       insideViewport: utility.left >= 0 && utility.right <= viewport.width && utility.top >= 0,
     };
   });
   expect(utilityBounds.parentId).toBe('game-container');
+  expect(utilityBounds.accountRightMost).toBe(true);
   expect(utilityBounds.insideContainer).toBe(true);
   expect(utilityBounds.insideViewport).toBe(true);
 
