@@ -42,7 +42,8 @@ assert.ok(indexSource.includes('visual-polish.css'));
 assert.ok(indexSource.includes('pwa.css'));
 assert.ok(indexSource.includes('pwa.js'));
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v4'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v5'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v5'"));
 assert.ok(serviceWorkerSource.includes("'./data.js'"));
 assert.ok(serviceWorkerSource.includes("'./analytics.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership-config.js'"));
@@ -73,4 +74,4 @@ assert.ok(analyticsSource.includes("track('level_complete'"));
 assert.ok(analyticsSource.includes("track('run_complete'"));
 assert.ok(analyticsSource.includes("track('pwa_install'"));
 
-console.log('PWA manifest, icons, install UI, analytics, coordinated membership shell, and offline cache checks passed');
+console.log('PWA manifest, icons, install UI, analytics, coordinated membership shell, and refreshed offline cache checks passed');
