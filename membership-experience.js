@@ -43,11 +43,17 @@
             };
     }
 
+    function syncUtilityVisibility() {
+        const utilityBar = document.getElementById('home-utility-bar');
+        const gameControls = document.getElementById('game-top-controls');
+        if (!utilityBar) return;
+        utilityBar.hidden = Boolean(gameControls && !gameControls.hidden);
+    }
+
     function installUtilityBar() {
-        const startScreen = document.getElementById('start-screen');
         const launcher = document.querySelector('.membership-launcher');
         const languageToggle = document.getElementById('language-toggle-btn');
-        if (!startScreen || !launcher) return false;
+        if (!launcher) return false;
 
         let utilityBar = document.getElementById('home-utility-bar');
         if (!utilityBar) {
@@ -55,7 +61,7 @@
             utilityBar.id = 'home-utility-bar';
             utilityBar.className = 'home-utility-bar';
             utilityBar.setAttribute('role', 'group');
-            startScreen.prepend(utilityBar);
+            document.body.appendChild(utilityBar);
         }
 
         utilityBar.setAttribute('aria-label', getCopy().utilityLabel);
@@ -63,6 +69,7 @@
         if (languageToggle && languageToggle.parentElement !== utilityBar) {
             utilityBar.appendChild(languageToggle);
         }
+        syncUtilityVisibility();
         return Boolean(languageToggle);
     }
 
@@ -131,6 +138,7 @@
         prompt.querySelector('[data-membership-result-copy]').textContent = view.body;
         prompt.querySelector('[data-membership-result-action]').textContent = view.action;
         prompt.hidden = false;
+        syncUtilityVisibility();
     }
 
     installUtilityBar();
@@ -141,6 +149,14 @@
     });
     utilityObserver.observe(document.body, { childList: true, subtree: true });
 
+    const gameControls = document.getElementById('game-top-controls');
+    if (gameControls) {
+        new MutationObserver(syncUtilityVisibility).observe(gameControls, {
+            attributes: true,
+            attributeFilter: ['hidden'],
+        });
+    }
+
     document.getElementById('champagne-btn')?.addEventListener('click', () => {
         window.requestAnimationFrame(renderResultPrompt);
     });
@@ -149,5 +165,6 @@
     window.FlappyKMembershipExperience = {
         installUtilityBar,
         renderResultPrompt,
+        syncUtilityVisibility,
     };
 })();
