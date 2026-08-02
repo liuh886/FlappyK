@@ -67,6 +67,15 @@ html[lang='zh-CN'] .custom-challenge-panel label {
     letter-spacing: 0.025em;
 }
 
+/* Mobile trade actions have stronger legacy selectors, so pin their display face. */
+html[lang='zh-CN'] #btn-buy,
+html[lang='zh-CN'] #btn-sell {
+    font-family: var(--font-zh-display);
+    font-weight: 400;
+    font-synthesis: none;
+    letter-spacing: 0.025em;
+}
+
 /* Dense information uses a readable CJK sans rather than the display face. */
 html[lang='zh-CN'] .stats-box,
 html[lang='zh-CN'] .controls-hint,
