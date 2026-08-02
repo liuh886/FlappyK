@@ -73,6 +73,13 @@ async function preparePage(page) {
   });
 }
 
+async function showCompletedRunScreen(page) {
+  await page.evaluate(() => {
+    document.querySelectorAll('.screen.active').forEach((screen) => screen.classList.remove('active'));
+    document.getElementById('champagne-screen').classList.add('active');
+  });
+}
+
 test('PWA registers, controls the page, and reloads offline', async ({ page, context }) => {
   await preparePage(page);
   await page.goto('/');
@@ -162,6 +169,7 @@ test('account tools are coordinated and completed runs prompt sign-in', async ({
   expect(positions.topDelta).toBeLessThan(2);
   expect(await page.evaluate(() => localStorage.getItem('flappyk_pending_cloud_runs_v1'))).toBeNull();
 
+  await showCompletedRunScreen(page);
   await page.evaluate(() => {
     window.dispatchEvent(new CustomEvent('flappyk:run-completed', {
       detail: {
@@ -219,6 +227,7 @@ test('Chinese desktop UI uses readable body type and larger information text', a
   expect(typography.statsFamily).not.toContain('ZCOOL QingKe HuangYou');
   expect(typography.buttonFamily).toContain('ZCOOL QingKe HuangYou');
 
+  await showCompletedRunScreen(page);
   await page.evaluate(() => {
     window.dispatchEvent(new CustomEvent('flappyk:run-completed', {
       detail: {
