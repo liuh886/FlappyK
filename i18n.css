@@ -84,6 +84,11 @@ html[lang='zh-CN'] .trade-emoji {
     font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif !important;
 }
 
+/* The game already communicates its rule elsewhere; do not repeat it in the Chinese HUD. */
+html[lang='zh-CN'] .stats-box > div:has(#target-return-display) {
+    display: none;
+}
+
 html[lang='zh-CN'] h1,
 html[lang='zh-CN'] h2,
 html[lang='zh-CN'] h3,
