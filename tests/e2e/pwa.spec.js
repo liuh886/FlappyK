@@ -142,7 +142,7 @@ test('install prompt exposes a home-screen install action', async ({ page }) => 
   await expect(installButton).toHaveAttribute('data-ready', 'true');
 });
 
-test('account tools are coordinated and completed runs prompt sign-in', async ({ page }) => {
+test('account tools stay inside the game window and completed runs prompt sign-in', async ({ page }) => {
   await preparePage(page);
   await page.goto('/');
 
@@ -157,16 +157,26 @@ test('account tools are coordinated and completed runs prompt sign-in', async ({
   await expect(languageButton).toHaveText('中文');
 
   const positions = await page.evaluate(() => {
+    const container = document.getElementById('game-container').getBoundingClientRect();
+    const utility = document.getElementById('home-utility-bar').getBoundingClientRect();
     const account = document.querySelector('.membership-launcher').getBoundingClientRect();
     const language = document.getElementById('language-toggle-btn').getBoundingClientRect();
     return {
+      parentId: document.getElementById('home-utility-bar').parentElement?.id,
       accountLeft: account.left,
       languageLeft: language.left,
       topDelta: Math.abs(account.top - language.top),
+      insideLeft: utility.left >= container.left,
+      insideRight: utility.right <= container.right,
+      insideTop: utility.top >= container.top,
     };
   });
+  expect(positions.parentId).toBe('game-container');
   expect(positions.accountLeft).toBeLessThan(positions.languageLeft);
   expect(positions.topDelta).toBeLessThan(2);
+  expect(positions.insideLeft).toBe(true);
+  expect(positions.insideRight).toBe(true);
+  expect(positions.insideTop).toBe(true);
   expect(await page.evaluate(() => localStorage.getItem('flappyk_pending_cloud_runs_v1'))).toBeNull();
 
   await showCompletedRunScreen(page);
@@ -197,7 +207,7 @@ test('account tools are coordinated and completed runs prompt sign-in', async ({
   await expect(page.locator('.membership-backdrop')).toBeVisible();
 });
 
-test('Chinese desktop UI uses readable body type and larger information text', async ({ page }) => {
+test('Chinese desktop UI uses one larger, consistent typeface', async ({ page }) => {
   await preparePage(page);
   await page.addInitScript(() => {
     window.localStorage.setItem('flappyk_language_v1', 'zh');
@@ -212,20 +222,25 @@ test('Chinese desktop UI uses readable body type and larger information text', a
     const stats = getComputedStyle(document.querySelector('.stats-box'));
     const intro = getComputedStyle(document.querySelector('#start-screen > p'));
     const playButton = getComputedStyle(document.getElementById('start-btn'));
+    const accountButton = getComputedStyle(document.querySelector('.membership-launcher'));
     return {
       statsSize: stats.fontSize,
       statsFamily: stats.fontFamily,
       introSize: intro.fontSize,
       introLineHeight: intro.lineHeight,
+      introFamily: intro.fontFamily,
       buttonFamily: playButton.fontFamily,
+      accountFamily: accountButton.fontFamily,
     };
   });
 
-  expect(typography.statsSize).toBe('14px');
-  expect(typography.introSize).toBe('16px');
-  expect(Number.parseFloat(typography.introLineHeight)).toBeGreaterThan(24);
-  expect(typography.statsFamily).not.toContain('ZCOOL QingKe HuangYou');
-  expect(typography.buttonFamily).toContain('ZCOOL QingKe HuangYou');
+  expect(typography.statsSize).toBe('15px');
+  expect(typography.introSize).toBe('17px');
+  expect(Number.parseFloat(typography.introLineHeight)).toBeGreaterThanOrEqual(28);
+  expect(typography.statsFamily).toContain('ZCOOL QingKe HuangYou');
+  expect(typography.introFamily).toBe(typography.statsFamily);
+  expect(typography.buttonFamily).toBe(typography.statsFamily);
+  expect(typography.accountFamily).toBe(typography.statsFamily);
 
   await showCompletedRunScreen(page);
   await page.evaluate(() => {
@@ -243,4 +258,51 @@ test('Chinese desktop UI uses readable body type and larger information text', a
   });
   await expect(page.locator('#membership-result-prompt')).toBeVisible();
   await expect(page.locator('.membership-result-action')).toHaveText('登录并保存成绩');
+});
+
+test('mobile account controls and dialog remain inside the viewport', async ({ page }) => {
+  await preparePage(page);
+  await page.addInitScript(() => {
+    window.localStorage.setItem('flappyk_language_v1', 'zh');
+  });
+  await page.setViewportSize({ width: 360, height: 740 });
+  await page.goto('/');
+
+  await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
+  await expect(page.locator('#home-utility-bar')).toBeVisible();
+  await expect(page.locator('.membership-launcher')).toHaveText('账户');
+
+  const utilityBounds = await page.evaluate(() => {
+    const viewport = { width: window.innerWidth, height: window.innerHeight };
+    const container = document.getElementById('game-container').getBoundingClientRect();
+    const utility = document.getElementById('home-utility-bar').getBoundingClientRect();
+    return {
+      parentId: document.getElementById('home-utility-bar').parentElement?.id,
+      insideContainer: utility.left >= container.left && utility.right <= container.right,
+      insideViewport: utility.left >= 0 && utility.right <= viewport.width && utility.top >= 0,
+    };
+  });
+  expect(utilityBounds.parentId).toBe('game-container');
+  expect(utilityBounds.insideContainer).toBe(true);
+  expect(utilityBounds.insideViewport).toBe(true);
+
+  await page.locator('.membership-launcher').click();
+  await expect(page.locator('.membership-dialog')).toBeVisible();
+
+  const dialogBounds = await page.evaluate(() => {
+    const dialog = document.querySelector('.membership-dialog').getBoundingClientRect();
+    return {
+      left: dialog.left,
+      top: dialog.top,
+      rightGap: window.innerWidth - dialog.right,
+      bottomGap: window.innerHeight - dialog.bottom,
+      width: dialog.width,
+      viewportWidth: window.innerWidth,
+    };
+  });
+  expect(dialogBounds.left).toBeGreaterThanOrEqual(0);
+  expect(dialogBounds.top).toBeGreaterThanOrEqual(0);
+  expect(dialogBounds.rightGap).toBeGreaterThanOrEqual(0);
+  expect(dialogBounds.bottomGap).toBeGreaterThanOrEqual(0);
+  expect(dialogBounds.width).toBeLessThanOrEqual(dialogBounds.viewportWidth);
 });
