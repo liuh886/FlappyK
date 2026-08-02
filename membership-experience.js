@@ -55,6 +55,7 @@
     function installUtilityBar() {
         const launcher = document.querySelector('.membership-launcher');
         const languageToggle = document.getElementById('language-toggle-btn');
+        const host = document.getElementById('game-container') || document.body;
         if (!launcher) return false;
 
         let utilityBar = document.getElementById('home-utility-bar');
@@ -63,9 +64,9 @@
             utilityBar.id = 'home-utility-bar';
             utilityBar.className = 'home-utility-bar';
             utilityBar.setAttribute('role', 'group');
-            document.body.appendChild(utilityBar);
         }
 
+        if (utilityBar.parentElement !== host) host.appendChild(utilityBar);
         utilityBar.setAttribute('aria-label', getCopy().utilityLabel);
         if (launcher.parentElement !== utilityBar) utilityBar.appendChild(launcher);
         if (languageToggle && languageToggle.parentElement !== utilityBar) {
