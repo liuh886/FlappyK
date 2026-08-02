@@ -48,6 +48,100 @@
             };
     }
 
+    function installUtilityRefinementStyles() {
+        if (document.getElementById('flappyk-account-utility-refinement')) return;
+        const style = document.createElement('style');
+        style.id = 'flappyk-account-utility-refinement';
+        style.textContent = `
+            .home-utility-bar {
+                gap: 0;
+                padding: 3px;
+                border: 1px solid rgba(240, 246, 252, 0.42);
+                border-radius: 999px;
+                background: rgba(13, 17, 23, 0.9);
+                box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+                backdrop-filter: blur(10px);
+            }
+            .home-utility-bar .membership-launcher,
+            .home-utility-bar #language-toggle-btn {
+                min-height: 32px;
+                height: 32px;
+                border: 0;
+                background: transparent;
+                box-shadow: none;
+            }
+            .home-utility-bar #language-toggle-btn {
+                order: 1;
+                min-width: 52px;
+                border-radius: 999px 0 0 999px;
+                border-right: 1px solid rgba(240, 246, 252, 0.2);
+            }
+            .home-utility-bar .membership-launcher {
+                order: 2;
+                min-width: 0;
+                padding: 0 10px;
+                border-radius: 0 999px 999px 0;
+                gap: 7px;
+            }
+            .home-utility-bar .membership-launcher::before {
+                display: none;
+            }
+            .membership-launcher-label {
+                white-space: nowrap;
+            }
+            .membership-launcher-tier {
+                display: inline-flex;
+                min-height: 20px;
+                padding: 2px 6px;
+                align-items: center;
+                justify-content: center;
+                border: 1px solid rgba(240, 246, 252, 0.35);
+                border-radius: 999px;
+                background: rgba(255, 255, 255, 0.08);
+                color: #c9d1d9;
+                font-size: 0.78em;
+                line-height: 1;
+                letter-spacing: 0.04em;
+            }
+            .membership-launcher-tier[hidden] {
+                display: none;
+            }
+            .membership-launcher[data-tier='pro'] .membership-launcher-tier {
+                border-color: rgba(241, 196, 15, 0.72);
+                background: rgba(241, 196, 15, 0.14);
+                color: #f1c40f;
+            }
+            .home-utility-bar .membership-launcher:hover,
+            .home-utility-bar #language-toggle-btn:hover {
+                border-color: transparent;
+                background: rgba(255, 255, 255, 0.08);
+            }
+            @media (max-width: 768px) {
+                .home-utility-bar {
+                    padding: 2px;
+                }
+                .home-utility-bar #language-toggle-btn {
+                    min-width: 44px;
+                    height: 30px;
+                    min-height: 30px;
+                    padding-inline: 7px;
+                }
+                .home-utility-bar .membership-launcher {
+                    height: 30px;
+                    min-height: 30px;
+                    padding-inline: 8px;
+                    gap: 5px;
+                    font-size: 11px;
+                }
+                .membership-launcher-tier {
+                    min-height: 18px;
+                    padding-inline: 5px;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
     function normalizeLauncher() {
         const launcher = document.querySelector('.membership-launcher');
         if (!launcher || normalizingLauncher) return;
@@ -120,7 +214,7 @@
         if (utilityBar.parentElement !== host) host.appendChild(utilityBar);
         utilityBar.setAttribute('aria-label', getCopy().utilityLabel);
 
-        // Language is the secondary utility; account remains the conventional right-most control.
+        // Language is secondary; account remains the conventional right-most control.
         if (languageToggle) utilityBar.appendChild(languageToggle);
         utilityBar.appendChild(launcher);
 
@@ -202,6 +296,7 @@
         syncUtilityVisibility();
     }
 
+    installUtilityRefinementStyles();
     installUtilityBar();
     createResultPrompt();
 
