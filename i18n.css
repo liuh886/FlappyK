@@ -4,7 +4,7 @@
 :root {
     --font-pixel: 'Press Start 2P', monospace;
     --font-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-zh-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei UI', 'Microsoft YaHei', 'Noto Sans CJK SC', 'Source Han Sans SC', 'WenQuanYi Micro Hei', sans-serif;
+    --font-zh-ui: 'PingFang SC', 'Microsoft YaHei UI', 'Microsoft YaHei', 'Hiragino Sans GB', 'Noto Sans CJK SC', 'Source Han Sans SC', system-ui, sans-serif;
     --font-zh-display: 'ZCOOL QingKe HuangYou', 'PingFang SC', 'Microsoft YaHei UI', 'Microsoft YaHei', sans-serif;
     --font-numeric: ui-monospace, 'SFMono-Regular', 'Roboto Mono', 'Cascadia Mono', 'Segoe UI Mono', Consolas, monospace;
 }
@@ -41,7 +41,6 @@
     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
-/* Long-form Chinese copy stays in a highly readable system CJK stack. */
 html[lang='zh-CN'] body,
 html[lang='zh-CN'] select,
 html[lang='zh-CN'] input,
@@ -53,11 +52,22 @@ html[lang='zh-CN'] textarea {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Game-facing Chinese UI uses a compact display face rather than document-style system type. */
+/* Keep the arcade face for short, prominent labels only. */
 html[lang='zh-CN'] button,
 html[lang='zh-CN'] h1:not(#game-title),
 html[lang='zh-CN'] h2,
 html[lang='zh-CN'] h3,
+html[lang='zh-CN'] .onboarding-kicker,
+html[lang='zh-CN'] .onboarding-rule strong,
+html[lang='zh-CN'] .status-msg,
+html[lang='zh-CN'] .custom-challenge-panel label {
+    font-family: var(--font-zh-display);
+    font-weight: 400;
+    font-synthesis: none;
+    letter-spacing: 0.025em;
+}
+
+/* Dense information uses a readable CJK sans rather than the display face. */
 html[lang='zh-CN'] .stats-box,
 html[lang='zh-CN'] .controls-hint,
 html[lang='zh-CN'] .local-records-summary,
@@ -67,24 +77,20 @@ html[lang='zh-CN'] .friend-challenge-result,
 html[lang='zh-CN'] .daily-run-result,
 html[lang='zh-CN'] .local-record-result,
 html[lang='zh-CN'] .leaderboard-panel,
-html[lang='zh-CN'] .onboarding-kicker,
-html[lang='zh-CN'] .onboarding-rule strong,
-html[lang='zh-CN'] .status-msg,
-html[lang='zh-CN'] .card-details p,
-html[lang='zh-CN'] .custom-challenge-panel label {
-    font-family: var(--font-zh-display);
-    font-weight: 400;
+html[lang='zh-CN'] .onboarding-rule span,
+html[lang='zh-CN'] .card-details p {
+    font-family: var(--font-zh-ui);
+    font-weight: 600;
     font-synthesis: none;
-    letter-spacing: 0.055em;
+    letter-spacing: 0;
 }
 
 html[lang='zh-CN'] #language-toggle-btn {
     font-family: var(--font-zh-display);
     font-weight: 400;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.02em;
 }
 
-/* Keep the brand and numerical readouts crisp without forcing pixel metrics onto Chinese copy. */
 html[lang='zh-CN'] #game-title,
 html[lang='zh-CN'] .start-data-ticker,
 html[lang='zh-CN'] .legend-ticker {
@@ -104,47 +110,87 @@ html[lang='zh-CN'] #speed-btn {
 
 html[lang='zh-CN'] p,
 html[lang='zh-CN'] .onboarding-rule span {
-    letter-spacing: 0.015em;
+    letter-spacing: 0.01em;
 }
 
 html[lang='zh-CN'] #start-screen > p {
-    max-width: 620px;
-    font-size: 14px;
-    line-height: 1.7;
+    max-width: 660px;
+    line-height: 1.75;
 }
 
 html[lang='zh-CN'] .stats-box,
 html[lang='zh-CN'] .controls-hint {
-    font-size: 12px;
-    line-height: 1.7;
+    line-height: 1.65;
 }
 
 html[lang='zh-CN'] .onboarding-rule span,
 html[lang='zh-CN'] .leaderboard-subtitle {
-    line-height: 1.65;
-}
-
-html[lang='zh-CN'] .onboarding-rule span {
-    font-size: 12px;
+    line-height: 1.7;
 }
 
 html[lang='zh-CN'] .card-details p {
-    font-size: 14px;
-    line-height: 1.45;
+    line-height: 1.55;
 }
 
 html[lang='zh-CN'] .status-msg {
-    font-size: 15px;
     line-height: 1.45;
 }
 
-html[lang='zh-CN'] .screen button,
-html[lang='zh-CN'] .onboarding-panel button,
-html[lang='zh-CN'] .leaderboard-panel button,
-html[lang='zh-CN'] .custom-challenge-panel button,
-html[lang='zh-CN'] .action-buttons button {
-    font-size: 15px;
-    line-height: 1.2;
+@media (min-width: 769px) {
+    html[lang='zh-CN'] #start-screen > p {
+        font-size: 16px;
+    }
+
+    html[lang='zh-CN'] .stats-box {
+        min-width: 220px;
+        font-size: 14px;
+    }
+
+    html[lang='zh-CN'] .controls-hint {
+        font-size: 13px;
+    }
+
+    html[lang='zh-CN'] .local-records-summary,
+    html[lang='zh-CN'] .daily-run-summary,
+    html[lang='zh-CN'] .friend-challenge-invite,
+    html[lang='zh-CN'] .friend-challenge-result,
+    html[lang='zh-CN'] .daily-run-result,
+    html[lang='zh-CN'] .local-record-result {
+        font-size: 13px;
+        line-height: 1.65;
+    }
+
+    html[lang='zh-CN'] .daily-run-summary small,
+    html[lang='zh-CN'] .leaderboard-subtitle {
+        font-size: 13px;
+    }
+
+    html[lang='zh-CN'] .leaderboard-row {
+        min-height: 42px;
+        font-size: 14px;
+        line-height: 1.55;
+    }
+
+    html[lang='zh-CN'] .onboarding-rule span {
+        font-size: 14px;
+    }
+
+    html[lang='zh-CN'] .card-details p {
+        font-size: 15px;
+    }
+
+    html[lang='zh-CN'] .status-msg {
+        font-size: 16px;
+    }
+
+    html[lang='zh-CN'] .screen button,
+    html[lang='zh-CN'] .onboarding-panel button,
+    html[lang='zh-CN'] .leaderboard-panel button,
+    html[lang='zh-CN'] .custom-challenge-panel button,
+    html[lang='zh-CN'] .action-buttons button {
+        font-size: 16px;
+        line-height: 1.2;
+    }
 }
 
 @media (max-width: 768px) {
