@@ -8,11 +8,14 @@ const pwaSource = fs.readFileSync('pwa.js', 'utf8');
 const serviceWorkerSource = fs.readFileSync('sw.js', 'utf8');
 const migrationSource = fs.readFileSync('supabase/migrations/0001_membership_foundation.sql', 'utf8');
 
-assert.ok(configSource.includes('enabled: false'));
+assert.ok(configSource.includes('enabled: true'));
+assert.ok(configSource.includes("supabaseUrl: 'https://blgwlycfcwvsupmqyqwn.supabase.co'"));
+assert.ok(configSource.includes("supabasePublishableKey: 'sb_publishable_"));
 assert.ok(configSource.includes("entitlementCode: 'flappyk.pro'"));
 assert.ok(!/sk_(live|test)_/.test(configSource));
 assert.ok(!/sb_secret_/.test(configSource));
 assert.ok(!/whsec_/.test(configSource));
+assert.ok(!/service_role/.test(configSource));
 
 assert.ok(membershipSource.includes("if (configured) void initialise()"));
 assert.ok(membershipSource.includes("from('entitlements')"));
