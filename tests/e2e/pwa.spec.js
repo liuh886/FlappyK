@@ -108,3 +108,14 @@ test('install prompt exposes a home-screen install action', async ({ page }) => 
   await installButton.click();
   await expect(installButton).toHaveAttribute('data-ready', 'true');
 });
+
+test('disabled membership foundation stays invisible and guest-safe', async ({ page }) => {
+  await preparePage(page);
+  await page.goto('/');
+
+  await expect.poll(() => page.evaluate(() => Boolean(window.FlappyKMembership))).toBe(true);
+  expect(await page.evaluate(() => window.FlappyKMembership.isConfigured())).toBe(false);
+  await expect(page.locator('.membership-launcher')).toHaveCount(0);
+  expect(await page.evaluate(() => localStorage.getItem('flappyk_pending_cloud_runs_v1'))).toBeNull();
+  await expect(page.getByRole('button', { name: 'PLAY', exact: true })).toBeVisible();
+});
