@@ -3,7 +3,10 @@ const fs = require('node:fs');
 
 const configSource = fs.readFileSync('membership-config.js', 'utf8');
 const membershipSource = fs.readFileSync('membership.js', 'utf8');
+const experienceSource = fs.readFileSync('membership-experience.js', 'utf8');
 const hookSource = fs.readFileSync('membership-run-hook.js', 'utf8');
+const membershipStyles = fs.readFileSync('membership.css', 'utf8');
+const i18nStyles = fs.readFileSync('i18n.css', 'utf8');
 const pwaSource = fs.readFileSync('pwa.js', 'utf8');
 const serviceWorkerSource = fs.readFileSync('sw.js', 'utf8');
 const migrationSource = fs.readFileSync('supabase/migrations/0001_membership_foundation.sql', 'utf8');
@@ -27,6 +30,19 @@ assert.ok(membershipSource.includes("persistSession: true"));
 assert.ok(membershipSource.includes("flowType: 'pkce'"));
 assert.ok(membershipSource.includes('Authorization: `Bearer ${token}`'));
 
+assert.ok(experienceSource.includes("utilityBar.id = 'home-utility-bar'"));
+assert.ok(experienceSource.includes("document.body.appendChild(utilityBar)"));
+assert.ok(experienceSource.includes("guestAction: '登录并保存成绩'"));
+assert.ok(experienceSource.includes("membership.open?.()"));
+assert.ok(experienceSource.includes("window.addEventListener('flappyk:run-completed'"));
+assert.ok(experienceSource.includes('syncUtilityVisibility'));
+assert.ok(membershipStyles.includes('.home-utility-bar'));
+assert.ok(membershipStyles.includes('.membership-result-prompt'));
+assert.ok(membershipStyles.includes('.membership-result-action'));
+assert.ok(i18nStyles.includes("@media (min-width: 769px)"));
+assert.ok(i18nStyles.includes("html[lang='zh-CN'] .stats-box"));
+assert.ok(i18nStyles.includes('font-size: 14px'));
+
 assert.ok(hookSource.includes("getElementById('champagne-btn')"));
 assert.ok(hookSource.includes('isConfigured'));
 assert.ok(hookSource.includes('queueCompletedRun'));
@@ -34,12 +50,14 @@ assert.ok(hookSource.includes('buildRunSignature'));
 
 assert.ok(pwaSource.includes("'./membership-config.js'"));
 assert.ok(pwaSource.includes("'./membership.js'"));
+assert.ok(pwaSource.includes("'./membership-experience.js'"));
 assert.ok(pwaSource.includes("'./membership-run-hook.js'"));
 assert.ok(pwaSource.includes("'./membership.css'"));
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v3'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v4'"));
 assert.ok(serviceWorkerSource.includes("'./membership-config.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership.js'"));
+assert.ok(serviceWorkerSource.includes("'./membership-experience.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership-run-hook.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership.css'"));
 
@@ -52,4 +70,4 @@ assert.ok(migrationSource.includes('grant select on public.entitlements to authe
 assert.ok(!migrationSource.includes('grant insert on public.entitlements to authenticated'));
 assert.ok(!migrationSource.includes('grant update on public.entitlements to authenticated'));
 
-console.log('Membership configuration, guest fallback, sync contract, and RLS boundary validated');
+console.log('Membership configuration, coordinated account UI, result guidance, sync contract, and RLS boundary validated');
