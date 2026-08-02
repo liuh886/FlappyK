@@ -58,6 +58,9 @@ jobs:
           node --check card-export.js
           node --check pwa.js
           node --check analytics.js
+          node --check membership-config.js
+          node --check membership.js
+          node --check membership-run-hook.js
           node --check sw.js
           node --check scripts/leaderboard-ranking.js
           node --check playwright.config.cjs
@@ -73,6 +76,7 @@ jobs:
           node --check tests/player-profile.test.js
           node --check tests/daily-run.test.js
           node --check tests/i18n.test.js
+          node --check tests/membership-contract.test.js
 
       - name: Run regression checks
         run: |
@@ -85,6 +89,7 @@ jobs:
           node tests/player-profile.test.js
           node tests/daily-run.test.js
           node tests/i18n.test.js
+          node tests/membership-contract.test.js
 
       - name: Check Python syntax
         run: |
@@ -114,7 +119,7 @@ jobs:
           print("index.html, og-image.png, and leaderboard.json validated")
           PY
 
-      - name: Check onboarding, daily, challenge, sharing, pacing, records, language, analytics, and leaderboard integration
+      - name: Check gameplay, PWA, analytics, and membership integration
         run: |
           grep -q '"QQQ"' fetch_all_data.py
           grep -q 'qqq-loader.js' index.html
@@ -164,6 +169,13 @@ jobs:
           grep -q 'G-ZW4437KBXE' analytics.js
           grep -q "track('play_start')" analytics.js
           grep -q "track('run_complete'" analytics.js
+          grep -q 'membership-config.js' pwa.js
+          grep -q 'membership.js' pwa.js
+          grep -q 'membership-run-hook.js' pwa.js
+          grep -q './membership.css' sw.js
+          grep -q "entitlementCode: 'flappyk.pro'" membership-config.js
+          grep -q "from('entitlements')" membership.js
+          grep -q 'enable row level security' supabase/migrations/0001_membership_foundation.sql
           grep -q 'issues:' .github/workflows/leaderboard.yml
           grep -q 'LEADERBOARD_LIMIT = 10' scripts/leaderboard-ranking.js
 
