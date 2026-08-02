@@ -47,7 +47,9 @@
         const utilityBar = document.getElementById('home-utility-bar');
         const gameControls = document.getElementById('game-top-controls');
         if (!utilityBar) return;
-        utilityBar.hidden = Boolean(gameControls && !gameControls.hidden);
+        const hidden = Boolean(gameControls && !gameControls.hidden);
+        utilityBar.hidden = hidden;
+        utilityBar.style.display = hidden ? 'none' : '';
     }
 
     function installUtilityBar() {
@@ -69,6 +71,9 @@
         if (languageToggle && languageToggle.parentElement !== utilityBar) {
             utilityBar.appendChild(languageToggle);
         }
+        [launcher, languageToggle].filter(Boolean).forEach((control) => {
+            control.style.boxSizing = 'border-box';
+        });
         syncUtilityVisibility();
         return Boolean(languageToggle);
     }
