@@ -43,13 +43,16 @@ assert.ok(browserSource.includes("button.id = 'language-toggle-btn'"));
 assert.ok(browserSource.includes('new MutationObserver'));
 assert.ok(browserSource.includes('patchNativeShare'));
 assert.ok(cssSource.startsWith("@import url('./visual-polish.css');"));
-assert.ok(cssSource.includes('--font-zh-ui'));
+assert.ok(cssSource.includes('--font-zh-unified'));
+assert.ok(cssSource.includes("'ZCOOL QingKe HuangYou'"));
 assert.ok(cssSource.includes("'PingFang SC'"));
 assert.ok(cssSource.includes("'Microsoft YaHei UI'"));
 assert.ok(cssSource.includes("'Noto Sans CJK SC'"));
 assert.ok(cssSource.includes("html[lang='zh-CN'] #game-title"));
-assert.ok(cssSource.includes('font-family: var(--font-zh-ui)'));
-assert.ok(cssSource.includes('font-family: var(--font-numeric)'));
+assert.ok(cssSource.includes('font-family: var(--font-zh-unified) !important'));
+assert.ok(!cssSource.includes('--font-zh-ui'));
+assert.ok(!cssSource.includes('--font-zh-display'));
+assert.ok(!cssSource.includes('--font-numeric'));
 assert.ok(cssSource.includes('border-radius: 999px'));
 assert.equal(
     cssSource.includes("font-family: 'Press Start 2P', 'Noto Sans SC'"),
@@ -64,4 +67,4 @@ assert.ok(visualSource.includes('justify-content: space-between'));
 assert.ok(visualSource.includes(':focus-visible'));
 assert.ok(visualSource.includes('backdrop-filter: blur(8px)'));
 
-console.log('Chinese-English i18n, typography, and visual polish checks passed');
+console.log('Chinese-English i18n, unified typography, and visual polish checks passed');
