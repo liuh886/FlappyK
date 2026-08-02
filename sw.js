@@ -1,5 +1,5 @@
-const APP_CACHE = 'flappyk-app-v3';
-const RUNTIME_CACHE = 'flappyk-runtime-v3';
+const APP_CACHE = 'flappyk-app-v5';
+const RUNTIME_CACHE = 'flappyk-runtime-v5';
 
 const APP_SHELL = [
     './',
@@ -50,6 +50,7 @@ const APP_SHELL = [
     './analytics.js',
     './membership-config.js',
     './membership.js',
+    './membership-experience.js',
     './membership-run-hook.js',
     './data/leaderboard.json',
     './og-image.png',

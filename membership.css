@@ -3,26 +3,100 @@
     top: max(14px, env(safe-area-inset-top));
     right: max(14px, env(safe-area-inset-right));
     z-index: 1200;
-    min-width: 104px;
-    padding: 10px 12px;
-    border: 2px solid #f0f6fc;
-    border-radius: 0;
-    background: #0d1117;
+    display: inline-flex;
+    min-width: 92px;
+    min-height: 36px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 11px;
+    border: 2px solid rgba(240, 246, 252, 0.86);
+    border-radius: 999px;
+    background: rgba(13, 17, 23, 0.92);
     color: #f0f6fc;
-    box-shadow: 4px 4px 0 #30363d;
-    font: 10px/1.2 "Press Start 2P", monospace;
+    box-shadow: 0 3px 0 rgba(255, 255, 255, 0.28);
+    font: 9px/1.2 "Press Start 2P", monospace;
+    white-space: nowrap;
     cursor: pointer;
+    backdrop-filter: blur(10px);
+}
+
+.membership-launcher::before {
+    flex: 0 0 auto;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #8b949e;
+    box-shadow: 0 0 0 2px rgba(139, 148, 158, 0.16);
+    content: '';
 }
 
 .membership-launcher[data-tier="pro"] {
     border-color: #f1c40f;
     color: #f1c40f;
-    box-shadow: 4px 4px 0 #8a6d00;
+    box-shadow: 0 3px 0 rgba(138, 109, 0, 0.78);
+}
+
+.membership-launcher[data-tier="pro"]::before {
+    background: #f1c40f;
+    box-shadow: 0 0 0 2px rgba(241, 196, 15, 0.18);
+}
+
+/* The utility group is mounted inside #game-container, not against the browser. */
+.home-utility-bar {
+    position: absolute;
+    top: max(12px, env(safe-area-inset-top));
+    right: max(12px, env(safe-area-inset-right));
+    z-index: 1200;
+    display: flex;
+    max-width: calc(100% - 24px);
+    min-width: 0;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.home-utility-bar[hidden] {
+    display: none !important;
+}
+
+.home-utility-bar .membership-launcher,
+.home-utility-bar #language-toggle-btn {
+    position: static;
+    top: auto;
+    right: auto;
+    flex: 0 1 auto;
+    max-width: 100%;
+    margin: 0;
+}
+
+.home-utility-bar .membership-launcher {
+    min-width: 88px;
+    height: 36px;
+}
+
+.home-utility-bar #language-toggle-btn {
+    min-width: 56px;
+    height: 36px;
+    box-shadow: 0 3px 0 rgba(255, 255, 255, 0.28);
+}
+
+.membership-launcher:hover,
+.home-utility-bar #language-toggle-btn:hover {
+    border-color: #f1c40f;
+    background: rgba(31, 41, 55, 0.96);
+}
+
+.membership-launcher:active,
+.home-utility-bar #language-toggle-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.24);
 }
 
 .membership-launcher:focus-visible,
 .membership-dialog button:focus-visible,
-.membership-dialog input:focus-visible {
+.membership-dialog input:focus-visible,
+.membership-result-action:focus-visible {
     outline: 3px solid #58a6ff;
     outline-offset: 3px;
 }
@@ -33,8 +107,9 @@
     z-index: 1500;
     display: grid;
     place-items: center;
-    padding: 20px;
-    background: rgba(1, 4, 9, 0.82);
+    padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    overflow: hidden;
+    background: rgba(1, 4, 9, 0.84);
 }
 
 .membership-backdrop[hidden] {
@@ -42,10 +117,15 @@
 }
 
 .membership-dialog {
-    width: min(430px, 100%);
-    max-height: min(680px, calc(100vh - 40px));
+    width: min(430px, calc(100vw - 32px));
+    max-width: 100%;
+    max-height: min(680px, calc(100dvh - 32px));
+    min-width: 0;
+    overflow-x: hidden;
     overflow-y: auto;
+    overscroll-behavior: contain;
     border: 3px solid #f0f6fc;
+    border-radius: 14px;
     background: #0d1117;
     color: #f0f6fc;
     box-shadow: 10px 10px 0 #30363d;
@@ -55,10 +135,15 @@
 
 .membership-dialog-header {
     display: flex;
+    min-width: 0;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 18px;
+    gap: 14px;
     margin-bottom: 22px;
+}
+
+.membership-dialog-header > div {
+    min-width: 0;
 }
 
 .membership-kicker {
@@ -70,6 +155,7 @@
 
 .membership-dialog h2 {
     margin: 0;
+    overflow-wrap: anywhere;
     color: #f1c40f;
     font-size: 17px;
     line-height: 1.45;
@@ -77,11 +163,15 @@
 
 .membership-close {
     flex: 0 0 auto;
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
+    margin: 0;
+    padding: 0;
     border: 2px solid #8b949e;
+    border-radius: 8px;
     background: transparent;
     color: #f0f6fc;
+    box-shadow: none;
     cursor: pointer;
     font-size: 18px;
 }
@@ -97,19 +187,24 @@
     color: #c9d1d9;
     font-size: 14px;
     line-height: 1.65;
+    text-align: left;
 }
 
 .membership-actions {
     display: grid;
+    min-width: 0;
     gap: 12px;
 }
 
 .membership-actions button {
     width: 100%;
+    min-width: 0;
     min-height: 44px;
+    margin: 0;
     padding: 12px 14px;
+    overflow-wrap: anywhere;
     border: 2px solid #f0f6fc;
-    border-radius: 0;
+    border-radius: 8px;
     background: #161b22;
     color: #f0f6fc;
     box-shadow: 3px 3px 0 #30363d;
@@ -131,14 +226,16 @@
 
 .membership-email-form {
     display: grid;
-    grid-template-columns: 1fr auto;
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 8px;
 }
 
 .membership-email-form input {
+    width: 100%;
     min-width: 0;
     border: 2px solid #8b949e;
-    border-radius: 0;
+    border-radius: 8px;
     background: #010409;
     color: #f0f6fc;
     padding: 12px;
@@ -150,19 +247,28 @@
 }
 
 .membership-account-card {
+    min-width: 0;
     margin-bottom: 18px;
     padding: 16px;
+    overflow: hidden;
     border: 2px solid #30363d;
+    border-radius: 10px;
     background: #161b22;
 }
 
 .membership-tier {
-    display: inline-block;
+    display: inline-flex;
+    max-width: 100%;
     margin-bottom: 12px;
     padding: 6px 8px;
+    align-items: center;
     border: 2px solid #8b949e;
+    border-radius: 999px;
     color: #c9d1d9;
     font-size: 9px;
+    line-height: 1.3;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
 .membership-tier[data-tier="pro"] {
@@ -171,19 +277,23 @@
 }
 
 .membership-account-meta {
+    max-width: 100%;
     margin: 0;
     overflow-wrap: anywhere;
     color: #c9d1d9;
     font-size: 13px;
     line-height: 1.55;
+    text-align: left;
 }
 
 .membership-status {
     min-height: 22px;
     margin: 16px 0 0;
+    overflow-wrap: anywhere;
     color: #8b949e;
     font-size: 13px;
     line-height: 1.5;
+    text-align: left;
 }
 
 .membership-status[data-kind="error"] {
@@ -194,17 +304,158 @@
     color: #3fb950;
 }
 
+.membership-result-prompt {
+    display: grid;
+    width: min(720px, calc(100% - 32px));
+    max-width: 100%;
+    min-width: 0;
+    margin: 18px auto 2px;
+    padding: 18px 20px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 20px;
+    border: 2px solid rgba(241, 196, 15, 0.7);
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(241, 196, 15, 0.12), rgba(13, 17, 23, 0.94) 55%);
+    color: #f0f6fc;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+}
+
+.membership-result-prompt[hidden] {
+    display: none;
+}
+
+.membership-result-prompt[data-state="signed-in"] {
+    border-color: rgba(63, 185, 80, 0.72);
+    background: linear-gradient(135deg, rgba(63, 185, 80, 0.12), rgba(13, 17, 23, 0.94) 55%);
+}
+
+.membership-result-prompt[data-state="error"] {
+    border-color: rgba(255, 123, 114, 0.72);
+}
+
+.membership-result-copy {
+    min-width: 0;
+}
+
+.membership-result-kicker {
+    margin: 0 0 7px;
+    color: #f1c40f;
+    font: 8px/1.4 "Press Start 2P", monospace;
+    letter-spacing: 0.06em;
+    text-align: left;
+}
+
+.membership-result-prompt[data-state="signed-in"] .membership-result-kicker {
+    color: #3fb950;
+}
+
+.membership-result-prompt[data-state="error"] .membership-result-kicker {
+    color: #ff7b72;
+}
+
+.membership-result-prompt h2 {
+    margin: 0 0 8px;
+    overflow-wrap: anywhere;
+    color: #f0f6fc;
+    font: 15px/1.45 "Press Start 2P", monospace;
+    text-align: left;
+}
+
+.membership-result-prompt [data-membership-result-copy] {
+    margin: 0;
+    overflow-wrap: anywhere;
+    color: #c9d1d9;
+    font: 14px/1.65 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    text-align: left;
+}
+
+.membership-result-action {
+    min-width: 208px;
+    min-height: 46px;
+    margin: 0;
+    padding: 12px 16px;
+    overflow-wrap: anywhere;
+    border: 2px solid #f1c40f;
+    border-radius: 8px;
+    background: #f1c40f;
+    color: #0d1117;
+    box-shadow: 3px 3px 0 #8a6d00;
+    font: 9px/1.45 "Press Start 2P", monospace;
+    cursor: pointer;
+}
+
+.membership-result-prompt[data-state="signed-in"] .membership-result-action {
+    border-color: #3fb950;
+    background: #3fb950;
+    box-shadow: 3px 3px 0 #176b2b;
+}
+
+html[lang='zh-CN'] .membership-kicker,
+html[lang='zh-CN'] .membership-result-kicker {
+    font-size: 13px;
+}
+
+html[lang='zh-CN'] .membership-dialog h2 {
+    font-size: 23px;
+    line-height: 1.3;
+}
+
+html[lang='zh-CN'] .membership-copy {
+    font-size: 16px;
+    line-height: 1.65;
+}
+
+html[lang='zh-CN'] .membership-account-meta,
+html[lang='zh-CN'] .membership-status,
+html[lang='zh-CN'] .membership-result-prompt [data-membership-result-copy] {
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+html[lang='zh-CN'] .membership-result-prompt h2 {
+    font-size: 21px;
+    line-height: 1.3;
+}
+
 @media (max-width: 768px) {
-    .membership-launcher {
-        top: max(10px, env(safe-area-inset-top));
-        right: max(10px, env(safe-area-inset-right));
-        min-width: 86px;
-        padding: 9px;
+    .home-utility-bar {
+        top: max(8px, env(safe-area-inset-top));
+        right: max(8px, env(safe-area-inset-right));
+        max-width: calc(100% - 16px);
+        gap: 6px;
+    }
+
+    .home-utility-bar .membership-launcher {
+        min-width: 68px;
+        height: 32px;
+        min-height: 32px;
+        padding: 6px 8px;
         font-size: 8px;
     }
 
+    .home-utility-bar #language-toggle-btn {
+        min-width: 48px;
+        height: 32px;
+        padding: 0 8px;
+        font-size: 10px;
+    }
+
+    .membership-backdrop {
+        place-items: end center;
+        padding: max(10px, env(safe-area-inset-top)) 8px max(0px, env(safe-area-inset-bottom));
+    }
+
     .membership-dialog {
-        padding: 20px;
+        width: 100%;
+        max-height: calc(100dvh - max(10px, env(safe-area-inset-top)));
+        padding: 20px 16px max(20px, calc(16px + env(safe-area-inset-bottom)));
+        border-radius: 16px 16px 0 0;
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.45);
+    }
+
+    .membership-dialog-header {
+        margin-bottom: 18px;
     }
 
     .membership-email-form {
@@ -213,5 +464,49 @@
 
     .membership-email-form button {
         width: 100%;
+    }
+
+    .membership-result-prompt {
+        width: min(520px, calc(100% - 20px));
+        margin-top: 14px;
+        padding: 16px;
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .membership-result-action {
+        width: 100%;
+        min-width: 0;
+    }
+
+    html[lang='zh-CN'] .membership-dialog h2 {
+        font-size: 21px;
+    }
+
+    html[lang='zh-CN'] .membership-copy,
+    html[lang='zh-CN'] .membership-account-meta,
+    html[lang='zh-CN'] .membership-status,
+    html[lang='zh-CN'] .membership-result-prompt [data-membership-result-copy] {
+        font-size: 14px;
+    }
+
+    html[lang='zh-CN'] .membership-result-prompt h2 {
+        font-size: 19px;
+    }
+}
+
+@media (max-width: 380px) {
+    .home-utility-bar .membership-launcher {
+        min-width: 62px;
+        padding-inline: 7px;
+    }
+
+    .home-utility-bar .membership-launcher::before {
+        width: 6px;
+        height: 6px;
+    }
+
+    .membership-dialog {
+        padding-inline: 14px;
     }
 }
