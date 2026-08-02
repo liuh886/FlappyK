@@ -4,8 +4,20 @@
     const legendButton = document.getElementById('champagne-btn');
     if (!legendButton) return;
 
+    function getGameMode() {
+        if (document.getElementById('level-display')?.textContent?.trim() === 'CUSTOM') {
+            return 'custom';
+        }
+        if (window.FlappyKDailyRun?.isActive?.()) return 'daily';
+        if (window.FlappyKFriendChallenge?.isActive?.()) return 'friend';
+        return 'normal';
+    }
+
     legendButton.addEventListener('click', () => {
         window.requestAnimationFrame(() => {
+            const membership = window.FlappyKMembership;
+            if (!membership?.isConfigured?.()) return;
+
             const score = window.FlappyKLegendScore?.calculate?.(collectedCards, finalReturn);
             const signature = window.FlappyKPlayerProfile?.buildRunSignature?.(
                 collectedCards,
@@ -13,10 +25,10 @@
             );
             if (!score || !signature) return;
 
-            window.FlappyKMembership?.queueCompletedRun?.({
+            membership.queueCompletedRun?.({
                 signature,
                 score,
-                mode: window.FlappyKAnalytics?.getGameMode?.() || 'normal',
+                mode: getGameMode(),
             });
         });
     });
