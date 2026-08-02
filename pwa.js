@@ -129,6 +129,7 @@
     ensureStylesheet('flappyk-membership-styles', './membership.css');
     void loadScript('flappyk-membership-config', './membership-config.js')
         .then(() => loadScript('flappyk-membership-client', './membership.js'))
+        .then(() => loadScript('flappyk-membership-experience', './membership-experience.js'))
         .then(() => loadScript('flappyk-membership-run-hook', './membership-run-hook.js'))
         .catch((error) => {
             console.warn('FlappyK membership could not be loaded. Guest play is unaffected.', error);
