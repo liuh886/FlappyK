@@ -5,6 +5,32 @@ async function preparePage(page) {
   await page.route('https://fonts.gstatic.com/**', (route) => route.abort());
   await page.route('https://raw.githubusercontent.com/**', (route) => route.abort());
   await page.route('https://html2canvas.hertzen.com/**', (route) => route.abort());
+  await page.route('https://cdn.jsdelivr.net/**', (route) => route.fulfill({
+    contentType: 'application/javascript',
+    body: `
+      export function createClient() {
+        return {
+          auth: {
+            getSession: async () => ({ data: { session: null }, error: null }),
+            onAuthStateChange: () => ({ data: { subscription: { unsubscribe() {} } } }),
+            signInWithOAuth: async () => ({ error: null }),
+            signInWithOtp: async () => ({ error: null }),
+            signOut: async () => ({ error: null })
+          },
+          from() {
+            return {
+              select() {
+                return {
+                  eq: async () => ({ data: [], error: null })
+                };
+              },
+              upsert: async () => ({ error: null })
+            };
+          }
+        };
+      }
+    `,
+  }));
   await page.addInitScript(() => {
     window.localStorage.setItem('flappyk_language_v1', 'en');
     window.localStorage.setItem('flappyk_onboarding_seen_v1', '1');
@@ -109,13 +135,14 @@ test('install prompt exposes a home-screen install action', async ({ page }) => 
   await expect(installButton).toHaveAttribute('data-ready', 'true');
 });
 
-test('disabled membership foundation stays invisible and guest-safe', async ({ page }) => {
+test('configured membership remains optional and guest-safe', async ({ page }) => {
   await preparePage(page);
   await page.goto('/');
 
   await expect.poll(() => page.evaluate(() => Boolean(window.FlappyKMembership))).toBe(true);
-  expect(await page.evaluate(() => window.FlappyKMembership.isConfigured())).toBe(false);
-  await expect(page.locator('.membership-launcher')).toHaveCount(0);
+  expect(await page.evaluate(() => window.FlappyKMembership.isConfigured())).toBe(true);
+  await expect(page.locator('.membership-launcher')).toBeVisible();
+  await expect(page.locator('.membership-launcher')).toHaveText('ACCOUNT');
   expect(await page.evaluate(() => localStorage.getItem('flappyk_pending_cloud_runs_v1'))).toBeNull();
   await expect(page.getByRole('button', { name: 'PLAY', exact: true })).toBeVisible();
 });
