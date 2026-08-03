@@ -1,0 +1,84 @@
+#ui-layer[hidden] {
+    display: none !important;
+}
+
+.hud-legacy-goal {
+    display: none !important;
+}
+
+@media (min-width: 721px) and (pointer: fine) {
+    .controls-hint {
+        margin-top: 38px;
+    }
+}
+
+html:not([data-ui-state='home']):not([data-ui-state='run-complete']) .home-utility-bar {
+    display: none !important;
+}
+
+html[data-ui-state='paused'] #btn-buy,
+html[data-ui-state='paused'] #btn-sell {
+    opacity: 0.48;
+    filter: grayscale(0.45);
+    pointer-events: none;
+}
+
+html[lang='zh-CN'] .stats-box {
+    font-size: 15px;
+}
+
+html[lang='zh-CN'] .hud-header,
+html[lang='zh-CN'] .hud-detail-row,
+html[lang='zh-CN'] .excess-meter-label,
+html[lang='zh-CN'] .excess-meter-label strong {
+    font-size: 12px;
+}
+
+.profit-card .card-details {
+    display: grid;
+}
+
+#settlement-screen.active .profit-card:not([data-details-expanded='true']) .card-details {
+    display: none;
+}
+
+.settlement-comparison-track {
+    position: relative;
+}
+
+.settlement-comparison-track::after {
+    position: absolute;
+    top: -2px;
+    bottom: -2px;
+    left: 50%;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.62);
+    content: '';
+}
+
+.settlement-comparison-track i {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2%;
+}
+
+.settlement-comparison-track i[data-direction='positive'] {
+    background: rgba(6, 78, 47, 0.86);
+}
+
+.settlement-comparison-track i[data-direction='negative'] {
+    background: rgba(127, 29, 29, 0.86);
+}
+
+@media (max-width: 720px), (pointer: coarse) {
+    html[lang='zh-CN'] .stats-box {
+        font-size: 12px;
+    }
+
+    html[lang='zh-CN'] .hud-header,
+    html[lang='zh-CN'] .excess-meter-label,
+    html[lang='zh-CN'] .excess-meter-label strong {
+        font-size: 11px;
+    }
+}

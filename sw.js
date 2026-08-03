@@ -1,5 +1,5 @@
-const APP_CACHE = 'flappyk-app-v5';
-const RUNTIME_CACHE = 'flappyk-runtime-v5';
+const APP_CACHE = 'flappyk-app-v6';
+const RUNTIME_CACHE = 'flappyk-runtime-v6';
 
 const APP_SHELL = [
     './',
@@ -21,6 +21,8 @@ const APP_SHELL = [
     './i18n.css',
     './visual-polish.css',
     './pwa.css',
+    './premium-ui.css',
+    './premium-ui-refinement.css',
     './membership.css',
     './data.js',
     './qqq-loader.js',
@@ -47,6 +49,9 @@ const APP_SHELL = [
     './card-export.js',
     './scripts/player-profile.js',
     './pwa.js',
+    './scripts/ui-state.js',
+    './scripts/premium-ui.js',
+    './scripts/premium-ui-refinement.js',
     './analytics.js',
     './membership-config.js',
     './membership.js',

@@ -2,27 +2,26 @@
     'use strict';
 
     const STORAGE_KEY = 'flappyk_onboarding_seen_v1';
-    const overlay = document.getElementById('onboarding-screen');
-    const continueButton = document.getElementById('onboarding-start-btn');
     const launchButtons = [
         document.getElementById('start-btn'),
         document.getElementById('daily-run-btn'),
     ].filter(Boolean);
 
-    let pendingButton = null;
+    let pending = false;
     let seenInSession = false;
 
-    function hasSeenOnboarding() {
+    function hasSeen() {
         if (seenInSession) return true;
         try {
             return window.localStorage.getItem(STORAGE_KEY) === '1';
-        } catch (error) {
+        } catch {
             return false;
         }
     }
 
     function markSeen() {
         seenInSession = true;
+        pending = false;
         try {
             window.localStorage.setItem(STORAGE_KEY, '1');
         } catch (error) {
@@ -30,48 +29,27 @@
         }
     }
 
-    function showOnboarding(button) {
-        pendingButton = button;
-        if (!overlay) return;
-        overlay.hidden = false;
-        overlay.classList.add('active');
-        continueButton?.focus();
+    function queueGuide() {
+        if (!hasSeen()) pending = true;
     }
 
-    function hideOnboarding() {
-        if (!overlay) return;
-        overlay.classList.remove('active');
-        overlay.hidden = true;
-    }
-
-    function interceptFirstLaunch(event) {
-        if (hasSeenOnboarding()) return;
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        showOnboarding(event.currentTarget);
+    function consumePending() {
+        if (!pending || hasSeen()) return false;
+        pending = false;
+        return true;
     }
 
     launchButtons.forEach((button) => {
-        button.addEventListener('click', interceptFirstLaunch, { capture: true });
-    });
-
-    continueButton?.addEventListener('click', (event) => {
-        event.preventDefault();
-        const button = pendingButton;
-        pendingButton = null;
-        markSeen();
-        hideOnboarding();
-        button?.click();
-    });
-
-    overlay?.addEventListener('click', (event) => {
-        if (event.target !== overlay) return;
-        continueButton?.focus();
+        button.addEventListener('click', queueGuide, { capture: true });
     });
 
     window.FlappyKOnboarding = {
-        hasSeen: hasSeenOnboarding,
-        reset: () => {
+        STORAGE_KEY,
+        hasSeen,
+        markSeen,
+        consumePending,
+        reset() {
+            pending = false;
             seenInSession = false;
             try {
                 window.localStorage.removeItem(STORAGE_KEY);

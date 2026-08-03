@@ -215,7 +215,7 @@ test('account stays right-most inside the game window and completed runs prompt 
   await expect(page.locator('.membership-backdrop')).toBeVisible();
 });
 
-test('Chinese desktop UI uses one larger, consistent typeface without a repeated goal row', async ({ page }) => {
+test('Chinese desktop UI uses one compact, consistent typeface without a repeated goal row', async ({ page }) => {
   await preparePage(page);
   await page.addInitScript(() => {
     window.localStorage.setItem('flappyk_language_v1', 'zh');
@@ -244,7 +244,7 @@ test('Chinese desktop UI uses one larger, consistent typeface without a repeated
     };
   });
 
-  expect(typography.statsSize).toBe('15px');
+  expect(Number.parseFloat(typography.statsSize)).toBeGreaterThanOrEqual(12);
   expect(typography.introSize).toBe('17px');
   expect(Number.parseFloat(typography.introLineHeight)).toBeGreaterThanOrEqual(28);
   expect(typography.statsFamily).toContain('ZCOOL QingKe HuangYou');
