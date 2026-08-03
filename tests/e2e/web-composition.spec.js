@@ -92,6 +92,10 @@ test('desktop game uses a proportionally scaled modern pixel interface', async (
   await expect(page.locator('.stats-box > .day-progress')).toHaveCount(0);
   await expect(page.locator('#run-progress-panel > .hud-header')).toHaveCount(1);
   await expect(page.locator('#run-progress-panel > .day-progress')).toHaveCount(1);
+  await expect(page.locator('.hud-total .hud-metric-label')).toHaveText('TOTAL');
+  await expect(page.locator('.hud-return .hud-metric-label')).toHaveText('RETURN');
+  await expect(page.locator('.hud-game .hud-metric-label')).toHaveText('RUN');
+  await expect(page.locator('.hud-day .hud-metric-label')).toHaveText('DAY');
 
   await expect(page.locator('#game-top-controls > .desktop-speed-control')).toHaveCount(1);
   await expect(page.locator('.controls-hint .desktop-speed-control')).toHaveCount(0);
@@ -103,8 +107,8 @@ test('desktop game uses a proportionally scaled modern pixel interface', async (
     const run = box('#run-progress-panel');
     const trade = box('.controls-hint');
     const top = box('#game-top-controls');
-    const total = style('.hud-total span');
-    const returns = style('.hud-return span');
+    const total = style('#total-display');
+    const returns = style('#return-display');
     const stats = style('.stats-box');
     const speed = style('#desktop-speed-readout');
     const tradeHint = style('.trade-key-hint');
@@ -169,7 +173,7 @@ test('mobile preserves pixel scale and keeps run progress above virtual controls
     const controls = document.querySelector('#mobile-controls').getBoundingClientRect();
     const buy = getComputedStyle(document.querySelector('#btn-buy'));
     const speed = getComputedStyle(document.querySelector('#mobile-speed-readout'));
-    const hud = getComputedStyle(document.querySelector('.hud-total span'));
+    const hud = getComputedStyle(document.querySelector('#total-display'));
     return {
       runBottom: run.bottom,
       controlsTop: controls.top,
