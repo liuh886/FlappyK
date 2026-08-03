@@ -54,8 +54,6 @@ test('desktop game keeps a compact modern pixel HUD around the dominant chart', 
   await preparePage(page);
   await page.goto('/');
 
-  await expect(page.locator('#flappyk-hud-compact-styles')).toHaveCount(1);
-
   const homeTypography = await page.evaluate(() => {
     const title = getComputedStyle(document.querySelector('#game-title'));
     const play = getComputedStyle(document.querySelector('#start-btn'));
@@ -177,7 +175,6 @@ test('mobile uses an even lighter HUD above virtual controls', async ({ page }) 
   await page.setViewportSize({ width: 390, height: 844 });
   await preparePage(page);
   await page.goto('/');
-  await expect(page.locator('#flappyk-hud-compact-styles')).toHaveCount(1);
   await page.getByRole('button', { name: 'PLAY', exact: true }).click();
 
   await expect(page.locator('#mobile-controls')).toBeVisible();

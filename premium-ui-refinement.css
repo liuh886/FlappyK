@@ -264,35 +264,40 @@ html:not([lang='zh-CN']) body :where(button, output, .hud-stat-row, .excess-mete
     font-size: 13px;
 }
 
-/* Persistent top HUD: two clear value cells and one chunky Excess meter. */
+/* Persistent game HUD: compact status strips that preserve chart area. */
 .stats-box[data-composition='returns-only'] {
-    width: min(340px, calc(100% - 116px));
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(108px, 0.86fr);
+    align-items: center;
+    gap: 10px;
+    width: min(316px, calc(100% - 108px));
     min-width: 0;
-    padding: 12px;
-    border: 2px solid var(--pixel-line-strong);
+    padding: 6px 8px;
+    border: 1px solid rgba(216, 226, 239, 0.42);
     border-radius: 0;
-    background: var(--pixel-panel-soft);
-    box-shadow: var(--pixel-shadow-step);
-    clip-path: var(--pixel-cut);
+    background: rgba(7, 12, 20, 0.74);
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.72);
+    clip-path: none;
     backdrop-filter: none;
 }
 
 .stats-box[data-composition='returns-only'] .hud-main {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
     margin: 0;
-    padding: 0 0 10px;
-    border-bottom: 2px solid var(--pixel-line);
+    padding: 0;
+    border-bottom: 0;
 }
 
 .stats-box[data-composition='returns-only'] .hud-main .hud-stat-row {
-    display: grid;
+    display: flex;
     min-width: 0;
-    gap: 3px;
-    padding: 8px 10px;
-    border: 2px solid #273248;
-    background: #0b111c;
+    align-items: baseline;
+    gap: 4px;
+    padding: 0;
+    border: 0;
+    background: transparent;
     color: var(--pixel-text);
     font-size: 0;
     line-height: 1;
@@ -300,11 +305,13 @@ html:not([lang='zh-CN']) body :where(button, output, .hud-stat-row, .excess-mete
 
 .stats-box[data-composition='returns-only'] .hud-total::before,
 .stats-box[data-composition='returns-only'] .hud-return::before {
+    flex: 0 0 auto;
     color: var(--pixel-muted);
     font-family: var(--pixel-font-display);
-    font-size: 8px;
-    line-height: 1.4;
-    letter-spacing: 0.035em;
+    font-size: 6px;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    opacity: 0.72;
 }
 
 .stats-box[data-composition='returns-only'] .hud-total::before {
@@ -325,13 +332,14 @@ html[lang='zh-CN'] .stats-box[data-composition='returns-only'] .hud-return::befo
 
 .stats-box[data-composition='returns-only'] .hud-total span,
 .stats-box[data-composition='returns-only'] .hud-return span {
+    min-width: 0;
     overflow: hidden;
     color: var(--pixel-text);
     font-family: var(--pixel-font-ui);
-    font-size: 17px;
+    font-size: 13px;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
-    line-height: 1.05;
+    line-height: 1;
     text-overflow: ellipsis;
 }
 
@@ -348,21 +356,28 @@ html[lang='zh-CN'] .stats-box[data-composition='returns-only'] .hud-return::befo
 }
 
 .stats-box[data-composition='returns-only'] .excess-meter {
-    margin-top: 10px;
+    min-width: 0;
+    margin: 0;
 }
 
 .excess-meter-label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 5px;
     color: var(--pixel-muted);
     font-family: var(--pixel-font-display);
-    font-size: 8px;
-    line-height: 1.4;
+    font-size: 6px;
+    line-height: 1;
+    opacity: 0.9;
 }
 
 .excess-meter-label strong {
     color: var(--pixel-red);
     font-family: var(--pixel-font-ui);
-    font-size: 16px;
+    font-size: 13px;
     font-weight: 600;
+    line-height: 1;
 }
 
 .excess-meter[data-leading='true'] .excess-meter-label strong {
@@ -370,9 +385,9 @@ html[lang='zh-CN'] .stats-box[data-composition='returns-only'] .hud-return::befo
 }
 
 .excess-meter-track {
-    height: 8px;
-    margin-top: 6px;
-    border: 2px solid #29364b;
+    height: 4px;
+    margin-top: 3px;
+    border: 1px solid #29364b;
     border-radius: 0;
     background: #05080d;
 }
@@ -385,43 +400,42 @@ html[lang='zh-CN'] .stats-box[data-composition='returns-only'] .hud-return::befo
 }
 
 .excess-meter-zero {
-    top: -3px;
-    bottom: -3px;
-    width: 2px;
+    top: -2px;
+    bottom: -2px;
+    width: 1px;
     background: var(--pixel-line-strong);
 }
 
 .excess-meter-indicator {
-    width: 10px;
-    height: 10px;
-    border: 2px solid #fff;
+    width: 7px;
+    height: 7px;
+    border: 1px solid #fff;
     border-radius: 0;
     background: var(--pixel-red);
-    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.7);
+    box-shadow: none;
 }
 
 .excess-meter[data-leading='true'] .excess-meter-indicator {
     background: var(--pixel-green);
-    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.7);
+    box-shadow: none;
 }
 
-/* Lower-left run panel: concise game state on the same 4px grid. */
 .run-progress-panel {
     position: absolute;
-    left: 16px;
-    bottom: 16px;
+    left: 10px;
+    bottom: 10px;
     z-index: 44;
     display: none;
-    width: 224px;
-    padding: 10px 12px;
-    border: 2px solid var(--pixel-line);
+    width: 176px;
+    padding: 5px 7px;
+    border: 1px solid rgba(216, 226, 239, 0.34);
     border-radius: 0;
-    background: rgba(11, 17, 28, 0.92);
-    box-shadow: var(--pixel-shadow-small);
-    clip-path: var(--pixel-cut);
+    background: rgba(7, 12, 20, 0.72);
+    box-shadow: none;
+    clip-path: none;
     color: var(--pixel-muted);
     font-family: var(--pixel-font-ui);
-    font-size: 13px;
+    font-size: 11px;
     line-height: 1.2;
     backdrop-filter: none;
 }
@@ -433,27 +447,30 @@ html[data-ui-state='paused'] .run-progress-panel {
 
 .run-progress-panel .hud-header {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
     color: var(--pixel-text);
     font-size: 0;
 }
 
 .run-progress-panel .hud-game,
 .run-progress-panel .hud-day {
-    display: grid;
+    display: flex;
+    align-items: baseline;
     gap: 3px;
-    padding: 6px 8px;
-    border: 2px solid #263249;
-    background: #080d16;
+    padding: 0;
+    border: 0;
+    background: transparent;
 }
 
 .run-progress-panel .hud-game::before,
 .run-progress-panel .hud-day::before {
+    flex: 0 0 auto;
     color: var(--pixel-muted);
     font-family: var(--pixel-font-display);
-    font-size: 7px;
-    line-height: 1.4;
+    font-size: 6px;
+    line-height: 1;
+    opacity: 0.72;
 }
 
 .run-progress-panel .hud-game::before {
@@ -476,7 +493,7 @@ html[lang='zh-CN'] .run-progress-panel .hud-day::before {
 .run-progress-panel .hud-day span {
     color: var(--pixel-text);
     font-family: var(--pixel-font-ui);
-    font-size: 15px;
+    font-size: 12px;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
     line-height: 1;
@@ -485,19 +502,19 @@ html[lang='zh-CN'] .run-progress-panel .hud-day::before {
 .run-progress-panel .hud-game span::after {
     content: '/3';
     color: var(--pixel-muted);
-    font-size: 12px;
+    font-size: 9px;
 }
 
 .run-progress-panel .hud-day span::after {
     content: '/250';
     color: var(--pixel-muted);
-    font-size: 12px;
+    font-size: 9px;
 }
 
 .run-progress-panel .day-progress {
-    height: 6px;
-    margin-top: 8px;
-    border: 2px solid #29364b;
+    height: 3px;
+    margin-top: 4px;
+    border: 1px solid #29364b;
     border-radius: 0;
     background: #05080d;
 }
@@ -509,30 +526,7 @@ html[lang='zh-CN'] .run-progress-panel .hud-day::before {
 }
 
 .run-progress-panel .hud-details {
-    margin-top: 6px;
-}
-
-.run-progress-panel .hud-details summary {
-    width: auto;
-    color: var(--pixel-muted);
-    font-family: var(--pixel-font-ui);
-    font-size: 12px;
-    text-align: left;
-}
-
-.run-progress-panel .hud-details summary::before {
-    content: 'DATA '; 
-}
-
-.run-progress-panel .hud-details[open] {
-    gap: 8px;
-    padding-top: 8px;
-    border-top: 2px solid var(--pixel-line);
-}
-
-.run-progress-panel .hud-detail-row {
-    color: var(--pixel-muted);
-    font-size: 12px;
+    display: none;
 }
 
 /* Desktop trade hints live near the return curve as translucent pixel tags. */
@@ -552,14 +546,14 @@ html[lang='zh-CN'] .run-progress-panel .hud-day::before {
     }
 
     .stats-box[data-composition='returns-only'] {
-        width: 340px;
-        min-width: 340px;
+        width: 316px;
+        min-width: 0;
     }
 
     .controls-hint {
         position: absolute;
         left: 16px;
-        bottom: 116px;
+        bottom: 64px;
         z-index: 43;
         display: block;
         width: auto;
@@ -576,13 +570,13 @@ html[lang='zh-CN'] .run-progress-panel .hud-day::before {
     .trade-key-hints {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 8px;
+        gap: 6px;
     }
 
     .trade-key-hint {
         width: max-content;
-        min-height: 32px;
-        padding: 5px 10px 5px 5px;
+        min-height: 28px;
+        padding: 4px 8px 4px 4px;
         border: 2px solid rgba(216, 226, 239, 0.28);
         border-radius: 0;
         background: rgba(7, 10, 15, 0.7);
@@ -590,21 +584,22 @@ html[lang='zh-CN'] .run-progress-panel .hud-day::before {
         clip-path: var(--pixel-cut);
         color: rgba(247, 251, 255, 0.86);
         font-family: var(--pixel-font-ui);
-        font-size: 14px;
+        font-size: 13px;
         line-height: 1;
         text-shadow: none;
+        opacity: 0.76;
     }
 
     .trade-key-hint .key {
-        min-width: 28px;
-        padding: 5px;
+        min-width: 26px;
+        padding: 4px;
         border: 0;
         border-radius: 0;
         background: var(--pixel-yellow);
         box-shadow: none;
         color: #171104;
         font-family: var(--pixel-font-display);
-        font-size: 10px;
+        font-size: 9px;
     }
 
     #game-top-controls {
@@ -878,40 +873,48 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
     }
 
     .stats-box[data-composition='returns-only'] {
-        width: min(304px, calc(100% - 72px));
-        padding: 8px;
-        border-width: 2px;
-        box-shadow: 3px 3px 0 var(--pixel-shadow);
+        grid-template-columns: minmax(0, 1fr) minmax(84px, 0.82fr);
+        gap: 6px;
+        width: min(258px, calc(100% - 76px));
+        padding: 4px 6px;
+        border-width: 1px;
+        box-shadow: none;
     }
 
     .stats-box[data-composition='returns-only'] .hud-main {
-        gap: 6px;
-        padding-bottom: 7px;
+        gap: 5px;
+        padding: 0;
     }
 
     .stats-box[data-composition='returns-only'] .hud-main .hud-stat-row {
-        gap: 2px;
-        padding: 6px 7px;
+        gap: 3px;
+        padding: 0;
     }
 
     .stats-box[data-composition='returns-only'] .hud-total::before,
     .stats-box[data-composition='returns-only'] .hud-return::before,
     .excess-meter-label {
-        font-size: 7px;
+        font-size: 5px;
     }
 
     .stats-box[data-composition='returns-only'] .hud-total span,
     .stats-box[data-composition='returns-only'] .hud-return span,
     .excess-meter-label strong {
-        font-size: 14px;
+        font-size: 11px;
+    }
+
+    .excess-meter-track {
+        height: 3px;
+        margin-top: 2px;
     }
 
     .run-progress-panel {
-        left: max(8px, env(safe-area-inset-left));
-        bottom: calc(108px + env(safe-area-inset-bottom));
-        width: min(184px, 48vw);
-        padding: 8px;
-        box-shadow: 3px 3px 0 var(--pixel-shadow);
+        left: max(6px, env(safe-area-inset-left));
+        bottom: calc(100px + env(safe-area-inset-bottom));
+        width: min(142px, 40vw);
+        padding: 4px 6px;
+        border-width: 1px;
+        box-shadow: none;
     }
 
     .run-progress-panel .hud-header {
@@ -920,21 +923,27 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
 
     .run-progress-panel .hud-game,
     .run-progress-panel .hud-day {
-        padding: 5px 6px;
+        padding: 0;
     }
 
     .run-progress-panel .hud-game::before,
     .run-progress-panel .hud-day::before {
-        font-size: 6px;
+        font-size: 5px;
     }
 
     .run-progress-panel .hud-game span,
     .run-progress-panel .hud-day span {
-        font-size: 13px;
+        font-size: 11px;
     }
 
-    .run-progress-panel .hud-details {
-        display: none;
+    .run-progress-panel .hud-game span::after,
+    .run-progress-panel .hud-day span::after {
+        font-size: 8px;
+    }
+
+    .run-progress-panel .day-progress {
+        height: 2px;
+        margin-top: 3px;
     }
 
     .controls-hint {
@@ -1044,12 +1053,12 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
 
 @media (max-width: 390px) {
     .stats-box[data-composition='returns-only'] {
-        width: calc(100% - 66px);
+        width: calc(100% - 72px);
     }
 
     .run-progress-panel {
-        bottom: calc(98px + env(safe-area-inset-bottom));
-        width: 170px;
+        bottom: calc(92px + env(safe-area-inset-bottom));
+        width: 136px;
     }
 
     #mobile-controls:not([hidden]) {
