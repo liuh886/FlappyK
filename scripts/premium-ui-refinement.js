@@ -9,6 +9,7 @@
     const DESKTOP_CANVAS_WIDTH = 896;
     const DESKTOP_CANVAS_HEIGHT = 672;
     const PIXEL_COMPATIBILITY_STYLE_ID = 'flappyk-pixel-ui-compatibility';
+    let compositionFrame = 0;
 
     function isChinese() {
         return root.dataset.flappykLanguage === 'zh'
@@ -227,7 +228,6 @@
             runPanel = document.createElement('section');
             runPanel.id = 'run-progress-panel';
             runPanel.className = 'run-progress-panel';
-            runPanel.setAttribute('aria-label', isChinese() ? '本局进度' : 'Run progress');
             gameContainer?.appendChild(runPanel);
         }
 
@@ -350,60 +350,103 @@
 
     function syncCanvasLayout() {
         if (!canvasElement || typeof draw !== 'function') return;
-        if (usesVirtualControls()) {
-            canvasElement.width = canvasElement.clientWidth || window.innerWidth;
-            canvasElement.height = canvasElement.clientHeight || Math.round(window.innerHeight * 0.68);
-        } else {
-            canvasElement.width = DESKTOP_CANVAS_WIDTH;
-            canvasElement.height = DESKTOP_CANVAS_HEIGHT;
+
+        const targetWidth = usesVirtualControls()
+            ? (canvasElement.clientWidth || window.innerWidth)
+            : DESKTOP_CANVAS_WIDTH;
+        const targetHeight = usesVirtualControls()
+            ? (canvasElement.clientHeight || Math.round(window.innerHeight * 0.68))
+            : DESKTOP_CANVAS_HEIGHT;
+        let changed = false;
+
+        if (canvasElement.width !== targetWidth) {
+            canvasElement.width = targetWidth;
+            changed = true;
         }
-        if (typeof isPlaying !== 'undefined' && isPlaying) draw();
+        if (canvasElement.height !== targetHeight) {
+            canvasElement.height = targetHeight;
+            changed = true;
+        }
+        if (changed && typeof isPlaying !== 'undefined' && isPlaying) draw();
     }
 
-    installPixelCompatibilityStyles();
-    restoreLegacyGoalNode();
-    refineHudComposition();
-    refineDesktopControls();
-    syncLiveExcess();
-    syncCanvasLayout();
-    syncGuideTarget();
-
-    const previousUpdateUI = updateUI;
-    updateUI = function refinedUpdateUI() {
-        const result = previousUpdateUI();
-        normalizeMetricRows();
-        syncLiveExcess();
-        return result;
-    };
-
-    const previousStartLevel = startLevel;
-    startLevel = function refinedStartLevel() {
-        const result = previousStartLevel();
-        refineHudComposition();
-        refineDesktopControls();
-        requestAnimationFrame(() => {
-            syncCanvasLayout();
-            syncGuideTarget();
-        });
-        return result;
-    };
-
-    const previousEndLevel = endLevel;
-    endLevel = function refinedEndLevel() {
-        const result = previousEndLevel();
-        requestAnimationFrame(syncSettlementComparison);
-        return result;
-    };
-
-    const syncComposition = () => requestAnimationFrame(() => {
+    function syncComposition() {
         refineHudComposition();
         refineDesktopControls();
         syncCanvasLayout();
         syncGuideTarget();
+    }
+
+    function scheduleComposition() {
+        if (compositionFrame) return;
+        compositionFrame = window.requestAnimationFrame(() => {
+            compositionFrame = 0;
+            syncComposition();
+        });
+    }
+
+    function observeTextNodes(ids, callback) {
+        const observer = new MutationObserver(callback);
+        ids.forEach((id) => {
+            const node = document.getElementById(id);
+            if (node) observer.observe(node, { childList: true, characterData: true, subtree: true });
+        });
+        return observer;
+    }
+
+    installPixelCompatibilityStyles();
+    restoreLegacyGoalNode();
+    syncComposition();
+    syncLiveExcess();
+    syncSettlementComparison();
+
+    observeTextNodes(
+        ['total-display', 'return-display', 'level-display', 'day-display'],
+        () => {
+            normalizeMetricRows();
+            syncLiveExcess();
+        },
+    );
+
+    observeTextNodes(
+        ['card-level-return', 'card-market-return', 'card-excess-return', 'card-status'],
+        syncSettlementComparison,
+    );
+
+    const status = document.getElementById('card-status');
+    if (status) {
+        new MutationObserver(syncSettlementComparison).observe(status, {
+            attributes: true,
+            attributeFilter: ['class'],
+        });
+    }
+
+    if (canvasElement) {
+        new MutationObserver(scheduleComposition).observe(canvasElement, {
+            attributes: true,
+            attributeFilter: ['width', 'height'],
+        });
+    }
+
+    [
+        topControls,
+        document.getElementById('start-screen'),
+        document.getElementById('settlement-screen'),
+        document.getElementById('mobile-controls'),
+    ].filter(Boolean).forEach((element) => {
+        new MutationObserver(scheduleComposition).observe(element, {
+            attributes: true,
+            attributeFilter: ['hidden', 'aria-hidden', 'class'],
+        });
+    });
+
+    new MutationObserver(scheduleComposition).observe(root, {
+        attributes: true,
+        attributeFilter: ['lang', 'data-flappyk-language', 'data-ui-state'],
     });
 
     if (gameContainer) {
-        new MutationObserver(syncComposition).observe(gameContainer, {
+        new MutationObserver(() => window.requestAnimationFrame(syncGuideTarget)).observe(gameContainer, {
             childList: true,
             subtree: true,
             attributes: true,
@@ -411,9 +454,9 @@
         });
     }
 
-    window.addEventListener('flappyk:layout-state', syncComposition);
-    window.addEventListener('resize', syncComposition);
-    window.addEventListener('orientationchange', syncComposition);
+    window.addEventListener('flappyk:layout-state', scheduleComposition);
+    window.addEventListener('resize', scheduleComposition);
+    window.addEventListener('orientationchange', scheduleComposition);
 
     window.FlappyKPremiumUIRefinement = {
         DESKTOP_CANVAS_WIDTH,
@@ -428,5 +471,6 @@
         syncSettlementComparison,
         syncCanvasLayout,
         syncGuideTarget,
+        scheduleComposition,
     };
 })();
