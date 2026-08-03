@@ -128,6 +128,7 @@
 
     ensureStylesheet('flappyk-membership-styles', './membership.css');
     void loadScript('flappyk-membership-config', './membership-config.js')
+        .then(() => loadScript('flappyk-cloud-run-sync-core', './scripts/cloud-run-sync-core.js'))
         .then(() => loadScript('flappyk-membership-client', './membership.js'))
         .then(() => loadScript('flappyk-membership-experience', './membership-experience.js'))
         .then(() => loadScript('flappyk-membership-run-hook', './membership-run-hook.js'))

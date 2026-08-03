@@ -2,6 +2,7 @@
     'use strict';
 
     const config = window.FlappyKMembershipConfig || {};
+    const syncCore = window.FlappyKCloudRunSyncCore;
     const entitlementCode = config.entitlementCode || 'flappyk.pro';
     const pendingRunsKey = 'flappyk_pending_cloud_runs_v1';
     const configured = Boolean(
@@ -17,6 +18,21 @@
         user: null,
         entitlements: new Set(),
         lastError: '',
+        sync: {
+            status: 'local',
+            queued: 0,
+            saved: 0,
+            failed: 0,
+            lastAttemptAt: null,
+            lastError: '',
+        },
+        cloudHistory: {
+            loaded: false,
+            runs: [],
+            bestExcess: null,
+            runsCompleted: 0,
+            lastCompletedAt: null,
+        },
     };
 
     let ui = null;
@@ -35,7 +51,7 @@
                 google: '使用 GOOGLE 登录',
                 emailPlaceholder: '邮箱地址',
                 emailSubmit: '发送登录链接',
-                signedInCopy: '本地游戏记录仍保留在浏览器；新完成的整局成绩会同步到你的账户。',
+                signedInCopy: '本地游戏记录仍保留在浏览器；完整三局成绩会幂等同步到你的账户。',
                 free: 'FREE PLAYER',
                 pro: 'FLAPPYK PRO',
                 upgrade: '升级到 PRO',
@@ -48,6 +64,19 @@
                 signedOut: '已退出登录。游客游戏不受影响。',
                 unavailable: '账户服务暂时不可用，游客游戏仍可正常使用。',
                 invalidEmail: '请输入有效邮箱地址。',
+                syncTitle: '成绩同步',
+                syncLocal: '仅保存在本机',
+                syncQueued: '等待同步',
+                syncSyncing: '正在同步',
+                syncSaved: '已保存到云端',
+                syncRetry: '同步失败，可重试',
+                syncQueuedDetail: (count) => `${count} 条完整成绩等待上传。`,
+                syncSavedDetail: (count) => count > 0 ? `本次已保存 ${count} 条成绩。` : '本地与云端队列已对齐。',
+                syncRetryDetail: (count) => `${count} 条成绩仍安全保存在本机。`,
+                retry: '重试同步',
+                cloudHistory: '云端历史',
+                cloudHistoryEmpty: '云端尚无完整三局成绩。',
+                cloudHistorySummary: (count, best) => `${count} 局 · 最佳超额 ${best}`,
             }
             : {
                 launcherGuest: 'ACCOUNT',
@@ -59,7 +88,7 @@
                 google: 'CONTINUE WITH GOOGLE',
                 emailPlaceholder: 'Email address',
                 emailSubmit: 'EMAIL SIGN-IN LINK',
-                signedInCopy: 'Local records remain in this browser. Newly completed runs are also synced to your account.',
+                signedInCopy: 'Local records remain in this browser. Complete three-game runs sync idempotently to your account.',
                 free: 'FREE PLAYER',
                 pro: 'FLAPPYK PRO',
                 upgrade: 'UPGRADE TO PRO',
@@ -72,6 +101,19 @@
                 signedOut: 'Signed out. Guest play is unchanged.',
                 unavailable: 'Account service is unavailable. Guest play still works.',
                 invalidEmail: 'Enter a valid email address.',
+                syncTitle: 'RUN SYNC',
+                syncLocal: 'LOCAL ONLY',
+                syncQueued: 'QUEUED',
+                syncSyncing: 'SYNCING',
+                syncSaved: 'SAVED TO CLOUD',
+                syncRetry: 'RETRY NEEDED',
+                syncQueuedDetail: (count) => `${count} completed run${count === 1 ? '' : 's'} waiting to upload.`,
+                syncSavedDetail: (count) => count > 0 ? `${count} run${count === 1 ? '' : 's'} saved this time.` : 'Local and cloud queues are aligned.',
+                syncRetryDetail: (count) => `${count} run${count === 1 ? '' : 's'} remain safely on this device.`,
+                retry: 'RETRY SYNC',
+                cloudHistory: 'CLOUD HISTORY',
+                cloudHistoryEmpty: 'No complete three-game runs are stored in the cloud yet.',
+                cloudHistorySummary: (count, best) => `${count} RUNS · BEST EXCESS ${best}`,
             };
     }
 
@@ -83,6 +125,11 @@
             entitlements: [...state.entitlements],
             isPro: state.entitlements.has(entitlementCode),
             lastError: state.lastError,
+            sync: Object.freeze({ ...state.sync }),
+            cloudHistory: Object.freeze({
+                ...state.cloudHistory,
+                runs: [...state.cloudHistory.runs],
+            }),
         });
     }
 
@@ -109,11 +156,36 @@
         render();
     }
 
+    function formatPercent(value) {
+        const number = Number(value);
+        return Number.isFinite(number)
+            ? `${number >= 0 ? '+' : ''}${number.toFixed(2)}%`
+            : '---%';
+    }
+
+    function syncView(copy) {
+        const status = state.sync.status;
+        if (status === 'syncing') {
+            return { label: copy.syncSyncing, detail: copy.syncQueuedDetail(state.sync.queued) };
+        }
+        if (status === 'queued') {
+            return { label: copy.syncQueued, detail: copy.syncQueuedDetail(state.sync.queued) };
+        }
+        if (status === 'retry') {
+            return { label: copy.syncRetry, detail: copy.syncRetryDetail(state.sync.queued) };
+        }
+        if (status === 'saved') {
+            return { label: copy.syncSaved, detail: copy.syncSavedDetail(state.sync.saved) };
+        }
+        return { label: copy.syncLocal, detail: copy.syncQueuedDetail(state.sync.queued) };
+    }
+
     function render() {
         if (!ui) return;
         const copy = getCopy();
         const isSignedIn = Boolean(state.user);
         const isPro = can(entitlementCode);
+        const sync = syncView(copy);
 
         ui.launcher.textContent = isPro
             ? copy.launcherPro
@@ -137,8 +209,26 @@
         ui.signOut.textContent = state.loading ? copy.busy : copy.signOut;
         ui.upgrade.hidden = isPro || !config.checkoutFunctionUrl;
         ui.manage.hidden = !isPro || !config.portalFunctionUrl;
-        [ui.google, ui.email, ui.emailSubmit, ui.upgrade, ui.manage, ui.signOut]
-            .forEach((element) => { element.disabled = state.loading; });
+
+        ui.syncTitle.textContent = copy.syncTitle;
+        ui.syncState.textContent = sync.label;
+        ui.syncState.dataset.state = state.sync.status;
+        ui.syncDetail.textContent = sync.detail;
+        ui.retry.textContent = copy.retry;
+        ui.retry.hidden = state.sync.status !== 'retry';
+
+        ui.cloudTitle.textContent = copy.cloudHistory;
+        if (!isSignedIn || !state.cloudHistory.loaded || state.cloudHistory.runsCompleted === 0) {
+            ui.cloudDetail.textContent = copy.cloudHistoryEmpty;
+        } else {
+            ui.cloudDetail.textContent = copy.cloudHistorySummary(
+                state.cloudHistory.runsCompleted,
+                formatPercent(state.cloudHistory.bestExcess),
+            );
+        }
+
+        [ui.google, ui.email, ui.emailSubmit, ui.upgrade, ui.manage, ui.signOut, ui.retry]
+            .forEach((element) => { element.disabled = state.loading || state.sync.status === 'syncing'; });
     }
 
     function closeDialog() {
@@ -192,6 +282,18 @@
                         <p class="membership-account-meta" data-membership-account-meta></p>
                     </div>
                     <p class="membership-copy" data-membership-account-copy></p>
+                    <section class="membership-sync-card" aria-live="polite">
+                        <div>
+                            <strong data-membership-sync-title></strong>
+                            <span class="membership-sync-state" data-membership-sync-state></span>
+                        </div>
+                        <p data-membership-sync-detail></p>
+                        <button type="button" data-membership-sync-retry hidden></button>
+                    </section>
+                    <section class="membership-cloud-history">
+                        <strong data-membership-cloud-title></strong>
+                        <p data-membership-cloud-detail></p>
+                    </section>
                     <div class="membership-actions">
                         <button type="button" class="membership-primary" data-membership-upgrade></button>
                         <button type="button" data-membership-manage></button>
@@ -219,6 +321,12 @@
             tier: backdrop.querySelector('[data-membership-tier]'),
             accountMeta: backdrop.querySelector('[data-membership-account-meta]'),
             accountCopy: backdrop.querySelector('[data-membership-account-copy]'),
+            syncTitle: backdrop.querySelector('[data-membership-sync-title]'),
+            syncState: backdrop.querySelector('[data-membership-sync-state]'),
+            syncDetail: backdrop.querySelector('[data-membership-sync-detail]'),
+            retry: backdrop.querySelector('[data-membership-sync-retry]'),
+            cloudTitle: backdrop.querySelector('[data-membership-cloud-title]'),
+            cloudDetail: backdrop.querySelector('[data-membership-cloud-detail]'),
             upgrade: backdrop.querySelector('[data-membership-upgrade]'),
             manage: backdrop.querySelector('[data-membership-manage]'),
             signOut: backdrop.querySelector('[data-membership-sign-out]'),
@@ -241,6 +349,7 @@
         ui.signOut.addEventListener('click', () => void signOut());
         ui.upgrade.addEventListener('click', () => void startCheckout());
         ui.manage.addEventListener('click', () => void openPortal());
+        ui.retry.addEventListener('click', () => void retryPendingRuns());
         render();
     }
 
@@ -262,23 +371,6 @@
         return state.client;
     }
 
-    function readPendingRuns() {
-        try {
-            const value = JSON.parse(window.localStorage.getItem(pendingRunsKey) || '[]');
-            return Array.isArray(value) ? value.slice(-25) : [];
-        } catch {
-            return [];
-        }
-    }
-
-    function writePendingRuns(runs) {
-        try {
-            window.localStorage.setItem(pendingRunsKey, JSON.stringify(runs.slice(-25)));
-        } catch (error) {
-            console.warn('FlappyK cloud queue could not be saved.', error);
-        }
-    }
-
     function normalizeCompletedRun(detail) {
         const signature = String(detail?.signature || '');
         const score = detail?.score;
@@ -298,13 +390,49 @@
         };
     }
 
+    async function uploadCloudRun(run) {
+        if (!state.user || !state.client) throw new Error('Sign in is required to sync runs');
+        const { error } = await state.client.from('game_runs').upsert({
+            ...run,
+            user_id: state.user.id,
+            product_code: 'flappyk',
+        }, {
+            onConflict: 'user_id,local_signature',
+            ignoreDuplicates: true,
+        });
+        if (error) throw error;
+    }
+
+    const syncController = syncCore?.create?.({
+        storage: window.localStorage,
+        storageKey: pendingRunsKey,
+        upload: uploadCloudRun,
+        onState(nextSync) {
+            const previousStatus = state.sync.status;
+            state.sync = { ...nextSync };
+            if (nextSync.status === 'retry') state.lastError = nextSync.lastError;
+            else if (previousStatus === 'retry') state.lastError = '';
+            render();
+            window.dispatchEvent(new CustomEvent('flappyk:cloud-sync-state', {
+                detail: { ...state.sync },
+            }));
+            if (previousStatus !== nextSync.status) {
+                track('cloud_run_sync_state', {
+                    sync_state: nextSync.status,
+                    queued_runs: nextSync.queued,
+                    saved_runs: nextSync.saved,
+                    failed_runs: nextSync.failed,
+                });
+            }
+        },
+    });
+
     function queueCompletedRun(detail) {
         const run = normalizeCompletedRun(detail);
-        if (!run) return;
-        const current = readPendingRuns().filter((item) => item.local_signature !== run.local_signature);
-        current.push(run);
-        writePendingRuns(current);
-        if (state.user) void flushPendingRuns();
+        if (!run || !syncController) return;
+        syncController.queue(run);
+        track('cloud_run_queued', { run_mode: run.mode });
+        if (state.user) void flushPendingRuns('run-complete');
     }
 
     async function syncLocalProfile() {
@@ -328,24 +456,66 @@
         if (error) throw error;
     }
 
-    async function flushPendingRuns() {
-        if (!state.user || !state.client) return;
-        const pending = readPendingRuns();
-        if (pending.length === 0) return;
+    async function flushPendingRuns(reason = 'automatic') {
+        if (!state.user || !state.client || !syncController) return state.sync;
+        const result = await syncController.flush(reason);
+        if (result.status === 'saved') await loadCloudHistory();
+        return result;
+    }
 
-        const remaining = [];
-        for (const run of pending) {
-            const { error } = await state.client.from('game_runs').upsert({
-                ...run,
-                user_id: state.user.id,
-                product_code: 'flappyk',
-            }, {
-                onConflict: 'user_id,local_signature',
-                ignoreDuplicates: true,
-            });
-            if (error) remaining.push(run);
+    async function retryPendingRuns() {
+        if (!state.user || !state.client || !syncController) return state.sync;
+        track('cloud_run_retry_clicked', { queued_runs: state.sync.queued });
+        const result = await syncController.retry();
+        if (result.status === 'saved') {
+            state.lastError = '';
+            setStatus(getCopy().syncSaved, 'success');
+            await loadCloudHistory();
+        } else {
+            setStatus(getCopy().unavailable, 'error');
         }
-        writePendingRuns(remaining);
+        return result;
+    }
+
+    async function loadCloudHistory() {
+        if (!state.user || !state.client) return;
+
+        const [profileResult, runsResult] = await Promise.all([
+            state.client
+                .from('profiles')
+                .select('best_excess,runs_completed,markets_beaten,updated_at')
+                .eq('id', state.user.id)
+                .maybeSingle(),
+            state.client
+                .from('game_runs')
+                .select('local_signature,mode,total_return_pct,total_excess_pct,completed_at')
+                .eq('user_id', state.user.id)
+                .eq('product_code', 'flappyk')
+                .order('completed_at', { ascending: false })
+                .limit(20),
+        ]);
+
+        if (profileResult.error) throw profileResult.error;
+        if (runsResult.error) throw runsResult.error;
+
+        const runs = Array.isArray(runsResult.data) ? runsResult.data : [];
+        const bestFromRuns = runs.reduce((best, run) => {
+            const value = Number(run.total_excess_pct);
+            return Number.isFinite(value) && (best === null || value > best) ? value : best;
+        }, null);
+        const profileBest = Number(profileResult.data?.best_excess);
+
+        state.cloudHistory = {
+            loaded: true,
+            runs,
+            bestExcess: Number.isFinite(profileBest) ? profileBest : bestFromRuns,
+            runsCompleted: Math.max(Number(profileResult.data?.runs_completed) || 0, runs.length),
+            lastCompletedAt: runs[0]?.completed_at || null,
+        };
+        render();
+        window.dispatchEvent(new CustomEvent('flappyk:cloud-history-loaded', {
+            detail: { ...state.cloudHistory, runs: [...runs] },
+        }));
     }
 
     async function refreshEntitlements() {
@@ -377,6 +547,14 @@
         state.lastError = '';
         if (!state.user) {
             state.entitlements = new Set();
+            state.cloudHistory = {
+                loaded: false,
+                runs: [],
+                bestExcess: null,
+                runsCompleted: 0,
+                lastCompletedAt: null,
+            };
+            syncController?.refresh?.();
             render();
             return;
         }
@@ -385,8 +563,9 @@
             await Promise.all([
                 refreshEntitlements(),
                 syncLocalProfile(),
-                flushPendingRuns(),
             ]);
+            await flushPendingRuns('session');
+            await loadCloudHistory();
             if (previousUserId !== state.user.id) {
                 setStatus(getCopy().signedIn, 'success');
                 track('sign_in_completed', { sign_in_provider: state.user.app_metadata?.provider || 'unknown' });
@@ -532,14 +711,23 @@
         open: openDialog,
         refresh: async () => {
             if (!configured) return snapshot();
-            await refreshEntitlements();
+            await Promise.all([refreshEntitlements(), loadCloudHistory()]);
             return snapshot();
         },
         queueCompletedRun,
+        retryPendingRuns,
+        getSyncState: () => Object.freeze({ ...state.sync }),
+        getCloudHistory: () => Object.freeze({
+            ...state.cloudHistory,
+            runs: [...state.cloudHistory.runs],
+        }),
     };
 
     window.addEventListener('flappyk:run-completed', (event) => {
         queueCompletedRun(event.detail);
+    });
+    window.addEventListener('online', () => {
+        if (state.user && state.sync.queued > 0) void flushPendingRuns('online');
     });
 
     if (configured) void initialise();
