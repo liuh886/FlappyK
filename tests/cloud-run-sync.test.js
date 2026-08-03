@@ -94,11 +94,19 @@ function run(signature) {
         getItem() { throw new Error('blocked'); },
         setItem() { throw new Error('blocked'); },
     };
-    const nonBlocking = create({ storage: unavailableStorage, upload: async () => {} });
+    const uploadedFromMemory = [];
+    const nonBlocking = create({
+        storage: unavailableStorage,
+        upload: async (item) => uploadedFromMemory.push(item.local_signature),
+    });
     assert.doesNotThrow(() => nonBlocking.queue(run('local-only')));
     assert.equal(nonBlocking.snapshot().status, 'queued');
+    assert.deepEqual(nonBlocking.read().map((item) => item.local_signature), ['local-only']);
+    const memorySaved = await nonBlocking.flush('storage-blocked');
+    assert.equal(memorySaved.status, 'saved');
+    assert.deepEqual(uploadedFromMemory, ['local-only']);
 
-    console.log('Cloud-run local, queued, syncing, saved, retry, dedupe, and concurrency checks passed');
+    console.log('Cloud-run local, queued, syncing, saved, retry, dedupe, concurrency, and blocked-storage checks passed');
 })().catch((error) => {
     console.error(error);
     process.exitCode = 1;
