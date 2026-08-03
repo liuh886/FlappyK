@@ -9,6 +9,7 @@
     const DESKTOP_CANVAS_WIDTH = 896;
     const DESKTOP_CANVAS_HEIGHT = 672;
     const PIXEL_COMPATIBILITY_STYLE_ID = 'flappyk-pixel-ui-compatibility';
+    let compositionFrame = 0;
 
     function isChinese() {
         return root.dataset.flappykLanguage === 'zh'
@@ -349,14 +350,24 @@
 
     function syncCanvasLayout() {
         if (!canvasElement || typeof draw !== 'function') return;
-        if (usesVirtualControls()) {
-            canvasElement.width = canvasElement.clientWidth || window.innerWidth;
-            canvasElement.height = canvasElement.clientHeight || Math.round(window.innerHeight * 0.68);
-        } else {
-            canvasElement.width = DESKTOP_CANVAS_WIDTH;
-            canvasElement.height = DESKTOP_CANVAS_HEIGHT;
+
+        const targetWidth = usesVirtualControls()
+            ? (canvasElement.clientWidth || window.innerWidth)
+            : DESKTOP_CANVAS_WIDTH;
+        const targetHeight = usesVirtualControls()
+            ? (canvasElement.clientHeight || Math.round(window.innerHeight * 0.68))
+            : DESKTOP_CANVAS_HEIGHT;
+        let changed = false;
+
+        if (canvasElement.width !== targetWidth) {
+            canvasElement.width = targetWidth;
+            changed = true;
         }
-        if (typeof isPlaying !== 'undefined' && isPlaying) draw();
+        if (canvasElement.height !== targetHeight) {
+            canvasElement.height = targetHeight;
+            changed = true;
+        }
+        if (changed && typeof isPlaying !== 'undefined' && isPlaying) draw();
     }
 
     function syncComposition() {
@@ -364,6 +375,14 @@
         refineDesktopControls();
         syncCanvasLayout();
         syncGuideTarget();
+    }
+
+    function scheduleComposition() {
+        if (compositionFrame) return;
+        compositionFrame = window.requestAnimationFrame(() => {
+            compositionFrame = 0;
+            syncComposition();
+        });
     }
 
     function observeTextNodes(ids, callback) {
@@ -402,8 +421,32 @@
         });
     }
 
+    if (canvasElement) {
+        new MutationObserver(scheduleComposition).observe(canvasElement, {
+            attributes: true,
+            attributeFilter: ['width', 'height'],
+        });
+    }
+
+    [
+        topControls,
+        document.getElementById('start-screen'),
+        document.getElementById('settlement-screen'),
+        document.getElementById('mobile-controls'),
+    ].filter(Boolean).forEach((element) => {
+        new MutationObserver(scheduleComposition).observe(element, {
+            attributes: true,
+            attributeFilter: ['hidden', 'aria-hidden', 'class'],
+        });
+    });
+
+    new MutationObserver(scheduleComposition).observe(root, {
+        attributes: true,
+        attributeFilter: ['lang', 'data-flappyk-language', 'data-ui-state'],
+    });
+
     if (gameContainer) {
-        new MutationObserver(() => requestAnimationFrame(syncGuideTarget)).observe(gameContainer, {
+        new MutationObserver(() => window.requestAnimationFrame(syncGuideTarget)).observe(gameContainer, {
             childList: true,
             subtree: true,
             attributes: true,
@@ -411,9 +454,9 @@
         });
     }
 
-    window.addEventListener('flappyk:layout-state', () => requestAnimationFrame(syncComposition));
-    window.addEventListener('resize', () => requestAnimationFrame(syncComposition));
-    window.addEventListener('orientationchange', () => requestAnimationFrame(syncComposition));
+    window.addEventListener('flappyk:layout-state', scheduleComposition);
+    window.addEventListener('resize', scheduleComposition);
+    window.addEventListener('orientationchange', scheduleComposition);
 
     window.FlappyKPremiumUIRefinement = {
         DESKTOP_CANVAS_WIDTH,
@@ -428,5 +471,6 @@
         syncSettlementComparison,
         syncCanvasLayout,
         syncGuideTarget,
+        scheduleComposition,
     };
 })();
