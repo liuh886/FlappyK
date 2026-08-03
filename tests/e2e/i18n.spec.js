@@ -87,6 +87,8 @@ test('language toggle switches, persists, and uses one Chinese UI typeface', asy
 
   const typography = await page.evaluate(() => {
     const style = (selector) => getComputedStyle(document.querySelector(selector));
+    const card = document.getElementById('profit-card');
+    card.dataset.detailsExpanded = 'true';
     const firstCardRow = document.querySelector('.card-details p');
     return {
       bodyFamily: style('body').fontFamily,
