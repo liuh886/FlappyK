@@ -40,7 +40,9 @@ assert.ok(refinementCss.includes("font-size: 15px"));
 assert.ok(refinementCss.includes('backdrop-filter: none'));
 assert.ok(refinementCss.includes("html[data-virtual-controls='true'] #game-top-controls .desktop-speed-control"));
 
-assert.ok(serviceWorker.includes("flappyk-app-v8"));
-assert.ok(serviceWorker.includes("flappyk-runtime-v8"));
+assert.ok(serviceWorker.includes("flappyk-app-v9"));
+assert.ok(serviceWorker.includes("flappyk-runtime-v9"));
+assert.ok(serviceWorker.includes("'./scripts/cloud-run-sync-core.js'"));
+assert.ok(serviceWorker.includes("'./membership-sync.css'"));
 
-console.log('Modern pixel typography, semantic run counter, normalized HUD labels, hard utility chrome, enlarged frame, controls, and PWA cache contracts passed');
+console.log('Modern pixel typography, semantic run counter, normalized HUD labels, hard utility chrome, enlarged frame, controls, reliable cloud sync, and PWA cache contracts passed');
