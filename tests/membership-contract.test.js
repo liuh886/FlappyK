@@ -71,8 +71,8 @@ assert.ok(pwaSource.includes("'./membership-experience.js'"));
 assert.ok(pwaSource.includes("'./membership-run-hook.js'"));
 assert.ok(pwaSource.includes("'./membership.css'"));
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v6'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v6'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v7'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v7'"));
 assert.ok(serviceWorkerSource.includes("'./membership-config.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership-experience.js'"));
