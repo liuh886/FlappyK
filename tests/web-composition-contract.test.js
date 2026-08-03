@@ -4,6 +4,8 @@ const fs = require('node:fs');
 const hardeningJs = fs.readFileSync('core-hardening.js', 'utf8');
 const refinementJs = fs.readFileSync('scripts/premium-ui-refinement.js', 'utf8');
 const refinementCss = fs.readFileSync('premium-ui-refinement.css', 'utf8');
+const compactHudCss = fs.readFileSync('hud-compact.css', 'utf8');
+const pwaSource = fs.readFileSync('pwa.js', 'utf8');
 const serviceWorker = fs.readFileSync('sw.js', 'utf8');
 
 assert.ok(hardeningJs.includes('levelDisp.textContent = String(visibleGame)'));
@@ -35,14 +37,23 @@ assert.ok(refinementCss.includes('.run-progress-panel'));
 assert.ok(refinementCss.includes('width: min(896px'));
 assert.ok(refinementCss.includes('.trade-key-hints'));
 assert.ok(refinementCss.includes('#game-top-controls .desktop-speed-control'));
-assert.ok(refinementCss.includes("font-size: 17px"));
-assert.ok(refinementCss.includes("font-size: 15px"));
 assert.ok(refinementCss.includes('backdrop-filter: none'));
 assert.ok(refinementCss.includes("html[data-virtual-controls='true'] #game-top-controls .desktop-speed-control"));
 
-assert.ok(serviceWorker.includes("flappyk-app-v9"));
-assert.ok(serviceWorker.includes("flappyk-runtime-v9"));
+assert.ok(compactHudCss.includes("width: min(316px, calc(100% - 108px))"));
+assert.ok(compactHudCss.includes('width: 176px'));
+assert.ok(compactHudCss.includes('font-size: 13px'));
+assert.ok(compactHudCss.includes('font-size: 12px'));
+assert.ok(compactHudCss.includes('box-shadow: none'));
+assert.ok(compactHudCss.includes('clip-path: none'));
+assert.ok(compactHudCss.includes('.run-progress-panel .hud-details'));
+assert.ok(compactHudCss.includes('display: none'));
+assert.ok(pwaSource.includes("ensureStylesheet('flappyk-hud-compact-styles', './hud-compact.css')"));
+
+assert.ok(serviceWorker.includes("flappyk-app-v10"));
+assert.ok(serviceWorker.includes("flappyk-runtime-v10"));
+assert.ok(serviceWorker.includes("'./hud-compact.css'"));
 assert.ok(serviceWorker.includes("'./scripts/cloud-run-sync-core.js'"));
 assert.ok(serviceWorker.includes("'./membership-sync.css'"));
 
-console.log('Modern pixel typography, semantic run counter, normalized HUD labels, hard utility chrome, enlarged frame, controls, reliable cloud sync, and PWA cache contracts passed');
+console.log('Modern pixel typography, compact low-obstruction HUD, semantic run counter, normalized labels, enlarged frame, controls, reliable cloud sync, and PWA cache contracts passed');
