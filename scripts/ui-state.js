@@ -15,7 +15,9 @@
 
     const root = document.documentElement;
     const container = document.getElementById('game-container');
+    const uiLayer = document.getElementById('ui-layer');
     const compactWidth = 720;
+    const gameChromeStates = new Set([STATES.ONBOARDING, STATES.PLAYING, STATES.PAUSED]);
     let state = STATES.HOME;
     let layout = 'wide';
     let input = 'pointer';
@@ -24,11 +26,19 @@
         window.dispatchEvent(new CustomEvent(name, { detail }));
     }
 
+    function syncGameChrome() {
+        if (!uiLayer) return;
+        const visible = gameChromeStates.has(state);
+        uiLayer.hidden = !visible;
+        uiLayer.setAttribute('aria-hidden', String(!visible));
+    }
+
     function transition(next, detail = {}) {
         if (!Object.values(STATES).includes(next)) return state;
         const previous = state;
         state = next;
         root.dataset.uiState = state;
+        syncGameChrome();
         if (previous !== next) emit('flappyk:ui-state', { previous, state, ...detail });
         return state;
     }
@@ -65,7 +75,7 @@
 
         const pacing = window.FlappyKPacing;
         if (pacing?.paused) return transition(STATES.PAUSED, { source: 'pacing' });
-        if (pacing?.active || document.getElementById('game-container')?.classList.contains('game-active')) {
+        if (pacing?.active || container?.classList.contains('game-active')) {
             return transition(STATES.PLAYING, { source: 'pacing' });
         }
         return transition(STATES.HOME, { source: 'dom' });
