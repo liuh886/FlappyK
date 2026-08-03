@@ -19,7 +19,6 @@ const APP_SHELL = [
     './daily-run.css',
     './onboarding.css',
     './i18n.css',
-    './visual-polish.css',
     './pwa.css',
     './premium-ui.css',
     './premium-ui-refinement.css',
