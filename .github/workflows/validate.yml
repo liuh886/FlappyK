@@ -1,81 +1,134 @@
-name: Apply PR 50 final fix
+name: Validate
 
 on:
   push:
-    branches:
-      - agent/cloud-run-reliability-v2
+    branches: [master]
   pull_request:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: apply-pr50-final-fix
+  group: validate-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  patch:
-    if: github.ref_name == 'agent/cloud-run-reliability-v2' || github.head_ref == 'agent/cloud-run-reliability-v2'
+  detect-impact:
     runs-on: ubuntu-latest
+    outputs:
+      browser: ${{ steps.scope.outputs.browser }}
     steps:
-      - name: Check out PR branch
+      - name: Check out change history
         uses: actions/checkout@v6
         with:
-          ref: agent/cloud-run-reliability-v2
           fetch-depth: 0
 
-      - name: Reconcile cloud profile cache with completed-run facts
-        shell: python
-        run: |
-          from pathlib import Path
-
-          membership_path = Path('membership.js')
-          source = membership_path.read_text(encoding='utf-8')
-          anchor = "        const profileBest = profileBestValue == null ? null : Number(profileBestValue);"
-          insertion = "\n".join([
-              anchor,
-              "        const bestExcess = [profileBest, bestFromRuns].reduce((best, value) => (",
-              "            Number.isFinite(value) && (best === null || value > best) ? value : best",
-              "        ), null);",
-          ])
-          if source.count(anchor) != 1:
-              raise SystemExit(f'Expected one profile-best anchor, found {source.count(anchor)}')
-          source = source.replace(anchor, insertion, 1)
-
-          old_assignment = "            bestExcess: Number.isFinite(profileBest) ? profileBest : bestFromRuns,"
-          if source.count(old_assignment) != 1:
-              raise SystemExit(f'Expected one best-excess assignment, found {source.count(old_assignment)}')
-          source = source.replace(old_assignment, "            bestExcess,", 1)
-          membership_path.write_text(source, encoding='utf-8')
-
-          test_path = Path('tests/cloud-history-fallback.test.js')
-          test_source = test_path.read_text(encoding='utf-8')
-          marker = "console.log('Cloud history null fallback contract passed.');"
-          regression = """assert.match(
-  membership,
-  /const bestExcess = \[profileBest, bestFromRuns\]\.reduce/,
-  'cloud history must reconcile the profile cache with run-derived facts',
-);
-assert.match(
-  membership,
-  /Number\.isFinite\(value\) && \(best === null \|\| value > best\)/,
-  'a stale or zero profile cache must not lower a stronger completed-run result',
-);
-
-console.log('Cloud history null and stale-cache fallback contracts passed.');"""
-          if test_source.count(marker) != 1:
-              raise SystemExit('Expected cloud-history test marker was not found')
-          test_path.write_text(test_source.replace(marker, regression, 1), encoding='utf-8')
-
-      - name: Restore CI and commit only the product fix
+      - name: Decide whether browser acceptance is required
+        id: scope
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
           set -euo pipefail
-          node --check membership.js
-          node tests/cloud-history-fallback.test.js
-          rm -f .github/workflows/apply-pr50-final-fix.yml
-          git checkout origin/master -- .github/workflows/validate.yml
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add membership.js tests/cloud-history-fallback.test.js .github/workflows/validate.yml .github/workflows/apply-pr50-final-fix.yml
-          git commit -m "fix: reconcile cloud profile cache with run facts [pr50-final-fix]"
-          git push origin HEAD:agent/cloud-run-reliability-v2
+          if [[ "$EVENT_NAME" != "pull_request" ]]; then
+            echo "browser=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git diff --name-only "$BASE_SHA" "$GITHUB_SHA" > changed-files.txt
+          cat changed-files.txt
+          if grep -Eq '^(index\.html|.*\.(js|css|html|webmanifest)$|scripts/|tests/e2e/|data/|icons/|supabase/|package(-lock)?\.json|playwright\.config\.cjs|\.github/workflows/validate\.yml)' changed-files.txt; then
+            echo "browser=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "browser=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  static-and-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - name: Generate raster social preview
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends librsvg2-bin
+          rsvg-convert -w 1200 -h 630 og-image.svg -o og-image.png
+
+      - name: Validate discovered JavaScript and product contracts
+        run: npm run validate:static
+
+      - name: Check Python syntax
+        run: python -m py_compile fetch_all_data.py scripts/audit_bundled_data.py
+
+      - name: Check HTML, social preview, and leaderboard data
+        run: |
+          python - <<'PY'
+          import json
+          from html.parser import HTMLParser
+          from pathlib import Path
+
+          class Parser(HTMLParser):
+              pass
+
+          Parser().feed(Path("index.html").read_text(encoding="utf-8"))
+          payload = json.loads(Path("data/leaderboard.json").read_text(encoding="utf-8"))
+          entries = payload.get("entries", [])
+          assert isinstance(entries, list)
+          assert len(entries) <= 10
+
+          image = Path("og-image.png").read_bytes()
+          assert image[:8] == b"\x89PNG\r\n\x1a\n"
+          width = int.from_bytes(image[16:20], "big")
+          height = int.from_bytes(image[20:24], "big")
+          assert (width, height) == (1200, 630), (width, height)
+          print("HTML, social preview, and leaderboard data validated")
+          PY
+
+      - name: Audit bundled equity split continuity
+        run: python scripts/audit_bundled_data.py
+
+  browser-smoke:
+    needs: [detect-impact, static-and-data]
+    if: needs.detect-impact.outputs.browser == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install locked test dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser smoke tests
+        run: npm run test:e2e
+
+      - name: Upload browser failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7
