@@ -439,15 +439,18 @@
         if (!state.user || !state.client) return;
         const profile = window.FlappyKLocalProfile?.getProfile?.();
         if (!profile) return;
+        const localBestValue = profile.bestExcess;
 
         const payload = {
             id: state.user.id,
             display_name: state.user.user_metadata?.full_name
                 || state.user.user_metadata?.name
                 || null,
-            best_excess: Number.isFinite(Number(profile.bestExcess))
-                ? Number(profile.bestExcess)
-                : null,
+            best_excess: localBestValue == null
+                ? null
+                : Number.isFinite(Number(localBestValue))
+                    ? Number(localBestValue)
+                    : null,
             runs_completed: Math.max(0, Number(profile.runsCompleted) || 0),
             markets_beaten: Math.max(0, Number(profile.marketsBeaten) || 0),
             updated_at: new Date().toISOString(),
@@ -505,11 +508,14 @@
         }, null);
         const profileBestValue = profileResult.data?.best_excess;
         const profileBest = profileBestValue == null ? null : Number(profileBestValue);
+        const bestExcess = [profileBest, bestFromRuns].reduce((best, value) => (
+            Number.isFinite(value) && (best === null || value > best) ? value : best
+        ), null);
 
         state.cloudHistory = {
             loaded: true,
             runs,
-            bestExcess: Number.isFinite(profileBest) ? profileBest : bestFromRuns,
+            bestExcess,
             runsCompleted: Math.max(Number(profileResult.data?.runs_completed) || 0, runs.length),
             lastCompletedAt: runs[0]?.completed_at || null,
         };
