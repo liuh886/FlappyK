@@ -11,7 +11,6 @@ const syncStyles = fs.readFileSync('membership-sync.css', 'utf8');
 const i18nStyles = fs.readFileSync('i18n.css', 'utf8');
 const premiumStyles = fs.readFileSync('premium-ui.css', 'utf8');
 const pixelStyles = fs.readFileSync('premium-ui-refinement.css', 'utf8');
-const compactHudStyles = fs.readFileSync('hud-compact.css', 'utf8');
 const pwaSource = fs.readFileSync('pwa.js', 'utf8');
 const serviceWorkerSource = fs.readFileSync('sw.js', 'utf8');
 const migrationSource = fs.readFileSync('supabase/migrations/0001_membership_foundation.sql', 'utf8');
@@ -84,16 +83,17 @@ assert.ok(premiumStyles.includes('.home-secondary-actions'));
 assert.ok(premiumStyles.includes('.excess-meter-track'));
 assert.ok(pixelStyles.includes("--pixel-font-ui: 'Pixelify Sans'"));
 assert.ok(pixelStyles.includes('--pixel-grid: 4px'));
-assert.ok(compactHudStyles.includes("width: min(316px, calc(100% - 108px))"));
-assert.ok(compactHudStyles.includes('width: 176px'));
-assert.ok(compactHudStyles.includes('clip-path: none'));
+assert.ok(pixelStyles.includes("width: min(316px, calc(100% - 108px))"));
+assert.ok(pixelStyles.includes('width: 176px'));
+assert.ok(pixelStyles.includes('clip-path: none'));
+assert.ok(pixelStyles.includes('.run-progress-panel .hud-details'));
 
 assert.ok(hookSource.includes("getElementById('champagne-btn')"));
 assert.ok(hookSource.includes('isConfigured'));
 assert.ok(hookSource.includes('queueCompletedRun'));
 assert.ok(hookSource.includes('buildRunSignature'));
 
-assert.ok(pwaSource.includes("ensureStylesheet('flappyk-hud-compact-styles', './hud-compact.css')"));
+assert.ok(!pwaSource.includes('hud-compact.css'));
 assert.ok(pwaSource.includes("loadScript('flappyk-membership-config', './membership-config.js')"));
 assert.ok(pwaSource.includes("loadScript('flappyk-cloud-run-sync-core', './scripts/cloud-run-sync-core.js')"));
 assert.ok(pwaSource.includes("loadScript('flappyk-membership-client', './membership.js')"));
@@ -113,7 +113,7 @@ assert.ok(serviceWorkerSource.includes("'./membership.css'"));
 assert.ok(serviceWorkerSource.includes("'./membership-sync.css'"));
 assert.ok(serviceWorkerSource.includes("'./premium-ui.css'"));
 assert.ok(serviceWorkerSource.includes("'./premium-ui-refinement.css'"));
-assert.ok(serviceWorkerSource.includes("'./hud-compact.css'"));
+assert.ok(!serviceWorkerSource.includes("'./hud-compact.css'"));
 
 assert.ok(migrationSource.includes('alter table public.profiles enable row level security'));
 assert.ok(migrationSource.includes('alter table public.game_runs enable row level security'));
@@ -128,4 +128,4 @@ assert.ok(privacySource.includes('Only a completed three-game run summary is eli
 assert.ok(privacySource.includes('Partial runs, keystrokes'));
 assert.ok(privacySource.includes('not automatically trusted as public leaderboard evidence'));
 
-console.log('Membership, reliable cloud sync, typography, compact pixel HUD cache, privacy, result guidance, and RLS boundary validated');
+console.log('Membership, reliable cloud sync, typography, owner-scoped compact pixel HUD, privacy, result guidance, and RLS boundary validated');
