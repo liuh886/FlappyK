@@ -100,6 +100,9 @@ test('language toggle switches, persists, and uses one Chinese UI typeface', asy
       summaryFamily: style('#daily-run-summary').fontFamily,
       toggleFamily: style('#language-toggle-btn').fontFamily,
       toggleRadius: parseFloat(style('#language-toggle-btn').borderRadius),
+      utilityRadius: parseFloat(style('.home-utility-bar').borderRadius),
+      utilityBackdrop: style('.home-utility-bar').backdropFilter,
+      utilityShadow: style('.home-utility-bar').boxShadow,
       cardLayout: style('.card-details').display,
       cardRowLayout: getComputedStyle(firstCardRow).display,
     };
@@ -126,9 +129,17 @@ test('language toggle switches, persists, and uses one Chinese UI typeface', asy
   expect(typography.startButtonSize).toBeGreaterThanOrEqual(16);
   expect(typography.statsSize).toBeGreaterThanOrEqual(15);
   expect(typography.paragraphSize).toBeGreaterThanOrEqual(17);
-  expect(typography.toggleRadius).toBeGreaterThan(20);
+  expect(typography.toggleRadius).toBe(0);
+  expect(typography.utilityRadius).toBe(0);
+  expect(typography.utilityBackdrop).toBe('none');
+  expect(typography.utilityShadow).not.toBe('none');
   expect(typography.cardLayout).toBe('grid');
   expect(typography.cardRowLayout).toBe('flex');
+
+  await expect(page.locator('.hud-total .hud-metric-label')).toHaveText('总资产');
+  await expect(page.locator('.hud-return .hud-metric-label')).toHaveText('收益');
+  await expect(page.locator('.stats-box')).not.toContainText('TOTAL:');
+  await expect(page.locator('.stats-box')).not.toContainText('RETURN:');
 
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
@@ -162,11 +173,19 @@ test('Chinese mobile gameplay keeps one typeface and readable controls', async (
   await expect(page.locator('#pause-btn')).toHaveText('');
   await expect(page.locator('#pause-btn')).toHaveAttribute('aria-label', '暂停游戏');
   await expect(page.locator('#game-back-btn')).toBeVisible();
+  await expect(page.locator('#game-back-btn')).toHaveText('');
   await expect(page.locator('#game-back-btn')).toHaveAttribute('aria-label', '返回首页');
+
+  await expect(page.locator('.hud-game .hud-metric-label')).toHaveText('局数');
+  await expect(page.locator('.hud-day .hud-metric-label')).toHaveText('天数');
+  await expect(page.locator('#level-display')).toHaveText(/^1$/);
+  await expect(page.locator('#run-progress-panel')).not.toContainText('局数：');
+  await expect(page.locator('#run-progress-panel')).not.toContainText('交易日：');
 
   const mobileTypography = await page.evaluate(() => ({
     buyFamily: getComputedStyle(document.getElementById('btn-buy')).fontFamily,
     buySize: parseFloat(getComputedStyle(document.getElementById('btn-buy')).fontSize),
+    buyWhiteSpace: getComputedStyle(document.querySelector('#btn-buy > span:last-child')).whiteSpace,
     statsFamily: getComputedStyle(document.querySelector('.stats-box')).fontFamily,
     statsSize: parseFloat(getComputedStyle(document.querySelector('.stats-box')).fontSize),
   }));
@@ -174,5 +193,6 @@ test('Chinese mobile gameplay keeps one typeface and readable controls', async (
   expect(mobileTypography.statsFamily).toContain('ZCOOL QingKe HuangYou');
   expect(mobileTypography.buyFamily).toBe(mobileTypography.statsFamily);
   expect(mobileTypography.buySize).toBeGreaterThanOrEqual(15);
+  expect(mobileTypography.buyWhiteSpace).toBe('nowrap');
   expect(mobileTypography.statsSize).toBeGreaterThanOrEqual(12);
 });
