@@ -1,0 +1,905 @@
+:root {
+    --game-bg: #070b10;
+    --game-surface: rgba(10, 16, 24, 0.9);
+    --game-surface-soft: rgba(15, 23, 34, 0.74);
+    --game-border: rgba(192, 205, 220, 0.3);
+    --game-border-strong: rgba(240, 246, 252, 0.78);
+    --game-text: #f2f6fb;
+    --game-muted: #9ba9ba;
+    --game-yellow: #f4cc3a;
+    --game-cyan: #55dce9;
+    --game-green: #32d17d;
+    --game-red: #ff6b66;
+    --game-purple: #9d75ff;
+    --game-radius-sm: 7px;
+    --game-radius-md: 12px;
+    --game-shadow-control: 0 3px 0 rgba(0, 0, 0, 0.48);
+    --game-shadow-panel: 0 16px 42px rgba(0, 0, 0, 0.38);
+}
+
+/* One final UI layer owns the new components. Legacy market-specific candle colours remain untouched. */
+#ui-layer {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 40;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px;
+    pointer-events: none;
+}
+
+#ui-layer > * {
+    pointer-events: auto;
+}
+
+.stats-box {
+    width: min(286px, calc(100% - 92px));
+    min-width: 0;
+    padding: 9px 10px;
+    border: 1px solid var(--game-border);
+    border-radius: var(--game-radius-md);
+    background: linear-gradient(145deg, rgba(6, 10, 16, 0.94), rgba(15, 23, 34, 0.82));
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+    font-size: 9px;
+    line-height: 1.35;
+    backdrop-filter: blur(10px);
+}
+
+.hud-header,
+.hud-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.hud-header {
+    color: var(--game-muted);
+    font-size: 8px;
+}
+
+.hud-main {
+    margin-top: 6px;
+    color: var(--game-text);
+}
+
+.hud-main .hud-total {
+    font-size: 10px;
+}
+
+.hud-main .hud-return {
+    font-size: 11px;
+}
+
+.hud-stat-row {
+    min-width: 0;
+    white-space: nowrap;
+}
+
+.hud-stat-row span {
+    font-variant-numeric: tabular-nums;
+}
+
+.hud-legacy-goal {
+    display: none !important;
+}
+
+.day-progress {
+    position: relative;
+    height: 3px;
+    margin-top: 7px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.day-progress-fill {
+    display: block;
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--game-cyan), var(--game-yellow));
+    transition: width 180ms linear;
+}
+
+.excess-meter {
+    margin-top: 7px;
+}
+
+.excess-meter-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--game-muted);
+    font-size: 7px;
+    letter-spacing: 0.04em;
+}
+
+.excess-meter-label strong {
+    color: var(--game-red);
+    font-size: 8px;
+    font-weight: inherit;
+    font-variant-numeric: tabular-nums;
+}
+
+.excess-meter[data-leading='true'] .excess-meter-label strong {
+    color: var(--game-green);
+}
+
+.excess-meter-track {
+    position: relative;
+    height: 5px;
+    margin-top: 4px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.excess-meter-negative,
+.excess-meter-positive {
+    position: absolute;
+    top: 1px;
+    bottom: 1px;
+    width: 50%;
+    opacity: 0.42;
+}
+
+.excess-meter-negative {
+    left: 0;
+    border-radius: 999px 0 0 999px;
+    background: linear-gradient(90deg, rgba(255, 107, 102, 0.68), transparent);
+}
+
+.excess-meter-positive {
+    right: 0;
+    border-radius: 0 999px 999px 0;
+    background: linear-gradient(90deg, transparent, rgba(50, 209, 125, 0.68));
+}
+
+.excess-meter-zero {
+    position: absolute;
+    top: -2px;
+    bottom: -2px;
+    left: 50%;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.excess-meter-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 7px;
+    height: 7px;
+    border: 1px solid #fff;
+    border-radius: 50%;
+    background: var(--game-red);
+    box-shadow: 0 0 7px rgba(255, 107, 102, 0.58);
+    transform: translate(-50%, -50%);
+    transition: left 180ms linear, background 160ms ease, box-shadow 160ms ease;
+}
+
+.excess-meter[data-leading='true'] .excess-meter-indicator {
+    background: var(--game-green);
+    box-shadow: 0 0 7px rgba(50, 209, 125, 0.58);
+}
+
+.hud-details {
+    position: relative;
+    margin-top: 4px;
+}
+
+.hud-details summary {
+    width: 30px;
+    margin-left: auto;
+    color: var(--game-muted);
+    cursor: pointer;
+    list-style: none;
+    text-align: right;
+}
+
+.hud-details summary::-webkit-details-marker {
+    display: none;
+}
+
+.hud-details[open] {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px 10px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hud-details[open] summary {
+    grid-column: 1 / -1;
+    height: 0;
+    overflow: hidden;
+}
+
+.hud-detail-row {
+    color: var(--game-muted);
+    font-size: 7px;
+}
+
+.controls-hint {
+    width: 202px;
+    padding: 8px;
+    border: 1px solid var(--game-border);
+    border-radius: var(--game-radius-md);
+    background: var(--game-surface);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.24);
+    font-size: 8px;
+    backdrop-filter: blur(10px);
+}
+
+.trade-key-hints {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+.trade-key-hint {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--game-muted);
+    white-space: nowrap;
+}
+
+.trade-key-hint .key {
+    min-width: 25px;
+    margin: 0;
+    padding: 4px;
+    text-align: center;
+}
+
+.game-speed-control,
+.mobile-speed-control {
+    display: grid;
+    grid-template-columns: 30px minmax(44px, auto) 30px;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.desktop-speed-control {
+    margin-top: 7px;
+}
+
+.speed-step,
+.mobile-speed-control .small-btn {
+    display: inline-flex;
+    width: 30px;
+    min-width: 30px;
+    height: 28px;
+    min-height: 28px;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    border-radius: var(--game-radius-sm);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--game-text);
+    box-shadow: none;
+    font-family: var(--font-ui, system-ui, sans-serif);
+    font-size: 17px;
+}
+
+.speed-readout {
+    min-width: 44px;
+    color: var(--game-yellow);
+    font-size: 9px;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+}
+
+#speed-btn[hidden] {
+    display: none !important;
+}
+
+/* Home: one primary decision, then mode and utility layers. */
+#start-screen {
+    justify-content: flex-start;
+    padding: 70px 28px 34px;
+    overflow-y: auto;
+}
+
+#start-screen > p {
+    margin-bottom: 4px;
+}
+
+.home-primary-actions {
+    width: min(360px, 90%);
+    margin-top: 10px;
+}
+
+.home-primary-actions #start-btn {
+    width: 100%;
+    min-height: 58px;
+    margin-top: 12px;
+    border-color: rgba(255, 255, 255, 0.9);
+    background: linear-gradient(180deg, #39dc87, #24b86b);
+    box-shadow: 0 5px 0 #137a43, 0 12px 28px rgba(50, 209, 125, 0.18);
+    font-size: 17px;
+}
+
+.home-mode-stack {
+    display: grid;
+    width: min(520px, 92%);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.daily-mode-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px 14px;
+    padding: 12px 14px;
+    border: 1px solid rgba(157, 117, 255, 0.48);
+    border-radius: var(--game-radius-md);
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.18), rgba(10, 16, 24, 0.86) 62%);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.2);
+}
+
+.daily-mode-card:has(#daily-run-btn[hidden]) {
+    display: none;
+}
+
+.daily-mode-copy {
+    display: grid;
+    gap: 5px;
+    text-align: left;
+}
+
+.daily-mode-copy strong {
+    color: #c8b9ff;
+    font-size: 9px;
+}
+
+.daily-mode-copy span {
+    color: var(--game-muted);
+    font-family: var(--font-ui, system-ui, sans-serif);
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.daily-mode-card #daily-run-btn {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    min-width: 150px;
+    margin: 0;
+    padding: 11px 14px;
+    border-width: 2px;
+    font-size: 10px;
+}
+
+.daily-mode-card .daily-run-summary {
+    grid-column: 1;
+    grid-row: 2;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+}
+
+.daily-mode-card .daily-run-summary strong,
+.daily-mode-card .daily-run-summary span {
+    display: none;
+}
+
+.daily-mode-card .daily-run-summary small {
+    color: #c8b9ff;
+}
+
+.local-records-summary {
+    display: flex;
+    gap: 10px;
+    width: min(520px, 92%);
+    justify-content: center;
+    margin-top: 12px;
+    padding: 7px 11px;
+    border-width: 1px;
+    color: var(--game-muted);
+}
+
+.home-secondary-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.home-secondary-actions button {
+    min-height: 34px;
+    margin: 0;
+    padding: 7px 11px;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.36);
+    background: rgba(255, 255, 255, 0.045);
+    box-shadow: none;
+    color: var(--game-muted);
+    font-size: 8px;
+}
+
+.start-data-ticker {
+    opacity: 0.7;
+}
+
+/* Mobile controls preserve virtual keys and place the high-frequency actions in thumb zones. */
+#mobile-controls:not([hidden]) {
+    display: grid !important;
+    grid-template-columns: 88px minmax(106px, 1fr) 88px;
+    align-items: end;
+    gap: 8px;
+    padding: 10px 12px calc(12px + env(safe-area-inset-bottom)) !important;
+}
+
+#mobile-controls .mobile-trade-primary {
+    width: 82px;
+    height: 82px;
+    margin: 0;
+}
+
+#mobile-controls #btn-buy {
+    justify-self: start;
+}
+
+#mobile-controls #btn-sell {
+    justify-self: end;
+}
+
+.mobile-speed-control {
+    align-self: end;
+    justify-self: center;
+    padding: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 10px;
+    background: rgba(7, 11, 16, 0.82);
+    backdrop-filter: blur(8px);
+}
+
+.mobile-speed-control .small-btn {
+    position: static;
+    width: 32px;
+    height: 32px;
+    border-color: rgba(255, 255, 255, 0.34);
+    color: var(--game-text);
+}
+
+.mobile-btn.is-rejected,
+.speed-step.is-rejected {
+    animation: rejected-control 320ms ease;
+}
+
+@keyframes rejected-control {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.game-feedback-toast {
+    position: absolute;
+    top: 78px;
+    left: 50%;
+    z-index: 130;
+    max-width: min(320px, 80%);
+    padding: 8px 11px;
+    border: 1px solid rgba(255, 255, 255, 0.46);
+    border-radius: 999px;
+    background: rgba(7, 11, 16, 0.9);
+    color: var(--game-green);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
+    font-size: 8px;
+    opacity: 0;
+    transform: translate(-50%, -6px);
+    transition: opacity 160ms ease, transform 160ms ease;
+    pointer-events: none;
+}
+
+.game-feedback-toast[data-kind='error'] {
+    color: var(--game-red);
+}
+
+.game-feedback-toast.is-visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+/* Learn by doing. */
+.game-coachmark {
+    position: absolute;
+    right: 12px;
+    bottom: 14px;
+    left: 12px;
+    z-index: 125;
+    display: flex;
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 11px 12px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    border: 1px solid rgba(85, 220, 233, 0.55);
+    border-radius: var(--game-radius-md);
+    background: rgba(7, 11, 16, 0.92);
+    box-shadow: var(--game-shadow-panel);
+    backdrop-filter: blur(12px);
+}
+
+.game-coachmark-copy {
+    display: grid;
+    min-width: 0;
+    gap: 5px;
+}
+
+.game-coachmark-copy strong {
+    color: var(--game-cyan);
+    font-size: 9px;
+}
+
+.game-coachmark-copy span {
+    color: var(--game-text);
+    font-family: var(--font-ui, system-ui, sans-serif);
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.game-coachmark button {
+    flex: 0 0 auto;
+    min-height: 32px;
+    margin: 0;
+    padding: 7px 10px;
+    border-width: 1px;
+    background: transparent;
+    box-shadow: none;
+    color: var(--game-muted);
+    font-size: 7px;
+}
+
+.guide-target {
+    position: relative;
+    z-index: 126 !important;
+    animation: guide-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes guide-pulse {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.38) drop-shadow(0 0 7px rgba(85, 220, 233, 0.72)); }
+}
+
+/* Result first, detail second. */
+#settlement-screen {
+    padding: 18px 12px 28px;
+    justify-content: flex-start;
+    overflow-y: auto;
+}
+
+#settlement-screen .profit-card {
+    width: min(500px, 94%);
+    margin-top: 6px;
+    padding: 22px;
+}
+
+.settlement-summary {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.settlement-verdict {
+    color: var(--game-text);
+    font-size: 12px;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.settlement-excess-summary {
+    color: #161b22;
+    font-size: 38px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    text-align: center;
+    text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.38);
+}
+
+.profit-card[data-result='success'] .settlement-excess-summary {
+    color: #064e2f;
+}
+
+.profit-card[data-result='failure'] .settlement-excess-summary {
+    color: #7f1d1d;
+}
+
+.settlement-comparison {
+    display: grid;
+    gap: 8px;
+}
+
+.settlement-comparison-row {
+    display: grid;
+    grid-template-columns: 58px minmax(0, 1fr) 78px;
+    align-items: center;
+    gap: 8px;
+    font-size: 8px;
+}
+
+.settlement-comparison-row > strong {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+.settlement-comparison-track {
+    height: 7px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.settlement-comparison-track i {
+    display: block;
+    width: 4%;
+    height: 100%;
+    border-radius: inherit;
+    background: rgba(13, 17, 23, 0.82);
+    transition: width 360ms ease;
+}
+
+#settlement-market-bar {
+    opacity: 0.56;
+}
+
+.profit-card .card-details {
+    display: none;
+    margin-top: 12px;
+}
+
+.profit-card[data-details-expanded='true'] .card-details {
+    display: grid;
+}
+
+.profit-card > .big-return,
+.profit-card > .big-return + div,
+.profit-card > .status-msg {
+    display: none;
+}
+
+.settlement-details-toggle {
+    display: block;
+    width: auto;
+    min-height: 32px;
+    margin: 12px auto 0;
+    padding: 7px 10px;
+    border: 1px solid rgba(0, 0, 0, 0.38);
+    background: rgba(255, 255, 255, 0.18);
+    box-shadow: none;
+    color: inherit;
+    font-size: 7px;
+}
+
+#settlement-screen > button {
+    width: min(320px, 88vw);
+    margin-top: 10px;
+}
+
+#settlement-screen #next-level-btn,
+#settlement-screen #champagne-btn,
+#settlement-screen #restart-btn {
+    min-height: 48px;
+}
+
+#settlement-screen #save-card-btn {
+    min-height: 36px;
+    border-width: 2px;
+    background: rgba(52, 152, 219, 0.2) !important;
+    box-shadow: none !important;
+    color: var(--game-text);
+    font-size: 9px;
+}
+
+html[lang='zh-CN'] .stats-box,
+html[lang='zh-CN'] .controls-hint {
+    font-size: 13px;
+}
+
+html[lang='zh-CN'] .hud-header,
+html[lang='zh-CN'] .hud-detail-row,
+html[lang='zh-CN'] .excess-meter-label,
+html[lang='zh-CN'] .excess-meter-label strong {
+    font-size: 12px;
+}
+
+html[lang='zh-CN'] .hud-main .hud-total,
+html[lang='zh-CN'] .hud-main .hud-return {
+    font-size: 14px;
+}
+
+html[lang='zh-CN'] .daily-mode-copy strong,
+html[lang='zh-CN'] .game-coachmark-copy strong,
+html[lang='zh-CN'] .settlement-verdict {
+    font-size: 15px;
+}
+
+html[lang='zh-CN'] .daily-mode-copy span,
+html[lang='zh-CN'] .game-coachmark-copy span {
+    font-size: 15px;
+}
+
+@media (max-width: 720px), (pointer: coarse) {
+    #ui-layer {
+        padding: max(7px, env(safe-area-inset-top)) 7px 0;
+    }
+
+    .stats-box {
+        width: calc(100% - 82px);
+        max-width: 278px;
+        padding: 7px 8px;
+        font-size: 8px;
+    }
+
+    .hud-header {
+        font-size: 7px;
+    }
+
+    .hud-main .hud-total,
+    .hud-main .hud-return {
+        font-size: 9px;
+    }
+
+    .hud-details {
+        display: none;
+    }
+
+    .controls-hint {
+        display: none;
+    }
+
+    #start-screen {
+        padding: max(62px, calc(env(safe-area-inset-top) + 52px)) 14px max(28px, calc(env(safe-area-inset-bottom) + 22px));
+    }
+
+    .home-primary-actions {
+        width: min(330px, 94vw);
+    }
+
+    .home-primary-actions #start-btn {
+        min-height: 52px;
+        font-size: 14px;
+    }
+
+    .home-mode-stack,
+    .local-records-summary {
+        width: min(330px, 94vw);
+    }
+
+    .daily-mode-card {
+        grid-template-columns: minmax(0, 1fr) auto;
+        padding: 10px;
+    }
+
+    .daily-mode-copy span {
+        font-size: 11px;
+    }
+
+    .daily-mode-card #daily-run-btn {
+        min-width: 118px;
+        padding: 9px 10px;
+        font-size: 9px;
+    }
+
+    #mobile-controls:not([hidden]) {
+        grid-template-columns: 78px minmax(100px, 1fr) 78px;
+        gap: 5px;
+        padding-inline: 8px !important;
+    }
+
+    #mobile-controls .mobile-trade-primary {
+        width: 74px;
+        height: 74px;
+    }
+
+    .game-coachmark {
+        bottom: calc(100px + env(safe-area-inset-bottom));
+        padding: 10px;
+        align-items: flex-start;
+    }
+
+    .game-coachmark-copy strong {
+        font-size: 8px;
+    }
+
+    .game-coachmark-copy span {
+        font-size: 12px;
+    }
+
+    #settlement-screen .profit-card {
+        width: min(390px, 96%);
+        padding: 16px;
+    }
+
+    .settlement-excess-summary {
+        font-size: 31px;
+    }
+
+    .settlement-comparison-row {
+        grid-template-columns: 52px minmax(0, 1fr) 72px;
+        font-size: 8px;
+    }
+
+    html[lang='zh-CN'] .stats-box {
+        font-size: 11px;
+    }
+
+    html[lang='zh-CN'] .hud-header,
+    html[lang='zh-CN'] .excess-meter-label,
+    html[lang='zh-CN'] .excess-meter-label strong {
+        font-size: 10px;
+    }
+
+    html[lang='zh-CN'] .hud-main .hud-total,
+    html[lang='zh-CN'] .hud-main .hud-return {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 390px) {
+    #mobile-controls:not([hidden]) {
+        grid-template-columns: 70px minmax(96px, 1fr) 70px;
+        padding-inline: 5px !important;
+    }
+
+    #mobile-controls .mobile-trade-primary {
+        width: 68px;
+        height: 68px;
+    }
+
+    .mobile-speed-control {
+        grid-template-columns: 28px 38px 28px;
+        gap: 3px;
+        padding: 4px;
+    }
+
+    .mobile-speed-control .small-btn {
+        width: 28px;
+        height: 29px;
+        min-width: 28px;
+    }
+
+    .daily-mode-card {
+        grid-template-columns: 1fr;
+    }
+
+    .daily-mode-card #daily-run-btn {
+        grid-column: 1;
+        grid-row: auto;
+        width: 100%;
+    }
+
+    .daily-mode-card .daily-run-summary {
+        grid-row: auto;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .day-progress-fill,
+    .excess-meter-indicator,
+    .settlement-comparison-track i,
+    .game-feedback-toast {
+        transition: none;
+    }
+
+    .guide-target {
+        animation: none;
+        outline: 2px solid var(--game-cyan);
+        outline-offset: 3px;
+    }
+}
