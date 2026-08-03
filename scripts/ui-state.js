@@ -29,15 +29,19 @@
     function syncGameChrome() {
         if (!uiLayer) return;
         const visible = gameChromeStates.has(state);
-        uiLayer.hidden = !visible;
-        uiLayer.setAttribute('aria-hidden', String(!visible));
+        const shouldHide = !visible;
+        if (uiLayer.hidden !== shouldHide) uiLayer.hidden = shouldHide;
+        const ariaHidden = String(shouldHide);
+        if (uiLayer.getAttribute('aria-hidden') !== ariaHidden) {
+            uiLayer.setAttribute('aria-hidden', ariaHidden);
+        }
     }
 
     function transition(next, detail = {}) {
         if (!Object.values(STATES).includes(next)) return state;
         const previous = state;
         state = next;
-        root.dataset.uiState = state;
+        if (root.dataset.uiState !== state) root.dataset.uiState = state;
         syncGameChrome();
         if (previous !== next) emit('flappyk:ui-state', { previous, state, ...detail });
         return state;
@@ -53,8 +57,8 @@
         const changed = nextLayout !== layout || nextInput !== input;
         layout = nextLayout;
         input = nextInput;
-        root.dataset.layout = layout;
-        root.dataset.input = input;
+        if (root.dataset.layout !== layout) root.dataset.layout = layout;
+        if (root.dataset.input !== input) root.dataset.input = input;
         if (changed) emit('flappyk:layout-state', { layout, input, width, height });
     }
 
