@@ -179,9 +179,18 @@ button:active {
 }
 
 .card-details p {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
     text-align: left;
     font-size: 14px;
     margin-bottom: 15px;
+}
+
+.card-details p > span {
+    flex: 0 0 auto;
+    text-align: right;
 }
 
 .highlight {
@@ -225,10 +234,11 @@ button:active {
 }
 
 .action-buttons {
-    margin-top: -150px;
+    position: relative;
     z-index: 30;
     display: flex;
     gap: 20px;
+    margin-top: 20px;
 }
 
 /* Mobile Controls */
