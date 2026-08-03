@@ -503,7 +503,8 @@
             const value = Number(run.total_excess_pct);
             return Number.isFinite(value) && (best === null || value > best) ? value : best;
         }, null);
-        const profileBest = Number(profileResult.data?.best_excess);
+        const profileBestValue = profileResult.data?.best_excess;
+        const profileBest = profileBestValue == null ? null : Number(profileBestValue);
 
         state.cloudHistory = {
             loaded: true,
