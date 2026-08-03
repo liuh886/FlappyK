@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "pretest:e2e": "node --check pwa.js && node --check analytics.js && node --check membership-config.js && node --check membership.js && node --check membership-experience.js && node --check membership-run-hook.js && node --check sw.js && node --check tests/e2e/pwa.spec.js && node tests/pwa.test.js && node tests/membership-contract.test.js",
+    "validate:static": "node scripts/validate-static-contracts.mjs",
+    "pretest:e2e": "node scripts/validate-static-contracts.mjs --syntax-only",
     "test:e2e": "playwright test"
   },
   "devDependencies": {
