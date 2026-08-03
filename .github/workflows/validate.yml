@@ -8,22 +8,56 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  detect-impact:
+    runs-on: ubuntu-latest
+    outputs:
+      browser: ${{ steps.scope.outputs.browser }}
+    steps:
+      - name: Check out change history
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Decide whether browser acceptance is required
+        id: scope
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" != "pull_request" ]]; then
+            echo "browser=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git diff --name-only "$BASE_SHA" "$GITHUB_SHA" > changed-files.txt
+          cat changed-files.txt
+          if grep -Eq '^(index\.html|.*\.(js|css|html|webmanifest)$|scripts/|tests/e2e/|data/|icons/|supabase/|package(-lock)?\.json|playwright\.config\.cjs|\.github/workflows/validate\.yml)' changed-files.txt; then
+            echo "browser=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "browser=false" >> "$GITHUB_OUTPUT"
+          fi
+
   static-and-data:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: "24"
 
       - name: Generate raster social preview
         run: |
@@ -31,69 +65,11 @@ jobs:
           sudo apt-get install -y --no-install-recommends librsvg2-bin
           rsvg-convert -w 1200 -h 630 og-image.svg -o og-image.png
 
-      - name: Check JavaScript syntax
-        run: |
-          node --check qqq-loader.js
-          node --check scripts/friend-challenge-codec.js
-          node --check scripts/legend-score.js
-          node --check scripts/daily-run-core.js
-          node --check scripts/i18n-core.js
-          node --check scripts/i18n.js
-          node --check scripts/market-pass-rule.js
-          node --check scripts/market-goal-ui.js
-          node --check scripts/game-pacing.js
-          node --check scripts/player-profile.js
-          node --check game.js
-          node --check results.js
-          node --check legend-ticker.js
-          node --check custom-challenge.js
-          node --check experience.js
-          node --check core-hardening.js
-          node --check onboarding.js
-          node --check friend-challenge.js
-          node --check daily-run.js
-          node --check ui-polish.js
-          node --check leaderboard.js
-          node --check share-challenge.js
-          node --check card-export.js
-          node --check pwa.js
-          node --check analytics.js
-          node --check membership-config.js
-          node --check membership.js
-          node --check membership-run-hook.js
-          node --check sw.js
-          node --check scripts/leaderboard-ranking.js
-          node --check playwright.config.cjs
-          node --check tests/e2e/product-flow.spec.js
-          node --check tests/e2e/i18n.spec.js
-          node --check tests/e2e/mobile-controls-wide.spec.js
-          node --check tests/ui-regression.test.js
-          node --check tests/mobile-controls-layout.test.js
-          node --check tests/leaderboard-ranking.test.js
-          node --check tests/friend-challenge.test.js
-          node --check tests/legend-score.test.js
-          node --check tests/market-pass-rule.test.js
-          node --check tests/player-profile.test.js
-          node --check tests/daily-run.test.js
-          node --check tests/i18n.test.js
-          node --check tests/membership-contract.test.js
-
-      - name: Run regression checks
-        run: |
-          node tests/ui-regression.test.js
-          node tests/mobile-controls-layout.test.js
-          node tests/leaderboard-ranking.test.js
-          node tests/friend-challenge.test.js
-          node tests/legend-score.test.js
-          node tests/market-pass-rule.test.js
-          node tests/player-profile.test.js
-          node tests/daily-run.test.js
-          node tests/i18n.test.js
-          node tests/membership-contract.test.js
+      - name: Validate discovered JavaScript and product contracts
+        run: npm run validate:static
 
       - name: Check Python syntax
-        run: |
-          python -m py_compile fetch_all_data.py scripts/audit_bundled_data.py
+        run: python -m py_compile fetch_all_data.py scripts/audit_bundled_data.py
 
       - name: Check HTML, social preview, and leaderboard data
         run: |
@@ -116,92 +92,28 @@ jobs:
           width = int.from_bytes(image[16:20], "big")
           height = int.from_bytes(image[20:24], "big")
           assert (width, height) == (1200, 630), (width, height)
-          print("index.html, og-image.png, and leaderboard.json validated")
+          print("HTML, social preview, and leaderboard data validated")
           PY
-
-      - name: Check gameplay, PWA, analytics, and membership integration
-        run: |
-          grep -q '"QQQ"' fetch_all_data.py
-          grep -q 'qqq-loader.js' index.html
-          grep -q 'REAL HISTORICAL K-LINES' index.html
-          ! grep -q 'NOT LIVE DATA' index.html
-          grep -q 'onboarding.js' index.html
-          grep -q 'onboarding.css' index.html
-          grep -q 'onboarding-screen' index.html
-          grep -q 'onboarding-start-btn' index.html
-          grep -q 'POSITIVE EXCESS PASSES' index.html
-          grep -q 'scripts/friend-challenge-codec.js' index.html
-          grep -q 'scripts/legend-score.js' index.html
-          grep -q 'scripts/daily-run-core.js' index.html
-          grep -q 'scripts/i18n-core.js' index.html
-          grep -q 'scripts/i18n.js' index.html
-          grep -q 'i18n.css' index.html
-          grep -q 'flappyk_language_v1' scripts/i18n-core.js
-          grep -q 'language-toggle-btn' scripts/i18n.js
-          grep -q 'daily-run.js' index.html
-          grep -q 'daily-run.css' index.html
-          grep -q 'daily-run-btn' index.html
-          grep -q 'daily-run-summary' index.html
-          grep -q 'daily-run-result' index.html
-          grep -q 'scripts/market-pass-rule.js' index.html
-          grep -q 'scripts/game-pacing.js' index.html
-          grep -q 'scripts/player-profile.js' index.html
-          grep -q 'local-records.css' index.html
-          grep -q 'personal-profile-summary' index.html
-          grep -q 'personal-best-result' index.html
-          grep -q 'game-top-controls' index.html
-          grep -q 'pause-btn' index.html
-          grep -q 'game-back-btn' index.html
-          grep -q 'mobile-controls" hidden' index.html
-          ! grep -q 'btn-pause' index.html
-          grep -q 'BEAT THE MARKET' index.html
-          grep -q 'card-market-return' index.html
-          grep -q 'friend-challenge.js' index.html
-          grep -q 'friend-challenge-result' index.html
-          grep -q 'share-challenge.js' index.html
-          grep -q 'challenge-share-btn' index.html
-          grep -q 'og-image.png' index.html
-          grep -q 'leaderboard.js' index.html
-          grep -q 'leaderboard-open-btn' index.html
-          grep -q 'leaderboard-submit-btn' index.html
-          grep -q 'analytics.js' pwa.js
-          grep -q './analytics.js' sw.js
-          grep -q 'G-ZW4437KBXE' analytics.js
-          grep -q "track('play_start')" analytics.js
-          grep -q "track('run_complete'" analytics.js
-          grep -q 'membership-config.js' pwa.js
-          grep -q 'membership.js' pwa.js
-          grep -q 'membership-run-hook.js' pwa.js
-          grep -q './membership.css' sw.js
-          grep -q "entitlementCode: 'flappyk.pro'" membership-config.js
-          grep -q "from('entitlements')" membership.js
-          grep -q 'enable row level security' supabase/migrations/0001_membership_foundation.sql
-          grep -q 'issues:' .github/workflows/leaderboard.yml
-          grep -q 'LEADERBOARD_LIMIT = 10' scripts/leaderboard-ranking.js
 
       - name: Audit bundled equity split continuity
         run: python scripts/audit_bundled_data.py
 
   browser-smoke:
-    needs: static-and-data
+    needs: [detect-impact, static-and-data]
+    if: needs.detect-impact.outputs.browser == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+        uses: actions/checkout@v6
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: "24"
           cache: npm
 
-      - name: Install test dependencies
+      - name: Install locked test dependencies
         run: npm ci
 
       - name: Install Chromium
