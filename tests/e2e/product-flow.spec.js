@@ -21,7 +21,11 @@ async function preparePage(page) {
       createOscillator() {
         return {
           type: 'square',
-          frequency: { value: 0 },
+          frequency: {
+            value: 0,
+            setValueAtTime() {},
+            exponentialRampToValueAtTime() {},
+          },
           connect() {},
           start() {},
           stop() {},
