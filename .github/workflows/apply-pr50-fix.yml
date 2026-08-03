@@ -1,0 +1,56 @@
+name: Apply PR 50 fix
+
+on:
+  push:
+    branches:
+      - agent/cloud-run-reliability-v2
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: ${{ !contains(github.event.head_commit.message, '[pr50-fix-applied]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out PR branch
+        uses: actions/checkout@v6
+
+      - name: Preserve run-derived best Excess Return
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('membership.js')
+          source = path.read_text(encoding='utf-8')
+          old = """        const profileBest = Number(profileResult.data?.best_excess);
+
+          state.cloudHistory = {
+              loaded: true,
+              runs,
+              bestExcess: Number.isFinite(profileBest) ? profileBest : bestFromRuns,
+          """
+          new = """        const profileBestValue = profileResult.data?.best_excess;
+          const profileBest = profileBestValue == null ? null : Number(profileBestValue);
+
+          state.cloudHistory = {
+              loaded: true,
+              runs,
+              bestExcess: Number.isFinite(profileBest) ? profileBest : bestFromRuns,
+          """
+          if old not in source:
+              raise SystemExit('Expected cloud-history block was not found')
+          path.write_text(source.replace(old, new, 1), encoding='utf-8')
+
+      - name: Verify syntax and remove temporary workflow
+        run: |
+          node --check membership.js
+          rm .github/workflows/apply-pr50-fix.yml
+
+      - name: Commit the focused fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add membership.js .github/workflows/apply-pr50-fix.yml
+          git commit -m "fix: preserve cloud run best excess [pr50-fix-applied]"
+          git push
