@@ -6,12 +6,17 @@ const root = path.resolve(__dirname, '..');
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 
 const index = read('index.html');
+const i18n = read('i18n.css');
 const pixelRuntime = read('scripts/premium-ui-refinement.js');
 const architecture = read('docs/UI_ARCHITECTURE.md');
 
 assert.ok(
   !index.includes('visual-polish.css'),
   'The obsolete rounded/glass visual-polish layer must not be loaded after the pixel UI.',
+);
+assert.ok(
+  !i18n.includes('visual-polish.css'),
+  'Feature stylesheets must not reintroduce the obsolete visual layer through hidden imports.',
 );
 
 for (const assignment of ['updateUI =', 'startLevel =', 'endLevel =']) {
