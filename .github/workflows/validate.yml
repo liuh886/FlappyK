@@ -31,23 +31,13 @@ jobs:
 
           path = Path('membership.js')
           source = path.read_text(encoding='utf-8')
-          old = """        const profileBest = Number(profileResult.data?.best_excess);
-
-          state.cloudHistory = {
-              loaded: true,
-              runs,
-              bestExcess: Number.isFinite(profileBest) ? profileBest : bestFromRuns,
-          """
-          new = """        const profileBestValue = profileResult.data?.best_excess;
-          const profileBest = profileBestValue == null ? null : Number(profileBestValue);
-
-          state.cloudHistory = {
-              loaded: true,
-              runs,
-              bestExcess: Number.isFinite(profileBest) ? profileBest : bestFromRuns,
-          """
-          if old not in source:
-              raise SystemExit('Expected cloud-history block was not found')
+          old = "        const profileBest = Number(profileResult.data?.best_excess);"
+          new = "\n".join([
+              "        const profileBestValue = profileResult.data?.best_excess;",
+              "        const profileBest = profileBestValue == null ? null : Number(profileBestValue);",
+          ])
+          if source.count(old) != 1:
+              raise SystemExit(f'Expected one cloud-history line, found {source.count(old)}')
           path.write_text(source.replace(old, new, 1), encoding='utf-8')
 
       - name: Restore repository workflow and commit product fix
