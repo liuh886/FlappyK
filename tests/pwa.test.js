@@ -6,6 +6,7 @@ const indexSource = fs.readFileSync('index.html', 'utf8');
 const serviceWorkerSource = fs.readFileSync('sw.js', 'utf8');
 const pwaSource = fs.readFileSync('pwa.js', 'utf8');
 const analyticsSource = fs.readFileSync('analytics.js', 'utf8');
+const pixelStyles = fs.readFileSync('premium-ui-refinement.css', 'utf8');
 
 assert.equal(manifest.id, './');
 assert.equal(manifest.start_url, './?source=pwa');
@@ -41,12 +42,17 @@ assert.ok(indexSource.includes('rel="apple-touch-icon"'));
 assert.ok(indexSource.includes('visual-polish.css'));
 assert.ok(indexSource.includes('pwa.css'));
 assert.ok(indexSource.includes('premium-ui.css'));
+assert.ok(indexSource.includes('premium-ui-refinement.css'));
 assert.ok(indexSource.includes('scripts/ui-state.js'));
 assert.ok(indexSource.includes('scripts/premium-ui.js'));
 assert.ok(indexSource.includes('pwa.js'));
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v7'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v7'"));
+assert.ok(pixelStyles.includes("family=Pixelify+Sans"));
+assert.ok(pixelStyles.includes('--pixel-shadow-step'));
+assert.ok(pixelStyles.includes('--pixel-cut'));
+
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v8'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v8'"));
 assert.ok(serviceWorkerSource.includes("'./data.js'"));
 assert.ok(serviceWorkerSource.includes("'./analytics.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership-config.js'"));
@@ -55,6 +61,7 @@ assert.ok(serviceWorkerSource.includes("'./membership-experience.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership-run-hook.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership.css'"));
 assert.ok(serviceWorkerSource.includes("'./premium-ui.css'"));
+assert.ok(serviceWorkerSource.includes("'./premium-ui-refinement.css'"));
 assert.ok(serviceWorkerSource.includes("'./scripts/ui-state.js'"));
 assert.ok(serviceWorkerSource.includes("'./scripts/premium-ui.js'"));
 assert.ok(serviceWorkerSource.includes("'./manifest.webmanifest'"));
@@ -80,4 +87,4 @@ assert.ok(analyticsSource.includes("track('level_complete'"));
 assert.ok(analyticsSource.includes("track('run_complete'"));
 assert.ok(analyticsSource.includes("track('pwa_install'"));
 
-console.log('PWA manifest, icons, install UI, analytics, premium UI shell, membership shell, and refreshed offline cache checks passed');
+console.log('PWA manifest, icons, install UI, analytics, modern pixel UI shell, membership shell, and refreshed offline cache checks passed');
