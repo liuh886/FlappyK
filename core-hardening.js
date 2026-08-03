@@ -52,7 +52,8 @@
 
         if (levelDisp.textContent !== 'CUSTOM') {
             const visibleGame = Math.min(Math.max(level, 1), 3);
-            levelDisp.textContent = `${visibleGame}/3`;
+            // Keep the underlying value semantic. The modern pixel HUD owns the visual `/3` suffix.
+            levelDisp.textContent = String(visibleGame);
         }
     };
 

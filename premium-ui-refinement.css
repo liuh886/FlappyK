@@ -1,3 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+    --pixel-grid: 4px;
+    --pixel-font-display: 'Press Start 2P', monospace;
+    --pixel-font-ui: 'Pixelify Sans', 'Press Start 2P', monospace;
+    --pixel-bg: #070a0f;
+    --pixel-panel: #111827;
+    --pixel-panel-raised: #172033;
+    --pixel-panel-soft: rgba(17, 24, 39, 0.92);
+    --pixel-line: #344056;
+    --pixel-line-strong: #d8e2ef;
+    --pixel-text: #f7fbff;
+    --pixel-muted: #a9b5c7;
+    --pixel-yellow: #ffd84a;
+    --pixel-cyan: #5ce7f2;
+    --pixel-green: #46e08a;
+    --pixel-red: #ff6b6b;
+    --pixel-purple: #ad91ff;
+    --pixel-shadow: #020408;
+    --pixel-shadow-step: 4px 4px 0 var(--pixel-shadow);
+    --pixel-shadow-small: 3px 3px 0 var(--pixel-shadow);
+    --pixel-cut: polygon(
+        0 4px,
+        4px 4px,
+        4px 0,
+        calc(100% - 4px) 0,
+        calc(100% - 4px) 4px,
+        100% 4px,
+        100% calc(100% - 4px),
+        calc(100% - 4px) calc(100% - 4px),
+        calc(100% - 4px) 100%,
+        4px 100%,
+        4px calc(100% - 4px),
+        0 calc(100% - 4px)
+    );
+}
+
 #ui-layer[hidden] {
     display: none !important;
 }
@@ -17,57 +55,375 @@ html[data-ui-state='paused'] #btn-sell {
     pointer-events: none;
 }
 
-/* The persistent top HUD is intentionally limited to portfolio return and Excess. */
-.stats-box[data-composition='returns-only'] {
-    width: min(276px, calc(100% - 92px));
+body {
+    background:
+        linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+        #090d14;
+    background-size: 16px 16px;
+    font-family: var(--pixel-font-ui);
+    text-rendering: geometricPrecision;
 }
 
-html:not([lang='zh-CN']) .stats-box[data-composition='returns-only'],
-html:not([lang='zh-CN']) .stats-box[data-composition='returns-only'] .hud-stat-row,
-html:not([lang='zh-CN']) .stats-box[data-composition='returns-only'] .hud-stat-row span,
-html:not([lang='zh-CN']) .run-progress-panel,
-html:not([lang='zh-CN']) .speed-readout {
-    font-family: var(--font-pixel, 'Press Start 2P', monospace);
+body::before {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: repeating-linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.018) 0,
+        rgba(255, 255, 255, 0.018) 1px,
+        transparent 1px,
+        transparent 4px
+    );
+    content: '';
+    opacity: 0.38;
+    pointer-events: none;
+}
+
+#game-container {
+    border: 4px solid var(--pixel-line-strong);
+    border-radius: 0;
+    background: var(--pixel-bg);
+    box-shadow: 8px 8px 0 var(--pixel-shadow);
+    image-rendering: pixelated;
+}
+
+#game-container::after {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border: 2px solid rgba(7, 10, 15, 0.86);
+    content: '';
+    pointer-events: none;
+}
+
+.screen {
+    background:
+        radial-gradient(circle at 50% 34%, rgba(92, 231, 242, 0.045), transparent 40%),
+        linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+        rgba(7, 10, 15, 0.96);
+    background-size: auto, 16px 16px, 16px 16px, auto;
+}
+
+/* Modern pixel typography: display face for titles, readable pixel face for UI. */
+#game-title,
+.screen h1,
+.screen h2,
+.profit-card h2,
+.legend-ticker,
+.onboarding-kicker,
+.custom-unlocked {
+    font-family: var(--pixel-font-display);
     font-synthesis: none;
 }
 
-.stats-box[data-composition='returns-only'] .hud-main {
-    margin-top: 0;
-    padding-bottom: 7px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+body :where(
+    button,
+    input,
+    select,
+    textarea,
+    output,
+    .stats-box,
+    .controls-hint,
+    .run-progress-panel,
+    .game-coachmark,
+    .settlement-summary,
+    .leaderboard-panel,
+    .custom-challenge-panel,
+    .daily-mode-card,
+    .local-records-summary
+) {
+    font-family: var(--pixel-font-ui);
+    font-synthesis: none;
 }
 
-.stats-box[data-composition='returns-only'] .hud-main .hud-total,
-.stats-box[data-composition='returns-only'] .hud-main .hud-return,
-.stats-box[data-composition='returns-only'] .hud-main .hud-total span,
-.stats-box[data-composition='returns-only'] .hud-main .hud-return span {
+html:not([lang='zh-CN']) body :where(button, output, .hud-stat-row, .excess-meter, .run-progress-panel) {
+    letter-spacing: 0.015em;
+}
+
+/* Home screen: strong hierarchy, low decoration, hard pixel edges. */
+#start-screen {
+    padding: 72px 32px 40px;
+}
+
+#game-title {
+    margin-bottom: 20px;
+    color: var(--pixel-yellow);
+    font-size: clamp(40px, 5vw, 52px);
+    line-height: 1.15;
+    letter-spacing: 0.04em;
+    text-shadow: 4px 0 0 #7a4b00, 0 4px 0 #7a4b00, 4px 4px 0 var(--pixel-shadow);
+}
+
+#start-screen > p {
+    margin-bottom: 4px;
+    color: var(--pixel-muted);
+    font-family: var(--pixel-font-ui);
+    font-size: 18px;
+    line-height: 1.35;
+}
+
+.home-primary-actions #start-btn,
+.daily-mode-card,
+.local-records-summary,
+.home-secondary-actions button,
+#pwa-install-btn,
+.membership-launcher {
+    border-radius: 0 !important;
+    clip-path: var(--pixel-cut);
+}
+
+.home-primary-actions {
+    width: min(400px, 92%);
+    margin-top: 16px;
+}
+
+.home-primary-actions #start-btn {
+    min-height: 64px;
+    margin-top: 0;
+    border: 2px solid #dfffea;
+    background: var(--pixel-green);
+    box-shadow: var(--pixel-shadow-step);
+    color: #062313;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.home-primary-actions #start-btn:hover {
+    background: #63eca0;
+    filter: none;
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0 var(--pixel-shadow);
+}
+
+.home-primary-actions #start-btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: none;
+}
+
+.home-mode-stack {
+    width: min(584px, 94%);
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.daily-mode-card {
+    gap: 12px 20px;
+    padding: 16px 18px;
+    border: 2px solid #7765ab;
+    background: var(--pixel-panel);
+    box-shadow: var(--pixel-shadow-step);
+}
+
+.daily-mode-copy strong {
+    color: var(--pixel-purple);
+    font-family: var(--pixel-font-display);
     font-size: 10px;
-    font-weight: 400;
-    line-height: 1.45;
-    letter-spacing: 0;
+    line-height: 1.5;
+}
+
+.daily-mode-copy span {
+    color: var(--pixel-text);
+    font-family: var(--pixel-font-ui);
+    font-size: 16px;
+    line-height: 1.25;
+}
+
+.daily-mode-card #daily-run-btn {
+    min-width: 164px;
+    min-height: 48px;
+    border: 2px solid #dcd4ff;
+    border-radius: 0;
+    background: #6f55c9;
+    box-shadow: var(--pixel-shadow-small);
+    color: #fff;
+    font-size: 15px;
+}
+
+.local-records-summary {
+    width: min(584px, 94%);
+    padding: 10px 14px;
+    border: 2px solid var(--pixel-line);
+    background: #0d1420;
+    box-shadow: var(--pixel-shadow-small);
+    color: var(--pixel-muted);
+    font-size: 14px;
+}
+
+.home-secondary-actions button,
+#pwa-install-btn,
+.membership-launcher {
+    min-height: 38px;
+    border: 2px solid var(--pixel-line);
+    background: var(--pixel-panel);
+    box-shadow: 2px 2px 0 var(--pixel-shadow);
+    color: var(--pixel-muted);
+    font-size: 13px;
+}
+
+/* Persistent top HUD: two clear value cells and one chunky Excess meter. */
+.stats-box[data-composition='returns-only'] {
+    width: min(340px, calc(100% - 116px));
+    min-width: 0;
+    padding: 12px;
+    border: 2px solid var(--pixel-line-strong);
+    border-radius: 0;
+    background: var(--pixel-panel-soft);
+    box-shadow: var(--pixel-shadow-step);
+    clip-path: var(--pixel-cut);
+    backdrop-filter: none;
+}
+
+.stats-box[data-composition='returns-only'] .hud-main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 0;
+    padding: 0 0 10px;
+    border-bottom: 2px solid var(--pixel-line);
+}
+
+.stats-box[data-composition='returns-only'] .hud-main .hud-stat-row {
+    display: grid;
+    min-width: 0;
+    gap: 3px;
+    padding: 8px 10px;
+    border: 2px solid #273248;
+    background: #0b111c;
+    color: var(--pixel-text);
+    font-size: 0;
+    line-height: 1;
+}
+
+.stats-box[data-composition='returns-only'] .hud-total::before,
+.stats-box[data-composition='returns-only'] .hud-return::before {
+    color: var(--pixel-muted);
+    font-family: var(--pixel-font-display);
+    font-size: 8px;
+    line-height: 1.4;
+    letter-spacing: 0.035em;
+}
+
+.stats-box[data-composition='returns-only'] .hud-total::before {
+    content: 'TOTAL';
+}
+
+.stats-box[data-composition='returns-only'] .hud-return::before {
+    content: 'RETURN';
+}
+
+html[lang='zh-CN'] .stats-box[data-composition='returns-only'] .hud-total::before {
+    content: '总资产';
+}
+
+html[lang='zh-CN'] .stats-box[data-composition='returns-only'] .hud-return::before {
+    content: '收益';
+}
+
+.stats-box[data-composition='returns-only'] .hud-total span,
+.stats-box[data-composition='returns-only'] .hud-return span {
+    overflow: hidden;
+    color: var(--pixel-text);
+    font-family: var(--pixel-font-ui);
+    font-size: 17px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.05;
+    text-overflow: ellipsis;
+}
+
+.stats-box[data-composition='returns-only'] .hud-total span::before {
+    content: '$';
+}
+
+.stats-box[data-composition='returns-only'] .hud-return span.positive {
+    color: var(--pixel-green);
+}
+
+.stats-box[data-composition='returns-only'] .hud-return span.negative {
+    color: var(--pixel-red);
 }
 
 .stats-box[data-composition='returns-only'] .excess-meter {
-    margin-top: 7px;
+    margin-top: 10px;
 }
 
-/* Run position leaves the top chart clean and remains available without dominating it. */
+.excess-meter-label {
+    color: var(--pixel-muted);
+    font-family: var(--pixel-font-display);
+    font-size: 8px;
+    line-height: 1.4;
+}
+
+.excess-meter-label strong {
+    color: var(--pixel-red);
+    font-family: var(--pixel-font-ui);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.excess-meter[data-leading='true'] .excess-meter-label strong {
+    color: var(--pixel-green);
+}
+
+.excess-meter-track {
+    height: 8px;
+    margin-top: 6px;
+    border: 2px solid #29364b;
+    border-radius: 0;
+    background: #05080d;
+}
+
+.excess-meter-negative,
+.excess-meter-positive {
+    top: 0;
+    bottom: 0;
+    opacity: 0.65;
+}
+
+.excess-meter-zero {
+    top: -3px;
+    bottom: -3px;
+    width: 2px;
+    background: var(--pixel-line-strong);
+}
+
+.excess-meter-indicator {
+    width: 10px;
+    height: 10px;
+    border: 2px solid #fff;
+    border-radius: 0;
+    background: var(--pixel-red);
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.7);
+}
+
+.excess-meter[data-leading='true'] .excess-meter-indicator {
+    background: var(--pixel-green);
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.7);
+}
+
+/* Lower-left run panel: concise game state on the same 4px grid. */
 .run-progress-panel {
     position: absolute;
-    left: 12px;
-    bottom: 12px;
+    left: 16px;
+    bottom: 16px;
     z-index: 44;
     display: none;
-    width: 194px;
-    padding: 7px 9px;
-    border: 1px solid rgba(192, 205, 220, 0.2);
-    border-radius: 9px;
-    background: rgba(7, 11, 16, 0.54);
-    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.16);
-    color: var(--game-muted);
-    font-size: 8px;
-    line-height: 1.35;
-    backdrop-filter: blur(6px);
+    width: 224px;
+    padding: 10px 12px;
+    border: 2px solid var(--pixel-line);
+    border-radius: 0;
+    background: rgba(11, 17, 28, 0.92);
+    box-shadow: var(--pixel-shadow-small);
+    clip-path: var(--pixel-cut);
+    color: var(--pixel-muted);
+    font-family: var(--pixel-font-ui);
+    font-size: 13px;
+    line-height: 1.2;
+    backdrop-filter: none;
 }
 
 html[data-ui-state='playing'] .run-progress-panel,
@@ -76,98 +432,134 @@ html[data-ui-state='paused'] .run-progress-panel {
 }
 
 .run-progress-panel .hud-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    color: rgba(242, 246, 251, 0.74);
-    font-size: 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    color: var(--pixel-text);
+    font-size: 0;
+}
+
+.run-progress-panel .hud-game,
+.run-progress-panel .hud-day {
+    display: grid;
+    gap: 3px;
+    padding: 6px 8px;
+    border: 2px solid #263249;
+    background: #080d16;
+}
+
+.run-progress-panel .hud-game::before,
+.run-progress-panel .hud-day::before {
+    color: var(--pixel-muted);
+    font-family: var(--pixel-font-display);
+    font-size: 7px;
+    line-height: 1.4;
+}
+
+.run-progress-panel .hud-game::before {
+    content: 'RUN';
+}
+
+.run-progress-panel .hud-day::before {
+    content: 'DAY';
+}
+
+html[lang='zh-CN'] .run-progress-panel .hud-game::before {
+    content: '局数';
+}
+
+html[lang='zh-CN'] .run-progress-panel .hud-day::before {
+    content: '天数';
+}
+
+.run-progress-panel .hud-game span,
+.run-progress-panel .hud-day span {
+    color: var(--pixel-text);
+    font-family: var(--pixel-font-ui);
+    font-size: 15px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+
+.run-progress-panel .hud-game span::after {
+    content: '/3';
+    color: var(--pixel-muted);
+    font-size: 12px;
+}
+
+.run-progress-panel .hud-day span::after {
+    content: '/250';
+    color: var(--pixel-muted);
+    font-size: 12px;
 }
 
 .run-progress-panel .day-progress {
-    height: 2px;
-    margin-top: 6px;
+    height: 6px;
+    margin-top: 8px;
+    border: 2px solid #29364b;
+    border-radius: 0;
+    background: #05080d;
+}
+
+.run-progress-panel .day-progress-fill {
+    border-radius: 0;
+    background: var(--pixel-yellow);
+    transition: width 120ms steps(4, end);
 }
 
 .run-progress-panel .hud-details {
-    margin-top: 2px;
+    margin-top: 6px;
 }
 
 .run-progress-panel .hud-details summary {
-    width: 24px;
-    font-size: 8px;
-    opacity: 0.65;
+    width: auto;
+    color: var(--pixel-muted);
+    font-family: var(--pixel-font-ui);
+    font-size: 12px;
+    text-align: left;
+}
+
+.run-progress-panel .hud-details summary::before {
+    content: 'DATA '; 
 }
 
 .run-progress-panel .hud-details[open] {
-    gap: 4px 8px;
-    padding-top: 5px;
+    gap: 8px;
+    padding-top: 8px;
+    border-top: 2px solid var(--pixel-line);
 }
 
 .run-progress-panel .hud-detail-row {
-    font-size: 7px;
+    color: var(--pixel-muted);
+    font-size: 12px;
 }
 
-/* Settlement keeps the signed comparison and authoritative game verdict. */
-.profit-card .card-details {
-    display: grid;
+/* Desktop trade hints live near the return curve as translucent pixel tags. */
+.controls-hint {
+    border-radius: 0;
 }
 
-#settlement-screen.active .profit-card:not([data-details-expanded='true']) .card-details {
-    display: none;
-}
-
-.settlement-comparison-track {
-    position: relative;
-}
-
-.settlement-comparison-track::after {
-    position: absolute;
-    top: -2px;
-    bottom: -2px;
-    left: 50%;
-    width: 1px;
-    background: rgba(255, 255, 255, 0.62);
-    content: '';
-}
-
-.settlement-comparison-track i {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: 2%;
-}
-
-.settlement-comparison-track i[data-direction='positive'] {
-    background: rgba(6, 78, 47, 0.86);
-}
-
-.settlement-comparison-track i[data-direction='negative'] {
-    background: rgba(127, 29, 29, 0.86);
-}
-
-/* Full desktop browser composition: 12% larger frame with controls placed around the chart. */
 @media (min-width: 1025px) and (pointer: fine) {
     #game-container {
-        width: min(896px, calc(100vw - 24px), calc(133.333vh - 32px));
+        width: min(896px, calc(100vw - 32px), calc(133.333vh - 40px));
         aspect-ratio: 4 / 3;
     }
 
     #ui-layer {
         justify-content: flex-start;
-        padding: 12px;
+        padding: 16px;
     }
 
     .stats-box[data-composition='returns-only'] {
-        width: 276px;
-        min-width: 276px;
-        padding: 9px 10px;
+        width: 340px;
+        min-width: 340px;
     }
 
     .controls-hint {
         position: absolute;
-        left: 12px;
-        bottom: 82px;
+        left: 16px;
+        bottom: 116px;
         z-index: 43;
         display: block;
         width: auto;
@@ -176,7 +568,7 @@ html[data-ui-state='paused'] .run-progress-panel {
         border: 0;
         background: transparent;
         box-shadow: none;
-        opacity: 0.62;
+        opacity: 0.82;
         backdrop-filter: none;
         pointer-events: none;
     }
@@ -184,74 +576,102 @@ html[data-ui-state='paused'] .run-progress-panel {
     .trade-key-hints {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 5px;
+        gap: 8px;
     }
 
     .trade-key-hint {
         width: max-content;
-        padding: 3px 6px 3px 4px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 6px;
-        background: rgba(7, 11, 16, 0.28);
-        color: rgba(242, 246, 251, 0.76);
-        font-size: 8px;
-        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.75);
+        min-height: 32px;
+        padding: 5px 10px 5px 5px;
+        border: 2px solid rgba(216, 226, 239, 0.28);
+        border-radius: 0;
+        background: rgba(7, 10, 15, 0.7);
+        box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.52);
+        clip-path: var(--pixel-cut);
+        color: rgba(247, 251, 255, 0.86);
+        font-family: var(--pixel-font-ui);
+        font-size: 14px;
+        line-height: 1;
+        text-shadow: none;
     }
 
     .trade-key-hint .key {
-        min-width: 23px;
-        padding: 3px;
-        border-radius: 5px;
-        background: rgba(255, 255, 255, 0.74);
+        min-width: 28px;
+        padding: 5px;
+        border: 0;
+        border-radius: 0;
+        background: var(--pixel-yellow);
         box-shadow: none;
-        color: rgba(7, 11, 16, 0.9);
+        color: #171104;
+        font-family: var(--pixel-font-display);
+        font-size: 10px;
     }
 
     #game-top-controls {
-        top: 10px;
-        right: 10px;
+        top: 12px;
+        right: 12px;
         gap: 4px;
-        padding: 3px;
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        border-radius: 8px;
-        background: rgba(7, 11, 16, 0.5);
-        box-shadow: none;
-        backdrop-filter: blur(7px);
+        padding: 4px;
+        border: 2px solid var(--pixel-line);
+        border-radius: 0;
+        background: rgba(11, 17, 28, 0.94);
+        box-shadow: var(--pixel-shadow-small);
+        clip-path: var(--pixel-cut);
+        backdrop-filter: none;
     }
 
     #game-top-controls .desktop-speed-control {
-        grid-template-columns: 24px 38px 24px;
+        grid-template-columns: 30px 48px 30px;
         gap: 2px;
-        margin: 0 3px 0 0;
-        padding-right: 5px;
-        border-right: 1px solid rgba(255, 255, 255, 0.12);
+        margin: 0 4px 0 0;
+        padding-right: 6px;
+        border-right: 2px solid var(--pixel-line);
     }
 
     #game-top-controls .speed-step {
-        width: 24px;
-        min-width: 24px;
-        height: 24px;
-        min-height: 24px;
-        border-color: rgba(255, 255, 255, 0.22);
-        border-radius: 5px;
-        background: rgba(255, 255, 255, 0.035);
-        font-size: 14px;
+        width: 30px;
+        min-width: 30px;
+        height: 30px;
+        min-height: 30px;
+        border: 2px solid #4b5870;
+        border-radius: 0;
+        background: #121b2a;
+        color: var(--pixel-text);
+        font-family: var(--pixel-font-ui);
+        font-size: 18px;
+        box-shadow: none;
+    }
+
+    #game-top-controls .speed-step:hover {
+        background: #1d2940;
     }
 
     #game-top-controls .speed-readout {
-        min-width: 38px;
-        font-size: 8px;
+        min-width: 48px;
+        color: var(--pixel-yellow);
+        font-family: var(--pixel-font-ui);
+        font-size: 15px;
+        font-weight: 600;
     }
 
     #game-top-controls > button {
-        width: 26px;
-        height: 26px;
-        border-color: rgba(255, 255, 255, 0.56);
+        width: 34px;
+        height: 34px;
+        border: 2px solid #8794a8;
+        border-radius: 0;
+        background: #121b2a;
         box-shadow: none;
+    }
+
+    #game-back-btn::before {
+        font-size: 19px;
+    }
+
+    #pause-btn::before {
+        font-size: 14px;
     }
 }
 
-/* The desktop speed control is replaced by the virtual control cluster on touch layouts. */
 html[data-virtual-controls='true'] #game-top-controls .desktop-speed-control {
     display: none;
 }
@@ -260,39 +680,257 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
     display: none !important;
 }
 
-html[lang='zh-CN'] .stats-box {
+/* Coachmark: tutorial as an in-game message box, not a web modal. */
+.game-coachmark {
+    right: 16px;
+    bottom: 16px;
+    left: 16px;
+    max-width: 688px;
+    padding: 14px 16px;
+    border: 2px solid var(--pixel-cyan);
+    border-radius: 0;
+    background: #0c1420;
+    box-shadow: var(--pixel-shadow-step);
+    clip-path: var(--pixel-cut);
+    backdrop-filter: none;
+}
+
+.game-coachmark-copy {
+    gap: 6px;
+}
+
+.game-coachmark-copy strong {
+    color: var(--pixel-cyan);
+    font-family: var(--pixel-font-display);
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+.game-coachmark-copy span {
+    color: var(--pixel-text);
+    font-family: var(--pixel-font-ui);
+    font-size: 17px;
+    line-height: 1.25;
+}
+
+.game-coachmark button {
+    min-height: 36px;
+    padding: 8px 12px;
+    border: 2px solid var(--pixel-line);
+    border-radius: 0;
+    background: #111b2a;
+    box-shadow: 2px 2px 0 var(--pixel-shadow);
+    color: var(--pixel-muted);
+    font-size: 13px;
+}
+
+.guide-target {
+    animation: pixel-guide-pulse 800ms steps(2, end) infinite;
+    outline: 2px solid var(--pixel-cyan);
+    outline-offset: 3px;
+}
+
+@keyframes pixel-guide-pulse {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.35); }
+}
+
+/* Settlement and secondary panels use the same pixel shell. */
+.profit-card,
+.leaderboard-panel,
+.custom-challenge-panel,
+.onboarding-panel {
+    border-radius: 0;
+    clip-path: var(--pixel-cut);
+}
+
+#settlement-screen .profit-card {
+    width: min(548px, 94%);
+    padding: 24px;
+    border-width: 4px;
+    box-shadow: 8px 8px 0 var(--pixel-shadow);
+}
+
+.settlement-summary {
+    gap: 14px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.34);
+}
+
+.settlement-verdict {
+    font-family: var(--pixel-font-display);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.settlement-excess-summary {
+    font-family: var(--pixel-font-ui);
+    font-size: 48px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-shadow: 3px 3px 0 rgba(255, 255, 255, 0.26);
+}
+
+.settlement-comparison-row {
+    grid-template-columns: 72px minmax(0, 1fr) 92px;
+    gap: 10px;
+    font-family: var(--pixel-font-ui);
+    font-size: 14px;
+}
+
+.settlement-comparison-track {
+    position: relative;
+    height: 10px;
+    border: 2px solid rgba(0, 0, 0, 0.35);
+    border-radius: 0;
+    background: rgba(0, 0, 0, 0.16);
+}
+
+.settlement-comparison-track::after {
+    position: absolute;
+    top: -3px;
+    bottom: -3px;
+    left: 50%;
+    width: 2px;
+    background: rgba(255, 255, 255, 0.68);
+    content: '';
+}
+
+.settlement-comparison-track i {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2%;
+    border-radius: 0;
+}
+
+.settlement-comparison-track i[data-direction='positive'] {
+    background: #087443;
+}
+
+.settlement-comparison-track i[data-direction='negative'] {
+    background: #a51f2d;
+}
+
+.settlement-details-toggle,
+#settlement-screen > button,
+.custom-challenge-actions button,
+.leaderboard-panel button,
+.action-buttons button {
+    border-width: 2px;
+    border-radius: 0;
+    box-shadow: var(--pixel-shadow-small);
+    clip-path: var(--pixel-cut);
+    font-family: var(--pixel-font-ui);
+    font-size: 16px;
+}
+
+#settlement-screen #next-level-btn,
+#settlement-screen #champagne-btn,
+#settlement-screen #restart-btn {
+    min-height: 52px;
+}
+
+.leaderboard-panel,
+.custom-challenge-panel,
+.onboarding-panel {
+    border: 2px solid var(--pixel-line-strong);
+    background: var(--pixel-panel);
+    box-shadow: 8px 8px 0 var(--pixel-shadow);
+}
+
+.leaderboard-panel h2,
+.custom-challenge-panel h2,
+.onboarding-panel h2 {
+    font-size: 20px;
+    line-height: 1.4;
+}
+
+.leaderboard-subtitle,
+.custom-challenge-panel p,
+.onboarding-rule span {
+    font-family: var(--pixel-font-ui);
+    font-size: 16px;
+    line-height: 1.3;
+}
+
+.leaderboard-row {
+    min-height: 48px;
+    border-bottom: 2px solid #263249;
+    font-family: var(--pixel-font-ui);
     font-size: 15px;
 }
 
-html[lang='zh-CN'] .hud-header,
-html[lang='zh-CN'] .hud-detail-row,
-html[lang='zh-CN'] .excess-meter-label,
-html[lang='zh-CN'] .excess-meter-label strong {
-    font-size: 12px;
-}
-
+/* Mobile keeps the same visual grammar while preserving thumb controls. */
 @media (max-width: 720px), (pointer: coarse) {
-    html[lang='zh-CN'] .stats-box {
-        font-size: 12px;
+    body::before {
+        opacity: 0.24;
     }
 
-    html[lang='zh-CN'] .hud-header,
-    html[lang='zh-CN'] .excess-meter-label,
-    html[lang='zh-CN'] .excess-meter-label strong {
-        font-size: 11px;
+    #game-container {
+        border: 0;
+        box-shadow: none;
+    }
+
+    #ui-layer {
+        padding: max(8px, env(safe-area-inset-top)) 8px 0;
+    }
+
+    .stats-box[data-composition='returns-only'] {
+        width: min(304px, calc(100% - 72px));
+        padding: 8px;
+        border-width: 2px;
+        box-shadow: 3px 3px 0 var(--pixel-shadow);
+    }
+
+    .stats-box[data-composition='returns-only'] .hud-main {
+        gap: 6px;
+        padding-bottom: 7px;
+    }
+
+    .stats-box[data-composition='returns-only'] .hud-main .hud-stat-row {
+        gap: 2px;
+        padding: 6px 7px;
+    }
+
+    .stats-box[data-composition='returns-only'] .hud-total::before,
+    .stats-box[data-composition='returns-only'] .hud-return::before,
+    .excess-meter-label {
+        font-size: 7px;
+    }
+
+    .stats-box[data-composition='returns-only'] .hud-total span,
+    .stats-box[data-composition='returns-only'] .hud-return span,
+    .excess-meter-label strong {
+        font-size: 14px;
     }
 
     .run-progress-panel {
         left: max(8px, env(safe-area-inset-left));
-        bottom: calc(100px + env(safe-area-inset-bottom));
-        width: min(158px, 42vw);
-        padding: 6px 7px;
-        background: rgba(7, 11, 16, 0.46);
-        font-size: 7px;
+        bottom: calc(108px + env(safe-area-inset-bottom));
+        width: min(184px, 48vw);
+        padding: 8px;
+        box-shadow: 3px 3px 0 var(--pixel-shadow);
     }
 
     .run-progress-panel .hud-header {
-        font-size: 7px;
+        gap: 6px;
+    }
+
+    .run-progress-panel .hud-game,
+    .run-progress-panel .hud-day {
+        padding: 5px 6px;
+    }
+
+    .run-progress-panel .hud-game::before,
+    .run-progress-panel .hud-day::before {
+        font-size: 6px;
+    }
+
+    .run-progress-panel .hud-game span,
+    .run-progress-panel .hud-day span {
+        font-size: 13px;
     }
 
     .run-progress-panel .hud-details {
@@ -302,11 +940,144 @@ html[lang='zh-CN'] .excess-meter-label strong {
     .controls-hint {
         display: none !important;
     }
+
+    #mobile-controls:not([hidden]) {
+        grid-template-columns: 82px minmax(110px, 1fr) 82px;
+        gap: 6px;
+        padding: 10px 10px calc(12px + env(safe-area-inset-bottom)) !important;
+        background: linear-gradient(to top, rgba(7, 10, 15, 0.96), rgba(7, 10, 15, 0));
+    }
+
+    #mobile-controls .mobile-trade-primary {
+        width: 78px;
+        height: 78px;
+        border-width: 3px;
+        border-radius: 0;
+        background: #0d1623;
+        box-shadow: 4px 4px 0 var(--pixel-shadow);
+        clip-path: var(--pixel-cut);
+        font-family: var(--pixel-font-ui);
+        font-size: 16px;
+    }
+
+    #mobile-controls .buy-btn {
+        border-color: var(--pixel-green);
+        color: var(--pixel-green);
+    }
+
+    #mobile-controls .sell-btn {
+        border-color: var(--pixel-red);
+        color: var(--pixel-red);
+    }
+
+    .mobile-speed-control {
+        padding: 5px;
+        border: 2px solid var(--pixel-line);
+        border-radius: 0;
+        background: #0b111c;
+        box-shadow: 3px 3px 0 var(--pixel-shadow);
+        clip-path: var(--pixel-cut);
+        backdrop-filter: none;
+    }
+
+    .mobile-speed-control .small-btn {
+        border: 2px solid #4b5870;
+        border-radius: 0;
+        background: #121b2a;
+        box-shadow: none;
+    }
+
+    .mobile-speed-control .speed-readout {
+        font-family: var(--pixel-font-ui);
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .game-coachmark {
+        bottom: calc(108px + env(safe-area-inset-bottom));
+        padding: 12px;
+    }
+
+    .game-coachmark-copy strong {
+        font-size: 8px;
+    }
+
+    .game-coachmark-copy span {
+        font-size: 15px;
+    }
+
+    #start-screen {
+        padding: max(64px, calc(env(safe-area-inset-top) + 54px)) 16px max(28px, calc(env(safe-area-inset-bottom) + 22px));
+    }
+
+    #game-title {
+        font-size: clamp(34px, 10vw, 42px);
+    }
+
+    #start-screen > p {
+        font-size: 15px;
+    }
+
+    .home-primary-actions #start-btn {
+        min-height: 56px;
+        font-size: 19px;
+    }
+
+    .daily-mode-copy span,
+    .local-records-summary {
+        font-size: 14px;
+    }
+
+    #settlement-screen .profit-card {
+        padding: 18px;
+    }
+
+    .settlement-excess-summary {
+        font-size: 38px;
+    }
+
+    .settlement-comparison-row {
+        grid-template-columns: 58px minmax(0, 1fr) 78px;
+        font-size: 12px;
+    }
 }
 
 @media (max-width: 390px) {
+    .stats-box[data-composition='returns-only'] {
+        width: calc(100% - 66px);
+    }
+
     .run-progress-panel {
-        bottom: calc(92px + env(safe-area-inset-bottom));
-        width: 146px;
+        bottom: calc(98px + env(safe-area-inset-bottom));
+        width: 170px;
+    }
+
+    #mobile-controls:not([hidden]) {
+        grid-template-columns: 72px minmax(102px, 1fr) 72px;
+        padding-inline: 6px !important;
+    }
+
+    #mobile-controls .mobile-trade-primary {
+        width: 70px;
+        height: 70px;
+        font-size: 14px;
+    }
+
+    .mobile-speed-control {
+        grid-template-columns: 28px 42px 28px;
+        gap: 3px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .guide-target {
+        animation: none;
+    }
+
+    .day-progress-fill,
+    .excess-meter-indicator,
+    .settlement-comparison-track i,
+    .game-feedback-toast {
+        transition: none;
     }
 }

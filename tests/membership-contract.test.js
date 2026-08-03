@@ -8,6 +8,7 @@ const hookSource = fs.readFileSync('membership-run-hook.js', 'utf8');
 const membershipStyles = fs.readFileSync('membership.css', 'utf8');
 const i18nStyles = fs.readFileSync('i18n.css', 'utf8');
 const premiumStyles = fs.readFileSync('premium-ui.css', 'utf8');
+const pixelStyles = fs.readFileSync('premium-ui-refinement.css', 'utf8');
 const pwaSource = fs.readFileSync('pwa.js', 'utf8');
 const serviceWorkerSource = fs.readFileSync('sw.js', 'utf8');
 const migrationSource = fs.readFileSync('supabase/migrations/0001_membership_foundation.sql', 'utf8');
@@ -59,6 +60,8 @@ assert.ok(i18nStyles.includes("div:has(#target-return-display)"));
 assert.ok(i18nStyles.includes('font-size: 15px'));
 assert.ok(premiumStyles.includes('.home-secondary-actions'));
 assert.ok(premiumStyles.includes('.excess-meter-track'));
+assert.ok(pixelStyles.includes("--pixel-font-ui: 'Pixelify Sans'"));
+assert.ok(pixelStyles.includes('--pixel-grid: 4px'));
 
 assert.ok(hookSource.includes("getElementById('champagne-btn')"));
 assert.ok(hookSource.includes('isConfigured'));
@@ -71,14 +74,15 @@ assert.ok(pwaSource.includes("'./membership-experience.js'"));
 assert.ok(pwaSource.includes("'./membership-run-hook.js'"));
 assert.ok(pwaSource.includes("'./membership.css'"));
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v7'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v7'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v8'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v8'"));
 assert.ok(serviceWorkerSource.includes("'./membership-config.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership-experience.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership-run-hook.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership.css'"));
 assert.ok(serviceWorkerSource.includes("'./premium-ui.css'"));
+assert.ok(serviceWorkerSource.includes("'./premium-ui-refinement.css'"));
 
 assert.ok(migrationSource.includes('alter table public.profiles enable row level security'));
 assert.ok(migrationSource.includes('alter table public.game_runs enable row level security'));
@@ -89,4 +93,4 @@ assert.ok(migrationSource.includes('grant select on public.entitlements to authe
 assert.ok(!migrationSource.includes('grant insert on public.entitlements to authenticated'));
 assert.ok(!migrationSource.includes('grant update on public.entitlements to authenticated'));
 
-console.log('Membership configuration, right-most account badge, hidden Chinese goal row, premium PWA shell, result guidance, sync contract, and RLS boundary validated');
+console.log('Membership, typography, modern pixel UI cache, result guidance, sync contract, and RLS boundary validated');
