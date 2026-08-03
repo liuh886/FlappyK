@@ -7,14 +7,20 @@
     const mobileControls = document.getElementById('mobile-controls');
     const pauseButton = document.getElementById('pause-btn');
     const backButton = document.getElementById('game-back-btn');
-    const compactViewport = window.matchMedia('(max-width: 1024px)');
+    const narrowViewport = window.matchMedia('(max-width: 719px)');
     const coarsePointer = window.matchMedia('(pointer: coarse)');
     let paused = false;
     let gameActive = false;
 
-    function shouldShowVirtualControls() {
+    function wantsVirtualControls() {
+        const sharedLayout = window.FlappyKUiState;
+        if (sharedLayout) return sharedLayout.virtualControls;
         const hasTouch = Number(navigator.maxTouchPoints || 0) > 0;
-        return gameActive && (compactViewport.matches || coarsePointer.matches || hasTouch);
+        return narrowViewport.matches || coarsePointer.matches || hasTouch;
+    }
+
+    function shouldShowVirtualControls() {
+        return gameActive && wantsVirtualControls();
     }
 
     function syncControlVisibility() {
@@ -51,6 +57,7 @@
         stopAudio();
         syncPauseControl();
         syncControlVisibility();
+        window.FlappyKUiState?.transition?.(window.FlappyKUiState.STATES.PAUSED, { source: 'pacing' });
         return true;
     }
 
@@ -63,6 +70,7 @@
         gameInterval = setInterval(gameTick, TICK_RATE);
         syncPauseControl();
         syncControlVisibility();
+        window.FlappyKUiState?.transition?.(window.FlappyKUiState.STATES.PLAYING, { source: 'pacing' });
         return true;
     }
 
@@ -95,6 +103,7 @@
         previousStartLevel();
         setGameActive(true);
         syncPauseControl();
+        window.FlappyKUiState?.transition?.(window.FlappyKUiState.STATES.PLAYING, { source: 'pacing' });
     };
 
     const previousEndLevel = endLevel;
@@ -129,13 +138,14 @@
         if (document.hidden) pauseGame();
     });
 
-    [compactViewport, coarsePointer].forEach((mediaQuery) => {
+    [narrowViewport, coarsePointer].forEach((mediaQuery) => {
         if (typeof mediaQuery.addEventListener === 'function') {
             mediaQuery.addEventListener('change', syncControlVisibility);
         } else if (typeof mediaQuery.addListener === 'function') {
             mediaQuery.addListener(syncControlVisibility);
         }
     });
+    window.addEventListener('flappyk:layout-state', syncControlVisibility);
     window.addEventListener('resize', syncControlVisibility);
     window.addEventListener('orientationchange', syncControlVisibility);
 
