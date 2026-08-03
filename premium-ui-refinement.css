@@ -6,12 +6,6 @@
     display: none !important;
 }
 
-@media (min-width: 721px) and (pointer: fine) {
-    .controls-hint {
-        margin-top: 38px;
-    }
-}
-
 html:not([data-ui-state='home']):not([data-ui-state='run-complete']) .home-utility-bar {
     display: none !important;
 }
@@ -23,17 +17,99 @@ html[data-ui-state='paused'] #btn-sell {
     pointer-events: none;
 }
 
-html[lang='zh-CN'] .stats-box {
-    font-size: 15px;
+/* The persistent top HUD is intentionally limited to portfolio return and Excess. */
+.stats-box[data-composition='returns-only'] {
+    width: min(276px, calc(100% - 92px));
 }
 
-html[lang='zh-CN'] .hud-header,
-html[lang='zh-CN'] .hud-detail-row,
-html[lang='zh-CN'] .excess-meter-label,
-html[lang='zh-CN'] .excess-meter-label strong {
-    font-size: 12px;
+html:not([lang='zh-CN']) .stats-box[data-composition='returns-only'],
+html:not([lang='zh-CN']) .stats-box[data-composition='returns-only'] .hud-stat-row,
+html:not([lang='zh-CN']) .stats-box[data-composition='returns-only'] .hud-stat-row span,
+html:not([lang='zh-CN']) .run-progress-panel,
+html:not([lang='zh-CN']) .speed-readout {
+    font-family: var(--font-pixel, 'Press Start 2P', monospace);
+    font-synthesis: none;
 }
 
+.stats-box[data-composition='returns-only'] .hud-main {
+    margin-top: 0;
+    padding-bottom: 7px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stats-box[data-composition='returns-only'] .hud-main .hud-total,
+.stats-box[data-composition='returns-only'] .hud-main .hud-return,
+.stats-box[data-composition='returns-only'] .hud-main .hud-total span,
+.stats-box[data-composition='returns-only'] .hud-main .hud-return span {
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 1.45;
+    letter-spacing: 0;
+}
+
+.stats-box[data-composition='returns-only'] .excess-meter {
+    margin-top: 7px;
+}
+
+/* Run position leaves the top chart clean and remains available without dominating it. */
+.run-progress-panel {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+    z-index: 44;
+    display: none;
+    width: 194px;
+    padding: 7px 9px;
+    border: 1px solid rgba(192, 205, 220, 0.2);
+    border-radius: 9px;
+    background: rgba(7, 11, 16, 0.54);
+    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.16);
+    color: var(--game-muted);
+    font-size: 8px;
+    line-height: 1.35;
+    backdrop-filter: blur(6px);
+}
+
+html[data-ui-state='onboarding'] .run-progress-panel,
+html[data-ui-state='playing'] .run-progress-panel,
+html[data-ui-state='paused'] .run-progress-panel {
+    display: block;
+}
+
+.run-progress-panel .hud-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    color: rgba(242, 246, 251, 0.74);
+    font-size: 8px;
+}
+
+.run-progress-panel .day-progress {
+    height: 2px;
+    margin-top: 6px;
+}
+
+.run-progress-panel .hud-details {
+    margin-top: 2px;
+}
+
+.run-progress-panel .hud-details summary {
+    width: 24px;
+    font-size: 8px;
+    opacity: 0.65;
+}
+
+.run-progress-panel .hud-details[open] {
+    gap: 4px 8px;
+    padding-top: 5px;
+}
+
+.run-progress-panel .hud-detail-row {
+    font-size: 7px;
+}
+
+/* Settlement keeps the signed comparison and authoritative game verdict. */
 .profit-card .card-details {
     display: grid;
 }
@@ -71,6 +147,131 @@ html[lang='zh-CN'] .excess-meter-label strong {
     background: rgba(127, 29, 29, 0.86);
 }
 
+/* Full desktop browser composition: 12% larger frame with controls placed around the chart. */
+@media (min-width: 1025px) and (pointer: fine) {
+    #game-container {
+        width: min(896px, calc(100vw - 24px), calc(133.333vh - 32px));
+        aspect-ratio: 4 / 3;
+    }
+
+    #ui-layer {
+        justify-content: flex-start;
+        padding: 12px;
+    }
+
+    .stats-box[data-composition='returns-only'] {
+        width: 276px;
+        min-width: 276px;
+        padding: 9px 10px;
+    }
+
+    .controls-hint {
+        position: absolute;
+        left: 12px;
+        bottom: 82px;
+        z-index: 43;
+        display: block;
+        width: auto;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+        opacity: 0.62;
+        backdrop-filter: none;
+        pointer-events: none;
+    }
+
+    .trade-key-hints {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 5px;
+    }
+
+    .trade-key-hint {
+        width: max-content;
+        padding: 3px 6px 3px 4px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        background: rgba(7, 11, 16, 0.28);
+        color: rgba(242, 246, 251, 0.76);
+        font-size: 8px;
+        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.75);
+    }
+
+    .trade-key-hint .key {
+        min-width: 23px;
+        padding: 3px;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.74);
+        box-shadow: none;
+        color: rgba(7, 11, 16, 0.9);
+    }
+
+    #game-top-controls {
+        top: 10px;
+        right: 10px;
+        gap: 4px;
+        padding: 3px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 8px;
+        background: rgba(7, 11, 16, 0.5);
+        box-shadow: none;
+        backdrop-filter: blur(7px);
+    }
+
+    #game-top-controls .desktop-speed-control {
+        grid-template-columns: 24px 38px 24px;
+        gap: 2px;
+        margin: 0 3px 0 0;
+        padding-right: 5px;
+        border-right: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    #game-top-controls .speed-step {
+        width: 24px;
+        min-width: 24px;
+        height: 24px;
+        min-height: 24px;
+        border-color: rgba(255, 255, 255, 0.22);
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.035);
+        font-size: 14px;
+    }
+
+    #game-top-controls .speed-readout {
+        min-width: 38px;
+        font-size: 8px;
+    }
+
+    #game-top-controls > button {
+        width: 26px;
+        height: 26px;
+        border-color: rgba(255, 255, 255, 0.56);
+        box-shadow: none;
+    }
+}
+
+/* The desktop speed control is replaced by the virtual control cluster on touch layouts. */
+html[data-virtual-controls='true'] #game-top-controls .desktop-speed-control {
+    display: none;
+}
+
+html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-ui-state='paused']) .controls-hint {
+    display: none !important;
+}
+
+html[lang='zh-CN'] .stats-box {
+    font-size: 15px;
+}
+
+html[lang='zh-CN'] .hud-header,
+html[lang='zh-CN'] .hud-detail-row,
+html[lang='zh-CN'] .excess-meter-label,
+html[lang='zh-CN'] .excess-meter-label strong {
+    font-size: 12px;
+}
+
 @media (max-width: 720px), (pointer: coarse) {
     html[lang='zh-CN'] .stats-box {
         font-size: 12px;
@@ -80,5 +281,33 @@ html[lang='zh-CN'] .excess-meter-label strong {
     html[lang='zh-CN'] .excess-meter-label,
     html[lang='zh-CN'] .excess-meter-label strong {
         font-size: 11px;
+    }
+
+    .run-progress-panel {
+        left: max(8px, env(safe-area-inset-left));
+        bottom: calc(100px + env(safe-area-inset-bottom));
+        width: min(158px, 42vw);
+        padding: 6px 7px;
+        background: rgba(7, 11, 16, 0.46);
+        font-size: 7px;
+    }
+
+    .run-progress-panel .hud-header {
+        font-size: 7px;
+    }
+
+    .run-progress-panel .hud-details {
+        display: none;
+    }
+
+    .controls-hint {
+        display: none !important;
+    }
+}
+
+@media (max-width: 390px) {
+    .run-progress-panel {
+        bottom: calc(92px + env(safe-area-inset-bottom));
+        width: 146px;
     }
 }
