@@ -12,6 +12,13 @@ assert.ok(refinementJs.includes("topControls.insertBefore(speedControl, topContr
 assert.ok(refinementJs.includes("gameContainer?.appendChild(controlsHint)"));
 assert.ok(refinementJs.includes("stats.dataset.composition = 'returns-only'"));
 assert.ok(refinementJs.includes('usesVirtualControls()'));
+assert.ok(refinementJs.includes('function normalizeMetricRows()'));
+assert.ok(refinementJs.includes("labelElement.className = 'hud-metric-label'"));
+assert.ok(refinementJs.includes("button.textContent = ''"));
+assert.ok(refinementJs.includes("font-size: 15px !important"));
+assert.ok(refinementJs.includes("font-size: 12px !important"));
+assert.ok(refinementJs.includes("border-radius: 0 !important"));
+assert.ok(refinementJs.includes("white-space: nowrap"));
 
 assert.ok(refinementCss.includes("family=Pixelify+Sans"));
 assert.ok(refinementCss.includes("--pixel-font-display: 'Press Start 2P'"));
@@ -32,4 +39,4 @@ assert.ok(refinementCss.includes("html[data-virtual-controls='true'] #game-top-c
 assert.ok(serviceWorker.includes("flappyk-app-v8"));
 assert.ok(serviceWorker.includes("flappyk-runtime-v8"));
 
-console.log('Modern pixel typography, 4px grid, hard shadows, enlarged frame, HUD placement, controls, and PWA cache contracts passed');
+console.log('Modern pixel typography, normalized HUD labels, hard utility chrome, enlarged frame, controls, and PWA cache contracts passed');
