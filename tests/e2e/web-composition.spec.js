@@ -49,10 +49,34 @@ async function preparePage(page) {
   });
 }
 
-test('desktop game uses the enlarged frame and rebalanced HUD composition', async ({ page }) => {
+test('desktop game uses a proportionally scaled modern pixel interface', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await preparePage(page);
   await page.goto('/');
+
+  const homeTypography = await page.evaluate(() => {
+    const title = getComputedStyle(document.querySelector('#game-title'));
+    const play = getComputedStyle(document.querySelector('#start-btn'));
+    const daily = getComputedStyle(document.querySelector('.daily-mode-copy span'));
+    return {
+      titleFont: title.fontFamily,
+      titleSize: title.fontSize,
+      playFont: play.fontFamily,
+      playSize: play.fontSize,
+      playRadius: play.borderRadius,
+      playShadow: play.boxShadow,
+      dailySize: daily.fontSize,
+    };
+  });
+
+  expect(homeTypography.titleFont).toContain('Press Start 2P');
+  expect(parseFloat(homeTypography.titleSize)).toBeGreaterThanOrEqual(40);
+  expect(homeTypography.playFont).toContain('Pixelify Sans');
+  expect(homeTypography.playSize).toBe('22px');
+  expect(homeTypography.dailySize).toBe('16px');
+  expect(homeTypography.playRadius).toBe('0px');
+  expect(homeTypography.playShadow).not.toBe('none');
+
   await page.getByRole('button', { name: 'PLAY', exact: true }).click();
 
   await expect(page.locator('#game-top-controls')).toBeVisible();
@@ -74,12 +98,18 @@ test('desktop game uses the enlarged frame and rebalanced HUD composition', asyn
 
   const layout = await page.evaluate(() => {
     const box = (selector) => document.querySelector(selector).getBoundingClientRect();
+    const style = (selector) => getComputedStyle(document.querySelector(selector));
     const container = box('#game-container');
     const run = box('#run-progress-panel');
     const trade = box('.controls-hint');
     const top = box('#game-top-controls');
-    const total = getComputedStyle(document.querySelector('.hud-total'));
-    const returns = getComputedStyle(document.querySelector('.hud-return'));
+    const total = style('.hud-total span');
+    const returns = style('.hud-return span');
+    const stats = style('.stats-box');
+    const speed = style('#desktop-speed-readout');
+    const tradeHint = style('.trade-key-hint');
+    const runValue = style('#level-display');
+    const excessValue = style('#live-excess-display');
     return {
       container: { x: container.x, y: container.y, width: container.width, height: container.height, bottom: container.bottom },
       run: { x: run.x, y: run.y, bottom: run.bottom },
@@ -89,23 +119,42 @@ test('desktop game uses the enlarged frame and rebalanced HUD composition', asyn
       returnFont: returns.fontFamily,
       totalSize: total.fontSize,
       returnSize: returns.fontSize,
+      speedSize: speed.fontSize,
+      tradeSize: tradeHint.fontSize,
+      runSize: runValue.fontSize,
+      excessSize: excessValue.fontSize,
+      statsRadius: stats.borderRadius,
+      statsBackdrop: stats.backdropFilter,
+      statsShadow: stats.boxShadow,
+      statsClip: stats.clipPath,
     };
   });
 
   expect(layout.container.width).toBeGreaterThanOrEqual(894);
   expect(layout.container.width).toBeLessThanOrEqual(898);
-  expect(layout.run.x - layout.container.x).toBeLessThan(24);
-  expect(layout.container.bottom - layout.run.bottom).toBeLessThan(24);
-  expect(layout.trade.x - layout.container.x).toBeLessThan(40);
-  expect(layout.trade.y).toBeGreaterThan(layout.container.y + layout.container.height * 0.7);
-  expect(layout.top.x).toBeGreaterThan(layout.container.x + layout.container.width * 0.65);
-  expect(layout.top.y - layout.container.y).toBeLessThan(24);
-  expect(layout.totalFont).toBe(layout.returnFont);
-  expect(layout.totalFont).toContain('Press Start 2P');
-  expect(layout.totalSize).toBe(layout.returnSize);
+  expect(layout.run.x - layout.container.x).toBeLessThan(28);
+  expect(layout.container.bottom - layout.run.bottom).toBeLessThan(28);
+  expect(layout.trade.x - layout.container.x).toBeLessThan(44);
+  expect(layout.trade.y).toBeGreaterThan(layout.container.y + layout.container.height * 0.68);
+  expect(layout.top.x).toBeGreaterThan(layout.container.x + layout.container.width * 0.62);
+  expect(layout.top.y - layout.container.y).toBeLessThan(28);
+
+  expect(layout.totalFont).toContain('Pixelify Sans');
+  expect(layout.returnFont).toContain('Pixelify Sans');
+  expect(layout.totalSize).toBe('17px');
+  expect(layout.returnSize).toBe('17px');
+  expect(layout.excessSize).toBe('16px');
+  expect(layout.speedSize).toBe('15px');
+  expect(layout.tradeSize).toBe('14px');
+  expect(layout.runSize).toBe('15px');
+
+  expect(layout.statsRadius).toBe('0px');
+  expect(layout.statsBackdrop).toBe('none');
+  expect(layout.statsShadow).not.toBe('none');
+  expect(layout.statsClip).not.toBe('none');
 });
 
-test('mobile run progress stays above the virtual control zone', async ({ page }) => {
+test('mobile preserves pixel scale and keeps run progress above virtual controls', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await preparePage(page);
   await page.goto('/');
@@ -118,7 +167,24 @@ test('mobile run progress stays above the virtual control zone', async ({ page }
   const positions = await page.evaluate(() => {
     const run = document.querySelector('#run-progress-panel').getBoundingClientRect();
     const controls = document.querySelector('#mobile-controls').getBoundingClientRect();
-    return { runBottom: run.bottom, controlsTop: controls.top };
+    const buy = getComputedStyle(document.querySelector('#btn-buy'));
+    const speed = getComputedStyle(document.querySelector('#mobile-speed-readout'));
+    const hud = getComputedStyle(document.querySelector('.hud-total span'));
+    return {
+      runBottom: run.bottom,
+      controlsTop: controls.top,
+      buySize: buy.fontSize,
+      buyRadius: buy.borderRadius,
+      buyShadow: buy.boxShadow,
+      speedSize: speed.fontSize,
+      hudSize: hud.fontSize,
+    };
   });
+
   expect(positions.runBottom).toBeLessThanOrEqual(positions.controlsTop + 8);
+  expect(parseFloat(positions.buySize)).toBeGreaterThanOrEqual(14);
+  expect(positions.buyRadius).toBe('0px');
+  expect(positions.buyShadow).not.toBe('none');
+  expect(positions.speedSize).toBe('14px');
+  expect(positions.hudSize).toBe('14px');
 });
