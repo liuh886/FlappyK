@@ -1,5 +1,5 @@
-const APP_CACHE = 'flappyk-app-v8';
-const RUNTIME_CACHE = 'flappyk-runtime-v8';
+const APP_CACHE = 'flappyk-app-v9';
+const RUNTIME_CACHE = 'flappyk-runtime-v9';
 
 const APP_SHELL = [
     './',
@@ -23,6 +23,7 @@ const APP_SHELL = [
     './premium-ui.css',
     './premium-ui-refinement.css',
     './membership.css',
+    './membership-sync.css',
     './data.js',
     './qqq-loader.js',
     './scripts/friend-challenge-codec.js',
@@ -30,6 +31,7 @@ const APP_SHELL = [
     './scripts/daily-run-core.js',
     './scripts/i18n-core.js',
     './scripts/i18n.js',
+    './scripts/cloud-run-sync-core.js',
     './game.js',
     './scripts/market-pass-rule.js',
     './results.js',
