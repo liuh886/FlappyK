@@ -4,6 +4,17 @@
     const root = document.documentElement;
     const canvasElement = document.getElementById('game-canvas');
     const gameContainer = document.getElementById('game-container');
+    const topControls = document.getElementById('game-top-controls');
+    const controlsHint = document.querySelector('.controls-hint');
+    const DESKTOP_CANVAS_WIDTH = 896;
+    const DESKTOP_CANVAS_HEIGHT = 672;
+
+    function usesVirtualControls() {
+        if (window.FlappyKUiState) return window.FlappyKUiState.virtualControls;
+        return window.matchMedia?.('(pointer: coarse)').matches
+            || Number(navigator.maxTouchPoints || 0) > 0
+            || window.innerWidth < 720;
+    }
 
     function restoreLegacyGoalNode() {
         if (document.getElementById('target-return-display')) return;
@@ -14,6 +25,40 @@
         row.setAttribute('aria-hidden', 'true');
         row.append('GOAL: ', targetDisp);
         document.querySelector('.hud-details')?.appendChild(row);
+    }
+
+    function refineHudComposition() {
+        const stats = document.querySelector('.stats-box');
+        if (!stats) return;
+
+        let runPanel = document.getElementById('run-progress-panel');
+        if (!runPanel) {
+            runPanel = document.createElement('section');
+            runPanel.id = 'run-progress-panel';
+            runPanel.className = 'run-progress-panel';
+            runPanel.setAttribute('aria-label', 'Run progress');
+            gameContainer?.appendChild(runPanel);
+        }
+
+        const header = stats.querySelector('.hud-header');
+        const progress = stats.querySelector('.day-progress');
+        const details = stats.querySelector('.hud-details');
+        [header, progress, details].filter(Boolean).forEach((element) => {
+            if (element.parentElement !== runPanel) runPanel.appendChild(element);
+        });
+
+        stats.dataset.composition = 'returns-only';
+        runPanel.dataset.composition = 'run-progress';
+    }
+
+    function refineDesktopControls() {
+        const speedControl = document.querySelector('.desktop-speed-control');
+        if (speedControl && topControls && speedControl.parentElement !== topControls) {
+            topControls.insertBefore(speedControl, topControls.firstChild);
+        }
+        if (controlsHint && controlsHint.parentElement !== gameContainer) {
+            gameContainer?.appendChild(controlsHint);
+        }
     }
 
     function readLiveMetrics() {
@@ -95,46 +140,55 @@
         syncSettlementVerdict();
     }
 
-    function guideTargetSelector(step) {
-        const useVirtualControls = window.FlappyKUiState?.virtualControls === true;
-        if (step === 'buy') return useVirtualControls ? '#btn-buy' : '.trade-hint-buy';
-        if (step === 'sell') return useVirtualControls ? '#btn-sell' : '.trade-hint-sell';
-        return null;
-    }
-
     function syncGuideTarget() {
         const guide = document.querySelector('.game-coachmark[data-active="true"]');
         if (!guide) return;
-        const selector = guideTargetSelector(guide.dataset.step);
-        if (!selector) return;
+        const step = guide.dataset.step;
+        if (!['buy', 'sell'].includes(step)) return;
 
-        document.querySelectorAll('.guide-target').forEach((element) => {
-            element.classList.remove('guide-target');
-        });
+        document.querySelectorAll('.trade-hint-buy, .trade-hint-sell, #btn-buy, #btn-sell')
+            .forEach((element) => element.classList.remove('guide-target'));
+        const selector = usesVirtualControls()
+            ? `#btn-${step}`
+            : `.trade-hint-${step}`;
         document.querySelector(selector)?.classList.add('guide-target');
     }
 
     function syncCanvasLayout() {
         if (!canvasElement || typeof draw !== 'function') return;
-        const compact = window.FlappyKUiState?.layout === 'compact';
-        if (compact) {
+        if (usesVirtualControls()) {
             canvasElement.width = canvasElement.clientWidth || window.innerWidth;
             canvasElement.height = canvasElement.clientHeight || Math.round(window.innerHeight * 0.68);
         } else {
-            canvasElement.width = 800;
-            canvasElement.height = 600;
+            canvasElement.width = DESKTOP_CANVAS_WIDTH;
+            canvasElement.height = DESKTOP_CANVAS_HEIGHT;
         }
         if (typeof isPlaying !== 'undefined' && isPlaying) draw();
     }
 
     restoreLegacyGoalNode();
+    refineHudComposition();
+    refineDesktopControls();
     syncLiveExcess();
     syncCanvasLayout();
+    syncGuideTarget();
 
     const previousUpdateUI = updateUI;
     updateUI = function refinedUpdateUI() {
         const result = previousUpdateUI();
         syncLiveExcess();
+        return result;
+    };
+
+    const previousStartLevel = startLevel;
+    startLevel = function refinedStartLevel() {
+        const result = previousStartLevel();
+        refineHudComposition();
+        refineDesktopControls();
+        requestAnimationFrame(() => {
+            syncCanvasLayout();
+            syncGuideTarget();
+        });
         return result;
     };
 
@@ -145,8 +199,15 @@
         return result;
     };
 
+    const syncComposition = () => requestAnimationFrame(() => {
+        refineHudComposition();
+        refineDesktopControls();
+        syncCanvasLayout();
+        syncGuideTarget();
+    });
+
     if (gameContainer) {
-        new MutationObserver(() => requestAnimationFrame(syncGuideTarget)).observe(gameContainer, {
+        new MutationObserver(syncComposition).observe(gameContainer, {
             childList: true,
             subtree: true,
             attributes: true,
@@ -154,19 +215,20 @@
         });
     }
 
-    window.addEventListener('flappyk:layout-state', () => {
-        requestAnimationFrame(syncCanvasLayout);
-        requestAnimationFrame(syncGuideTarget);
-    });
-    window.addEventListener('resize', () => requestAnimationFrame(syncCanvasLayout));
-    window.addEventListener('orientationchange', () => requestAnimationFrame(syncCanvasLayout));
+    window.addEventListener('flappyk:layout-state', syncComposition);
+    window.addEventListener('resize', syncComposition);
+    window.addEventListener('orientationchange', syncComposition);
 
     window.FlappyKPremiumUIRefinement = {
+        DESKTOP_CANVAS_WIDTH,
+        DESKTOP_CANVAS_HEIGHT,
         restoreLegacyGoalNode,
+        refineHudComposition,
+        refineDesktopControls,
         syncLiveExcess,
         syncSettlementVerdict,
         syncSettlementComparison,
-        syncGuideTarget,
         syncCanvasLayout,
+        syncGuideTarget,
     };
 })();
