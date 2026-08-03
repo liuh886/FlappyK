@@ -87,7 +87,8 @@ assert.ok(hardeningSource.includes("addEventListener('click'"));
 assert.ok(hardeningSource.includes('maxStart + 1'));
 assert.ok(hardeningSource.includes('dataset.completedLevel'));
 assert.ok(hardeningSource.includes("title.textContent = 'PROFIT CARD'"));
-assert.ok(hardeningSource.includes('levelDisp.textContent = `${visibleGame}/3`'));
+assert.ok(hardeningSource.includes('levelDisp.textContent = String(visibleGame)'));
+assert.equal(hardeningSource.includes('levelDisp.textContent = `${visibleGame}/3`'), false);
 assert.ok(hardeningSource.includes("levelDisp.textContent !== 'CUSTOM'"));
 
 assert.ok(indexSource.includes('scripts/market-pass-rule.js'));
