@@ -33,6 +33,9 @@
         const now = typeof options.now === 'function' ? options.now : () => new Date().toISOString();
 
         let inflight = null;
+        let memoryRuns = [];
+        let storageReadable = Boolean(storage?.getItem);
+        let storageWritable = Boolean(storage?.setItem);
         let state = {
             status: 'local',
             queued: 0,
@@ -54,24 +57,26 @@
         }
 
         function read() {
-            if (!storage?.getItem) return [];
-            try {
-                return normalizeRuns(JSON.parse(storage.getItem(storageKey) || '[]'), limit);
-            } catch {
-                return [];
+            if (storageReadable) {
+                try {
+                    memoryRuns = normalizeRuns(JSON.parse(storage.getItem(storageKey) || '[]'), limit);
+                } catch {
+                    storageReadable = false;
+                }
             }
+            return normalizeRuns(memoryRuns, limit);
         }
 
         function write(runs) {
-            const normalized = normalizeRuns(runs, limit);
-            if (storage?.setItem) {
+            memoryRuns = normalizeRuns(runs, limit);
+            if (storageWritable) {
                 try {
-                    storage.setItem(storageKey, JSON.stringify(normalized));
+                    storage.setItem(storageKey, JSON.stringify(memoryRuns));
                 } catch {
-                    // Guest play and the in-memory result remain valid when storage is unavailable.
+                    storageWritable = false;
                 }
             }
-            return normalized;
+            return [...memoryRuns];
         }
 
         function refreshState(preferredStatus = null) {
