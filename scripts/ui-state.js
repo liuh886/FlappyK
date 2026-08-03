@@ -21,6 +21,7 @@
     let state = STATES.HOME;
     let layout = 'wide';
     let input = 'pointer';
+    let virtualControls = false;
 
     function emit(name, detail) {
         window.dispatchEvent(new CustomEvent(name, { detail }));
@@ -54,12 +55,25 @@
             || Number(navigator.maxTouchPoints || 0) > 0;
         const nextLayout = width < compactWidth || height < 700 || coarse ? 'compact' : 'wide';
         const nextInput = coarse ? 'touch' : 'pointer';
-        const changed = nextLayout !== layout || nextInput !== input;
+        const nextVirtualControls = coarse || width < compactWidth;
+        const changed = nextLayout !== layout
+            || nextInput !== input
+            || nextVirtualControls !== virtualControls;
         layout = nextLayout;
         input = nextInput;
+        virtualControls = nextVirtualControls;
         if (root.dataset.layout !== layout) root.dataset.layout = layout;
         if (root.dataset.input !== input) root.dataset.input = input;
-        if (changed) emit('flappyk:layout-state', { layout, input, width, height });
+        if (root.dataset.virtualControls !== String(virtualControls)) {
+            root.dataset.virtualControls = String(virtualControls);
+        }
+        if (changed) emit('flappyk:layout-state', {
+            layout,
+            input,
+            virtualControls,
+            width,
+            height,
+        });
     }
 
     function isActive(selector) {
@@ -111,6 +125,7 @@
         get state() { return state; },
         get layout() { return layout; },
         get input() { return input; },
+        get virtualControls() { return virtualControls; },
         transition,
         sync: inferFromDom,
         refreshLayout: computeLayout,
