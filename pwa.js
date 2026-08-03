@@ -126,6 +126,7 @@
         console.warn('FlappyK analytics could not be loaded.', error);
     });
 
+    ensureStylesheet('flappyk-hud-compact-styles', './hud-compact.css');
     ensureStylesheet('flappyk-membership-styles', './membership.css');
     ensureStylesheet('flappyk-membership-sync-styles', './membership-sync.css');
     void loadScript('flappyk-membership-config', './membership-config.js')

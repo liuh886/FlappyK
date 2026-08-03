@@ -49,10 +49,12 @@ async function preparePage(page) {
   });
 }
 
-test('desktop game uses a proportionally scaled modern pixel interface', async ({ page }) => {
+test('desktop game keeps a compact modern pixel HUD around the dominant chart', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await preparePage(page);
   await page.goto('/');
+
+  await expect(page.locator('#flappyk-hud-compact-styles')).toHaveCount(1);
 
   const homeTypography = await page.evaluate(() => {
     const title = getComputedStyle(document.querySelector('#game-title'));
@@ -104,6 +106,7 @@ test('desktop game uses a proportionally scaled modern pixel interface', async (
     const box = (selector) => document.querySelector(selector).getBoundingClientRect();
     const style = (selector) => getComputedStyle(document.querySelector(selector));
     const container = box('#game-container');
+    const statsBox = box('.stats-box');
     const run = box('#run-progress-panel');
     const trade = box('.controls-hint');
     const top = box('#game-top-controls');
@@ -116,7 +119,8 @@ test('desktop game uses a proportionally scaled modern pixel interface', async (
     const excessValue = style('#live-excess-display');
     return {
       container: { x: container.x, y: container.y, width: container.width, height: container.height, bottom: container.bottom },
-      run: { x: run.x, y: run.y, bottom: run.bottom },
+      stats: { x: statsBox.x, y: statsBox.y, width: statsBox.width, height: statsBox.height },
+      run: { x: run.x, y: run.y, width: run.width, height: run.height, bottom: run.bottom },
       trade: { x: trade.x, y: trade.y },
       top: { x: top.x, y: top.y },
       totalFont: total.fontFamily,
@@ -128,6 +132,7 @@ test('desktop game uses a proportionally scaled modern pixel interface', async (
       runSize: runValue.fontSize,
       excessSize: excessValue.fontSize,
       statsRadius: stats.borderRadius,
+      statsBorder: stats.borderTopWidth,
       statsBackdrop: stats.backdropFilter,
       statsShadow: stats.boxShadow,
       statsClip: stats.clipPath,
@@ -136,32 +141,43 @@ test('desktop game uses a proportionally scaled modern pixel interface', async (
 
   expect(layout.container.width).toBeGreaterThanOrEqual(894);
   expect(layout.container.width).toBeLessThanOrEqual(898);
-  expect(layout.run.x - layout.container.x).toBeLessThan(28);
-  expect(layout.container.bottom - layout.run.bottom).toBeLessThan(28);
+  expect(layout.run.x - layout.container.x).toBeLessThan(22);
+  expect(layout.container.bottom - layout.run.bottom).toBeLessThan(22);
   expect(layout.trade.x - layout.container.x).toBeLessThan(44);
-  expect(layout.trade.y).toBeGreaterThan(layout.container.y + layout.container.height * 0.68);
+  expect(layout.trade.y).toBeGreaterThan(layout.container.y + layout.container.height * 0.78);
   expect(layout.top.x).toBeGreaterThan(layout.container.x + layout.container.width * 0.62);
   expect(layout.top.y - layout.container.y).toBeLessThan(28);
 
+  expect(layout.stats.width).toBeLessThanOrEqual(318);
+  expect(layout.stats.height).toBeLessThanOrEqual(48);
+  expect(layout.run.width).toBeLessThanOrEqual(180);
+  expect(layout.run.height).toBeLessThanOrEqual(42);
+  const hudObstructionShare = (
+    (layout.stats.width * layout.stats.height) + (layout.run.width * layout.run.height)
+  ) / (layout.container.width * layout.container.height);
+  expect(hudObstructionShare).toBeLessThan(0.04);
+
   expect(layout.totalFont).toContain('Pixelify Sans');
   expect(layout.returnFont).toContain('Pixelify Sans');
-  expect(layout.totalSize).toBe('17px');
-  expect(layout.returnSize).toBe('17px');
-  expect(layout.excessSize).toBe('16px');
+  expect(layout.totalSize).toBe('13px');
+  expect(layout.returnSize).toBe('13px');
+  expect(layout.excessSize).toBe('13px');
   expect(layout.speedSize).toBe('15px');
-  expect(layout.tradeSize).toBe('14px');
-  expect(layout.runSize).toBe('15px');
+  expect(layout.tradeSize).toBe('13px');
+  expect(layout.runSize).toBe('12px');
 
   expect(layout.statsRadius).toBe('0px');
+  expect(layout.statsBorder).toBe('1px');
   expect(layout.statsBackdrop).toBe('none');
   expect(layout.statsShadow).not.toBe('none');
-  expect(layout.statsClip).not.toBe('none');
+  expect(layout.statsClip).toBe('none');
 });
 
-test('mobile preserves pixel scale and keeps run progress above virtual controls', async ({ page }) => {
+test('mobile uses an even lighter HUD above virtual controls', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await preparePage(page);
   await page.goto('/');
+  await expect(page.locator('#flappyk-hud-compact-styles')).toHaveCount(1);
   await page.getByRole('button', { name: 'PLAY', exact: true }).click();
 
   await expect(page.locator('#mobile-controls')).toBeVisible();
@@ -169,12 +185,18 @@ test('mobile preserves pixel scale and keeps run progress above virtual controls
   await expect(page.locator('#game-top-controls .desktop-speed-control')).toBeHidden();
 
   const positions = await page.evaluate(() => {
+    const stats = document.querySelector('.stats-box').getBoundingClientRect();
     const run = document.querySelector('#run-progress-panel').getBoundingClientRect();
     const controls = document.querySelector('#mobile-controls').getBoundingClientRect();
     const buy = getComputedStyle(document.querySelector('#btn-buy'));
     const speed = getComputedStyle(document.querySelector('#mobile-speed-readout'));
     const hud = getComputedStyle(document.querySelector('#total-display'));
+    const runValue = getComputedStyle(document.querySelector('#level-display'));
     return {
+      statsWidth: stats.width,
+      statsHeight: stats.height,
+      runWidth: run.width,
+      runHeight: run.height,
       runBottom: run.bottom,
       controlsTop: controls.top,
       buySize: buy.fontSize,
@@ -182,13 +204,19 @@ test('mobile preserves pixel scale and keeps run progress above virtual controls
       buyShadow: buy.boxShadow,
       speedSize: speed.fontSize,
       hudSize: hud.fontSize,
+      runSize: runValue.fontSize,
     };
   });
 
   expect(positions.runBottom).toBeLessThanOrEqual(positions.controlsTop + 8);
+  expect(positions.statsWidth).toBeLessThanOrEqual(320);
+  expect(positions.statsHeight).toBeLessThanOrEqual(44);
+  expect(positions.runWidth).toBeLessThanOrEqual(146);
+  expect(positions.runHeight).toBeLessThanOrEqual(38);
   expect(parseFloat(positions.buySize)).toBeGreaterThanOrEqual(14);
   expect(positions.buyRadius).toBe('0px');
   expect(positions.buyShadow).not.toBe('none');
   expect(positions.speedSize).toBe('14px');
-  expect(positions.hudSize).toBe('14px');
+  expect(positions.hudSize).toBe('11px');
+  expect(positions.runSize).toBe('11px');
 });
