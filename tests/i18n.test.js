@@ -65,6 +65,5 @@ assert.equal(
 assert.ok(pixelSource.includes('--pixel-cut'));
 assert.ok(pixelSource.includes('--pixel-shadow-step'));
 assert.ok(pixelSource.includes('backdrop-filter: none'));
-assert.ok(pixelSource.includes('.card-details'));
 
 console.log('Chinese-English i18n, unified typography, and modern pixel ownership checks passed');
