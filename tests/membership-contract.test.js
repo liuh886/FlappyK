@@ -3,15 +3,18 @@ const fs = require('node:fs');
 
 const configSource = fs.readFileSync('membership-config.js', 'utf8');
 const membershipSource = fs.readFileSync('membership.js', 'utf8');
+const syncCoreSource = fs.readFileSync('scripts/cloud-run-sync-core.js', 'utf8');
 const experienceSource = fs.readFileSync('membership-experience.js', 'utf8');
 const hookSource = fs.readFileSync('membership-run-hook.js', 'utf8');
 const membershipStyles = fs.readFileSync('membership.css', 'utf8');
+const syncStyles = fs.readFileSync('membership-sync.css', 'utf8');
 const i18nStyles = fs.readFileSync('i18n.css', 'utf8');
 const premiumStyles = fs.readFileSync('premium-ui.css', 'utf8');
 const pixelStyles = fs.readFileSync('premium-ui-refinement.css', 'utf8');
 const pwaSource = fs.readFileSync('pwa.js', 'utf8');
 const serviceWorkerSource = fs.readFileSync('sw.js', 'utf8');
 const migrationSource = fs.readFileSync('supabase/migrations/0001_membership_foundation.sql', 'utf8');
+const privacySource = fs.readFileSync('docs/CLOUD_RUN_SYNC.md', 'utf8');
 
 assert.ok(configSource.includes('enabled: true'));
 assert.ok(configSource.includes("supabaseUrl: 'https://blgwlycfcwvsupmqyqwn.supabase.co'"));
@@ -25,12 +28,27 @@ assert.ok(!/service_role/.test(configSource));
 assert.ok(membershipSource.includes("if (configured) void initialise()"));
 assert.ok(membershipSource.includes("from('entitlements')"));
 assert.ok(membershipSource.includes("from('game_runs')"));
+assert.ok(membershipSource.includes("onConflict: 'user_id,local_signature'"));
+assert.ok(membershipSource.includes('ignoreDuplicates: true'));
+assert.ok(membershipSource.includes('retryPendingRuns'));
+assert.ok(membershipSource.includes('loadCloudHistory'));
+assert.ok(membershipSource.includes("window.addEventListener('online'"));
+assert.ok(membershipSource.includes("status: 'local'"));
+assert.ok(membershipSource.includes("syncQueued: 'QUEUED'"));
+assert.ok(membershipSource.includes("syncSyncing: 'SYNCING'"));
+assert.ok(membershipSource.includes("syncSaved: 'SAVED TO CLOUD'"));
+assert.ok(membershipSource.includes("syncRetry: 'RETRY NEEDED'"));
 assert.ok(membershipSource.includes('can,'));
 assert.ok(membershipSource.includes('signInWithOAuth'));
 assert.ok(membershipSource.includes('signInWithOtp'));
 assert.ok(membershipSource.includes('persistSession: true'));
 assert.ok(membershipSource.includes("flowType: 'pkce'"));
 assert.ok(membershipSource.includes('Authorization: `Bearer ${token}`'));
+
+assert.ok(syncCoreSource.includes("new Set(['local', 'queued', 'syncing', 'saved', 'retry'])"));
+assert.ok(syncCoreSource.includes('let memoryRuns = []'));
+assert.ok(syncCoreSource.includes('if (inflight) return inflight'));
+assert.ok(syncCoreSource.includes("retry: () => flush('manual-retry')"));
 
 assert.ok(experienceSource.includes("utilityBar.id = 'home-utility-bar'"));
 assert.ok(experienceSource.includes("const host = document.getElementById('game-container') || document.body"));
@@ -51,6 +69,9 @@ assert.ok(membershipStyles.includes('max-width: calc(100% - 24px)'));
 assert.ok(membershipStyles.includes('.membership-result-prompt'));
 assert.ok(membershipStyles.includes('.membership-result-action'));
 assert.ok(membershipStyles.includes('max-height: calc(100dvh'));
+assert.ok(syncStyles.includes('.membership-sync-card'));
+assert.ok(syncStyles.includes("data-state=\"retry\""));
+assert.ok(syncStyles.includes('[data-membership-sync-retry]'));
 assert.ok(i18nStyles.includes('--font-zh-unified'));
 assert.ok(i18nStyles.includes('font-family: var(--font-zh-unified) !important'));
 assert.ok(!i18nStyles.includes('--font-zh-display'));
@@ -68,19 +89,23 @@ assert.ok(hookSource.includes('isConfigured'));
 assert.ok(hookSource.includes('queueCompletedRun'));
 assert.ok(hookSource.includes('buildRunSignature'));
 
-assert.ok(pwaSource.includes("'./membership-config.js'"));
-assert.ok(pwaSource.includes("'./membership.js'"));
-assert.ok(pwaSource.includes("'./membership-experience.js'"));
-assert.ok(pwaSource.includes("'./membership-run-hook.js'"));
-assert.ok(pwaSource.includes("'./membership.css'"));
+assert.ok(pwaSource.includes("loadScript('flappyk-membership-config', './membership-config.js')"));
+assert.ok(pwaSource.includes("loadScript('flappyk-cloud-run-sync-core', './scripts/cloud-run-sync-core.js')"));
+assert.ok(pwaSource.includes("loadScript('flappyk-membership-client', './membership.js')"));
+assert.ok(pwaSource.includes("loadScript('flappyk-membership-experience', './membership-experience.js')"));
+assert.ok(pwaSource.includes("loadScript('flappyk-membership-run-hook', './membership-run-hook.js')"));
+assert.ok(pwaSource.includes("ensureStylesheet('flappyk-membership-styles', './membership.css')"));
+assert.ok(pwaSource.includes("ensureStylesheet('flappyk-membership-sync-styles', './membership-sync.css')"));
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v8'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v8'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v9'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v9'"));
 assert.ok(serviceWorkerSource.includes("'./membership-config.js'"));
+assert.ok(serviceWorkerSource.includes("'./scripts/cloud-run-sync-core.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership-experience.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership-run-hook.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership.css'"));
+assert.ok(serviceWorkerSource.includes("'./membership-sync.css'"));
 assert.ok(serviceWorkerSource.includes("'./premium-ui.css'"));
 assert.ok(serviceWorkerSource.includes("'./premium-ui-refinement.css'"));
 
@@ -93,4 +118,8 @@ assert.ok(migrationSource.includes('grant select on public.entitlements to authe
 assert.ok(!migrationSource.includes('grant insert on public.entitlements to authenticated'));
 assert.ok(!migrationSource.includes('grant update on public.entitlements to authenticated'));
 
-console.log('Membership, typography, modern pixel UI cache, result guidance, sync contract, and RLS boundary validated');
+assert.ok(privacySource.includes('Only a completed three-game run summary is eligible for upload'));
+assert.ok(privacySource.includes('Partial runs, keystrokes'));
+assert.ok(privacySource.includes('not automatically trusted as public leaderboard evidence'));
+
+console.log('Membership, reliable cloud sync, typography, pixel UI cache, privacy, result guidance, and RLS boundary validated');
