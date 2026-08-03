@@ -227,7 +227,6 @@
             runPanel = document.createElement('section');
             runPanel.id = 'run-progress-panel';
             runPanel.className = 'run-progress-panel';
-            runPanel.setAttribute('aria-label', isChinese() ? '本局进度' : 'Run progress');
             gameContainer?.appendChild(runPanel);
         }
 
@@ -360,50 +359,51 @@
         if (typeof isPlaying !== 'undefined' && isPlaying) draw();
     }
 
-    installPixelCompatibilityStyles();
-    restoreLegacyGoalNode();
-    refineHudComposition();
-    refineDesktopControls();
-    syncLiveExcess();
-    syncCanvasLayout();
-    syncGuideTarget();
-
-    const previousUpdateUI = updateUI;
-    updateUI = function refinedUpdateUI() {
-        const result = previousUpdateUI();
-        normalizeMetricRows();
-        syncLiveExcess();
-        return result;
-    };
-
-    const previousStartLevel = startLevel;
-    startLevel = function refinedStartLevel() {
-        const result = previousStartLevel();
-        refineHudComposition();
-        refineDesktopControls();
-        requestAnimationFrame(() => {
-            syncCanvasLayout();
-            syncGuideTarget();
-        });
-        return result;
-    };
-
-    const previousEndLevel = endLevel;
-    endLevel = function refinedEndLevel() {
-        const result = previousEndLevel();
-        requestAnimationFrame(syncSettlementComparison);
-        return result;
-    };
-
-    const syncComposition = () => requestAnimationFrame(() => {
+    function syncComposition() {
         refineHudComposition();
         refineDesktopControls();
         syncCanvasLayout();
         syncGuideTarget();
-    });
+    }
+
+    function observeTextNodes(ids, callback) {
+        const observer = new MutationObserver(callback);
+        ids.forEach((id) => {
+            const node = document.getElementById(id);
+            if (node) observer.observe(node, { childList: true, characterData: true, subtree: true });
+        });
+        return observer;
+    }
+
+    installPixelCompatibilityStyles();
+    restoreLegacyGoalNode();
+    syncComposition();
+    syncLiveExcess();
+    syncSettlementComparison();
+
+    observeTextNodes(
+        ['total-display', 'return-display', 'level-display', 'day-display'],
+        () => {
+            normalizeMetricRows();
+            syncLiveExcess();
+        },
+    );
+
+    observeTextNodes(
+        ['card-level-return', 'card-market-return', 'card-excess-return', 'card-status'],
+        syncSettlementComparison,
+    );
+
+    const status = document.getElementById('card-status');
+    if (status) {
+        new MutationObserver(syncSettlementComparison).observe(status, {
+            attributes: true,
+            attributeFilter: ['class'],
+        });
+    }
 
     if (gameContainer) {
-        new MutationObserver(syncComposition).observe(gameContainer, {
+        new MutationObserver(() => requestAnimationFrame(syncGuideTarget)).observe(gameContainer, {
             childList: true,
             subtree: true,
             attributes: true,
@@ -411,9 +411,9 @@
         });
     }
 
-    window.addEventListener('flappyk:layout-state', syncComposition);
-    window.addEventListener('resize', syncComposition);
-    window.addEventListener('orientationchange', syncComposition);
+    window.addEventListener('flappyk:layout-state', () => requestAnimationFrame(syncComposition));
+    window.addEventListener('resize', () => requestAnimationFrame(syncComposition));
+    window.addEventListener('orientationchange', () => requestAnimationFrame(syncComposition));
 
     window.FlappyKPremiumUIRefinement = {
         DESKTOP_CANVAS_WIDTH,
