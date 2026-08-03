@@ -12,6 +12,10 @@ async function preparePage(page) {
   await page.addInitScript(() => {
     window.localStorage.setItem('flappyk_onboarding_seen_v1', '1');
     window.localStorage.setItem('flappyk_language_v1', 'en');
+    Object.defineProperty(navigator, 'maxTouchPoints', {
+      configurable: true,
+      value: 5,
+    });
     class SilentAudioContext {
       constructor() {
         this.currentTime = 0;
@@ -46,11 +50,14 @@ async function preparePage(page) {
   });
 }
 
-test('virtual controls stay inside a wide mobile viewport', async ({ page }) => {
+test('virtual controls stay inside a wide touch viewport', async ({ page }) => {
   await page.setViewportSize({ width: 820, height: 1180 });
   await preparePage(page);
   await page.goto('/');
 
+  await expect(page.locator('html')).toHaveAttribute('data-layout', 'compact');
+  await expect(page.locator('html')).toHaveAttribute('data-input', 'touch');
+  await expect(page.locator('html')).toHaveAttribute('data-virtual-controls', 'true');
   await page.getByRole('button', { name: 'PLAY', exact: true }).click();
 
   const controls = page.locator('#mobile-controls');
