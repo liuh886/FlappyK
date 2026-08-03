@@ -55,7 +55,7 @@ async function markOnboardingSeen(page) {
   });
 }
 
-test('first launch explains the rule, starts the game, and pause freezes progression', async ({ page }) => {
+test('first launch teaches by doing, exposes Excess, and pause freezes progression', async ({ page }) => {
   await preparePage(page);
   await page.goto('/');
   await page.evaluate(() => window.localStorage.clear());
@@ -63,34 +63,45 @@ test('first launch explains the rule, starts the game, and pause freezes progres
 
   await expect(page.getByRole('button', { name: 'PLAY', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'DAILY RUN', exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'LEADERBOARD', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: /LEADERBOARD|RANKINGS/, exact: true })).toBeVisible();
   await expect(page.locator('#game-top-controls')).toBeHidden();
   await expect(page.locator('#pause-btn')).toBeHidden();
 
   await page.getByRole('button', { name: 'PLAY', exact: true }).click();
-  await expect(page.locator('#onboarding-screen')).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'BEAT THE MARKET' })).toBeVisible();
-  await expect(page.locator('#onboarding-screen')).toContainText('POSITIVE EXCESS PASSES');
-
-  await page.getByRole('button', { name: 'GOT IT · START' }).click();
-  await expect(page.locator('#onboarding-screen')).toBeHidden();
   await expect(page.locator('#start-screen')).not.toHaveClass(/active/);
+  await expect(page.locator('#onboarding-screen')).toBeHidden();
+  await expect(page.locator('.game-coachmark')).toBeVisible();
+  await expect(page.locator('.game-coachmark')).toHaveAttribute('data-step', 'buy');
+  await expect(page.locator('.game-coachmark')).toContainText('STEP 1 · BUY');
+  await expect(page.locator('#excess-meter')).toBeVisible();
+  await expect(page.locator('#live-excess-display')).toHaveText(/^[+-]\d+\.\d{2}%$/);
+  await expect(page.locator('html')).toHaveAttribute('data-ui-state', 'onboarding');
   await expect(page.locator('#target-return-display')).toHaveText('BEAT THE MARKET');
-  await expect.poll(() => page.evaluate(() => window.FlappyKOnboarding.hasSeen())).toBe(true);
   await expect(page.locator('#game-top-controls')).toBeVisible();
-  await expect(page.locator('#pause-btn')).toBeVisible();
-  await expect(page.locator('#pause-btn')).toHaveText('');
+
+  await page.keyboard.press('ArrowUp');
+  await expect(page.locator('#game-feedback-toast')).toContainText('BOUGHT $1K');
+  await expect(page.locator('.game-coachmark')).toHaveAttribute('data-step', 'observe');
+  await expect.poll(async () => page.locator('.game-coachmark').getAttribute('data-step')).toBe('sell');
+
+  await page.keyboard.press('ArrowDown');
+  await expect(page.locator('#game-feedback-toast')).toContainText('SOLD $1K');
+  await expect(page.locator('.game-coachmark')).toHaveAttribute('data-step', 'goal');
+  await page.getByRole('button', { name: 'SKIP GUIDE' }).click();
+  await expect(page.locator('.game-coachmark')).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => window.FlappyKOnboarding.hasSeen())).toBe(true);
+  await expect(page.locator('#desktop-speed-readout')).toHaveText('15×');
+  await expect(page.locator('html')).toHaveAttribute('data-ui-state', 'playing');
 
   await page.locator('#pause-btn').click();
-  await expect(page.locator('#pause-btn')).toHaveText('');
   await expect(page.locator('#pause-btn')).toHaveAttribute('aria-label', 'Resume game');
   await expect(page.locator('#pause-btn')).toHaveAttribute('aria-pressed', 'true');
   const pausedDay = Number(await page.locator('#day-display').textContent());
   await page.waitForTimeout(750);
   await expect(page.locator('#day-display')).toHaveText(String(pausedDay));
+  await expect(page.locator('html')).toHaveAttribute('data-ui-state', 'paused');
 
   await page.locator('#pause-btn').click();
-  await expect(page.locator('#pause-btn')).toHaveText('');
   await expect(page.locator('#pause-btn')).toHaveAttribute('aria-label', 'Pause game');
   await expect(page.locator('#pause-btn')).toHaveAttribute('aria-pressed', 'false');
   await expect.poll(async () => Number(await page.locator('#day-display').textContent())).toBeGreaterThan(pausedDay);
@@ -177,11 +188,15 @@ test('mobile gameplay keeps virtual keys and top-right navigation visible', asyn
   await expect(page.locator('#btn-sell')).toBeVisible();
   await expect(page.locator('#btn-speed-down')).toBeVisible();
   await expect(page.locator('#btn-speed-up')).toBeVisible();
+  await expect(page.locator('#mobile-speed-readout')).toHaveText('15×');
   await expect(page.locator('.dpad-pause')).toHaveCount(0);
   await expect(page.locator('#pause-btn')).toHaveText('');
 
   const controlsDisplay = await page.locator('#mobile-controls').evaluate((element) => getComputedStyle(element).display);
-  expect(controlsDisplay).toBe('flex');
+  expect(controlsDisplay).toBe('grid');
+
+  const mobileOrder = await page.locator('#mobile-controls').evaluate((element) => Array.from(element.children).map((child) => child.id || child.className));
+  expect(mobileOrder).toEqual(['btn-buy', 'mobile-speed-control', 'btn-sell']);
 
   const topControlsBox = await page.locator('#game-top-controls').boundingBox();
   expect(topControlsBox).not.toBeNull();
