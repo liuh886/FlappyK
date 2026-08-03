@@ -3,6 +3,7 @@
 
     const root = document.documentElement;
     const canvasElement = document.getElementById('game-canvas');
+    const gameContainer = document.getElementById('game-container');
 
     function restoreLegacyGoalNode() {
         if (document.getElementById('target-return-display')) return;
@@ -69,12 +70,48 @@
         return Number.isFinite(number) ? number : 0;
     }
 
+    function syncSettlementVerdict() {
+        const status = document.getElementById('card-status');
+        const card = document.getElementById('profit-card');
+        const verdict = document.getElementById('settlement-verdict');
+        if (!status || !card || !verdict) return;
+
+        const isSuccess = status.classList.contains('card-positive');
+        const isFailure = status.classList.contains('card-negative');
+        if (!isSuccess && !isFailure) return;
+
+        verdict.textContent = isSuccess
+            ? (root.dataset.flappykLanguage === 'zh' ? '成功跑赢市场' : 'MARKET BEATEN')
+            : (root.dataset.flappykLanguage === 'zh' ? '本局市场获胜' : 'MARKET WON');
+        card.dataset.result = isSuccess ? 'success' : 'failure';
+    }
+
     function syncSettlementComparison() {
         const player = parsePercent(document.getElementById('card-level-return')?.textContent);
         const market = parsePercent(document.getElementById('card-market-return')?.textContent);
         const scale = Math.max(1, Math.abs(player), Math.abs(market));
         setSignedBar(document.getElementById('settlement-player-bar'), player, scale);
         setSignedBar(document.getElementById('settlement-market-bar'), market, scale);
+        syncSettlementVerdict();
+    }
+
+    function guideTargetSelector(step) {
+        const useVirtualControls = window.FlappyKUiState?.virtualControls === true;
+        if (step === 'buy') return useVirtualControls ? '#btn-buy' : '.trade-hint-buy';
+        if (step === 'sell') return useVirtualControls ? '#btn-sell' : '.trade-hint-sell';
+        return null;
+    }
+
+    function syncGuideTarget() {
+        const guide = document.querySelector('.game-coachmark[data-active="true"]');
+        if (!guide) return;
+        const selector = guideTargetSelector(guide.dataset.step);
+        if (!selector) return;
+
+        document.querySelectorAll('.guide-target').forEach((element) => {
+            element.classList.remove('guide-target');
+        });
+        document.querySelector(selector)?.classList.add('guide-target');
     }
 
     function syncCanvasLayout() {
@@ -108,14 +145,28 @@
         return result;
     };
 
-    window.addEventListener('flappyk:layout-state', () => requestAnimationFrame(syncCanvasLayout));
+    if (gameContainer) {
+        new MutationObserver(() => requestAnimationFrame(syncGuideTarget)).observe(gameContainer, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['data-step'],
+        });
+    }
+
+    window.addEventListener('flappyk:layout-state', () => {
+        requestAnimationFrame(syncCanvasLayout);
+        requestAnimationFrame(syncGuideTarget);
+    });
     window.addEventListener('resize', () => requestAnimationFrame(syncCanvasLayout));
     window.addEventListener('orientationchange', () => requestAnimationFrame(syncCanvasLayout));
 
     window.FlappyKPremiumUIRefinement = {
         restoreLegacyGoalNode,
         syncLiveExcess,
+        syncSettlementVerdict,
         syncSettlementComparison,
+        syncGuideTarget,
         syncCanvasLayout,
     };
 })();
