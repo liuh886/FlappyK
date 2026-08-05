@@ -25,27 +25,33 @@
         return element;
     }
 
+    function setText(element, value) {
+        if (element && element.textContent !== value) element.textContent = value;
+    }
+
     function installWeatherLayer() {
         if (!gameContainer || document.getElementById('market-weather-layer')) return;
 
         const layer = createElement('div', 'market-weather-layer');
         layer.id = 'market-weather-layer';
         layer.dataset.weather = 'clear';
-        layer.setAttribute('aria-hidden', 'true');
 
-        layer.append(
+        const decorativeElements = [
             createElement('span', 'weather-sun'),
             createElement('span', 'weather-cloud-bank'),
             createElement('span', 'weather-horizon'),
             createElement('span', 'weather-rain'),
             createElement('span', 'weather-vignette'),
-        );
+        ];
+        decorativeElements.forEach((element) => element.setAttribute('aria-hidden', 'true'));
+        layer.append(...decorativeElements);
 
         const status = createElement('div', 'weather-status');
         status.id = 'weather-status';
         status.setAttribute('role', 'status');
         status.setAttribute('aria-live', 'polite');
-        status.textContent = text('CLEAR · READY', '晴空 · 准备开始');
+        status.setAttribute('aria-atomic', 'true');
+        setText(status, text('CLEAR · READY', '晴空 · 准备开始'));
         layer.appendChild(status);
 
         gameContainer.prepend(layer);
@@ -60,6 +66,7 @@
         const topLine = createElement('div', 'home-console-topline');
         const brand = createElement('span', 'home-console-brand', 'FLAPPYK · POCKET MARKET ARCADE');
         const lamps = createElement('span', 'home-console-lamps');
+        lamps.setAttribute('aria-hidden', 'true');
         lamps.append(document.createElement('span'), document.createElement('span'), document.createElement('span'));
         topLine.append(brand, lamps);
 
@@ -70,6 +77,7 @@
 
         const footer = createElement('div', 'home-console-footer');
         const speaker = createElement('span', 'home-console-speaker');
+        speaker.setAttribute('aria-hidden', 'true');
         for (let index = 0; index < 14; index += 1) speaker.appendChild(document.createElement('span'));
         const legend = createElement('span', 'home-console-legend', text('BUY · SELL · BEAT THE MARKET', '买入 · 卖出 · 跑赢市场'));
         footer.append(speaker, legend);
@@ -131,9 +139,9 @@
         if (!layer || !status) return;
 
         const changed = layer.dataset.weather !== state;
-        layer.dataset.weather = state;
-        root.dataset.marketWeather = state;
-        if (!status.classList.contains('is-event')) status.textContent = stateLabel(state);
+        if (changed) layer.dataset.weather = state;
+        if (root.dataset.marketWeather !== state) root.dataset.marketWeather = state;
+        if (!status.classList.contains('is-event')) setText(status, stateLabel(state));
 
         if (changed && gameContainer) {
             gameContainer.classList.remove('weather-shift');
@@ -147,13 +155,13 @@
         if (!status) return;
 
         window.clearTimeout(eventTimer);
-        status.textContent = message;
+        setText(status, message);
         status.dataset.tone = tone;
         status.classList.add('is-event');
         eventTimer = window.setTimeout(() => {
             status.classList.remove('is-event');
             delete status.dataset.tone;
-            status.textContent = stateLabel(root.dataset.marketWeather || 'clear');
+            setText(status, stateLabel(root.dataset.marketWeather || 'clear'));
         }, 1150);
     }
 
@@ -192,7 +200,7 @@
             previousMetrics = null;
             const status = document.getElementById('weather-status');
             if (status && !status.classList.contains('is-event')) {
-                status.textContent = text('CLEAR · READY', '晴空 · 准备开始');
+                setText(status, text('CLEAR · READY', '晴空 · 准备开始'));
             }
             return;
         }
@@ -229,13 +237,14 @@
         const brand = document.querySelector('.home-console-brand');
         const kicker = document.querySelector('.home-console-kicker');
         const legend = document.querySelector('.home-console-legend');
-        if (brand) brand.textContent = 'FLAPPYK · POCKET MARKET ARCADE';
-        if (kicker) kicker.textContent = text('HIDDEN MARKET · PRESS PLAY', '隐藏市场 · 按下开始');
-        if (legend) legend.textContent = text('BUY · SELL · BEAT THE MARKET', '买入 · 卖出 · 跑赢市场');
+        setText(brand, 'FLAPPYK · POCKET MARKET ARCADE');
+        setText(kicker, text('HIDDEN MARKET · PRESS PLAY', '隐藏市场 · 按下开始'));
+        setText(legend, text('BUY · SELL · BEAT THE MARKET', '买入 · 卖出 · 跑赢市场'));
         scheduleSync();
     }
 
     function init() {
+        root.style.setProperty('--pixel-font-readable', "var(--pixel-font-ui, 'Pixelify Sans', monospace)");
         installWeatherLayer();
         installHomeConsole();
         bindPressFeedback();
