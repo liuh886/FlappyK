@@ -71,11 +71,12 @@ async function exposeGameChrome(page) {
   });
 }
 
-test('home opens as a lightweight handheld arcade with immediate play', async ({ page }) => {
+test('home opens as a full-viewport market scene with immediate play', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await preparePage(page);
   await page.goto('/');
 
+  await expect(page.locator('html')).toHaveAttribute('data-ui-state', 'home');
   await expect(page.locator('.home-console-bezel')).toBeVisible();
   await expect(page.locator('.home-console-screen')).toBeVisible();
   await expect(page.locator('.home-console-kicker')).toHaveText('HIDDEN MARKET · PRESS PLAY');
@@ -83,20 +84,34 @@ test('home opens as a lightweight handheld arcade with immediate play', async ({
   await expect(page.locator('#market-weather-layer')).toHaveAttribute('data-weather', 'clear');
 
   const hierarchy = await page.evaluate(() => {
+    const container = document.getElementById('game-container').getBoundingClientRect();
     const bezel = document.querySelector('.home-console-bezel').getBoundingClientRect();
     const screen = document.querySelector('.home-console-screen').getBoundingClientRect();
     const play = document.querySelector('#start-btn').getBoundingClientRect();
     const daily = document.querySelector('#daily-run-btn').getBoundingClientRect();
+    const bezelStyle = getComputedStyle(document.querySelector('.home-console-bezel'));
     return {
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+      containerWidth: container.width,
+      containerHeight: container.height,
       bezelWidth: bezel.width,
+      bezelHeight: bezel.height,
       screenWidth: screen.width,
+      bezelBorder: bezelStyle.borderTopWidth,
+      bezelShadow: bezelStyle.boxShadow,
       playArea: play.width * play.height,
       dailyArea: daily.width * daily.height,
     };
   });
 
-  expect(hierarchy.bezelWidth).toBeLessThanOrEqual(760);
-  expect(hierarchy.screenWidth).toBeLessThan(hierarchy.bezelWidth);
+  expect(Math.abs(hierarchy.containerWidth - hierarchy.viewportWidth)).toBeLessThanOrEqual(1);
+  expect(Math.abs(hierarchy.containerHeight - hierarchy.viewportHeight)).toBeLessThanOrEqual(1);
+  expect(Math.abs(hierarchy.bezelWidth - hierarchy.viewportWidth)).toBeLessThanOrEqual(1);
+  expect(Math.abs(hierarchy.bezelHeight - hierarchy.viewportHeight)).toBeLessThanOrEqual(1);
+  expect(Math.abs(hierarchy.screenWidth - hierarchy.viewportWidth)).toBeLessThanOrEqual(1);
+  expect(hierarchy.bezelBorder).toBe('0px');
+  expect(hierarchy.bezelShadow).toBe('none');
   expect(hierarchy.playArea).toBeGreaterThan(hierarchy.dailyArea);
 });
 
@@ -256,13 +271,26 @@ test('weather boundary events are brief, crisp, readable, and non-blocking', asy
   await page.goto('/');
   await page.waitForFunction(() => Boolean(window.FlappyKMarketWeather));
   await exposeGameChrome(page);
+  await expect(page.locator('html')).toHaveAttribute('data-ui-state', 'paused');
 
   await page.evaluate(() => {
-    window.FlappyKMarketWeather.applyMetrics({ playerReturn: 0.02, marketReturn: 0.01, excess: 0.01 }, { silent: true, immediate: true });
-    window.FlappyKMarketWeather.applyMetrics({ playerReturn: -0.01, marketReturn: -0.02, excess: 0.01 });
+    window.FlappyKMarketWeather.setWeatherState('clear', { immediate: true, source: 'manual' });
+    window.FlappyKMarketWeather.applyMetrics(
+      { playerReturn: 0.02, marketReturn: 0.01, excess: 0.01 },
+      { silent: true, immediate: true, source: 'manual' },
+    );
   });
 
   const status = page.locator('#weather-status');
+  await expect(status).not.toHaveClass(/is-event/);
+
+  await page.evaluate(() => {
+    window.FlappyKMarketWeather.applyMetrics(
+      { playerReturn: -0.01, marketReturn: -0.02, excess: 0.01 },
+      { source: 'manual' },
+    );
+  });
+
   await expect(status).toHaveText('RETURN BELOW ZERO');
   await expect(status).toHaveClass(/is-event/);
   await expect(page.locator('#market-weather-layer')).toHaveCSS('pointer-events', 'none');
