@@ -101,9 +101,11 @@ assert.ok(pwaSource.includes("loadScript('flappyk-membership-experience', './mem
 assert.ok(pwaSource.includes("loadScript('flappyk-membership-run-hook', './membership-run-hook.js')"));
 assert.ok(pwaSource.includes("ensureStylesheet('flappyk-membership-styles', './membership.css')"));
 assert.ok(pwaSource.includes("ensureStylesheet('flappyk-membership-sync-styles', './membership-sync.css')"));
+assert.ok(pwaSource.includes("ensureStylesheet('flappyk-market-weather-styles', './market-weather.css')"));
+assert.ok(pwaSource.includes("loadScript('flappyk-market-weather-client', './scripts/market-weather.js')"));
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v10'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v10'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v11'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v11'"));
 assert.ok(serviceWorkerSource.includes("'./membership-config.js'"));
 assert.ok(serviceWorkerSource.includes("'./scripts/cloud-run-sync-core.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership.js'"));
@@ -113,6 +115,8 @@ assert.ok(serviceWorkerSource.includes("'./membership.css'"));
 assert.ok(serviceWorkerSource.includes("'./membership-sync.css'"));
 assert.ok(serviceWorkerSource.includes("'./premium-ui.css'"));
 assert.ok(serviceWorkerSource.includes("'./premium-ui-refinement.css'"));
+assert.ok(serviceWorkerSource.includes("'./market-weather.css'"));
+assert.ok(serviceWorkerSource.includes("'./scripts/market-weather.js'"));
 assert.ok(!serviceWorkerSource.includes("'./hud-compact.css'"));
 
 assert.ok(migrationSource.includes('alter table public.profiles enable row level security'));
@@ -128,4 +132,4 @@ assert.ok(privacySource.includes('Only a completed three-game run summary is eli
 assert.ok(privacySource.includes('Partial runs, keystrokes'));
 assert.ok(privacySource.includes('not automatically trusted as public leaderboard evidence'));
 
-console.log('Membership, reliable cloud sync, typography, owner-scoped compact pixel HUD, privacy, result guidance, and RLS boundary validated');
+console.log('Membership, reliable cloud sync, typography, owner-scoped compact pixel HUD, market weather, privacy, result guidance, and RLS boundary validated');
