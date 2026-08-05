@@ -32,7 +32,8 @@
     function syncPrimaryActionLabel() {
         const startButton = document.getElementById('start-btn');
         if (!startButton) return;
-        const label = text('PLAY', '开始游戏');
+        const visibleLabel = String(startButton.textContent || '').trim();
+        const label = visibleLabel || text('PLAY', '开始游戏');
         if (startButton.getAttribute('aria-label') !== label) {
             startButton.setAttribute('aria-label', label);
         }
@@ -71,6 +72,7 @@
     function installHomeConsole() {
         if (!startScreen || startScreen.querySelector('.home-console-bezel')) return;
 
+        const legacyIntroParagraphs = Array.from(startScreen.querySelectorAll(':scope > p'));
         const bezel = createElement('div', 'home-console-bezel');
         const topLine = createElement('div', 'home-console-topline');
         const brand = createElement('span', 'home-console-brand', 'FLAPPYK · POCKET MARKET ARCADE');
@@ -82,7 +84,15 @@
         const screen = createElement('div', 'home-console-screen');
         const kicker = createElement('div', 'home-console-kicker', text('HIDDEN MARKET · PRESS PLAY', '隐藏市场 · 按下开始'));
         screen.appendChild(kicker);
-        [...startScreen.children].forEach((child) => screen.appendChild(child));
+        [...startScreen.children].forEach((child) => {
+            if (legacyIntroParagraphs.includes(child)) {
+                const visibleCopy = child.cloneNode(true);
+                visibleCopy.classList.add('home-console-intro-copy');
+                screen.appendChild(visibleCopy);
+                return;
+            }
+            screen.appendChild(child);
+        });
 
         const footer = createElement('div', 'home-console-footer');
         const speaker = createElement('span', 'home-console-speaker');
@@ -92,7 +102,12 @@
         footer.append(speaker, legend);
 
         bezel.append(topLine, screen, footer);
-        startScreen.replaceChildren(bezel);
+        legacyIntroParagraphs.forEach((paragraph) => {
+            paragraph.hidden = true;
+            paragraph.setAttribute('aria-hidden', 'true');
+            paragraph.classList.add('home-console-legacy-intro');
+        });
+        startScreen.replaceChildren(bezel, ...legacyIntroParagraphs);
         startScreen.classList.add('arcade-home');
         syncPrimaryActionLabel();
     }
@@ -261,6 +276,14 @@
         bindPressFeedback();
         syncWeather();
 
+        const startButton = document.getElementById('start-btn');
+        if (startButton) {
+            new MutationObserver(syncPrimaryActionLabel).observe(startButton, {
+                childList: true,
+                characterData: true,
+                subtree: true,
+            });
+        }
         if (gameContainer) {
             new MutationObserver(scheduleSync).observe(gameContainer, {
                 subtree: true,
