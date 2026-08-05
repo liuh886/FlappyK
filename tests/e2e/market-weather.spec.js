@@ -50,19 +50,21 @@ async function preparePage(page) {
 }
 
 async function exposeGameChrome(page) {
+  const startScreen = page.locator('#start-screen');
+  if (await startScreen.evaluate((element) => element.classList.contains('active'))) {
+    await page.getByRole('button', { name: 'PLAY', exact: true }).click();
+  }
+
+  const rail = page.locator('#game-hud-rail');
+  const pause = page.locator('#pause-btn');
+  await expect(rail).toBeVisible();
+  await expect(pause).toBeVisible();
+
+  if (await pause.getAttribute('aria-pressed') === 'false') {
+    await pause.click();
+  }
+
   await page.evaluate(() => {
-    document.querySelector('#start-screen')?.classList.remove('active');
-    const root = document.documentElement;
-    root.dataset.uiState = 'playing';
-    const uiLayer = document.getElementById('ui-layer');
-    uiLayer.hidden = false;
-    uiLayer.setAttribute('aria-hidden', 'false');
-    const topControls = document.getElementById('game-top-controls');
-    topControls.hidden = false;
-    topControls.setAttribute('aria-hidden', 'false');
-    const mobileControls = document.getElementById('mobile-controls');
-    mobileControls.hidden = false;
-    mobileControls.setAttribute('aria-hidden', 'false');
     window.FlappyKPremiumUIRefinement?.refineHudComposition?.();
     window.FlappyKPremiumUIRefinement?.refineDesktopControls?.();
     window.FlappyKMarketWeather?.syncWeatherStatusPlacement?.();
