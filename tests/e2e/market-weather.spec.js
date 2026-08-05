@@ -49,6 +49,26 @@ async function preparePage(page) {
   });
 }
 
+async function exposeGameChrome(page) {
+  await page.evaluate(() => {
+    document.querySelector('#start-screen')?.classList.remove('active');
+    const root = document.documentElement;
+    root.dataset.uiState = 'playing';
+    const uiLayer = document.getElementById('ui-layer');
+    uiLayer.hidden = false;
+    uiLayer.setAttribute('aria-hidden', 'false');
+    const topControls = document.getElementById('game-top-controls');
+    topControls.hidden = false;
+    topControls.setAttribute('aria-hidden', 'false');
+    const mobileControls = document.getElementById('mobile-controls');
+    mobileControls.hidden = false;
+    mobileControls.setAttribute('aria-hidden', 'false');
+    window.FlappyKPremiumUIRefinement?.refineHudComposition?.();
+    window.FlappyKPremiumUIRefinement?.refineDesktopControls?.();
+    window.FlappyKMarketWeather?.syncWeatherStatusPlacement?.();
+  });
+}
+
 test('home opens as a lightweight handheld arcade with immediate play', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await preparePage(page);
@@ -106,30 +126,127 @@ test('arcade controls use semantic pixel glyphs and keyboard press feedback', as
   await expect(playButton).not.toHaveClass(/is-arcade-pressed/);
 });
 
-test('weather maps performance to clear, cloudy, and rain without changing gameplay', async ({ page }) => {
+test('weather stages clear to rain and rain to clear through cloudy', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await preparePage(page);
   await page.goto('/');
   await page.waitForFunction(() => Boolean(window.FlappyKMarketWeather));
+  await exposeGameChrome(page);
+
+  const layer = page.locator('#market-weather-layer');
+  const root = page.locator('html');
 
   await page.evaluate(() => {
-    document.querySelector('#start-screen').classList.remove('active');
-    window.FlappyKMarketWeather.applyMetrics({ playerReturn: 0.04, marketReturn: 0.02, excess: 0.02 }, { silent: true });
+    window.FlappyKMarketWeather.setWeatherState('clear', { immediate: true });
+    window.FlappyKMarketWeather.setWeatherState('rain');
   });
-  await expect(page.locator('#market-weather-layer')).toHaveAttribute('data-weather', 'clear');
+
+  await expect(root).toHaveAttribute('data-market-weather', 'rain');
+  await expect(layer).toHaveAttribute('data-weather-target', 'rain');
+  await expect(layer).toHaveAttribute('data-weather-transition', 'clear-to-cloudy', { timeout: 800 });
+  await expect(layer).toHaveAttribute('data-weather', 'cloudy', { timeout: 1300 });
+  await expect(layer).toHaveAttribute('data-weather-transition', 'cloudy-to-rain', { timeout: 800 });
+  await expect(layer).toHaveAttribute('data-weather', 'rain', { timeout: 1300 });
+
+  await page.evaluate(() => {
+    window.FlappyKMarketWeather.setWeatherState('clear');
+  });
+
+  await expect(root).toHaveAttribute('data-market-weather', 'clear');
+  await expect(layer).toHaveAttribute('data-weather-target', 'clear');
+  await expect(layer).toHaveAttribute('data-weather-transition', 'rain-to-cloudy', { timeout: 800 });
+  await expect(layer).toHaveAttribute('data-weather', 'cloudy', { timeout: 1300 });
+  await expect(layer).toHaveAttribute('data-weather-transition', 'cloudy-to-clear', { timeout: 800 });
+  await expect(layer).toHaveAttribute('data-weather', 'clear', { timeout: 1300 });
+});
+
+test('an interrupted weather transition settles at the latest requested state', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await preparePage(page);
+  await page.goto('/');
+  await page.waitForFunction(() => Boolean(window.FlappyKMarketWeather));
+  await exposeGameChrome(page);
+
+  await page.evaluate(() => {
+    window.FlappyKMarketWeather.setWeatherState('clear', { immediate: true });
+    window.FlappyKMarketWeather.setWeatherState('rain');
+    window.setTimeout(() => window.FlappyKMarketWeather.setWeatherState('clear'), 220);
+  });
+
   await expect(page.locator('html')).toHaveAttribute('data-market-weather', 'clear');
+  await expect(page.locator('#market-weather-layer')).toHaveAttribute('data-weather', 'clear', { timeout: 1800 });
+  await expect.poll(async () => page.evaluate(() => window.FlappyKMarketWeather.requestedWeather)).toBe('clear');
+  await expect.poll(async () => page.evaluate(() => window.FlappyKMarketWeather.visualWeather)).toBe('clear');
+});
 
-  await page.evaluate(() => {
-    window.FlappyKMarketWeather.applyMetrics({ playerReturn: 0.04, marketReturn: 0.07, excess: -0.03 }, { silent: true });
-  });
-  await expect(page.locator('#market-weather-layer')).toHaveAttribute('data-weather', 'cloudy');
-  await expect(page.locator('html')).toHaveAttribute('data-market-weather', 'cloudy');
+test('desktop HUD is one coordinated top rail with a matching input dock', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await preparePage(page);
+  await page.goto('/');
+  await page.waitForFunction(() => Boolean(window.FlappyKPremiumUIRefinement && window.FlappyKMarketWeather));
+  await exposeGameChrome(page);
 
-  await page.evaluate(() => {
-    window.FlappyKMarketWeather.applyMetrics({ playerReturn: -0.01, marketReturn: -0.03, excess: 0.02 }, { silent: true });
+  const rail = page.locator('#game-hud-rail');
+  await expect(rail).toBeVisible();
+  await expect(page.locator('#weather-status')).toHaveJSProperty('parentElement', await rail.elementHandle());
+
+  const geometry = await page.evaluate(() => {
+    const rail = document.getElementById('game-hud-rail').getBoundingClientRect();
+    const weather = document.getElementById('weather-status').getBoundingClientRect();
+    const stats = document.querySelector('.stats-box').getBoundingClientRect();
+    const progress = document.getElementById('run-progress-panel').getBoundingClientRect();
+    const controls = document.getElementById('game-top-controls').getBoundingClientRect();
+    const hint = document.querySelector('.controls-hint').getBoundingClientRect();
+    return {
+      rail,
+      weather,
+      stats,
+      progress,
+      controls,
+      hint,
+      parents: {
+        weather: document.getElementById('weather-status').parentElement?.id,
+        stats: document.querySelector('.stats-box').parentElement?.id,
+        progress: document.getElementById('run-progress-panel').parentElement?.id,
+        controls: document.getElementById('game-top-controls').parentElement?.id,
+      },
+    };
   });
-  await expect(page.locator('#market-weather-layer')).toHaveAttribute('data-weather', 'rain');
-  await expect(page.locator('html')).toHaveAttribute('data-market-weather', 'rain');
+
+  for (const parent of Object.values(geometry.parents)) expect(parent).toBe('game-hud-rail');
+  for (const child of [geometry.weather, geometry.stats, geometry.progress, geometry.controls]) {
+    expect(child.top).toBeGreaterThanOrEqual(geometry.rail.top - 1);
+    expect(child.bottom).toBeLessThanOrEqual(geometry.rail.bottom + 1);
+  }
+  expect(geometry.weather.right).toBeLessThanOrEqual(geometry.stats.left + 1);
+  expect(geometry.stats.right).toBeLessThanOrEqual(geometry.progress.left + 1);
+  expect(geometry.progress.right).toBeLessThanOrEqual(geometry.controls.left + 1);
+  expect(Math.abs((geometry.hint.left + geometry.hint.width / 2) - (geometry.rail.left + geometry.rail.width / 2))).toBeLessThan(3);
+});
+
+test('mobile HUD uses two coordinated rows without colliding with thumb controls', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await preparePage(page);
+  await page.goto('/');
+  await page.waitForFunction(() => Boolean(window.FlappyKPremiumUIRefinement && window.FlappyKMarketWeather));
+  await exposeGameChrome(page);
+
+  const geometry = await page.evaluate(() => {
+    const rail = document.getElementById('game-hud-rail').getBoundingClientRect();
+    const weather = document.getElementById('weather-status').getBoundingClientRect();
+    const stats = document.querySelector('.stats-box').getBoundingClientRect();
+    const progress = document.getElementById('run-progress-panel').getBoundingClientRect();
+    const controls = document.getElementById('game-top-controls').getBoundingClientRect();
+    const mobile = document.getElementById('mobile-controls').getBoundingClientRect();
+    return { rail, weather, stats, progress, controls, mobile };
+  });
+
+  expect(geometry.rail.left).toBeGreaterThanOrEqual(5);
+  expect(geometry.rail.right).toBeLessThanOrEqual(385);
+  expect(Math.abs(geometry.stats.top - geometry.controls.top)).toBeLessThan(2);
+  expect(Math.abs(geometry.weather.top - geometry.progress.top)).toBeLessThan(2);
+  expect(geometry.weather.top).toBeGreaterThanOrEqual(geometry.stats.bottom - 1);
+  expect(geometry.rail.bottom).toBeLessThan(geometry.mobile.top);
 });
 
 test('weather boundary events are brief, crisp, readable, and non-blocking', async ({ page }) => {
@@ -137,10 +254,10 @@ test('weather boundary events are brief, crisp, readable, and non-blocking', asy
   await preparePage(page);
   await page.goto('/');
   await page.waitForFunction(() => Boolean(window.FlappyKMarketWeather));
+  await exposeGameChrome(page);
 
   await page.evaluate(() => {
-    document.querySelector('#start-screen').classList.remove('active');
-    window.FlappyKMarketWeather.applyMetrics({ playerReturn: 0.02, marketReturn: 0.01, excess: 0.01 }, { silent: true });
+    window.FlappyKMarketWeather.applyMetrics({ playerReturn: 0.02, marketReturn: 0.01, excess: 0.01 }, { silent: true, immediate: true });
     window.FlappyKMarketWeather.applyMetrics({ playerReturn: -0.01, marketReturn: -0.02, excess: 0.01 });
   });
 
@@ -148,6 +265,6 @@ test('weather boundary events are brief, crisp, readable, and non-blocking', asy
   await expect(status).toHaveText('RETURN BELOW ZERO');
   await expect(status).toHaveClass(/is-event/);
   await expect(page.locator('#market-weather-layer')).toHaveCSS('pointer-events', 'none');
-  expect(await status.evaluate((element) => element.style.transform.includes('scale'))).toBe(false);
+  await expect(status).toHaveCSS('transform', 'none');
   await expect(status).not.toHaveClass(/is-event/, { timeout: 2000 });
 });
