@@ -49,6 +49,9 @@ for (const transitionContract of [
   "source === 'live' && currentTime < explicitWeatherUntil",
   "source === 'manual'",
   "applyMetrics(metrics, { source: 'live' })",
+  'function clearWeatherEvent(options = {})',
+  'if (options.silent) clearWeatherEvent()',
+  'clearWeatherEvent({ restore: false })',
   'prefersReducedMotion()',
   'syncWeatherStatusPlacement',
   'function mutationElement(mutation)',
@@ -84,4 +87,4 @@ assert.ok(serviceWorker.includes("'./market-weather.css'"), 'Offline shell must 
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"), 'Offline shell must cache market-weather.js.');
 assert.ok(serviceWorker.includes("flappyk-app-v14"), 'The PWA cache version must advance for the staged weather and HUD release.');
 
-console.log('Pixel weather arcade, staged transition, explicit ownership, mutation isolation, and interaction detail contracts passed.');
+console.log('Pixel weather arcade, staged transition, explicit ownership, stale-event cleanup, mutation isolation, and interaction detail contracts passed.');
