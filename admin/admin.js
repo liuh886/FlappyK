@@ -8,16 +8,10 @@ const config = Object.freeze({
 });
 
 const client = createClient(config.supabaseUrl, config.publishableKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-    flowType: 'pkce'
-  }
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'pkce' }
 });
 
 const state = {
-  session: null,
   bootstrap: null,
   member: null,
   pendingPayment: null,
@@ -27,59 +21,29 @@ const state = {
 
 const $ = (selector) => document.querySelector(selector);
 const els = {
-  authGate: $('#auth-gate'),
-  console: $('#console'),
-  googleLogin: $('#google-login'),
-  authStatus: $('#auth-status'),
-  consoleStatus: $('#console-status'),
-  signOut: $('#sign-out'),
-  operatorEmail: $('#operator-email'),
-  operatorRole: $('#operator-role'),
-  statUsers: $('#stat-users'),
-  statSubscriptions: $('#stat-subscriptions'),
-  statGrants: $('#stat-grants'),
-  statActions: $('#stat-actions'),
-  searchForm: $('#member-search'),
-  searchEmail: $('#search-email'),
-  emptyWorkspace: $('#empty-workspace'),
-  memberWorkspace: $('#member-workspace'),
-  memberEmail: $('#member-email'),
-  memberMeta: $('#member-meta'),
-  memberTier: $('#member-tier'),
-  giftForm: $('#gift-form'),
-  giftProduct: $('#gift-product'),
-  giftDuration: $('#gift-duration'),
-  giftReason: $('#gift-reason'),
-  entitlementList: $('#entitlement-list'),
-  grantList: $('#grant-list'),
-  subscriptionList: $('#subscription-list'),
-  paymentList: $('#payment-list'),
-  activityList: $('#activity-list'),
-  recentActions: $('#recent-actions'),
-  refundDialog: $('#refund-dialog'),
-  refundForm: $('#refund-form'),
-  refundSummary: $('#refund-summary'),
-  refundCurrency: $('#refund-currency'),
-  refundAmount: $('#refund-amount'),
-  refundReason: $('#refund-reason'),
-  refundSubscriptionAction: $('#refund-subscription-action'),
-  refundSubscription: $('#refund-subscription'),
-  refundConfirmation: $('#refund-confirmation'),
-  cancelDialog: $('#cancel-dialog'),
-  cancelForm: $('#cancel-form'),
-  cancelSummary: $('#cancel-summary'),
-  cancelMode: $('#cancel-mode'),
+  authGate: $('#auth-gate'), console: $('#console'), googleLogin: $('#google-login'),
+  authStatus: $('#auth-status'), consoleStatus: $('#console-status'), signOut: $('#sign-out'),
+  operatorEmail: $('#operator-email'), operatorRole: $('#operator-role'),
+  statUsers: $('#stat-users'), statSubscriptions: $('#stat-subscriptions'),
+  statGrants: $('#stat-grants'), statActions: $('#stat-actions'),
+  searchForm: $('#member-search'), searchEmail: $('#search-email'),
+  emptyWorkspace: $('#empty-workspace'), memberWorkspace: $('#member-workspace'),
+  memberEmail: $('#member-email'), memberMeta: $('#member-meta'), memberTier: $('#member-tier'),
+  giftForm: $('#gift-form'), giftProduct: $('#gift-product'), giftDuration: $('#gift-duration'),
+  giftReason: $('#gift-reason'), entitlementList: $('#entitlement-list'), grantList: $('#grant-list'),
+  subscriptionList: $('#subscription-list'), paymentList: $('#payment-list'),
+  activityList: $('#activity-list'), recentActions: $('#recent-actions'),
+  refundDialog: $('#refund-dialog'), refundForm: $('#refund-form'), refundSummary: $('#refund-summary'),
+  refundCurrency: $('#refund-currency'), refundAmount: $('#refund-amount'), refundReason: $('#refund-reason'),
+  refundSubscriptionAction: $('#refund-subscription-action'), refundSubscription: $('#refund-subscription'),
+  refundConfirmation: $('#refund-confirmation'), cancelDialog: $('#cancel-dialog'),
+  cancelForm: $('#cancel-form'), cancelSummary: $('#cancel-summary'), cancelMode: $('#cancel-mode'),
   cancelConfirmation: $('#cancel-confirmation')
 };
 
-function escapeHtml(value) {
-  return String(value ?? '')
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
-}
+const escapeHtml = (value) => String(value ?? '')
+  .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+  .replaceAll('"', '&quot;').replaceAll("'", '&#039;');
 
 function formatDate(value, fallback = '—') {
   if (!value) return fallback;
@@ -105,7 +69,7 @@ function setStatus(element, message = '', kind = '') {
 function setBusy(value, message = '') {
   state.busy = Boolean(value);
   document.querySelectorAll('button, input, select').forEach((element) => {
-    if (!element.closest('dialog[open]') || value) element.disabled = state.busy;
+    element.disabled = state.busy;
   });
   if (message) setStatus(els.consoleStatus, message);
 }
@@ -127,10 +91,10 @@ async function callAdmin(action, payload = {}) {
   return result;
 }
 
-function showGate(message = '') {
+function showGate(message = '', kind = '') {
   els.authGate.hidden = false;
   els.console.hidden = true;
-  if (message) setStatus(els.authStatus, message, 'error');
+  setStatus(els.authStatus, message, kind);
 }
 
 function showConsole() {
@@ -147,13 +111,10 @@ function renderBootstrap() {
   els.statSubscriptions.textContent = data.counts.active_subscriptions;
   els.statGrants.textContent = data.counts.active_grants;
   els.statActions.textContent = data.counts.admin_actions;
-
-  const options = [
+  els.giftProduct.innerHTML = [
     '<option value="all">全部产品 · Hao Apps</option>',
     ...(data.products || []).map((product) => `<option value="${escapeHtml(product.product_code)}">${escapeHtml(product.name)}</option>`)
-  ];
-  els.giftProduct.innerHTML = options.join('');
-
+  ].join('');
   const recent = data.recent_actions || [];
   els.recentActions.innerHTML = recent.length
     ? recent.map((item) => `
@@ -187,96 +148,91 @@ function renderEntitlements(member) {
 
 function renderGrants(member) {
   const groups = groupGrants(member.grants);
-  els.grantList.innerHTML = groups.length
-    ? groups.map((grant) => {
-      const isManual = grant.source === 'manual_gift';
-      const entitlementText = grant.entitlements.join(' · ');
-      return `
-        <article class="record">
-          <div class="record-main">
-            <div class="record-title">
-              <span>${escapeHtml(entitlementText)}</span>
-              <span class="badge ${escapeHtml(grant.source)}">${escapeHtml(grant.source)}</span>
-              <span class="badge ${grant.active ? 'active' : 'inactive'}">${grant.active ? '有效' : '已撤销'}</span>
-            </div>
-            <div class="record-meta">
-              <span>${grant.valid_until ? `有效至 ${escapeHtml(formatDate(grant.valid_until))}` : '永久有效'}</span>
-              <span>${escapeHtml(grant.source_ref)}</span>
-              ${grant.metadata?.reason ? `<span>${escapeHtml(grant.metadata.reason)}</span>` : ''}
-            </div>
+  els.grantList.innerHTML = groups.length ? groups.map((grant) => {
+    const isManual = grant.source === 'manual_gift';
+    return `
+      <article class="record">
+        <div class="record-main">
+          <div class="record-title">
+            <span>${escapeHtml(grant.entitlements.join(' · '))}</span>
+            <span class="badge ${escapeHtml(grant.source)}">${escapeHtml(grant.source)}</span>
+            <span class="badge ${grant.active ? 'active' : 'inactive'}">${grant.active ? '有效' : '已撤销'}</span>
           </div>
-          <div class="record-actions">
-            ${isManual && grant.active ? `
-              <button class="mini-button" type="button" data-action="extend" data-source-ref="${escapeHtml(grant.source_ref)}" data-days="30">+30 天</button>
-              <button class="mini-button" type="button" data-action="extend" data-source-ref="${escapeHtml(grant.source_ref)}" data-days="365">+1 年</button>
-              <button class="mini-button danger" type="button" data-action="revoke" data-source-ref="${escapeHtml(grant.source_ref)}">撤销</button>` : ''}
+          <div class="record-meta">
+            <span>${grant.valid_until ? `有效至 ${escapeHtml(formatDate(grant.valid_until))}` : '永久有效'}</span>
+            <span>${escapeHtml(grant.source_ref)}</span>
+            ${grant.metadata?.reason ? `<span>${escapeHtml(grant.metadata.reason)}</span>` : ''}
           </div>
-        </article>`;
-    }).join('')
-    : '<p class="empty-copy">没有授权来源记录。</p>';
+        </div>
+        <div class="record-actions">
+          ${isManual && grant.active ? `
+            <button class="mini-button" type="button" data-action="extend" data-source-ref="${escapeHtml(grant.source_ref)}" data-days="30">+30 天</button>
+            <button class="mini-button" type="button" data-action="extend" data-source-ref="${escapeHtml(grant.source_ref)}" data-days="365">+1 年</button>
+            <button class="mini-button danger" type="button" data-action="revoke" data-source-ref="${escapeHtml(grant.source_ref)}">撤销</button>` : ''}
+        </div>
+      </article>`;
+  }).join('') : '<p class="empty-copy">没有授权来源记录。</p>';
 }
 
 function renderSubscriptions(member) {
   const subscriptions = member.subscriptions || [];
-  els.subscriptionList.innerHTML = subscriptions.length
-    ? subscriptions.map((subscription) => `
-      <article class="record">
-        <div class="record-main">
-          <div class="record-title">
-            <span>${escapeHtml(subscription.product_code)}</span>
-            <span class="badge ${escapeHtml(subscription.status)}">${escapeHtml(subscription.status)}</span>
-            ${subscription.cancel_at_period_end ? '<span class="badge canceled">期末取消</span>' : ''}
-          </div>
-          <div class="record-meta">
-            <span>${escapeHtml(subscription.id)}</span>
-            <span>周期结束 ${escapeHtml(formatDate(subscription.current_period_end))}</span>
-          </div>
+  els.subscriptionList.innerHTML = subscriptions.length ? subscriptions.map((subscription) => `
+    <article class="record">
+      <div class="record-main">
+        <div class="record-title">
+          <span>${escapeHtml(subscription.product_code)}</span>
+          <span class="badge ${escapeHtml(subscription.status)}">${escapeHtml(subscription.status)}</span>
+          ${subscription.cancel_at_period_end ? '<span class="badge canceled">期末取消</span>' : ''}
         </div>
-        <div class="record-actions">
-          ${['active', 'trialing', 'past_due'].includes(subscription.status) ? `<button class="mini-button danger" type="button" data-action="cancel" data-subscription-id="${escapeHtml(subscription.id)}">取消订阅</button>` : ''}
+        <div class="record-meta">
+          <span>${escapeHtml(subscription.id)}</span>
+          <span>周期结束 ${escapeHtml(formatDate(subscription.current_period_end))}</span>
         </div>
-      </article>`).join('')
-    : '<p class="empty-copy">没有 Stripe 订阅。</p>';
+      </div>
+      <div class="record-actions">
+        ${['active', 'trialing', 'past_due'].includes(subscription.status) ? `<button class="mini-button danger" type="button" data-action="cancel" data-subscription-id="${escapeHtml(subscription.id)}">取消订阅</button>` : ''}
+      </div>
+    </article>`).join('') : '<p class="empty-copy">没有 Stripe 订阅。</p>';
 }
 
 function renderPayments(member) {
   const payments = member.payments || [];
-  els.paymentList.innerHTML = payments.length
-    ? payments.map((payment) => {
-      const remaining = Math.max(0, payment.amount - payment.amount_refunded);
-      return `
-        <article class="record">
-          <div class="record-main">
-            <div class="record-title">
-              <span>${escapeHtml(formatMoney(payment.amount, payment.currency))}</span>
-              <span class="badge ${escapeHtml(payment.status)}">${escapeHtml(payment.status)}</span>
-              ${payment.amount_refunded ? `<span class="badge">已退 ${escapeHtml(formatMoney(payment.amount_refunded, payment.currency))}</span>` : ''}
-            </div>
-            <div class="record-meta">
-              <span>${escapeHtml(formatDate(payment.created_at))}</span>
-              <span>${escapeHtml(payment.payment_intent)}</span>
-              ${payment.receipt_url ? `<a href="${escapeHtml(payment.receipt_url)}" target="_blank" rel="noreferrer">收据</a>` : ''}
-            </div>
+  els.paymentList.innerHTML = payments.length ? payments.map((payment) => {
+    const remaining = Math.max(0, payment.amount - payment.amount_refunded);
+    return `
+      <article class="record">
+        <div class="record-main">
+          <div class="record-title">
+            <span>${escapeHtml(formatMoney(payment.amount, payment.currency))}</span>
+            <span class="badge ${escapeHtml(payment.status)}">${escapeHtml(payment.status)}</span>
+            ${payment.amount_refunded ? `<span class="badge">已退 ${escapeHtml(formatMoney(payment.amount_refunded, payment.currency))}</span>` : ''}
           </div>
-          <div class="record-actions">
-            ${remaining > 0 && payment.payment_intent ? `<button class="mini-button danger" type="button" data-action="refund" data-payment-intent="${escapeHtml(payment.payment_intent)}">退款</button>` : ''}
+          <div class="record-meta">
+            <span>${escapeHtml(formatDate(payment.created_at))}</span>
+            <span>${escapeHtml(payment.payment_intent)}</span>
+            ${payment.receipt_url ? `<a href="${escapeHtml(payment.receipt_url)}" target="_blank" rel="noreferrer">收据</a>` : ''}
           </div>
-        </article>`;
-    }).join('')
-    : '<p class="empty-copy">没有可显示的 Stripe 付款。</p>';
+        </div>
+        <div class="record-actions">
+          ${remaining > 0 && payment.payment_intent ? `<button class="mini-button danger" type="button" data-action="refund" data-payment-intent="${escapeHtml(payment.payment_intent)}">退款</button>` : ''}
+        </div>
+      </article>`;
+  }).join('') : '<p class="empty-copy">没有可显示的 Stripe 付款。</p>';
 }
 
 function renderActivity(member) {
   const actions = member.actions || [];
-  els.activityList.innerHTML = actions.length
-    ? actions.map((item) => `
-      <article class="record">
-        <div class="record-main">
-          <div class="record-title"><span>${escapeHtml(item.action_type)}</span><span class="badge ${escapeHtml(item.status)}">${escapeHtml(item.status)}</span></div>
-          <div class="record-meta"><span>${escapeHtml(formatDate(item.created_at))}</span><span>${escapeHtml(item.product_code || item.reason || '')}</span>${item.amount ? `<span>${escapeHtml(formatMoney(item.amount, item.currency))}</span>` : ''}</div>
+  els.activityList.innerHTML = actions.length ? actions.map((item) => `
+    <article class="record">
+      <div class="record-main">
+        <div class="record-title"><span>${escapeHtml(item.action_type)}</span><span class="badge ${escapeHtml(item.status)}">${escapeHtml(item.status)}</span></div>
+        <div class="record-meta">
+          <span>${escapeHtml(formatDate(item.created_at))}</span>
+          <span>${escapeHtml(item.product_code || item.reason || '')}</span>
+          ${item.amount ? `<span>${escapeHtml(formatMoney(item.amount, item.currency))}</span>` : ''}
         </div>
-      </article>`).join('')
-    : '<p class="empty-copy">该用户尚无管理操作。</p>';
+      </div>
+    </article>`).join('') : '<p class="empty-copy">该用户尚无管理操作。</p>';
 }
 
 function renderMember() {
@@ -303,15 +259,19 @@ async function refreshMember() {
   renderMember();
 }
 
+async function refreshBootstrap() {
+  state.bootstrap = await callAdmin('bootstrap');
+  renderBootstrap();
+}
+
 async function bootstrap() {
   setBusy(true, '正在载入会员运营台…');
   try {
-    state.bootstrap = await callAdmin('bootstrap');
+    await refreshBootstrap();
     showConsole();
-    renderBootstrap();
     setStatus(els.consoleStatus, '运营台已连接 Live Mode。', 'success');
   } catch (error) {
-    showGate(error.message);
+    showGate(error.message, 'error');
   } finally {
     setBusy(false);
   }
@@ -320,8 +280,7 @@ async function bootstrap() {
 els.googleLogin.addEventListener('click', async () => {
   setStatus(els.authStatus, '正在跳转 Google…');
   const { error } = await client.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: config.redirectUrl }
+    provider: 'google', options: { redirectTo: config.redirectUrl }
   });
   if (error) setStatus(els.authStatus, error.message, 'error');
 });
@@ -330,7 +289,7 @@ els.signOut.addEventListener('click', async () => {
   await client.auth.signOut();
   state.member = null;
   state.bootstrap = null;
-  showGate('已退出管理员账户。');
+  showGate('已退出管理员账户。', 'success');
 });
 
 els.searchForm.addEventListener('submit', async (event) => {
@@ -362,8 +321,7 @@ els.giftForm.addEventListener('submit', async (event) => {
     });
     state.member = result.member;
     renderMember();
-    state.bootstrap = await callAdmin('bootstrap');
-    renderBootstrap();
+    await refreshBootstrap();
     setStatus(els.consoleStatus, '会员赠送已生效。', 'success');
   } catch (error) {
     setStatus(els.consoleStatus, error.message, 'error');
@@ -376,30 +334,23 @@ els.grantList.addEventListener('click', async (event) => {
   const button = event.target.closest('button[data-action]');
   if (!button || !state.member) return;
   const sourceRef = button.dataset.sourceRef;
-  if (button.dataset.action === 'extend') {
-    const days = Number(button.dataset.days);
-    if (!window.confirm(`确认延长 ${days} 天？`)) return;
-    setBusy(true, '正在延长赠送权益…');
-    try {
-      const result = await callAdmin('extend_grant', { user_id: state.member.user.id, source_ref: sourceRef, duration_days: days });
-      state.member = result.member;
-      renderMember();
-      setStatus(els.consoleStatus, `已延长 ${days} 天。`, 'success');
-    } catch (error) {
-      setStatus(els.consoleStatus, error.message, 'error');
-    } finally { setBusy(false); }
-  }
-  if (button.dataset.action === 'revoke') {
-    if (!window.confirm('确认撤销这份人工赠送？其他 Stripe 或赠送来源不会受影响。')) return;
-    setBusy(true, '正在撤销赠送权益…');
-    try {
-      const result = await callAdmin('revoke_grant', { user_id: state.member.user.id, source_ref: sourceRef, reason: 'Revoked from membership operations console' });
-      state.member = result.member;
-      renderMember();
-      setStatus(els.consoleStatus, '人工赠送已撤销。', 'success');
-    } catch (error) {
-      setStatus(els.consoleStatus, error.message, 'error');
-    } finally { setBusy(false); }
+  const action = button.dataset.action;
+  const days = Number(button.dataset.days || 0);
+  if (action === 'extend' && !window.confirm(`确认延长 ${days} 天？`)) return;
+  if (action === 'revoke' && !window.confirm('确认撤销这份人工赠送？其他 Stripe 或赠送来源不会受影响。')) return;
+  setBusy(true, action === 'extend' ? '正在延长赠送权益…' : '正在撤销赠送权益…');
+  try {
+    const result = action === 'extend'
+      ? await callAdmin('extend_grant', { user_id: state.member.user.id, source_ref: sourceRef, duration_days: days })
+      : await callAdmin('revoke_grant', { user_id: state.member.user.id, source_ref: sourceRef, reason: 'Revoked from membership operations console' });
+    state.member = result.member;
+    renderMember();
+    await refreshBootstrap();
+    setStatus(els.consoleStatus, action === 'extend' ? `已延长 ${days} 天。` : '人工赠送已撤销。', 'success');
+  } catch (error) {
+    setStatus(els.consoleStatus, error.message, 'error');
+  } finally {
+    setBusy(false);
   }
 });
 
@@ -429,26 +380,29 @@ els.paymentList.addEventListener('click', (event) => {
     '<option value="">不关联订阅</option>',
     ...(state.member.subscriptions || []).map((subscription) => `<option value="${escapeHtml(subscription.id)}">${escapeHtml(subscription.product_code)} · ${escapeHtml(subscription.status)}</option>`)
   ].join('');
-  const activeSubscription = state.member.subscriptions.find((subscription) => ['active', 'trialing', 'past_due'].includes(subscription.status));
-  if (activeSubscription) els.refundSubscription.value = activeSubscription.id;
-  els.refundSubscriptionAction.value = activeSubscription ? 'cancel_now' : 'keep';
+  const active = state.member.subscriptions.find((subscription) => ['active', 'trialing', 'past_due'].includes(subscription.status));
+  els.refundSubscription.value = active?.id || '';
+  els.refundSubscriptionAction.value = active ? 'cancel_now' : 'keep';
   els.refundDialog.showModal();
 });
 
 els.refundForm.addEventListener('submit', async (event) => {
   event.preventDefault();
+  if (event.submitter?.value === 'cancel') {
+    els.refundDialog.close();
+    return;
+  }
   if (!state.member || !state.pendingPayment) return;
   if (els.refundConfirmation.value !== 'REFUND') {
     setStatus(els.consoleStatus, '请输入 REFUND 确认退款。', 'error');
     return;
   }
-  const amountMinor = Math.round(Number(els.refundAmount.value) * 100);
   setBusy(true, '正在向 Stripe 提交退款…');
   try {
     await callAdmin('refund', {
       user_id: state.member.user.id,
       payment_intent: state.pendingPayment.payment_intent,
-      amount: amountMinor,
+      amount: Math.round(Number(els.refundAmount.value) * 100),
       refund_reason: els.refundReason.value,
       subscription_id: els.refundSubscription.value || null,
       subscription_action: els.refundSubscriptionAction.value,
@@ -457,16 +411,21 @@ els.refundForm.addEventListener('submit', async (event) => {
     });
     els.refundDialog.close();
     await refreshMember();
-    state.bootstrap = await callAdmin('bootstrap');
-    renderBootstrap();
+    await refreshBootstrap();
     setStatus(els.consoleStatus, '退款请求已提交，Stripe 状态已刷新。', 'success');
   } catch (error) {
     setStatus(els.consoleStatus, error.message, 'error');
-  } finally { setBusy(false); }
+  } finally {
+    setBusy(false);
+  }
 });
 
 els.cancelForm.addEventListener('submit', async (event) => {
   event.preventDefault();
+  if (event.submitter?.value === 'cancel') {
+    els.cancelDialog.close();
+    return;
+  }
   if (!state.member || !state.pendingSubscription) return;
   if (els.cancelConfirmation.value !== 'CANCEL') {
     setStatus(els.consoleStatus, '请输入 CANCEL 确认取消。', 'error');
@@ -483,28 +442,36 @@ els.cancelForm.addEventListener('submit', async (event) => {
     });
     els.cancelDialog.close();
     await refreshMember();
+    await refreshBootstrap();
     setStatus(els.consoleStatus, '订阅取消设置已提交。', 'success');
   } catch (error) {
     setStatus(els.consoleStatus, error.message, 'error');
-  } finally { setBusy(false); }
+  } finally {
+    setBusy(false);
+  }
 });
 
 document.querySelectorAll('.tab').forEach((tab) => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach((item) => item.classList.toggle('is-active', item === tab));
-    document.querySelectorAll('.tab-panel').forEach((panel) => panel.classList.toggle('is-active', panel.dataset.panel === tab.dataset.tab));
+    document.querySelectorAll('.tab-panel').forEach((panel) => {
+      panel.classList.toggle('is-active', panel.dataset.panel === tab.dataset.tab);
+    });
   });
 });
 
+for (const dialog of [els.refundDialog, els.cancelDialog]) {
+  dialog.addEventListener('click', (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+}
+
 client.auth.onAuthStateChange((_event, session) => {
-  state.session = session;
   if (session) window.setTimeout(() => void bootstrap(), 0);
   else showGate();
 });
 
 const { data, error } = await client.auth.getSession();
-if (error) showGate(error.message);
-else if (data.session) {
-  state.session = data.session;
-  await bootstrap();
-} else showGate();
+if (error) showGate(error.message, 'error');
+else if (data.session) await bootstrap();
+else showGate();
