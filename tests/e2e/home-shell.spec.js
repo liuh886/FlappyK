@@ -110,6 +110,14 @@ test('desktop home owns the viewport and PLAY restores the arcade cabinet', asyn
   await page.getByRole('button', { name: 'PLAY', exact: true }).click();
   await expect(page.locator('html')).toHaveAttribute('data-ui-state', 'playing');
   await expect.poll(() => page.locator('#game-canvas').getAttribute('width')).toBe('896');
+  await expect.poll(async () => {
+    const box = await page.locator('#game-container').boundingBox();
+    return box?.width || 0;
+  }).toBeLessThanOrEqual(898);
+  await expect.poll(async () => {
+    const box = await page.locator('#game-container').boundingBox();
+    return box?.width || 0;
+  }).toBeGreaterThanOrEqual(894);
 
   const gameplay = await page.evaluate(() => {
     const container = document.getElementById('game-container').getBoundingClientRect();
