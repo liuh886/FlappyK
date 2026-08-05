@@ -55,8 +55,8 @@ assert.ok(pixelStyles.includes('width: 176px'));
 assert.ok(pixelStyles.includes('.run-progress-panel .hud-details'));
 assert.ok(pixelStyles.includes('clip-path: none'));
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v14'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v14'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v15'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v15'"));
 assert.ok(serviceWorkerSource.includes("'./data.js'"));
 assert.ok(serviceWorkerSource.includes("'./analytics.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership-config.js'"));
@@ -102,4 +102,4 @@ assert.ok(analyticsSource.includes("track('level_complete'"));
 assert.ok(analyticsSource.includes("track('run_complete'"));
 assert.ok(analyticsSource.includes("track('pwa_install'"));
 
-console.log('PWA manifest, icons, install UI, analytics, unified HUD shell, staged market weather, reliable cloud sync, and refreshed offline cache checks passed');
+console.log('PWA manifest, icons, install UI, analytics, full-viewport home, unified HUD shell, staged market weather, reliable cloud sync, and refreshed offline cache checks passed');

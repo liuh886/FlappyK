@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const hardeningJs = fs.readFileSync('core-hardening.js', 'utf8');
 const refinementJs = fs.readFileSync('scripts/premium-ui-refinement.js', 'utf8');
 const refinementCss = fs.readFileSync('premium-ui-refinement.css', 'utf8');
+const weatherCss = fs.readFileSync('market-weather.css', 'utf8');
 const pwaSource = fs.readFileSync('pwa.js', 'utf8');
 const serviceWorker = fs.readFileSync('sw.js', 'utf8');
 
@@ -58,12 +59,23 @@ assert.ok(refinementCss.includes('clip-path: none'));
 assert.ok(refinementCss.includes('.run-progress-panel .hud-details'));
 assert.ok(!pwaSource.includes('hud-compact.css'));
 
-assert.ok(serviceWorker.includes("flappyk-app-v14"));
-assert.ok(serviceWorker.includes("flappyk-runtime-v14"));
+for (const homeShellContract of [
+  "html[data-ui-state='home'] #game-container.arcade-weather-ready",
+  "html[data-ui-state='home'] .home-console-bezel",
+  "html[data-ui-state='home'] .home-console-screen",
+  'width: 100vw',
+  'height: 100dvh',
+  'grid-template-rows: auto minmax(0, 1fr) auto',
+]) {
+  assert.ok(weatherCss.includes(homeShellContract), `Missing web home shell contract: ${homeShellContract}`);
+}
+
+assert.ok(serviceWorker.includes("flappyk-app-v15"));
+assert.ok(serviceWorker.includes("flappyk-runtime-v15"));
 assert.ok(!serviceWorker.includes("'./hud-compact.css'"));
 assert.ok(serviceWorker.includes("'./scripts/cloud-run-sync-core.js'"));
 assert.ok(serviceWorker.includes("'./membership-sync.css'"));
 assert.ok(serviceWorker.includes("'./market-weather.css'"));
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"));
 
-console.log('Unified weather-performance-progress-control rail, coordinated input dock, modern pixel typography, semantic counters, responsive controls, cloud sync, and PWA cache contracts passed');
+console.log('Full-viewport web home, unified weather-performance-progress-control rail, coordinated input dock, modern pixel typography, semantic counters, responsive controls, cloud sync, and PWA cache contracts passed');
