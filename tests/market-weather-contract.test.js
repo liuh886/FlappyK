@@ -36,6 +36,21 @@ for (const stateSelector of [
   assert.ok(weatherStyles.includes(stateSelector), `Missing weather visual contract: ${stateSelector}`);
 }
 
+for (const transitionContract of [
+  "Object.freeze(['clear', 'cloudy', 'rain'])",
+  'WEATHER_DEBOUNCE_MS',
+  'WEATHER_STEP_MS',
+  'function weatherPath(from, to)',
+  'function runWeatherTransition(target, token)',
+  "layer.dataset.weatherTransition = `${fromState}-to-${nextState}`",
+  'weatherTransitionToken += 1',
+  "setWeatherState('clear', { immediate: true })",
+  'prefersReducedMotion()',
+  'syncWeatherStatusPlacement',
+]) {
+  assert.ok(weatherScript.includes(transitionContract), `Missing staged weather contract: ${transitionContract}`);
+}
+
 for (const detailContract of [
   'installPrimaryActionIcon',
   'installPixelTradeGlyphs',
@@ -43,7 +58,6 @@ for (const detailContract of [
   "'▲'",
   "'▼'",
   "event.key !== 'Enter' && event.key !== ' '",
-  "status.style.transform = 'translateX(-50%) translateY(4px)'",
 ]) {
   assert.ok(weatherScript.includes(detailContract), `Missing arcade detail contract: ${detailContract}`);
 }
@@ -59,6 +73,6 @@ assert.ok(pwa.includes("'./market-weather.css'"), 'PWA loader must attach market
 assert.ok(pwa.includes("'./scripts/market-weather.js'"), 'PWA loader must attach market-weather.js.');
 assert.ok(serviceWorker.includes("'./market-weather.css'"), 'Offline shell must cache market-weather.css.');
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"), 'Offline shell must cache market-weather.js.');
-assert.ok(serviceWorker.includes("flappyk-app-v13"), 'The PWA cache version must advance for the detail polish release.');
+assert.ok(serviceWorker.includes("flappyk-app-v14"), 'The PWA cache version must advance for the staged weather and HUD release.');
 
-console.log('Pixel weather arcade and detail polish contracts passed.');
+console.log('Pixel weather arcade, staged transition, and interaction detail contracts passed.');
