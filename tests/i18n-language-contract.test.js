@@ -8,7 +8,7 @@ const source = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'i18n.js'),
 
 assert.match(source, /navigator\.languages/, 'Language detection must respect the browser preference list.');
 assert.match(source, /storedLanguage/, 'A saved manual language choice must remain supported.');
-assert.match(source, /meta\[property=\\"og:title\\"\]/, 'Open Graph title must be localized.');
-assert.match(source, /meta\[name=\\"twitter:description\\"\]/, 'Twitter description must be localized.');
+assert.ok(source.includes('meta[property="og:title"]'), 'Open Graph title must be localized.');
+assert.ok(source.includes('meta[name="twitter:description"]'), 'Twitter description must be localized.');
 
 console.log('FlappyK i18n language contract passed.');
