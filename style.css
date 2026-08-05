@@ -120,6 +120,13 @@ button {
     border: 4px solid #fff;
     cursor: pointer;
     box-shadow: 4px 4px 0 #27ae60;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+        transform 80ms steps(2, end),
+        box-shadow 80ms steps(2, end),
+        background-color 120ms steps(3, end);
 }
 
 button:hover {
@@ -129,6 +136,25 @@ button:hover {
 button:active {
     transform: translate(4px, 4px);
     box-shadow: none;
+}
+
+:where(button, select, summary, a[href]):focus-visible {
+    outline: 3px solid #fff4a5;
+    outline-offset: 3px;
+}
+
+#start-screen.arcade-home #start-btn.has-dom-play-icon::before {
+    content: none;
+}
+
+.home-play-icon {
+    display: inline-block;
+    margin-right: 12px;
+    color: #d8ff9f;
+    font-family: var(--pixel-font-display, 'Press Start 2P', monospace);
+    font-size: 0.72em;
+    line-height: 1;
+    transform: translateY(-1px);
 }
 
 /* Profit Card Base */
@@ -266,7 +292,7 @@ button:active {
     user-select: none;
     -webkit-tap-highlight-color: transparent;
     cursor: pointer;
-    transition: transform 0.1s, box-shadow 0.1s;
+    transition: transform 80ms steps(2, end), box-shadow 80ms steps(2, end);
 }
 
 .mobile-btn:active {
@@ -287,21 +313,36 @@ button:active {
 }
 
 .trade-emoji {
-    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
-    line-height: 1;
-}
-
-.buy-btn .trade-emoji {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid #fff3a0;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #fff7b2 0%, #f1c40f 48%, #b8860b 100%);
-    box-shadow: 0 0 0 2px rgba(241, 196, 15, 0.28), 0 3px 0 #8a6508;
-    font-size: 19px;
+    border: 2px solid currentColor;
+    border-radius: 0;
+    background: #07111e;
+    box-shadow: 2px 2px 0 #020408;
+    font-family: var(--pixel-font-ui, 'Press Start 2P', monospace);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+    image-rendering: pixelated;
+}
+
+.buy-btn .trade-emoji {
+    border-color: #46e08a;
+    background: #0c2a1b;
+    color: #75f2a9;
+}
+
+.sell-btn .trade-emoji {
+    border-color: #ff6b6b;
+    background: #2d1014;
+    color: #ff9292;
+}
+
+.pixel-trade-glyph {
+    transform: translateY(-1px);
 }
 
 .buy-btn {
@@ -412,5 +453,14 @@ button:active {
     .action-buttons button {
         width: 100%;
         margin: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    button,
+    .mobile-btn,
+    .profit-card,
+    .screen {
+        transition: none !important;
     }
 }
