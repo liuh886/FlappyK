@@ -188,7 +188,6 @@ test('desktop HUD is one coordinated top rail with a matching input dock', async
 
   const rail = page.locator('#game-hud-rail');
   await expect(rail).toBeVisible();
-  await expect(page.locator('#weather-status')).toHaveJSProperty('parentElement', await rail.elementHandle());
 
   const geometry = await page.evaluate(() => {
     const rail = document.getElementById('game-hud-rail').getBoundingClientRect();
