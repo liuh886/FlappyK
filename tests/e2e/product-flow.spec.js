@@ -156,7 +156,7 @@ test('Daily Run is deterministic and produces a restorable friend challenge link
   expect(restored).toEqual(descriptors);
 });
 
-test('mobile gameplay keeps virtual keys and top-right navigation visible', async ({ page }) => {
+test('mobile gameplay keeps virtual keys and rail-integrated navigation visible', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await preparePage(page);
   await markOnboardingSeen(page);
@@ -183,6 +183,7 @@ test('mobile gameplay keeps virtual keys and top-right navigation visible', asyn
   expect(Math.abs(initialShell.containerHeight - initialShell.innerHeight)).toBeLessThanOrEqual(1);
 
   await page.getByRole('button', { name: 'PLAY', exact: true }).click();
+  await expect(page.locator('#game-hud-rail')).toBeVisible();
   await expect(page.locator('#game-top-controls')).toBeVisible();
   await expect(page.locator('#pause-btn')).toBeVisible();
   await expect(page.locator('#game-back-btn')).toBeVisible();
@@ -202,10 +203,15 @@ test('mobile gameplay keeps virtual keys and top-right navigation visible', asyn
   const mobileOrder = await page.locator('#mobile-controls').evaluate((element) => Array.from(element.children).map((child) => child.id || child.className));
   expect(mobileOrder).toEqual(['btn-buy', 'mobile-speed-control', 'btn-sell']);
 
+  const railBox = await page.locator('#game-hud-rail').boundingBox();
   const topControlsBox = await page.locator('#game-top-controls').boundingBox();
+  expect(railBox).not.toBeNull();
   expect(topControlsBox).not.toBeNull();
-  expect(topControlsBox.x).toBeGreaterThan(315);
-  expect(topControlsBox.y).toBeLessThan(50);
+  expect(await page.locator('#game-top-controls').evaluate((element) => element.parentElement?.id)).toBe('game-hud-rail');
+  expect(topControlsBox.x).toBeGreaterThan(railBox.x + railBox.width * 0.62);
+  expect(topControlsBox.right).toBeLessThanOrEqual(railBox.right + 1);
+  expect(topControlsBox.y).toBeGreaterThanOrEqual(railBox.y - 1);
+  expect(topControlsBox.bottom).toBeLessThanOrEqual(railBox.bottom + 1);
 
   const pauseBox = await page.locator('#pause-btn').boundingBox();
   expect(pauseBox).not.toBeNull();
