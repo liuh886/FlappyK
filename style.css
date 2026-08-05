@@ -464,3 +464,85 @@ button:active {
         transition: none !important;
     }
 }
+
+/* Unified HUD rail: three readable performance cells across desktop and mobile. */
+html body #game-container #game-hud-rail {
+    grid-template-columns: minmax(112px, 0.46fr) minmax(336px, 1.42fr) minmax(154px, 0.7fr) auto !important;
+}
+
+html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    padding: 0 !important;
+}
+
+html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] .hud-main {
+    display: contents !important;
+}
+
+html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] .hud-main .hud-stat-row,
+html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] .excess-meter {
+    display: grid !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 7px 9px !important;
+    align-content: center !important;
+    gap: 2px !important;
+    border: 0 !important;
+    background: transparent !important;
+}
+
+html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] .hud-return,
+html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] .excess-meter {
+    border-left: 1px solid rgba(216, 226, 239, 0.22) !important;
+}
+
+html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] .hud-total span,
+html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] .hud-return span,
+html body #game-container #game-hud-rail .excess-meter-label strong {
+    overflow: visible !important;
+    font-size: 13px !important;
+    text-overflow: clip !important;
+    white-space: nowrap !important;
+}
+
+html body #game-container #game-hud-rail .excess-meter-label {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 2px !important;
+    font-size: 7px !important;
+    line-height: 1 !important;
+}
+
+html body #game-container #game-hud-rail .excess-meter-track {
+    width: 100% !important;
+    margin-top: 1px !important;
+}
+
+@media (max-width: 720px), (pointer: coarse) {
+    html body #game-container #game-hud-rail {
+        grid-template-columns: minmax(0, 1fr) auto !important;
+    }
+
+    html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        padding: 0 !important;
+    }
+
+    html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] .hud-main .hud-stat-row,
+    html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] .excess-meter {
+        padding: 5px 6px !important;
+        gap: 1px !important;
+    }
+
+    html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] .hud-total span,
+    html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] .hud-return span,
+    html body #game-container #game-hud-rail .excess-meter-label strong {
+        font-size: 11px !important;
+    }
+
+    html body #game-container #game-hud-rail .hud-metric-label,
+    html body #game-container #game-hud-rail .excess-meter-label {
+        font-size: 6px !important;
+    }
+}
