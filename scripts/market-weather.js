@@ -10,6 +10,9 @@
     const WEATHER_DEBOUNCE_MS = 120;
     const WEATHER_STEP_MS = 560;
     const WEATHER_SETTLE_MS = 80;
+    const EXPLICIT_WEATHER_HOLD_MS = WEATHER_DEBOUNCE_MS
+        + (2 * (WEATHER_STEP_MS + WEATHER_SETTLE_MS))
+        + 300;
     const PRESS_SELECTOR = [
         '#start-btn',
         '#daily-run-btn',
@@ -25,6 +28,7 @@
     let syncFrame = 0;
     let weatherDebounceTimer = 0;
     let weatherTransitionToken = 0;
+    let explicitWeatherUntil = 0;
     let requestedWeather = 'clear';
     let visualWeather = 'clear';
 
@@ -50,6 +54,10 @@
 
     function delay(milliseconds) {
         return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+    }
+
+    function clockNow() {
+        return window.performance?.now?.() ?? Date.now();
     }
 
     function prefersReducedMotion() {
@@ -303,6 +311,13 @@
         const status = document.getElementById('weather-status');
         if (!layer || !status || !WEATHER_STATES.includes(state)) return;
 
+        const source = options.source || 'manual';
+        const currentTime = clockNow();
+        if (source === 'live' && currentTime < explicitWeatherUntil) return;
+        if (source === 'manual') {
+            explicitWeatherUntil = currentTime + EXPLICIT_WEATHER_HOLD_MS;
+        }
+
         const immediate = options.immediate || prefersReducedMotion();
         if (!immediate && requestedWeather === state) return;
 
@@ -362,7 +377,10 @@
 
     function applyMetrics(metrics, options = {}) {
         const state = classifyWeather(metrics);
-        setWeatherState(state, options);
+        setWeatherState(state, {
+            immediate: options.immediate,
+            source: options.source || 'manual',
+        });
         if (!options.silent) detectCrossing(previousMetrics, metrics);
         previousMetrics = metrics ? { ...metrics } : null;
         return state;
@@ -375,7 +393,8 @@
         installPixelTradeGlyphs();
         const homeActive = startScreen?.classList.contains('active');
         if (homeActive) {
-            setWeatherState('clear', { immediate: true });
+            explicitWeatherUntil = 0;
+            setWeatherState('clear', { immediate: true, source: 'system' });
             previousMetrics = null;
             const status = document.getElementById('weather-status');
             if (status && !status.classList.contains('is-event')) {
@@ -385,7 +404,7 @@
         }
 
         const metrics = readLiveMetrics();
-        if (metrics) applyMetrics(metrics);
+        if (metrics) applyMetrics(metrics, { source: 'live' });
     }
 
     function scheduleSync() {
@@ -504,6 +523,7 @@
     window.FlappyKMarketWeather = {
         WEATHER_DEBOUNCE_MS,
         WEATHER_STEP_MS,
+        EXPLICIT_WEATHER_HOLD_MS,
         classifyWeather,
         weatherPath,
         applyMetrics,
