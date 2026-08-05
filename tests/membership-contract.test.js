@@ -104,8 +104,8 @@ assert.ok(pwaSource.includes("ensureStylesheet('flappyk-membership-sync-styles',
 assert.ok(pwaSource.includes("ensureStylesheet('flappyk-market-weather-styles', './market-weather.css')"));
 assert.ok(pwaSource.includes("loadScript('flappyk-market-weather-client', './scripts/market-weather.js')"));
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v12'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v12'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v13'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v13'"));
 assert.ok(serviceWorkerSource.includes("'./membership-config.js'"));
 assert.ok(serviceWorkerSource.includes("'./scripts/cloud-run-sync-core.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership.js'"));
