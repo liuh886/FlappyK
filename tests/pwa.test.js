@@ -55,8 +55,8 @@ assert.ok(pixelStyles.includes('width: 176px'));
 assert.ok(pixelStyles.includes('.run-progress-panel .hud-details'));
 assert.ok(pixelStyles.includes('clip-path: none'));
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v12'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v12'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v13'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v13'"));
 assert.ok(serviceWorkerSource.includes("'./data.js'"));
 assert.ok(serviceWorkerSource.includes("'./analytics.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership-config.js'"));
