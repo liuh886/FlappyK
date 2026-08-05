@@ -142,7 +142,7 @@ test('install prompt exposes a home-screen install action', async ({ page }) => 
   await expect(installButton).toHaveAttribute('data-ready', 'true');
 });
 
-test('account stays right-most inside the game window and completed runs prompt sign-in', async ({ page }) => {
+test('account stays right-most inside the handheld and completed runs prompt sign-in', async ({ page }) => {
   await preparePage(page);
   await page.goto('/');
 
@@ -153,18 +153,21 @@ test('account stays right-most inside the game window and completed runs prompt 
   const accountButton = utilityBar.locator('.membership-launcher');
   const languageButton = utilityBar.locator('#language-toggle-btn');
   await expect(utilityBar).toBeVisible();
+  await expect(utilityBar).toHaveAttribute('data-arcade-placement', 'console');
   await expect(accountButton.locator('.membership-launcher-label')).toHaveText('ACCOUNT');
   await expect(accountButton.locator('.membership-launcher-tier')).toBeHidden();
   await expect(languageButton).toHaveText('中文');
 
   const positions = await page.evaluate(() => {
     const container = document.getElementById('game-container').getBoundingClientRect();
+    const bezel = document.querySelector('.home-console-bezel').getBoundingClientRect();
     const utilityElement = document.getElementById('home-utility-bar');
     const utility = utilityElement.getBoundingClientRect();
     const account = document.querySelector('.membership-launcher').getBoundingClientRect();
     const language = document.getElementById('language-toggle-btn').getBoundingClientRect();
     return {
-      parentId: utilityElement.parentElement?.id,
+      parentClass: utilityElement.parentElement?.className,
+      placement: utilityElement.dataset.arcadePlacement,
       childOrder: Array.from(utilityElement.children).map((element) => (
         element.id || element.className
       )),
@@ -172,19 +175,18 @@ test('account stays right-most inside the game window and completed runs prompt 
       accountRight: account.right,
       languageLeft: language.left,
       topDelta: Math.abs(account.top - language.top),
-      insideLeft: utility.left >= container.left,
-      insideRight: utility.right <= container.right,
-      insideTop: utility.top >= container.top,
+      insideContainer: utility.left >= container.left && utility.right <= container.right && utility.top >= container.top,
+      insideBezel: utility.left >= bezel.left && utility.right <= bezel.right && utility.top >= bezel.top,
     };
   });
-  expect(positions.parentId).toBe('game-container');
+  expect(positions.parentClass).toContain('home-console-topline');
+  expect(positions.placement).toBe('console');
   expect(positions.childOrder).toEqual(['language-toggle-btn', 'membership-launcher']);
   expect(positions.languageLeft).toBeLessThan(positions.accountLeft);
   expect(positions.accountRight).toBeGreaterThan(positions.languageLeft);
   expect(positions.topDelta).toBeLessThan(2);
-  expect(positions.insideLeft).toBe(true);
-  expect(positions.insideRight).toBe(true);
-  expect(positions.insideTop).toBe(true);
+  expect(positions.insideContainer).toBe(true);
+  expect(positions.insideBezel).toBe(true);
   expect(await page.evaluate(() => localStorage.getItem('flappyk_pending_cloud_runs_v1'))).toBeNull();
 
   await showCompletedRunScreen(page);
@@ -281,26 +283,32 @@ test('mobile account controls and dialog remain inside the viewport', async ({ p
 
   await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
   await expect(page.locator('#home-utility-bar')).toBeVisible();
+  await expect(page.locator('#home-utility-bar')).toHaveAttribute('data-arcade-placement', 'console');
   await expect(page.locator('.membership-launcher-label')).toHaveText('账户');
   await expect(page.locator('.membership-launcher-tier')).toBeHidden();
 
   const utilityBounds = await page.evaluate(() => {
     const viewport = { width: window.innerWidth, height: window.innerHeight };
     const container = document.getElementById('game-container').getBoundingClientRect();
+    const bezel = document.querySelector('.home-console-bezel').getBoundingClientRect();
     const utilityElement = document.getElementById('home-utility-bar');
     const utility = utilityElement.getBoundingClientRect();
     const account = document.querySelector('.membership-launcher').getBoundingClientRect();
     const language = document.getElementById('language-toggle-btn').getBoundingClientRect();
     return {
-      parentId: utilityElement.parentElement?.id,
+      parentClass: utilityElement.parentElement?.className,
+      placement: utilityElement.dataset.arcadePlacement,
       accountRightMost: account.right > language.right,
       insideContainer: utility.left >= container.left && utility.right <= container.right,
+      insideBezel: utility.left >= bezel.left && utility.right <= bezel.right,
       insideViewport: utility.left >= 0 && utility.right <= viewport.width && utility.top >= 0,
     };
   });
-  expect(utilityBounds.parentId).toBe('game-container');
+  expect(utilityBounds.parentClass).toContain('home-console-topline');
+  expect(utilityBounds.placement).toBe('console');
   expect(utilityBounds.accountRightMost).toBe(true);
   expect(utilityBounds.insideContainer).toBe(true);
+  expect(utilityBounds.insideBezel).toBe(true);
   expect(utilityBounds.insideViewport).toBe(true);
 
   await page.locator('.membership-launcher').click();

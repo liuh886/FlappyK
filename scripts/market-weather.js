@@ -39,6 +39,16 @@
         }
     }
 
+    function syncHomeUtilityPlacement() {
+        const utilityBar = document.getElementById('home-utility-bar');
+        if (!utilityBar || !gameContainer) return;
+        const topLine = document.querySelector('.home-console-topline');
+        const homeActive = startScreen?.classList.contains('active');
+        const target = homeActive && topLine ? topLine : gameContainer;
+        if (utilityBar.parentElement !== target) target.appendChild(utilityBar);
+        utilityBar.dataset.arcadePlacement = homeActive && topLine ? 'console' : 'game';
+    }
+
     function installWeatherLayer() {
         if (!gameContainer || document.getElementById('market-weather-layer')) return;
 
@@ -110,6 +120,7 @@
         startScreen.replaceChildren(bezel, ...legacyIntroParagraphs);
         startScreen.classList.add('arcade-home');
         syncPrimaryActionLabel();
+        syncHomeUtilityPlacement();
     }
 
     function readLiveMetrics() {
@@ -219,6 +230,7 @@
     }
 
     function syncWeather() {
+        syncHomeUtilityPlacement();
         const homeActive = startScreen?.classList.contains('active');
         if (homeActive) {
             setWeatherState('clear');
@@ -299,6 +311,7 @@
         });
         window.addEventListener('flappyk:layout-state', scheduleSync);
         window.addEventListener('resize', scheduleSync);
+        window.addEventListener('orientationchange', scheduleSync);
     }
 
     init();
@@ -310,5 +323,6 @@
         setWeatherState,
         syncWeather,
         scheduleSync,
+        syncHomeUtilityPlacement,
     };
 })();
