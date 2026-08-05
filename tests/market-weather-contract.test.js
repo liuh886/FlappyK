@@ -40,8 +40,8 @@ for (const detailContract of [
   'installPrimaryActionIcon',
   'installPixelTradeGlyphs',
   "glyph.textContent = symbol",
-  "['▲']",
-  "['▼']",
+  "'▲'",
+  "'▼'",
   "event.key !== 'Enter' && event.key !== ' '",
   "status.style.transform = 'translateX(-50%) translateY(4px)'",
 ]) {
