@@ -338,21 +338,29 @@
         }, WEATHER_DEBOUNCE_MS);
     }
 
+    function clearWeatherEvent(options = {}) {
+        const status = document.getElementById('weather-status');
+        window.clearTimeout(eventTimer);
+        eventTimer = 0;
+        if (!status) return;
+        status.classList.remove('is-event');
+        status.style.removeProperty('transform');
+        delete status.dataset.tone;
+        if (options.restore !== false) {
+            setText(status, stateLabel(visualWeather));
+        }
+    }
+
     function showWeatherEvent(message, tone) {
         const status = document.getElementById('weather-status');
         if (!status) return;
 
-        window.clearTimeout(eventTimer);
+        clearWeatherEvent({ restore: false });
         setText(status, message);
         status.dataset.tone = tone;
         status.classList.add('is-event');
         status.style.transform = 'translateY(2px)';
-        eventTimer = window.setTimeout(() => {
-            status.classList.remove('is-event');
-            status.style.removeProperty('transform');
-            delete status.dataset.tone;
-            setText(status, stateLabel(visualWeather));
-        }, 1150);
+        eventTimer = window.setTimeout(clearWeatherEvent, 1150);
     }
 
     function detectCrossing(previous, current) {
@@ -376,6 +384,7 @@
     }
 
     function applyMetrics(metrics, options = {}) {
+        if (options.silent) clearWeatherEvent();
         const state = classifyWeather(metrics);
         setWeatherState(state, {
             immediate: options.immediate,
@@ -394,10 +403,11 @@
         const homeActive = startScreen?.classList.contains('active');
         if (homeActive) {
             explicitWeatherUntil = 0;
+            clearWeatherEvent({ restore: false });
             setWeatherState('clear', { immediate: true, source: 'system' });
             previousMetrics = null;
             const status = document.getElementById('weather-status');
-            if (status && !status.classList.contains('is-event')) {
+            if (status) {
                 setText(status, text('CLEAR · READY', '晴空 · 准备开始'));
             }
             return;
@@ -529,6 +539,7 @@
         applyMetrics,
         readLiveMetrics,
         setWeatherState,
+        clearWeatherEvent,
         syncWeather,
         scheduleSync,
         scheduleSyncFromMutations,
