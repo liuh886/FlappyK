@@ -78,6 +78,34 @@ test('home opens as a lightweight handheld arcade with immediate play', async ({
   expect(hierarchy.playArea).toBeGreaterThan(hierarchy.dailyArea);
 });
 
+test('arcade controls use semantic pixel glyphs and keyboard press feedback', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await preparePage(page);
+  await page.goto('/');
+  await page.waitForFunction(() => Boolean(window.FlappyKMarketWeather));
+
+  const playButton = page.getByRole('button', { name: 'PLAY', exact: true });
+  const playIcon = playButton.locator('.home-play-icon');
+  await expect(playIcon).toHaveText('▶');
+  await expect(playIcon).toHaveAttribute('aria-hidden', 'true');
+  await expect(page.locator('#btn-buy .trade-emoji')).toHaveText('▲');
+  await expect(page.locator('#btn-sell .trade-emoji')).toHaveText('▼');
+  await expect(page.locator('#btn-buy .trade-emoji')).toHaveClass(/pixel-trade-glyph/);
+  await expect(page.locator('#btn-sell .trade-emoji')).toHaveClass(/pixel-trade-glyph/);
+
+  await page.evaluate(() => {
+    const button = document.getElementById('start-btn');
+    button.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+  });
+  await expect(playButton).toHaveClass(/is-arcade-pressed/);
+
+  await page.evaluate(() => {
+    const button = document.getElementById('start-btn');
+    button.dispatchEvent(new KeyboardEvent('keyup', { key: ' ', bubbles: true }));
+  });
+  await expect(playButton).not.toHaveClass(/is-arcade-pressed/);
+});
+
 test('weather maps performance to clear, cloudy, and rain without changing gameplay', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await preparePage(page);
@@ -104,7 +132,7 @@ test('weather maps performance to clear, cloudy, and rain without changing gamep
   await expect(page.locator('html')).toHaveAttribute('data-market-weather', 'rain');
 });
 
-test('weather boundary events are brief, readable, and non-blocking', async ({ page }) => {
+test('weather boundary events are brief, crisp, readable, and non-blocking', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await preparePage(page);
   await page.goto('/');
@@ -120,5 +148,6 @@ test('weather boundary events are brief, readable, and non-blocking', async ({ p
   await expect(status).toHaveText('RETURN BELOW ZERO');
   await expect(status).toHaveClass(/is-event/);
   await expect(page.locator('#market-weather-layer')).toHaveCSS('pointer-events', 'none');
+  expect(await status.evaluate((element) => element.style.transform.includes('scale'))).toBe(false);
   await expect(status).not.toHaveClass(/is-event/, { timeout: 2000 });
 });
