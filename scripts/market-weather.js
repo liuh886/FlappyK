@@ -5,6 +5,16 @@
     const gameContainer = document.getElementById('game-container');
     const startScreen = document.getElementById('start-screen');
     const EPSILON = 0.00001;
+    const PRESS_SELECTOR = [
+        '#start-btn',
+        '#daily-run-btn',
+        '#btn-buy',
+        '#btn-sell',
+        '.speed-step',
+        '#game-back-btn',
+        '#pause-btn',
+        '.home-secondary-actions button',
+    ].join(', ');
     let previousMetrics = null;
     let eventTimer = 0;
     let syncFrame = 0;
@@ -29,14 +39,50 @@
         if (element && element.textContent !== value) element.textContent = value;
     }
 
+    function readableButtonText(button) {
+        if (!button) return '';
+        return Array.from(button.childNodes)
+            .filter((node) => (
+                node.nodeType === Node.TEXT_NODE
+                || !(node instanceof Element)
+                || node.getAttribute('aria-hidden') !== 'true'
+            ))
+            .map((node) => node.textContent || '')
+            .join('')
+            .trim();
+    }
+
     function syncPrimaryActionLabel() {
         const startButton = document.getElementById('start-btn');
         if (!startButton) return;
-        const visibleLabel = String(startButton.textContent || '').trim();
+        const visibleLabel = readableButtonText(startButton);
         const label = visibleLabel || text('PLAY', '开始游戏');
         if (startButton.getAttribute('aria-label') !== label) {
             startButton.setAttribute('aria-label', label);
         }
+    }
+
+    function installPrimaryActionIcon() {
+        const startButton = document.getElementById('start-btn');
+        if (!startButton || startButton.querySelector('.home-play-icon')) return;
+        const icon = createElement('span', 'home-play-icon', '▶');
+        icon.setAttribute('aria-hidden', 'true');
+        startButton.prepend(icon);
+        startButton.classList.add('has-dom-play-icon');
+        syncPrimaryActionLabel();
+    }
+
+    function installPixelTradeGlyphs() {
+        const glyphs = [
+            [document.querySelector('#btn-buy .trade-emoji'), '▲'],
+            [document.querySelector('#btn-sell .trade-emoji'), '▼'],
+        ];
+        glyphs.forEach(([glyph, symbol]) => {
+            if (!glyph) return;
+            glyph.textContent = symbol;
+            glyph.classList.add('pixel-trade-glyph');
+            glyph.setAttribute('aria-hidden', 'true');
+        });
     }
 
     function syncHomeUtilityPlacement() {
@@ -119,6 +165,7 @@
         });
         startScreen.replaceChildren(bezel, ...legacyIntroParagraphs);
         startScreen.classList.add('arcade-home');
+        installPrimaryActionIcon();
         syncPrimaryActionLabel();
         syncHomeUtilityPlacement();
     }
@@ -177,7 +224,10 @@
         const changed = layer.dataset.weather !== state;
         if (changed) layer.dataset.weather = state;
         if (root.dataset.marketWeather !== state) root.dataset.marketWeather = state;
-        if (!status.classList.contains('is-event')) setText(status, stateLabel(state));
+        if (!status.classList.contains('is-event')) {
+            status.style.removeProperty('transform');
+            setText(status, stateLabel(state));
+        }
 
         if (changed && gameContainer) {
             gameContainer.classList.remove('weather-shift');
@@ -194,8 +244,10 @@
         setText(status, message);
         status.dataset.tone = tone;
         status.classList.add('is-event');
+        status.style.transform = 'translateX(-50%) translateY(4px)';
         eventTimer = window.setTimeout(() => {
             status.classList.remove('is-event');
+            status.style.removeProperty('transform');
             delete status.dataset.tone;
             setText(status, stateLabel(root.dataset.marketWeather || 'clear'));
         }, 1150);
@@ -231,6 +283,8 @@
 
     function syncWeather() {
         syncHomeUtilityPlacement();
+        installPrimaryActionIcon();
+        installPixelTradeGlyphs();
         const homeActive = startScreen?.classList.contains('active');
         if (homeActive) {
             setWeatherState('clear');
@@ -254,20 +308,41 @@
         });
     }
 
-    function bindPressFeedback() {
-        const selector = '#start-btn, #daily-run-btn, #btn-buy, #btn-sell, .trade-hint-buy, .trade-hint-sell';
-        document.addEventListener('pointerdown', (event) => {
-            const target = event.target.closest?.(selector);
-            if (!target) return;
-            target.classList.add('arcade-pressable', 'is-arcade-pressed');
+    function setPressed(element, pressed) {
+        if (!element) return;
+        element.classList.add('arcade-pressable');
+        element.classList.toggle('is-arcade-pressed', pressed);
+    }
+
+    function releasePressedControls() {
+        document.querySelectorAll('.is-arcade-pressed').forEach((element) => {
+            element.classList.remove('is-arcade-pressed');
         });
-        const release = () => {
-            document.querySelectorAll('.is-arcade-pressed').forEach((element) => {
-                element.classList.remove('is-arcade-pressed');
-            });
-        };
-        document.addEventListener('pointerup', release);
-        document.addEventListener('pointercancel', release);
+    }
+
+    function pressTarget(event) {
+        return event.target.closest?.(PRESS_SELECTOR) || null;
+    }
+
+    function bindPressFeedback() {
+        document.addEventListener('pointerdown', (event) => {
+            const target = pressTarget(event);
+            if (target) setPressed(target, true);
+        });
+        document.addEventListener('pointerup', releasePressedControls);
+        document.addEventListener('pointercancel', releasePressedControls);
+        window.addEventListener('blur', releasePressedControls);
+
+        document.addEventListener('keydown', (event) => {
+            if (event.repeat || (event.key !== 'Enter' && event.key !== ' ')) return;
+            const target = pressTarget(event);
+            if (target) setPressed(target, true);
+        });
+        document.addEventListener('keyup', (event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            const target = pressTarget(event);
+            if (target) setPressed(target, false);
+        });
     }
 
     function updateLanguage() {
@@ -277,6 +352,8 @@
         setText(brand, 'FLAPPYK · POCKET MARKET ARCADE');
         setText(kicker, text('HIDDEN MARKET · PRESS PLAY', '隐藏市场 · 按下开始'));
         setText(legend, text('BUY · SELL · BEAT THE MARKET', '买入 · 卖出 · 跑赢市场'));
+        installPrimaryActionIcon();
+        installPixelTradeGlyphs();
         syncPrimaryActionLabel();
         scheduleSync();
     }
@@ -285,6 +362,7 @@
         root.style.setProperty('--pixel-font-readable', "var(--pixel-font-ui, 'Pixelify Sans', monospace)");
         installWeatherLayer();
         installHomeConsole();
+        installPixelTradeGlyphs();
         bindPressFeedback();
         syncWeather();
 
@@ -324,5 +402,7 @@
         syncWeather,
         scheduleSync,
         syncHomeUtilityPlacement,
+        installPrimaryActionIcon,
+        installPixelTradeGlyphs,
     };
 })();

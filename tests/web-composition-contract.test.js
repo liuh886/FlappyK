@@ -47,8 +47,8 @@ assert.ok(refinementCss.includes('clip-path: none'));
 assert.ok(refinementCss.includes('.run-progress-panel .hud-details'));
 assert.ok(!pwaSource.includes('hud-compact.css'));
 
-assert.ok(serviceWorker.includes("flappyk-app-v12"));
-assert.ok(serviceWorker.includes("flappyk-runtime-v12"));
+assert.ok(serviceWorker.includes("flappyk-app-v13"));
+assert.ok(serviceWorker.includes("flappyk-runtime-v13"));
 assert.ok(!serviceWorker.includes("'./hud-compact.css'"));
 assert.ok(serviceWorker.includes("'./scripts/cloud-run-sync-core.js'"));
 assert.ok(serviceWorker.includes("'./membership-sync.css'"));

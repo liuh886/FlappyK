@@ -7,6 +7,7 @@ const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'u
 
 const weatherScript = read('scripts/market-weather.js');
 const weatherStyles = read('market-weather.css');
+const baseStyles = read('style.css');
 const pwa = read('pwa.js');
 const serviceWorker = read('sw.js');
 
@@ -35,10 +36,29 @@ for (const stateSelector of [
   assert.ok(weatherStyles.includes(stateSelector), `Missing weather visual contract: ${stateSelector}`);
 }
 
+for (const detailContract of [
+  'installPrimaryActionIcon',
+  'installPixelTradeGlyphs',
+  "glyph.textContent = symbol",
+  "'▲'",
+  "'▼'",
+  "event.key !== 'Enter' && event.key !== ' '",
+  "status.style.transform = 'translateX(-50%) translateY(4px)'",
+]) {
+  assert.ok(weatherScript.includes(detailContract), `Missing arcade detail contract: ${detailContract}`);
+}
+
+assert.ok(baseStyles.includes('#start-btn.has-dom-play-icon::before'));
+assert.ok(baseStyles.includes('.home-play-icon'));
+assert.ok(baseStyles.includes('.pixel-trade-glyph'));
+assert.ok(baseStyles.includes('.sell-btn .trade-emoji'));
+assert.ok(baseStyles.includes(':where(button, select, summary, a[href]):focus-visible'));
+assert.ok(!baseStyles.includes('"Apple Color Emoji"'), 'Native color emoji must not own trade-button styling.');
+
 assert.ok(pwa.includes("'./market-weather.css'"), 'PWA loader must attach market-weather.css.');
 assert.ok(pwa.includes("'./scripts/market-weather.js'"), 'PWA loader must attach market-weather.js.');
 assert.ok(serviceWorker.includes("'./market-weather.css'"), 'Offline shell must cache market-weather.css.');
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"), 'Offline shell must cache market-weather.js.');
-assert.ok(serviceWorker.includes("flappyk-app-v12"), 'The PWA cache version must advance for the visual release.');
+assert.ok(serviceWorker.includes("flappyk-app-v13"), 'The PWA cache version must advance for the detail polish release.');
 
-console.log('Pixel weather arcade contracts passed.');
+console.log('Pixel weather arcade and detail polish contracts passed.');
