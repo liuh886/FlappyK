@@ -208,10 +208,14 @@ test('mobile gameplay keeps virtual keys and rail-integrated navigation visible'
   expect(railBox).not.toBeNull();
   expect(topControlsBox).not.toBeNull();
   expect(await page.locator('#game-top-controls').evaluate((element) => element.parentElement?.id)).toBe('game-hud-rail');
+  const railRight = railBox.x + railBox.width;
+  const railBottom = railBox.y + railBox.height;
+  const topControlsRight = topControlsBox.x + topControlsBox.width;
+  const topControlsBottom = topControlsBox.y + topControlsBox.height;
   expect(topControlsBox.x).toBeGreaterThan(railBox.x + railBox.width * 0.62);
-  expect(topControlsBox.right).toBeLessThanOrEqual(railBox.right + 1);
+  expect(topControlsRight).toBeLessThanOrEqual(railRight + 1);
   expect(topControlsBox.y).toBeGreaterThanOrEqual(railBox.y - 1);
-  expect(topControlsBox.bottom).toBeLessThanOrEqual(railBox.bottom + 1);
+  expect(topControlsBottom).toBeLessThanOrEqual(railBottom + 1);
 
   const pauseBox = await page.locator('#pause-btn').boundingBox();
   expect(pauseBox).not.toBeNull();
