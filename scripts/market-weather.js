@@ -29,6 +29,15 @@
         if (element && element.textContent !== value) element.textContent = value;
     }
 
+    function syncPrimaryActionLabel() {
+        const startButton = document.getElementById('start-btn');
+        if (!startButton) return;
+        const label = text('PLAY', '开始游戏');
+        if (startButton.getAttribute('aria-label') !== label) {
+            startButton.setAttribute('aria-label', label);
+        }
+    }
+
     function installWeatherLayer() {
         if (!gameContainer || document.getElementById('market-weather-layer')) return;
 
@@ -85,6 +94,7 @@
         bezel.append(topLine, screen, footer);
         startScreen.replaceChildren(bezel);
         startScreen.classList.add('arcade-home');
+        syncPrimaryActionLabel();
     }
 
     function readLiveMetrics() {
@@ -240,6 +250,7 @@
         setText(brand, 'FLAPPYK · POCKET MARKET ARCADE');
         setText(kicker, text('HIDDEN MARKET · PRESS PLAY', '隐藏市场 · 按下开始'));
         setText(legend, text('BUY · SELL · BEAT THE MARKET', '买入 · 卖出 · 跑赢市场'));
+        syncPrimaryActionLabel();
         scheduleSync();
     }
 
