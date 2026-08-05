@@ -14,9 +14,19 @@
         console.warn('FlappyK language preference could not be loaded.', error);
     }
 
+    function preferredBrowserLanguage() {
+        const candidates = [
+            ...(Array.isArray(navigator.languages) ? navigator.languages : []),
+            navigator.language,
+        ].filter(Boolean);
+        return candidates.find((candidate) => /^(zh|en)(?:-|$)/i.test(candidate))
+            || candidates[0]
+            || 'en';
+    }
+
     const language = core.detectLanguage({
         storedLanguage,
-        browserLanguage: navigator.language,
+        browserLanguage: preferredBrowserLanguage(),
     });
     const htmlLanguage = language === 'zh' ? 'zh-CN' : 'en';
     document.documentElement.lang = htmlLanguage;
@@ -142,8 +152,16 @@
 
     function localizeMetadata() {
         document.title = translate(document.title);
-        const description = document.querySelector('meta[name="description"]');
-        if (description) description.content = translate(description.content);
+        [
+            'meta[name="description"]',
+            'meta[property="og:title"]',
+            'meta[property="og:description"]',
+            'meta[name="twitter:title"]',
+            'meta[name="twitter:description"]',
+        ].forEach((selector) => {
+            const meta = document.querySelector(selector);
+            if (meta?.content) meta.content = translate(meta.content);
+        });
     }
 
     installLanguageToggle();
