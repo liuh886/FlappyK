@@ -47,10 +47,12 @@ assert.ok(refinementCss.includes('clip-path: none'));
 assert.ok(refinementCss.includes('.run-progress-panel .hud-details'));
 assert.ok(!pwaSource.includes('hud-compact.css'));
 
-assert.ok(serviceWorker.includes("flappyk-app-v10"));
-assert.ok(serviceWorker.includes("flappyk-runtime-v10"));
+assert.ok(serviceWorker.includes("flappyk-app-v11"));
+assert.ok(serviceWorker.includes("flappyk-runtime-v11"));
 assert.ok(!serviceWorker.includes("'./hud-compact.css'"));
 assert.ok(serviceWorker.includes("'./scripts/cloud-run-sync-core.js'"));
 assert.ok(serviceWorker.includes("'./membership-sync.css'"));
+assert.ok(serviceWorker.includes("'./market-weather.css'"));
+assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"));
 
-console.log('Modern pixel typography, owner-scoped compact low-obstruction HUD, semantic run counter, normalized labels, enlarged frame, controls, reliable cloud sync, and PWA cache contracts passed');
+console.log('Modern pixel typography, owner-scoped compact low-obstruction HUD, semantic run counter, normalized labels, enlarged frame, controls, market weather, reliable cloud sync, and PWA cache contracts passed');
