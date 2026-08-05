@@ -31,9 +31,23 @@ for (const stateSelector of [
   "[data-weather='rain']",
   '.home-console-bezel',
   '.home-console-screen',
+  "html[data-ui-state='home'] #game-container.arcade-weather-ready",
+  "html[data-ui-state='home'] .home-console-bezel",
+  "html[data-ui-state='home'] .home-console-screen",
   '@media (prefers-reduced-motion: reduce)',
 ]) {
   assert.ok(weatherStyles.includes(stateSelector), `Missing weather visual contract: ${stateSelector}`);
+}
+
+for (const homeShellContract of [
+  'width: 100vw',
+  'height: 100dvh',
+  'grid-template-rows: auto minmax(0, 1fr) auto',
+  'clip-path: none',
+  'justify-content: center',
+  'The web home owns the viewport; the arcade cabinet belongs to gameplay.',
+]) {
+  assert.ok(weatherStyles.includes(homeShellContract), `Missing full-viewport home contract: ${homeShellContract}`);
 }
 
 for (const transitionContract of [
@@ -85,6 +99,6 @@ assert.ok(pwa.includes("'./market-weather.css'"), 'PWA loader must attach market
 assert.ok(pwa.includes("'./scripts/market-weather.js'"), 'PWA loader must attach market-weather.js.');
 assert.ok(serviceWorker.includes("'./market-weather.css'"), 'Offline shell must cache market-weather.css.');
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"), 'Offline shell must cache market-weather.js.');
-assert.ok(serviceWorker.includes("flappyk-app-v14"), 'The PWA cache version must advance for the staged weather and HUD release.');
+assert.ok(serviceWorker.includes("flappyk-app-v15"), 'The PWA cache version must advance for the full-viewport home release.');
 
-console.log('Pixel weather arcade, staged transition, explicit ownership, stale-event cleanup, mutation isolation, and interaction detail contracts passed.');
+console.log('Pixel weather arcade, staged transition, explicit ownership, stale-event cleanup, full-viewport home shell, and interaction detail contracts passed.');
