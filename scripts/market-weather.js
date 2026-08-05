@@ -3,8 +3,13 @@
 
     const root = document.documentElement;
     const gameContainer = document.getElementById('game-container');
+    const uiLayer = document.getElementById('ui-layer');
     const startScreen = document.getElementById('start-screen');
     const EPSILON = 0.00001;
+    const WEATHER_STATES = Object.freeze(['clear', 'cloudy', 'rain']);
+    const WEATHER_DEBOUNCE_MS = 120;
+    const WEATHER_STEP_MS = 560;
+    const WEATHER_SETTLE_MS = 80;
     const PRESS_SELECTOR = [
         '#start-btn',
         '#daily-run-btn',
@@ -18,6 +23,10 @@
     let previousMetrics = null;
     let eventTimer = 0;
     let syncFrame = 0;
+    let weatherDebounceTimer = 0;
+    let weatherTransitionToken = 0;
+    let requestedWeather = 'clear';
+    let visualWeather = 'clear';
 
     function isChinese() {
         return root.dataset.flappykLanguage === 'zh'
@@ -37,6 +46,14 @@
 
     function setText(element, value) {
         if (element && element.textContent !== value) element.textContent = value;
+    }
+
+    function delay(milliseconds) {
+        return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+    }
+
+    function prefersReducedMotion() {
+        return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false;
     }
 
     function readableButtonText(button) {
@@ -95,12 +112,23 @@
         utilityBar.dataset.arcadePlacement = homeActive && topLine ? 'console' : 'game';
     }
 
+    function syncWeatherStatusPlacement() {
+        const status = document.getElementById('weather-status');
+        if (!status) return;
+        const rail = document.getElementById('game-hud-rail');
+        const target = rail || uiLayer || gameContainer;
+        if (!target || status.parentElement === target) return;
+        if (rail) rail.prepend(status);
+        else target.appendChild(status);
+    }
+
     function installWeatherLayer() {
         if (!gameContainer || document.getElementById('market-weather-layer')) return;
 
         const layer = createElement('div', 'market-weather-layer');
         layer.id = 'market-weather-layer';
         layer.dataset.weather = 'clear';
+        layer.dataset.weatherTarget = 'clear';
 
         const decorativeElements = [
             createElement('span', 'weather-sun'),
@@ -118,11 +146,12 @@
         status.setAttribute('aria-live', 'polite');
         status.setAttribute('aria-atomic', 'true');
         setText(status, text('CLEAR · READY', '晴空 · 准备开始'));
-        layer.appendChild(status);
 
         gameContainer.prepend(layer);
+        (uiLayer || gameContainer).appendChild(status);
         gameContainer.classList.add('arcade-weather-ready');
         root.dataset.marketWeather = 'clear';
+        root.dataset.marketWeatherVisual = 'clear';
     }
 
     function installHomeConsole() {
@@ -216,24 +245,82 @@
         return text('CLEAR · AHEAD', '晴空 · 跑赢市场');
     }
 
-    function setWeatherState(state) {
+    function weatherPath(from, to) {
+        const fromIndex = WEATHER_STATES.indexOf(from);
+        const toIndex = WEATHER_STATES.indexOf(to);
+        if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return [];
+        const direction = toIndex > fromIndex ? 1 : -1;
+        const path = [];
+        for (let index = fromIndex + direction; index !== toIndex + direction; index += direction) {
+            path.push(WEATHER_STATES[index]);
+        }
+        return path;
+    }
+
+    function applyVisualWeather(state, transition = '') {
         const layer = document.getElementById('market-weather-layer');
         const status = document.getElementById('weather-status');
-        if (!layer || !status) return;
+        if (!layer || !status || !WEATHER_STATES.includes(state)) return;
 
-        const changed = layer.dataset.weather !== state;
-        if (changed) layer.dataset.weather = state;
-        if (root.dataset.marketWeather !== state) root.dataset.marketWeather = state;
+        visualWeather = state;
+        layer.dataset.weather = state;
+        root.dataset.marketWeatherVisual = state;
+        if (transition) layer.dataset.weatherTransition = transition;
+        else delete layer.dataset.weatherTransition;
         if (!status.classList.contains('is-event')) {
             status.style.removeProperty('transform');
             setText(status, stateLabel(state));
         }
+    }
 
-        if (changed && gameContainer) {
-            gameContainer.classList.remove('weather-shift');
-            requestAnimationFrame(() => gameContainer.classList.add('weather-shift'));
-            window.setTimeout(() => gameContainer.classList.remove('weather-shift'), 420);
+    async function runWeatherTransition(target, token) {
+        const layer = document.getElementById('market-weather-layer');
+        if (!layer || token !== weatherTransitionToken) return;
+        const path = weatherPath(visualWeather, target);
+        if (!path.length) {
+            delete layer.dataset.weatherTransition;
+            return;
         }
+
+        for (const nextState of path) {
+            if (token !== weatherTransitionToken) return;
+            const fromState = visualWeather;
+            layer.dataset.weatherTransition = `${fromState}-to-${nextState}`;
+            await delay(WEATHER_STEP_MS);
+            if (token !== weatherTransitionToken) return;
+            applyVisualWeather(nextState, `${fromState}-to-${nextState}`);
+            await delay(WEATHER_SETTLE_MS);
+        }
+
+        if (token === weatherTransitionToken) {
+            delete layer.dataset.weatherTransition;
+            layer.dataset.weatherTarget = target;
+        }
+    }
+
+    function setWeatherState(state, options = {}) {
+        const layer = document.getElementById('market-weather-layer');
+        const status = document.getElementById('weather-status');
+        if (!layer || !status || !WEATHER_STATES.includes(state)) return;
+
+        const immediate = options.immediate || prefersReducedMotion();
+        if (!immediate && requestedWeather === state) return;
+
+        requestedWeather = state;
+        root.dataset.marketWeather = state;
+        layer.dataset.weatherTarget = state;
+        window.clearTimeout(weatherDebounceTimer);
+
+        if (immediate) {
+            weatherTransitionToken += 1;
+            applyVisualWeather(state);
+            return;
+        }
+
+        const token = ++weatherTransitionToken;
+        weatherDebounceTimer = window.setTimeout(() => {
+            void runWeatherTransition(state, token);
+        }, WEATHER_DEBOUNCE_MS);
     }
 
     function showWeatherEvent(message, tone) {
@@ -244,12 +331,12 @@
         setText(status, message);
         status.dataset.tone = tone;
         status.classList.add('is-event');
-        status.style.transform = 'translateX(-50%) translateY(4px)';
+        status.style.transform = 'translateY(2px)';
         eventTimer = window.setTimeout(() => {
             status.classList.remove('is-event');
             status.style.removeProperty('transform');
             delete status.dataset.tone;
-            setText(status, stateLabel(root.dataset.marketWeather || 'clear'));
+            setText(status, stateLabel(visualWeather));
         }, 1150);
     }
 
@@ -275,7 +362,7 @@
 
     function applyMetrics(metrics, options = {}) {
         const state = classifyWeather(metrics);
-        setWeatherState(state);
+        setWeatherState(state, options);
         if (!options.silent) detectCrossing(previousMetrics, metrics);
         previousMetrics = metrics ? { ...metrics } : null;
         return state;
@@ -283,11 +370,12 @@
 
     function syncWeather() {
         syncHomeUtilityPlacement();
+        syncWeatherStatusPlacement();
         installPrimaryActionIcon();
         installPixelTradeGlyphs();
         const homeActive = startScreen?.classList.contains('active');
         if (homeActive) {
-            setWeatherState('clear');
+            setWeatherState('clear', { immediate: true });
             previousMetrics = null;
             const status = document.getElementById('weather-status');
             if (status && !status.classList.contains('is-event')) {
@@ -355,6 +443,7 @@
         installPrimaryActionIcon();
         installPixelTradeGlyphs();
         syncPrimaryActionLabel();
+        applyVisualWeather(visualWeather);
         scheduleSync();
     }
 
@@ -395,14 +484,20 @@
     init();
 
     window.FlappyKMarketWeather = {
+        WEATHER_DEBOUNCE_MS,
+        WEATHER_STEP_MS,
         classifyWeather,
+        weatherPath,
         applyMetrics,
         readLiveMetrics,
         setWeatherState,
         syncWeather,
         scheduleSync,
         syncHomeUtilityPlacement,
+        syncWeatherStatusPlacement,
         installPrimaryActionIcon,
         installPixelTradeGlyphs,
+        get requestedWeather() { return requestedWeather; },
+        get visualWeather() { return visualWeather; },
     };
 })();
