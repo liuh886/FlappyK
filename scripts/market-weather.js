@@ -396,6 +396,24 @@
         });
     }
 
+    function mutationElement(mutation) {
+        const target = mutation?.target;
+        if (!target) return null;
+        if (target.nodeType === Node.TEXT_NODE) return target.parentElement;
+        return target instanceof Element ? target : null;
+    }
+
+    function isWeatherOwnedMutation(mutation) {
+        const element = mutationElement(mutation);
+        return Boolean(element?.closest?.('#market-weather-layer, #weather-status'));
+    }
+
+    function scheduleSyncFromMutations(mutations) {
+        if (mutations.some((mutation) => !isWeatherOwnedMutation(mutation))) {
+            scheduleSync();
+        }
+    }
+
     function setPressed(element, pressed) {
         if (!element) return;
         element.classList.add('arcade-pressable');
@@ -464,7 +482,7 @@
             });
         }
         if (gameContainer) {
-            new MutationObserver(scheduleSync).observe(gameContainer, {
+            new MutationObserver(scheduleSyncFromMutations).observe(gameContainer, {
                 subtree: true,
                 childList: true,
                 characterData: true,
@@ -493,6 +511,7 @@
         setWeatherState,
         syncWeather,
         scheduleSync,
+        scheduleSyncFromMutations,
         syncHomeUtilityPlacement,
         syncWeatherStatusPlacement,
         installPrimaryActionIcon,
