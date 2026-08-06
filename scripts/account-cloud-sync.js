@@ -66,10 +66,13 @@
 
     async function recordCurrentRun() {
         if (!accountState?.user || !window.HaoAccount) return;
-        const cards = Array.isArray(window.collectedCards) ? window.collectedCards : null;
-        const score = scoreApi.calculate(cards, window.finalReturn);
+        const cards = typeof collectedCards !== 'undefined' && Array.isArray(collectedCards)
+            ? collectedCards
+            : null;
+        const cumulativeReturn = typeof finalReturn !== 'undefined' ? finalReturn : null;
+        const score = scoreApi.calculate(cards, cumulativeReturn);
         if (!score) return;
-        const signature = profileApi.buildRunSignature(cards, window.finalReturn);
+        const signature = profileApi.buildRunSignature(cards, cumulativeReturn);
         if (!signature) return;
 
         try {
