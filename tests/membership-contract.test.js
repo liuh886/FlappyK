@@ -77,8 +77,8 @@ for (const retiredRuntime of [
   assert.ok(!pwaSource.includes(retiredRuntime), `PWA runtime still loads retired account code: ${retiredRuntime}`);
 }
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v18'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v18'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v19'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v19'"));
 for (const retainedAsset of [
   "'./membership-config.js'",
   "'./account-integration.css'",
@@ -87,6 +87,8 @@ for (const retainedAsset of [
   "'./scripts/market-weather.js'",
   "'./premium-ui.css'",
   "'./premium-ui-refinement.css'",
+  "'./home-story.css'",
+  "'./scripts/home-story.js'",
 ]) {
   assert.ok(serviceWorkerSource.includes(retainedAsset), `Offline shell is missing ${retainedAsset}`);
 }
@@ -130,4 +132,4 @@ for (const privacyContract of [
   assert.ok(privacySource.includes(privacyContract), `Cloud-history documentation is missing ${privacyContract}`);
 }
 
-console.log('Shared account, dedicated home toolbar, personal cloud history, PWA v18, privacy, trusted-ranking separation, and RLS boundaries validated');
+console.log('Shared account, dedicated home toolbar, personal cloud history, PWA v19, privacy, trusted-ranking separation, and RLS boundaries validated');

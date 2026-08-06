@@ -102,8 +102,10 @@ assert.ok(pwa.includes("'./market-weather.css'"), 'PWA loader must attach market
 assert.ok(pwa.includes("'./scripts/market-weather.js'"), 'PWA loader must attach market-weather.js.');
 assert.ok(serviceWorker.includes("'./market-weather.css'"), 'Offline shell must cache market-weather.css.');
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"), 'Offline shell must cache scripts/market-weather.js.');
-assert.ok(serviceWorker.includes("flappyk-app-v18"), 'The PWA cache version must advance for the unified HUD release.');
+assert.ok(serviceWorker.includes("flappyk-app-v19"), 'The PWA cache version must advance for the two-page home release.');
+assert.ok(serviceWorker.includes("'./home-story.css'"), 'Offline shell must cache the second home panel styles.');
+assert.ok(serviceWorker.includes("'./scripts/home-story.js'"), 'Offline shell must cache the second home panel behavior.');
 assert.ok(serviceWorker.includes("'./account-integration.css'"), 'Offline shell must cache the account toolbar styles.');
 assert.ok(serviceWorker.includes("'./scripts/account-cloud-sync.js'"), 'Offline shell must cache the account cloud bridge.');
 
-console.log('Pixel weather arcade, staged transition, restrained HUD status-light language, explicit ownership, stale-event cleanup, full-viewport home shell, account-toolbar cache, cloud history, and interaction detail contracts passed.');
+console.log('Pixel weather arcade, staged transition, restrained HUD status-light language, explicit ownership, stale-event cleanup, two-page full-viewport home shell, account-toolbar cache, cloud history, and interaction detail contracts passed.');
