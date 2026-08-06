@@ -1,6 +1,41 @@
 (() => {
     'use strict';
 
+    function ensureHomeAccountToolbar() {
+        const startScreen = document.getElementById('start-screen');
+        if (!startScreen) return;
+
+        let toolbar = document.getElementById('home-utility-bar');
+        if (!toolbar) {
+            toolbar = document.createElement('div');
+            toolbar.id = 'home-utility-bar';
+            toolbar.className = 'home-utility-bar';
+            toolbar.dataset.arcadePlacement = 'console';
+            toolbar.setAttribute('aria-label', 'Language and player account');
+
+            const languageSlot = document.createElement('div');
+            languageSlot.id = 'language-toggle-slot';
+            languageSlot.className = 'home-language-slot';
+
+            const accountSlot = document.createElement('div');
+            accountSlot.className = 'home-account-slot';
+            accountSlot.dataset.accountSlot = '';
+
+            toolbar.append(languageSlot, accountSlot);
+            startScreen.prepend(toolbar);
+        }
+
+        if (!document.getElementById('flappyk-account-integration-styles')) {
+            const stylesheet = document.createElement('link');
+            stylesheet.id = 'flappyk-account-integration-styles';
+            stylesheet.rel = 'stylesheet';
+            stylesheet.href = './account-integration.css';
+            document.head.appendChild(stylesheet);
+        }
+    }
+
+    ensureHomeAccountToolbar();
+
     window.HaoAccountConfig = Object.freeze({
         enabled: true,
         billingEnabled: false,
@@ -12,8 +47,8 @@
         checkoutFunctionUrl: 'https://blgwlycfcwvsupmqyqwn.supabase.co/functions/v1/create-checkout-session',
         portalFunctionUrl: 'https://blgwlycfcwvsupmqyqwn.supabase.co/functions/v1/create-portal-session',
         redirectUrl: 'https://liuh886.github.io/FlappyK/',
-        mountSelectors: ['#start-screen .home-secondary-actions', '#start-screen .start-actions', '#start-screen'],
-        compactTrigger: true,
+        mountSelectors: ['[data-account-slot]', '#start-screen'],
+        compactTrigger: false,
         title: {
             zh: 'FlappyK 玩家账户',
             en: 'FlappyK player account',
