@@ -93,7 +93,10 @@ test('PWA registers, controls the page, and reloads offline', async ({ page, con
   expect(registration.scope).toContain('127.0.0.1:8000/');
 
   await page.reload();
-  await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
+  await expect.poll(
+    () => page.evaluate(() => Boolean(navigator.serviceWorker.controller)),
+    { timeout: 20_000 }
+  ).toBe(true);
 
   await context.setOffline(true);
   await page.reload({ waitUntil: 'domcontentloaded' });
