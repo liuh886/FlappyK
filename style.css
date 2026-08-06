@@ -582,7 +582,7 @@ html[data-market-weather='rain'] body #game-container #game-hud-rail .weather-st
 }
 
 html body #game-container #game-hud-rail .weather-status.is-event {
-    background: var(--hud-cell) !important;
+    background: transparent !important;
     color: var(--hud-value) !important;
 }
 
