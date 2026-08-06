@@ -1,0 +1,28 @@
+name: Bump Account Shell v2
+
+on:
+  push:
+    branches: [agent/account-shell-v2]
+    paths:
+      - 'scripts/bump-account-shell-v2.mjs'
+      - '.github/workflows/bump-account-shell-v2.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/account-shell-v2
+      - run: node scripts/bump-account-shell-v2.mjs
+      - name: Commit cache-busting references
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add index.html tests/membership-contract.test.js tests/pwa.test.js
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: load Account Shell v2"
+          git push origin HEAD:agent/account-shell-v2
