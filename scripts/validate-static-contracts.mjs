@@ -104,8 +104,8 @@ for (const contract of [
   if (!membershipConfig.includes(contract)) throw new Error(`FlappyK account config is missing ${contract}`);
 }
 for (const reference of [
-  'https://liuh886.github.io/admin/shared/account-shell.css?v=1',
-  'https://liuh886.github.io/admin/shared/account-shell.js?v=1',
+  'https://liuh886.github.io/admin/shared/account-shell.css?v=2',
+  'https://liuh886.github.io/admin/shared/account-shell.js?v=2',
   'scripts/account-cloud-sync.js',
 ]) {
   if (!index.includes(reference)) throw new Error(`FlappyK index is missing ${reference}`);
@@ -126,4 +126,4 @@ for (const forbidden of [/sk_(live|test)_/, /whsec_/, /sb_secret_/, /service_rol
 
 requireFile('data/leaderboard.json');
 requireFile('.github/workflows/leaderboard.yml');
-console.log('Structured gameplay, PWA, analytics, account, cloud-history, and asset contracts passed.');
+console.log('Structured gameplay, PWA, analytics, Account Shell v2, cloud-history, and asset contracts passed.');
