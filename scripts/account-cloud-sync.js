@@ -2,8 +2,7 @@
     'use strict';
 
     const profileApi = window.FlappyKPlayerProfile;
-    const scoreApi = window.FlappyKLegendScore;
-    if (!profileApi || !scoreApi) return;
+    if (!profileApi) return;
 
     let accountState = null;
     let syncing = false;
@@ -51,12 +50,13 @@
                 },
             });
             const client = await window.HaoAccount.getClient();
-            await client.from('profiles').update({
+            const { error } = await client.from('profiles').update({
                 best_excess: merged.bestExcess,
                 runs_completed: merged.runsCompleted,
                 markets_beaten: merged.marketsBeaten,
                 last_seen_at: new Date().toISOString(),
             }).eq('id', accountState.user.id);
+            if (error) throw error;
         } catch (error) {
             console.warn('FlappyK personal cloud profile sync failed.', error);
         } finally {
@@ -64,27 +64,39 @@
         }
     }
 
-    async function recordCurrentRun() {
+    function normalizedCompletedRun(detail) {
+        const score = detail?.score;
+        const signature = String(detail?.signature || '').trim();
+        if (!signature || !score || !Array.isArray(score.games) || score.games.length !== 3) return null;
+
+        const totalReturn = Number(score.totalReturn);
+        const totalExcess = Number(score.totalExcess ?? score.excess);
+        if (!Number.isFinite(totalReturn) || !Number.isFinite(totalExcess)) return null;
+
+        return {
+            signature,
+            mode: detail.mode === 'daily' ? 'daily' : 'normal',
+            totalReturn,
+            totalExcess,
+            games: score.games,
+        };
+    }
+
+    async function recordCompletedRun(detail) {
         if (!accountState?.user || !window.HaoAccount) return;
-        const cards = typeof collectedCards !== 'undefined' && Array.isArray(collectedCards)
-            ? collectedCards
-            : null;
-        const cumulativeReturn = typeof finalReturn !== 'undefined' ? finalReturn : null;
-        const score = scoreApi.calculate(cards, cumulativeReturn);
-        if (!score) return;
-        const signature = profileApi.buildRunSignature(cards, cumulativeReturn);
-        if (!signature) return;
+        const run = normalizedCompletedRun(detail);
+        if (!run) return;
 
         try {
             const client = await window.HaoAccount.getClient();
             const { error } = await client.from('game_runs').upsert({
                 user_id: accountState.user.id,
                 product_code: 'flappyk',
-                local_signature: signature,
-                mode: document.documentElement.dataset.dailyRunActive === 'true' ? 'daily' : 'normal',
-                total_return_pct: score.totalReturn,
-                total_excess_pct: score.totalExcess,
-                games: score.games,
+                local_signature: run.signature,
+                mode: run.mode,
+                total_return_pct: run.totalReturn,
+                total_excess_pct: run.totalExcess,
+                games: run.games,
                 completed_at: new Date().toISOString(),
             }, {
                 onConflict: 'user_id,local_signature',
@@ -102,8 +114,8 @@
         if (accountState?.user) void syncProfile();
     });
 
-    document.getElementById('champagne-btn')?.addEventListener('click', () => {
-        window.setTimeout(() => void recordCurrentRun(), 0);
+    window.addEventListener('flappyk:run-completed', (event) => {
+        void recordCompletedRun(event.detail);
     });
 
     const current = window.HaoAccount?.getState?.();
