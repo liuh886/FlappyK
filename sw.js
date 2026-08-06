@@ -1,5 +1,5 @@
-const APP_CACHE = 'flappyk-app-v15';
-const RUNTIME_CACHE = 'flappyk-runtime-v15';
+const APP_CACHE = 'flappyk-app-v16';
+const RUNTIME_CACHE = 'flappyk-runtime-v16';
 
 const APP_SHELL = [
     './',
@@ -51,6 +51,7 @@ const APP_SHELL = [
     './share-challenge.js',
     './card-export.js',
     './scripts/player-profile.js',
+    './scripts/account-cloud-sync.js',
     './pwa.js',
     './scripts/ui-state.js',
     './scripts/premium-ui.js',
