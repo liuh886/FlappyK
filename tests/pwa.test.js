@@ -52,8 +52,8 @@ assert.ok(indexSource.includes('scripts/ui-state.js'));
 assert.ok(indexSource.includes('scripts/premium-ui.js'));
 assert.ok(indexSource.includes('scripts/home-story.js'));
 assert.ok(indexSource.includes('pwa.js'));
-assert.ok(indexSource.includes('https://liuh886.github.io/admin/shared/account-shell.css?v=1'));
-assert.ok(indexSource.includes('async src="https://liuh886.github.io/admin/shared/account-shell.js?v=1"'));
+assert.ok(indexSource.includes('https://liuh886.github.io/admin/shared/account-shell.css?v=2'));
+assert.ok(indexSource.includes('async src="https://liuh886.github.io/admin/shared/account-shell.js?v=2"'));
 assert.ok(indexSource.includes('scripts/account-cloud-sync.js'));
 
 assert.ok(pixelStyles.includes("family=Pixelify+Sans"));
