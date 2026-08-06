@@ -1,5 +1,5 @@
-const APP_CACHE = 'flappyk-app-v16';
-const RUNTIME_CACHE = 'flappyk-runtime-v16';
+const APP_CACHE = 'flappyk-app-v17';
+const RUNTIME_CACHE = 'flappyk-runtime-v17';
 
 const APP_SHELL = [
     './',
@@ -22,6 +22,7 @@ const APP_SHELL = [
     './pwa.css',
     './premium-ui.css',
     './premium-ui-refinement.css',
+    './account-integration.css',
     './market-weather.css',
     './data.js',
     './qqq-loader.js',
