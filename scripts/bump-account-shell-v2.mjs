@@ -14,3 +14,5 @@ for (const file of files) {
   if (next === source) throw new Error(`${file} did not contain Account Shell v1.`);
   await writeFile(file, next, 'utf8');
 }
+
+// One-shot branch update. Remove before merge.
