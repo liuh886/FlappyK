@@ -58,6 +58,7 @@ assert.ok(refinementCss.includes('box-shadow: none'));
 assert.ok(refinementCss.includes('clip-path: none'));
 assert.ok(refinementCss.includes('.run-progress-panel .hud-details'));
 assert.ok(!pwaSource.includes('hud-compact.css'));
+assert.ok(!pwaSource.includes('flappyk-membership-client'));
 
 for (const homeShellContract of [
   "html[data-ui-state='home'] #game-container.arcade-weather-ready",
@@ -70,12 +71,14 @@ for (const homeShellContract of [
   assert.ok(weatherCss.includes(homeShellContract), `Missing web home shell contract: ${homeShellContract}`);
 }
 
-assert.ok(serviceWorker.includes("flappyk-app-v15"));
-assert.ok(serviceWorker.includes("flappyk-runtime-v15"));
+assert.ok(serviceWorker.includes("flappyk-app-v16"));
+assert.ok(serviceWorker.includes("flappyk-runtime-v16"));
 assert.ok(!serviceWorker.includes("'./hud-compact.css'"));
-assert.ok(serviceWorker.includes("'./scripts/cloud-run-sync-core.js'"));
-assert.ok(serviceWorker.includes("'./membership-sync.css'"));
+assert.ok(serviceWorker.includes("'./scripts/account-cloud-sync.js'"));
+assert.ok(serviceWorker.includes("'./membership-config.js'"));
+assert.ok(!serviceWorker.includes("'./scripts/cloud-run-sync-core.js'"));
+assert.ok(!serviceWorker.includes("'./membership-sync.css'"));
 assert.ok(serviceWorker.includes("'./market-weather.css'"));
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"));
 
-console.log('Full-viewport web home, unified weather-performance-progress-control rail, coordinated input dock, modern pixel typography, semantic counters, responsive controls, cloud sync, and PWA cache contracts passed');
+console.log('Full-viewport web home, unified weather-performance-progress-control rail, coordinated input dock, modern pixel typography, semantic counters, responsive controls, personal cloud history, and PWA cache contracts passed');
