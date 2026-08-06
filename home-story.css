@@ -3,7 +3,12 @@
     overflow: hidden;
 }
 
-#start-screen.is-story-active > :not(.home-story-slide):not(.home-story-navigation) {
+/* The weather module owns the home-console wrapper. Keep that shell and page inside its screen. */
+#start-screen.is-story-active > :not(.home-story-slide):not(.home-story-navigation):not(.home-console-bezel) {
+    display: none !important;
+}
+
+#start-screen.is-story-active .home-console-screen > :not(.home-story-slide):not(.home-story-navigation) {
     display: none !important;
 }
 
