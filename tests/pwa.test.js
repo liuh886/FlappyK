@@ -7,6 +7,7 @@ const serviceWorkerSource = fs.readFileSync('sw.js', 'utf8');
 const pwaSource = fs.readFileSync('pwa.js', 'utf8');
 const analyticsSource = fs.readFileSync('analytics.js', 'utf8');
 const pixelStyles = fs.readFileSync('premium-ui-refinement.css', 'utf8');
+const accountStyles = fs.readFileSync('account-integration.css', 'utf8');
 
 assert.equal(manifest.id, './');
 assert.equal(manifest.start_url, './?source=pwa');
@@ -47,7 +48,7 @@ assert.ok(indexSource.includes('scripts/ui-state.js'));
 assert.ok(indexSource.includes('scripts/premium-ui.js'));
 assert.ok(indexSource.includes('pwa.js'));
 assert.ok(indexSource.includes('https://liuh886.github.io/admin/shared/account-shell.css?v=1'));
-assert.ok(indexSource.includes('https://liuh886.github.io/admin/shared/account-shell.js?v=1'));
+assert.ok(indexSource.includes('async src="https://liuh886.github.io/admin/shared/account-shell.js?v=1"'));
 assert.ok(indexSource.includes('scripts/account-cloud-sync.js'));
 
 assert.ok(pixelStyles.includes("family=Pixelify+Sans"));
@@ -57,12 +58,16 @@ assert.ok(pixelStyles.includes("grid-template-columns: minmax(0, 1fr) minmax(108
 assert.ok(pixelStyles.includes('width: 176px'));
 assert.ok(pixelStyles.includes('.run-progress-panel .hud-details'));
 assert.ok(pixelStyles.includes('clip-path: none'));
+assert.ok(accountStyles.includes('.home-utility-bar'));
+assert.ok(accountStyles.includes('.home-account-slot .hao-account-trigger'));
+assert.ok(accountStyles.includes("html:not([data-ui-state='home']) .home-utility-bar"));
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v16'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v16'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v17'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v17'"));
 assert.ok(serviceWorkerSource.includes("'./data.js'"));
 assert.ok(serviceWorkerSource.includes("'./analytics.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership-config.js'"));
+assert.ok(serviceWorkerSource.includes("'./account-integration.css'"));
 assert.ok(serviceWorkerSource.includes("'./scripts/account-cloud-sync.js'"));
 assert.ok(serviceWorkerSource.includes("'./premium-ui.css'"));
 assert.ok(serviceWorkerSource.includes("'./premium-ui-refinement.css'"));
@@ -108,4 +113,4 @@ assert.ok(analyticsSource.includes("track('level_complete'"));
 assert.ok(analyticsSource.includes("track('run_complete'"));
 assert.ok(analyticsSource.includes("track('pwa_install'"));
 
-console.log('PWA manifest, icons, install UI, analytics, full-viewport home, unified HUD shell, staged market weather, shared account, personal cloud history, and refreshed offline cache checks passed');
+console.log('PWA manifest, icons, install UI, analytics, full-viewport home, unified HUD shell, staged market weather, dedicated account toolbar, personal cloud history, and v17 offline cache checks passed');
