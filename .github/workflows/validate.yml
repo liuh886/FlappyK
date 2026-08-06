@@ -9,11 +9,11 @@ permissions:
   contents: read
 
 concurrency:
-  group: validate-${{ github.ref }}
+  group: validate-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  detect-impact:
+  static-and-data:
     runs-on: ubuntu-latest
     outputs:
       browser: ${{ steps.scope.outputs.browser }}
@@ -37,43 +37,26 @@ jobs:
           fi
           git diff --name-only "$BASE_SHA" "$GITHUB_SHA" > changed-files.txt
           cat changed-files.txt
-          if grep -Eq '^(index\.html|.*\.(js|css|html|webmanifest)$|scripts/|tests/e2e/|data/|icons/|supabase/|package(-lock)?\.json|playwright\.config\.cjs|\.github/workflows/validate\.yml)' changed-files.txt; then
+          if grep -Eq '^(index\.html|manifest\.webmanifest|sw\.js|pwa\.js|game\.js|results\.js|membership-config\.js|account-integration\.css|scripts/.*\.(js|css)$|tests/e2e/|data/|icons/|package(-lock)?\.json|playwright\.config\.cjs|\.github/workflows/validate\.yml)' changed-files.txt; then
             echo "browser=true" >> "$GITHUB_OUTPUT"
           else
             echo "browser=false" >> "$GITHUB_OUTPUT"
           fi
-
-  static-and-data:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v6
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
           node-version: "24"
 
-      - name: Generate raster social preview
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends librsvg2-bin
-          rsvg-convert -w 1200 -h 630 og-image.svg -o og-image.png
-
       - name: Validate discovered JavaScript and product contracts
         run: npm run validate:static
 
       - name: Check Python syntax
-        run: python -m py_compile fetch_all_data.py scripts/audit_bundled_data.py
+        run: python3 -m py_compile fetch_all_data.py scripts/audit_bundled_data.py
 
-      - name: Check HTML, social preview, and leaderboard data
+      - name: Check HTML, committed social preview, and leaderboard data
         run: |
-          python - <<'PY'
+          python3 - <<'PY'
           import json
           from html.parser import HTMLParser
           from pathlib import Path
@@ -96,11 +79,11 @@ jobs:
           PY
 
       - name: Audit bundled equity split continuity
-        run: python scripts/audit_bundled_data.py
+        run: python3 scripts/audit_bundled_data.py
 
   browser-smoke:
-    needs: [detect-impact, static-and-data]
-    if: needs.detect-impact.outputs.browser == 'true'
+    needs: static-and-data
+    if: needs.static-and-data.outputs.browser == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
