@@ -1,0 +1,100 @@
+.home-utility-bar {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    z-index: 66;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    max-width: calc(100% - 36px);
+    border-radius: 0;
+    box-shadow: 1px 1px 0 rgba(2, 4, 8, 0.18);
+    backdrop-filter: none;
+}
+
+.home-language-slot,
+.home-account-slot {
+    display: inline-flex;
+    align-items: center;
+}
+
+#language-toggle-btn,
+.home-account-slot .hao-account-trigger {
+    min-height: 40px;
+    border: 2px solid var(--pixel-line, #344056);
+    border-radius: 0;
+    background: var(--pixel-panel, #111827);
+    box-shadow: 3px 3px 0 var(--pixel-shadow, #020408);
+    clip-path: var(--pixel-cut);
+    color: var(--pixel-text, #f7fbff);
+    font-family: var(--pixel-font-ui, monospace);
+    font-size: 13px;
+    font-weight: 650;
+    letter-spacing: 0.02em;
+}
+
+#language-toggle-btn {
+    position: static;
+    min-width: 54px;
+    margin: 0;
+    padding: 7px 10px;
+    cursor: pointer;
+}
+
+.home-account-slot .hao-account-trigger {
+    padding: 6px 11px 6px 7px;
+    backdrop-filter: none;
+}
+
+.home-account-slot .hao-account-trigger:hover,
+#language-toggle-btn:hover {
+    transform: translate(-1px, -1px);
+    border-color: var(--pixel-cyan, #5ce7f2);
+    box-shadow: 4px 4px 0 var(--pixel-shadow, #020408);
+}
+
+.home-account-slot .hao-account-trigger-visual {
+    border-radius: 0;
+    background: rgba(92, 231, 242, 0.12);
+    color: var(--pixel-cyan, #5ce7f2);
+}
+
+.home-account-slot .hao-account-trigger-label {
+    max-width: 132px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+html:not([data-ui-state='home']) .home-utility-bar {
+    display: none !important;
+}
+
+@media (max-width: 640px) {
+    .home-utility-bar {
+        top: 10px;
+        right: 10px;
+        gap: 6px;
+        max-width: calc(100% - 20px);
+    }
+
+    #language-toggle-btn,
+    .home-account-slot .hao-account-trigger {
+        min-height: 40px;
+    }
+
+    .home-account-slot .hao-account-trigger {
+        padding: 5px;
+    }
+
+    .home-account-slot .hao-account-trigger-label {
+        display: none;
+    }
+}
+
+@media (max-height: 680px) and (orientation: landscape) {
+    .home-utility-bar {
+        top: 8px;
+        right: 10px;
+    }
+}

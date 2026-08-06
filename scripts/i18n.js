@@ -114,7 +114,9 @@
             saveLanguage(language === 'zh' ? 'en' : 'zh');
             window.location.reload();
         });
-        startScreen.appendChild(button);
+
+        const slot = document.getElementById('language-toggle-slot');
+        (slot || startScreen).appendChild(button);
     }
 
     function patchDialogs() {

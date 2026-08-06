@@ -1,53 +1,53 @@
-# Cloud run sync boundary
+# Personal cloud history boundary
 
-FlappyK remains fully playable as a guest and offline. Cloud sync is an optional durability layer for authenticated players; it is not part of the game engine and cannot change a market result.
+FlappyK remains fully playable as a guest and offline. Signing in adds an optional personal durability layer; it is outside the game engine and cannot change a market result.
+
+## Shared account
+
+FlappyK uses the shared Hao Apps account system:
+
+- Google OAuth or an email magic link;
+- one shared profile across Hao Apps;
+- a FlappyK product-account row for small player state;
+- entitlement readiness with paid actions currently disabled.
+
+The browser uses only the Supabase publishable key. Row Level Security restricts every profile, product-account, entitlement, and game-run row to the authenticated owner.
 
 ## Data written
 
-Only a completed three-game run summary is eligible for upload:
+After a signed-in player completes a three-game run, FlappyK may write:
 
 - a deterministic local signature used for idempotency;
 - mode;
 - total return and total Excess Return;
 - the three completed game summaries;
 - completion timestamp;
-- authenticated user ID and product code added at upload time.
+- authenticated user ID and product code.
 
-Partial runs, keystrokes, raw browser history, credentials, OAuth tokens, email contents, and unrelated local-storage values are not uploaded.
+The product-account row may also store a small normalized personal profile:
 
-## Reliability states
+- best Excess Return;
+- completed-run count;
+- markets beaten;
+- best score by market.
 
-The account dialog exposes the canonical state of the pending queue:
+Partial runs, keystrokes, raw browser history, credentials, OAuth tokens, unrelated local-storage values, and payment secrets are not uploaded.
 
-- `local`: no authenticated cloud action has occurred;
-- `queued`: at least one completed run is retained locally;
-- `syncing`: one serialized upload pass is active;
-- `saved`: the pending queue is empty after successful idempotent upsert;
-- `retry`: at least one upload failed and remains retained locally.
+## Merge behavior
 
-Repeated login, `online`, and manual retry triggers share one in-flight promise. The database uniqueness rule `(user_id, local_signature)` and client-side signature deduplication prevent duplicate rows.
+After authentication, local and cloud profiles are merged conservatively:
 
-## Failure behavior
+- personal bests never decrease;
+- completed-run and market counts never decrease;
+- the best score for each market is retained;
+- `(user_id, local_signature)` prevents duplicate completed runs.
 
-- A failed upload never removes the local queue entry.
-- If `localStorage` is blocked, the current-session queue remains in memory and guest play continues.
-- Account, analytics, and network failures must not block the PLAY action or core offline game assets.
-- A visible retry control is shown when upload fails.
-
-## Restore behavior
-
-After authentication, the client reads the signed-in user's profile and recent `game_runs`. A clean browser can therefore display completed-run count and best Excess Return without relying on local history.
+A network or account failure never blocks guest play or changes a result. Local records remain usable when cloud sync is unavailable.
 
 ## Trust boundary
 
-Cloud history is personal durability data. It is not automatically trusted as public leaderboard evidence. Public ranking retains its separate validation and submission rules.
+Cloud history is personal durability data. It is not automatically trusted as public leaderboard evidence. A future public ranking must use a separate server-side validation path and must not rank directly from browser-submitted scores.
 
-Supabase Row Level Security restricts profile, entitlement, subscription, and game-run rows to the authenticated owner. Publishable browser credentials are not service-role credentials and must never bypass RLS.
+## Local and product boundaries
 
-## Acceptance evidence
-
-The repository includes:
-
-- deterministic Node tests for local, queued, syncing, saved, retry, dedupe, concurrent triggers, blocked storage, and recovery;
-- Chromium tests for offline-completed upload after sign-in, no duplicate row after repeated triggers, visible retry and recovery, guest-play availability, and clean-browser cloud restore;
-- PWA contracts requiring the queue core and sync UI assets in the offline shell.
+Only FlappyK summary data described above is written. The shared account system does not read data from Ownly, RhythmCoach, NewsFlow, or AlphaEngine, and FlappyK does not receive privileged access to other Hao Apps.

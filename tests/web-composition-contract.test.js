@@ -5,6 +5,7 @@ const hardeningJs = fs.readFileSync('core-hardening.js', 'utf8');
 const refinementJs = fs.readFileSync('scripts/premium-ui-refinement.js', 'utf8');
 const refinementCss = fs.readFileSync('premium-ui-refinement.css', 'utf8');
 const weatherCss = fs.readFileSync('market-weather.css', 'utf8');
+const accountCss = fs.readFileSync('account-integration.css', 'utf8');
 const pwaSource = fs.readFileSync('pwa.js', 'utf8');
 const serviceWorker = fs.readFileSync('sw.js', 'utf8');
 
@@ -57,7 +58,11 @@ assert.ok(refinementCss.includes('font-size: 12px'));
 assert.ok(refinementCss.includes('box-shadow: none'));
 assert.ok(refinementCss.includes('clip-path: none'));
 assert.ok(refinementCss.includes('.run-progress-panel .hud-details'));
+assert.ok(accountCss.includes('.home-utility-bar'));
+assert.ok(accountCss.includes('.home-account-slot .hao-account-trigger'));
+assert.ok(accountCss.includes("html:not([data-ui-state='home']) .home-utility-bar"));
 assert.ok(!pwaSource.includes('hud-compact.css'));
+assert.ok(!pwaSource.includes('flappyk-membership-client'));
 
 for (const homeShellContract of [
   "html[data-ui-state='home'] #game-container.arcade-weather-ready",
@@ -70,12 +75,15 @@ for (const homeShellContract of [
   assert.ok(weatherCss.includes(homeShellContract), `Missing web home shell contract: ${homeShellContract}`);
 }
 
-assert.ok(serviceWorker.includes("flappyk-app-v15"));
-assert.ok(serviceWorker.includes("flappyk-runtime-v15"));
+assert.ok(serviceWorker.includes("flappyk-app-v17"));
+assert.ok(serviceWorker.includes("flappyk-runtime-v17"));
 assert.ok(!serviceWorker.includes("'./hud-compact.css'"));
-assert.ok(serviceWorker.includes("'./scripts/cloud-run-sync-core.js'"));
-assert.ok(serviceWorker.includes("'./membership-sync.css'"));
+assert.ok(serviceWorker.includes("'./account-integration.css'"));
+assert.ok(serviceWorker.includes("'./scripts/account-cloud-sync.js'"));
+assert.ok(serviceWorker.includes("'./membership-config.js'"));
+assert.ok(!serviceWorker.includes("'./scripts/cloud-run-sync-core.js'"));
+assert.ok(!serviceWorker.includes("'./membership-sync.css'"));
 assert.ok(serviceWorker.includes("'./market-weather.css'"));
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"));
 
-console.log('Full-viewport web home, unified weather-performance-progress-control rail, coordinated input dock, modern pixel typography, semantic counters, responsive controls, cloud sync, and PWA cache contracts passed');
+console.log('Full-viewport web home, unified weather-performance-progress-control rail, dedicated account toolbar, coordinated input dock, modern pixel typography, semantic counters, responsive controls, personal cloud history, and PWA v17 cache contracts passed');

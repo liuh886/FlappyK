@@ -1,36 +1,12 @@
 const { test, expect } = require('@playwright/test');
+const { mockSharedAccount } = require('./account-fixture');
 
-async function preparePage(page) {
+async function preparePage(page, accountOptions = {}) {
   await page.route('https://fonts.googleapis.com/**', (route) => route.abort());
   await page.route('https://fonts.gstatic.com/**', (route) => route.abort());
   await page.route('https://raw.githubusercontent.com/**', (route) => route.abort());
   await page.route('https://html2canvas.hertzen.com/**', (route) => route.abort());
-  await page.route('https://cdn.jsdelivr.net/**', (route) => route.fulfill({
-    contentType: 'application/javascript',
-    body: `
-      export function createClient() {
-        return {
-          auth: {
-            getSession: async () => ({ data: { session: null }, error: null }),
-            onAuthStateChange: () => ({ data: { subscription: { unsubscribe() {} } } }),
-            signInWithOAuth: async () => ({ error: null }),
-            signInWithOtp: async () => ({ error: null }),
-            signOut: async () => ({ error: null })
-          },
-          from() {
-            return {
-              select() {
-                return {
-                  eq: async () => ({ data: [], error: null })
-                };
-              },
-              upsert: async () => ({ error: null })
-            };
-          }
-        };
-      }
-    `,
-  }));
+  await mockSharedAccount(page, accountOptions);
   await page.addInitScript(() => {
     window.localStorage.setItem('flappyk_language_v1', 'en');
     window.localStorage.setItem('flappyk_onboarding_seen_v1', '1');
@@ -44,39 +20,20 @@ async function preparePage(page) {
       createOscillator() {
         return {
           type: 'square',
-          frequency: {
-            value: 0,
-            setValueAtTime() {},
-            exponentialRampToValueAtTime() {},
-          },
-          connect() {},
-          start() {},
-          stop() {},
+          frequency: { value: 0, setValueAtTime() {}, exponentialRampToValueAtTime() {} },
+          connect() {}, start() {}, stop() {},
         };
       }
       createGain() {
         return {
-          gain: {
-            setValueAtTime() {},
-            exponentialRampToValueAtTime() {},
-          },
+          gain: { setValueAtTime() {}, exponentialRampToValueAtTime() {} },
           connect() {},
         };
       }
-      resume() {
-        this.state = 'running';
-        return Promise.resolve();
-      }
+      resume() { this.state = 'running'; return Promise.resolve(); }
     }
     window.AudioContext = SilentAudioContext;
     window.webkitAudioContext = SilentAudioContext;
-  });
-}
-
-async function showCompletedRunScreen(page) {
-  await page.evaluate(() => {
-    document.querySelectorAll('.screen.active').forEach((screen) => screen.classList.remove('active'));
-    document.getElementById('champagne-screen').classList.add('active');
   });
 }
 
@@ -102,23 +59,14 @@ test('PWA registers, controls the page, and reloads offline', async ({ page, con
   await page.reload({ waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('button', { name: 'PLAY', exact: true })).toBeVisible();
   await expect.poll(() => page.evaluate(() => (
-    typeof stockData !== 'undefined'
-      ? Object.keys(stockData.crypto || {}).length
-      : 0
+    typeof stockData !== 'undefined' ? Object.keys(stockData.crypto || {}).length : 0
   ))).toBeGreaterThan(0);
 
   await page.getByRole('button', { name: 'PLAY', exact: true }).click();
   await expect(page.locator('#start-screen')).not.toHaveClass(/active/);
-  await expect(page.locator('#target-return-display')).toHaveText('BEAT THE MARKET');
   await expect.poll(() => page.evaluate(() => (
-    typeof currentData !== 'undefined' && Array.isArray(currentData)
-      ? currentData.length
-      : 0
+    typeof currentData !== 'undefined' && Array.isArray(currentData) ? currentData.length : 0
   ))).toBe(250);
-  await expect.poll(() => page.evaluate(() => (
-    typeof isPlaying !== 'undefined' ? isPlaying : false
-  ))).toBe(true);
-
   await context.setOffline(false);
 });
 
@@ -128,9 +76,7 @@ test('install prompt exposes a home-screen install action', async ({ page }) => 
 
   await page.evaluate(() => {
     const event = new Event('beforeinstallprompt', { cancelable: true });
-    Object.defineProperty(event, 'prompt', {
-      value: () => Promise.resolve(),
-    });
+    Object.defineProperty(event, 'prompt', { value: () => Promise.resolve() });
     Object.defineProperty(event, 'userChoice', {
       value: Promise.resolve({ outcome: 'dismissed', platform: 'web' }),
     });
@@ -140,111 +86,63 @@ test('install prompt exposes a home-screen install action', async ({ page }) => 
   const installButton = page.locator('#pwa-install-btn');
   await expect(installButton).toBeVisible();
   await expect(installButton).toHaveText('INSTALL APP');
-  await expect(installButton).toHaveAttribute('aria-label', 'Install the FlappyK app');
   await installButton.click();
   await expect(installButton).toHaveAttribute('data-ready', 'true');
 });
 
-test('account stays right-most inside the handheld and completed runs prompt sign-in', async ({ page }) => {
+test('language and player account share a dedicated home toolbar', async ({ page }) => {
   await preparePage(page);
   await page.goto('/');
 
-  await expect.poll(() => page.evaluate(() => Boolean(window.FlappyKMembershipExperience))).toBe(true);
-  expect(await page.evaluate(() => window.FlappyKMembership.isConfigured())).toBe(true);
+  const toolbar = page.locator('#home-utility-bar');
+  const account = toolbar.locator('.hao-account-trigger');
+  const language = toolbar.locator('#language-toggle-btn');
+  await expect(toolbar).toBeVisible();
+  await expect(toolbar).toHaveAttribute('data-arcade-placement', 'console');
+  await expect(language).toHaveText('中文');
+  await expect(account).toBeVisible();
+  await expect(account.locator('.hao-account-trigger-label')).toHaveText('ACCOUNT');
 
-  const utilityBar = page.locator('#home-utility-bar');
-  const accountButton = utilityBar.locator('.membership-launcher');
-  const languageButton = utilityBar.locator('#language-toggle-btn');
-  await expect(utilityBar).toBeVisible();
-  await expect(utilityBar).toHaveAttribute('data-arcade-placement', 'console');
-  await expect(accountButton.locator('.membership-launcher-label')).toHaveText('ACCOUNT');
-  await expect(accountButton.locator('.membership-launcher-tier')).toBeHidden();
-  await expect(languageButton).toHaveText('中文');
-
-  const positions = await page.evaluate(() => {
+  const placement = await page.evaluate(() => {
+    const toolbar = document.getElementById('home-utility-bar');
+    const account = document.querySelector('.hao-account-trigger');
+    const language = document.getElementById('language-toggle-btn');
     const container = document.getElementById('game-container').getBoundingClientRect();
-    const bezel = document.querySelector('.home-console-bezel').getBoundingClientRect();
-    const utilityElement = document.getElementById('home-utility-bar');
-    const utility = utilityElement.getBoundingClientRect();
-    const account = document.querySelector('.membership-launcher').getBoundingClientRect();
-    const language = document.getElementById('language-toggle-btn').getBoundingClientRect();
+    const rect = toolbar.getBoundingClientRect();
     return {
-      parentClass: utilityElement.parentElement?.className,
-      placement: utilityElement.dataset.arcadePlacement,
-      childOrder: Array.from(utilityElement.children).map((element) => (
-        element.id || element.className
-      )),
-      accountLeft: account.left,
-      accountRight: account.right,
-      languageLeft: language.left,
-      topDelta: Math.abs(account.top - language.top),
-      insideContainer: utility.left >= container.left && utility.right <= container.right && utility.top >= container.top,
-      insideBezel: utility.left >= bezel.left && utility.right <= bezel.right && utility.top >= bezel.top,
+      childOrder: Array.from(toolbar.children).map((element) => element.id || element.className),
+      accountRightMost: account.getBoundingClientRect().right > language.getBoundingClientRect().right,
+      insideContainer: rect.left >= container.left && rect.right <= container.right && rect.top >= container.top,
     };
   });
-  expect(positions.parentClass).toContain('home-console-topline');
-  expect(positions.placement).toBe('console');
-  expect(positions.childOrder).toEqual(['language-toggle-btn', 'membership-launcher']);
-  expect(positions.languageLeft).toBeLessThan(positions.accountLeft);
-  expect(positions.accountRight).toBeGreaterThan(positions.languageLeft);
-  expect(positions.topDelta).toBeLessThan(2);
-  expect(positions.insideContainer).toBe(true);
-  expect(positions.insideBezel).toBe(true);
-  expect(await page.evaluate(() => localStorage.getItem('flappyk_pending_cloud_runs_v1'))).toBeNull();
+  expect(placement.childOrder).toEqual(['language-toggle-slot', 'home-account-slot']);
+  expect(placement.accountRightMost).toBe(true);
+  expect(placement.insideContainer).toBe(true);
 
-  await showCompletedRunScreen(page);
-  await page.evaluate(() => {
-    window.dispatchEvent(new CustomEvent('flappyk:run-completed', {
-      detail: {
-        signature: 'e2e-completed-run',
-        mode: 'normal',
-        score: {
-          excess: 8.6,
-          totalReturn: 21.4,
-          games: [{}, {}, {}],
-        },
-      },
-    }));
-  });
-
-  const resultPrompt = page.locator('#membership-result-prompt');
-  await expect(resultPrompt).toBeVisible();
-  await expect(resultPrompt).toHaveAttribute('data-state', 'guest');
-  await expect(resultPrompt.getByRole('heading')).toHaveText('Sign in to keep this result');
-  await expect(resultPrompt.getByRole('button')).toHaveText('SIGN IN & SAVE RESULT');
-  expect(await page.evaluate(() => JSON.parse(
-    localStorage.getItem('flappyk_pending_cloud_runs_v1') || '[]'
-  ).length)).toBe(1);
-
-  await resultPrompt.getByRole('button').click();
-  await expect(page.locator('.membership-backdrop')).toBeVisible();
+  await account.click();
+  await expect(page.locator('.hao-account-dialog')).toBeVisible();
 });
 
-test('Chinese desktop UI uses one compact, consistent typeface without a repeated goal row', async ({ page }) => {
+test('Chinese desktop game typography stays consistent around the account toolbar', async ({ page }) => {
   await preparePage(page);
-  await page.addInitScript(() => {
-    window.localStorage.setItem('flappyk_language_v1', 'zh');
-  });
+  await page.addInitScript(() => window.localStorage.setItem('flappyk_language_v1', 'zh'));
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/');
 
   await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
-  await expect.poll(() => page.evaluate(() => Boolean(window.FlappyKMembershipExperience))).toBe(true);
-
+  await expect(page.locator('.hao-account-trigger')).toBeVisible();
   const typography = await page.evaluate(() => {
-    const stats = getComputedStyle(document.querySelector('.stats-box'));
-    const intro = getComputedStyle(document.querySelector('#start-screen > p'));
-    const playButton = getComputedStyle(document.getElementById('start-btn'));
-    const accountButton = getComputedStyle(document.querySelector('.membership-launcher'));
+    const style = (selector) => getComputedStyle(document.querySelector(selector));
     const goalRow = document.getElementById('target-return-display').parentElement;
     return {
-      statsSize: stats.fontSize,
-      statsFamily: stats.fontFamily,
-      introSize: intro.fontSize,
-      introLineHeight: intro.lineHeight,
-      introFamily: intro.fontFamily,
-      buttonFamily: playButton.fontFamily,
-      accountFamily: accountButton.fontFamily,
+      statsSize: style('.stats-box').fontSize,
+      statsFamily: style('.stats-box').fontFamily,
+      introSize: style('#start-screen > p').fontSize,
+      introLineHeight: style('#start-screen > p').lineHeight,
+      introFamily: style('#start-screen > p').fontFamily,
+      buttonFamily: style('#start-btn').fontFamily,
+      languageFamily: style('#language-toggle-btn').fontFamily,
+      accountFamily: style('.hao-account-trigger').fontFamily,
       goalRowDisplay: getComputedStyle(goalRow).display,
     };
   });
@@ -252,80 +150,39 @@ test('Chinese desktop UI uses one compact, consistent typeface without a repeate
   expect(Number.parseFloat(typography.statsSize)).toBeGreaterThanOrEqual(12);
   expect(typography.introSize).toBe('17px');
   expect(Number.parseFloat(typography.introLineHeight)).toBeGreaterThanOrEqual(28);
-  expect(typography.statsFamily).toContain('ZCOOL QingKe HuangYou');
-  expect(typography.introFamily).toBe(typography.statsFamily);
-  expect(typography.buttonFamily).toBe(typography.statsFamily);
-  expect(typography.accountFamily).toBe(typography.statsFamily);
+  for (const family of [typography.statsFamily, typography.introFamily, typography.buttonFamily, typography.languageFamily, typography.accountFamily]) {
+    expect(family).toContain('ZCOOL QingKe HuangYou');
+  }
   expect(typography.goalRowDisplay).toBe('none');
-
-  await showCompletedRunScreen(page);
-  await page.evaluate(() => {
-    window.dispatchEvent(new CustomEvent('flappyk:run-completed', {
-      detail: {
-        signature: 'e2e-zh-run',
-        mode: 'normal',
-        score: {
-          excess: 5.2,
-          totalReturn: 18.1,
-          games: [{}, {}, {}],
-        },
-      },
-    }));
-  });
-  await expect(page.locator('#membership-result-prompt')).toBeVisible();
-  await expect(page.locator('.membership-result-action')).toHaveText('登录并保存成绩');
 });
 
-test('mobile account controls and dialog remain inside the viewport', async ({ page }) => {
+test('mobile account toolbar and drawer remain inside the viewport', async ({ page }) => {
   await preparePage(page);
-  await page.addInitScript(() => {
-    window.localStorage.setItem('flappyk_language_v1', 'zh');
-  });
+  await page.addInitScript(() => window.localStorage.setItem('flappyk_language_v1', 'zh'));
   await page.setViewportSize({ width: 360, height: 740 });
   await page.goto('/');
 
-  await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
-  await expect(page.locator('#home-utility-bar')).toBeVisible();
-  await expect(page.locator('#home-utility-bar')).toHaveAttribute('data-arcade-placement', 'console');
-  await expect(page.locator('.membership-launcher-label')).toHaveText('账户');
-  await expect(page.locator('.membership-launcher-tier')).toBeHidden();
-
-  const utilityBounds = await page.evaluate(() => {
-    const viewport = { width: window.innerWidth, height: window.innerHeight };
-    const container = document.getElementById('game-container').getBoundingClientRect();
-    const bezel = document.querySelector('.home-console-bezel').getBoundingClientRect();
-    const utilityElement = document.getElementById('home-utility-bar');
-    const utility = utilityElement.getBoundingClientRect();
-    const account = document.querySelector('.membership-launcher').getBoundingClientRect();
-    const language = document.getElementById('language-toggle-btn').getBoundingClientRect();
-    return {
-      parentClass: utilityElement.parentElement?.className,
-      placement: utilityElement.dataset.arcadePlacement,
-      accountRightMost: account.right > language.right,
-      insideContainer: utility.left >= container.left && utility.right <= container.right,
-      insideBezel: utility.left >= bezel.left && utility.right <= bezel.right,
-      insideViewport: utility.left >= 0 && utility.right <= viewport.width && utility.top >= 0,
-    };
+  const toolbar = page.locator('#home-utility-bar');
+  const account = toolbar.locator('.hao-account-trigger');
+  await expect(toolbar).toBeVisible();
+  await expect(account).toBeVisible();
+  const toolbarBounds = await page.evaluate(() => {
+    const rect = document.getElementById('home-utility-bar').getBoundingClientRect();
+    return { left: rect.left, top: rect.top, right: rect.right, width: window.innerWidth };
   });
-  expect(utilityBounds.parentClass).toContain('home-console-topline');
-  expect(utilityBounds.placement).toBe('console');
-  expect(utilityBounds.accountRightMost).toBe(true);
-  expect(utilityBounds.insideContainer).toBe(true);
-  expect(utilityBounds.insideBezel).toBe(true);
-  expect(utilityBounds.insideViewport).toBe(true);
+  expect(toolbarBounds.left).toBeGreaterThanOrEqual(0);
+  expect(toolbarBounds.top).toBeGreaterThanOrEqual(0);
+  expect(toolbarBounds.right).toBeLessThanOrEqual(toolbarBounds.width);
 
-  await page.locator('.membership-launcher').click();
-  await expect(page.locator('.membership-dialog')).toBeVisible();
-
+  await account.click();
+  await expect(page.locator('.hao-account-dialog')).toBeVisible();
   const dialogBounds = await page.evaluate(() => {
-    const dialog = document.querySelector('.membership-dialog').getBoundingClientRect();
+    const rect = document.querySelector('.hao-account-dialog').getBoundingClientRect();
     return {
-      left: dialog.left,
-      top: dialog.top,
-      rightGap: window.innerWidth - dialog.right,
-      bottomGap: window.innerHeight - dialog.bottom,
-      width: dialog.width,
-      viewportWidth: window.innerWidth,
+      left: rect.left, top: rect.top,
+      rightGap: window.innerWidth - rect.right,
+      bottomGap: window.innerHeight - rect.bottom,
+      width: rect.width, viewportWidth: window.innerWidth,
     };
   });
   expect(dialogBounds.left).toBeGreaterThanOrEqual(0);

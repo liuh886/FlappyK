@@ -1,5 +1,5 @@
-const APP_CACHE = 'flappyk-app-v15';
-const RUNTIME_CACHE = 'flappyk-runtime-v15';
+const APP_CACHE = 'flappyk-app-v17';
+const RUNTIME_CACHE = 'flappyk-runtime-v17';
 
 const APP_SHELL = [
     './',
@@ -22,9 +22,8 @@ const APP_SHELL = [
     './pwa.css',
     './premium-ui.css',
     './premium-ui-refinement.css',
+    './account-integration.css',
     './market-weather.css',
-    './membership.css',
-    './membership-sync.css',
     './data.js',
     './qqq-loader.js',
     './scripts/friend-challenge-codec.js',
@@ -32,7 +31,6 @@ const APP_SHELL = [
     './scripts/daily-run-core.js',
     './scripts/i18n-core.js',
     './scripts/i18n.js',
-    './scripts/cloud-run-sync-core.js',
     './scripts/market-weather.js',
     './game.js',
     './scripts/market-pass-rule.js',
@@ -51,15 +49,13 @@ const APP_SHELL = [
     './share-challenge.js',
     './card-export.js',
     './scripts/player-profile.js',
+    './scripts/account-cloud-sync.js',
     './pwa.js',
     './scripts/ui-state.js',
     './scripts/premium-ui.js',
     './scripts/premium-ui-refinement.js',
     './analytics.js',
     './membership-config.js',
-    './membership.js',
-    './membership-experience.js',
-    './membership-run-hook.js',
     './data/leaderboard.json',
     './og-image.png',
     './icons/flappyk-icon.svg',
@@ -143,6 +139,8 @@ self.addEventListener('fetch', (event) => {
         || url.hostname === 'fonts.gstatic.com'
         || url.hostname === 'html2canvas.hertzen.com'
         || url.hostname === 'raw.githubusercontent.com'
+        || url.hostname === 'liuh886.github.io'
+        || url.hostname === 'cdn.jsdelivr.net'
     ) {
         event.respondWith(staleWhileRevalidate(request));
     }
