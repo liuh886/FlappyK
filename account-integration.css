@@ -7,6 +7,9 @@
     align-items: center;
     gap: 8px;
     max-width: calc(100% - 36px);
+    border-radius: 0;
+    box-shadow: 1px 1px 0 rgba(2, 4, 8, 0.18);
+    backdrop-filter: none;
 }
 
 .home-language-slot,
