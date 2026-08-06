@@ -8,6 +8,7 @@ const pwaSource = fs.readFileSync('pwa.js', 'utf8');
 const serviceWorkerSource = fs.readFileSync('sw.js', 'utf8');
 const migrationSource = fs.readFileSync('supabase/migrations/0001_membership_foundation.sql', 'utf8');
 const privacySource = fs.readFileSync('docs/CLOUD_RUN_SYNC.md', 'utf8');
+const accountStyles = fs.readFileSync('account-integration.css', 'utf8');
 
 for (const contract of [
   'window.HaoAccountConfig',
@@ -17,6 +18,8 @@ for (const contract of [
   "supabasePublishableKey: 'sb_publishable_",
   "productCode: 'flappyk'",
   "entitlementCode: 'flappyk.pro'",
+  "mountSelectors: ['[data-account-slot]'",
+  'ensureHomeAccountToolbar',
   '公共排行榜不会直接信任浏览器提交的成绩',
 ]) {
   assert.ok(configSource.includes(contract), `Missing shared FlappyK account contract: ${contract}`);
@@ -28,10 +31,18 @@ for (const forbidden of [/sk_(live|test)_/, /sb_secret_/, /whsec_/, /service_rol
 for (const reference of [
   'https://liuh886.github.io/admin/shared/account-shell.css?v=1',
   '<script src="membership-config.js"></script>',
-  'https://liuh886.github.io/admin/shared/account-shell.js?v=1',
+  'async src="https://liuh886.github.io/admin/shared/account-shell.js?v=1"',
   '<script src="scripts/account-cloud-sync.js"></script>',
 ]) {
   assert.ok(indexSource.includes(reference), `FlappyK page is missing ${reference}`);
+}
+for (const toolbarContract of [
+  '.home-utility-bar',
+  '.home-account-slot .hao-account-trigger',
+  "html:not([data-ui-state='home']) .home-utility-bar",
+  '@media (max-width: 640px)',
+]) {
+  assert.ok(accountStyles.includes(toolbarContract), `Account toolbar styles are missing ${toolbarContract}`);
 }
 
 for (const contract of [
@@ -42,6 +53,7 @@ for (const contract of [
   "onConflict: 'user_id,local_signature'",
   'ignoreDuplicates: true',
   "window.addEventListener('hao:account-changed'",
+  "window.addEventListener('flappyk:run-completed'",
   'mergeProfiles',
 ]) {
   assert.ok(cloudSyncSource.includes(contract), `Missing personal cloud-history contract: ${contract}`);
@@ -65,10 +77,11 @@ for (const retiredRuntime of [
   assert.ok(!pwaSource.includes(retiredRuntime), `PWA runtime still loads retired account code: ${retiredRuntime}`);
 }
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v16'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v16'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v17'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v17'"));
 for (const retainedAsset of [
   "'./membership-config.js'",
+  "'./account-integration.css'",
   "'./scripts/account-cloud-sync.js'",
   "'./market-weather.css'",
   "'./scripts/market-weather.js'",
@@ -117,4 +130,4 @@ for (const privacyContract of [
   assert.ok(privacySource.includes(privacyContract), `Cloud-history documentation is missing ${privacyContract}`);
 }
 
-console.log('Shared account, personal cloud history, PWA, privacy, trusted-ranking separation, and RLS boundaries validated');
+console.log('Shared account, dedicated home toolbar, personal cloud history, PWA, privacy, trusted-ranking separation, and RLS boundaries validated');
