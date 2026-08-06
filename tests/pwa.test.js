@@ -8,6 +8,7 @@ const pwaSource = fs.readFileSync('pwa.js', 'utf8');
 const analyticsSource = fs.readFileSync('analytics.js', 'utf8');
 const pixelStyles = fs.readFileSync('premium-ui-refinement.css', 'utf8');
 const accountStyles = fs.readFileSync('account-integration.css', 'utf8');
+const baseStyles = fs.readFileSync('style.css', 'utf8');
 
 assert.equal(manifest.id, './');
 assert.equal(manifest.start_url, './?source=pwa');
@@ -61,9 +62,13 @@ assert.ok(pixelStyles.includes('clip-path: none'));
 assert.ok(accountStyles.includes('.home-utility-bar'));
 assert.ok(accountStyles.includes('.home-account-slot .hao-account-trigger'));
 assert.ok(accountStyles.includes("html:not([data-ui-state='home']) .home-utility-bar"));
+assert.ok(baseStyles.includes('HUD instrument system: one shell, one divider, one label/value hierarchy.'));
+assert.ok(baseStyles.includes('--hud-shell:'));
+assert.ok(baseStyles.includes('--hud-divider:'));
+assert.ok(baseStyles.includes('.weather-status::before'));
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v17'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v17'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v18'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v18'"));
 assert.ok(serviceWorkerSource.includes("'./data.js'"));
 assert.ok(serviceWorkerSource.includes("'./analytics.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership-config.js'"));
@@ -113,4 +118,4 @@ assert.ok(analyticsSource.includes("track('level_complete'"));
 assert.ok(analyticsSource.includes("track('run_complete'"));
 assert.ok(analyticsSource.includes("track('pwa_install'"));
 
-console.log('PWA manifest, icons, install UI, analytics, full-viewport home, unified HUD shell, staged market weather, dedicated account toolbar, personal cloud history, and v17 offline cache checks passed');
+console.log('PWA manifest, icons, install UI, analytics, full-viewport home, unified HUD instrument language, staged market weather, dedicated account toolbar, personal cloud history, and v18 offline cache checks passed');

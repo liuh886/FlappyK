@@ -93,14 +93,17 @@ assert.ok(baseStyles.includes('.home-play-icon'));
 assert.ok(baseStyles.includes('.pixel-trade-glyph'));
 assert.ok(baseStyles.includes('.sell-btn .trade-emoji'));
 assert.ok(baseStyles.includes(':where(button, select, summary, a[href]):focus-visible'));
+assert.ok(baseStyles.includes('#game-hud-rail .weather-status::before'));
+assert.ok(baseStyles.includes("html[data-market-weather='rain']"));
+assert.ok(baseStyles.includes('--hud-warning:'));
 assert.ok(!baseStyles.includes('"Apple Color Emoji"'), 'Native color emoji must not own trade-button styling.');
 
 assert.ok(pwa.includes("'./market-weather.css'"), 'PWA loader must attach market-weather.css.');
 assert.ok(pwa.includes("'./scripts/market-weather.js'"), 'PWA loader must attach market-weather.js.');
 assert.ok(serviceWorker.includes("'./market-weather.css'"), 'Offline shell must cache market-weather.css.');
-assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"), 'Offline shell must cache market-weather.js.');
-assert.ok(serviceWorker.includes("flappyk-app-v17"), 'The PWA cache version must advance for the account-toolbar release.');
+assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"), 'Offline shell must cache scripts/market-weather.js.');
+assert.ok(serviceWorker.includes("flappyk-app-v18"), 'The PWA cache version must advance for the unified HUD release.');
 assert.ok(serviceWorker.includes("'./account-integration.css'"), 'Offline shell must cache the account toolbar styles.');
 assert.ok(serviceWorker.includes("'./scripts/account-cloud-sync.js'"), 'Offline shell must cache the account cloud bridge.');
 
-console.log('Pixel weather arcade, staged transition, explicit ownership, stale-event cleanup, full-viewport home shell, account-toolbar cache, cloud history, and interaction detail contracts passed.');
+console.log('Pixel weather arcade, staged transition, restrained HUD status-light language, explicit ownership, stale-event cleanup, full-viewport home shell, account-toolbar cache, cloud history, and interaction detail contracts passed.');

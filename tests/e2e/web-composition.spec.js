@@ -199,7 +199,7 @@ test('desktop game uses one compact pixel HUD rail around the dominant chart', a
   expect(layout.excessSize).toBe('13px');
   expect(layout.speedSize).toBe('14px');
   expect(layout.tradeSize).toBe('13px');
-  expect(layout.runSize).toBe('12px');
+  expect(layout.runSize).toBe('13px');
 
   expect(layout.railRadius).toBe('0px');
   expect(layout.railBorder).toBe('2px');

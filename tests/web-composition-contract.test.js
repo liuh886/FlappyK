@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const hardeningJs = fs.readFileSync('core-hardening.js', 'utf8');
 const refinementJs = fs.readFileSync('scripts/premium-ui-refinement.js', 'utf8');
 const refinementCss = fs.readFileSync('premium-ui-refinement.css', 'utf8');
+const baseStyles = fs.readFileSync('style.css', 'utf8');
 const weatherCss = fs.readFileSync('market-weather.css', 'utf8');
 const accountCss = fs.readFileSync('account-integration.css', 'utf8');
 const pwaSource = fs.readFileSync('pwa.js', 'utf8');
@@ -64,6 +65,24 @@ assert.ok(accountCss.includes("html:not([data-ui-state='home']) .home-utility-ba
 assert.ok(!pwaSource.includes('hud-compact.css'));
 assert.ok(!pwaSource.includes('flappyk-membership-client'));
 
+for (const hudLanguageContract of [
+  'HUD instrument system: one shell, one divider, one label/value hierarchy.',
+  '--hud-shell:',
+  '--hud-divider:',
+  '--hud-label:',
+  '--hud-value:',
+  '--hud-positive:',
+  '--hud-negative:',
+  '#game-hud-rail .weather-status::before',
+  "html[data-market-weather='cloudy']",
+  "grid-template-columns: repeat(3, minmax(0, 1fr))",
+  '.run-progress-panel .hud-header',
+  '#game-top-controls .speed-step:hover',
+  '.trade-key-hint + .trade-key-hint',
+]) {
+  assert.ok(baseStyles.includes(hudLanguageContract), `Missing unified HUD language contract: ${hudLanguageContract}`);
+}
+
 for (const homeShellContract of [
   "html[data-ui-state='home'] #game-container.arcade-weather-ready",
   "html[data-ui-state='home'] .home-console-bezel",
@@ -75,8 +94,8 @@ for (const homeShellContract of [
   assert.ok(weatherCss.includes(homeShellContract), `Missing web home shell contract: ${homeShellContract}`);
 }
 
-assert.ok(serviceWorker.includes("flappyk-app-v17"));
-assert.ok(serviceWorker.includes("flappyk-runtime-v17"));
+assert.ok(serviceWorker.includes("flappyk-app-v18"));
+assert.ok(serviceWorker.includes("flappyk-runtime-v18"));
 assert.ok(!serviceWorker.includes("'./hud-compact.css'"));
 assert.ok(serviceWorker.includes("'./account-integration.css'"));
 assert.ok(serviceWorker.includes("'./scripts/account-cloud-sync.js'"));
@@ -86,4 +105,4 @@ assert.ok(!serviceWorker.includes("'./membership-sync.css'"));
 assert.ok(serviceWorker.includes("'./market-weather.css'"));
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"));
 
-console.log('Full-viewport web home, unified weather-performance-progress-control rail, dedicated account toolbar, coordinated input dock, modern pixel typography, semantic counters, responsive controls, personal cloud history, and PWA v17 cache contracts passed');
+console.log('Full-viewport web home, unified HUD instrument language, dedicated account toolbar, coordinated input dock, modern pixel typography, semantic counters, responsive controls, personal cloud history, and PWA v18 cache contracts passed');
