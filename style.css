@@ -626,8 +626,8 @@ html body #game-container #game-hud-rail .stats-box[data-composition='returns-on
     border-left: 1px solid var(--hud-divider) !important;
 }
 
-html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] .hud-total span,
-html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] .hud-return span,
+html body #game-container #game-hud-rail #total-display,
+html body #game-container #game-hud-rail #return-display,
 html body #game-container #game-hud-rail .excess-meter-label strong {
     overflow: visible !important;
     font-size: 13px !important;
