@@ -99,7 +99,8 @@ assert.ok(pwa.includes("'./market-weather.css'"), 'PWA loader must attach market
 assert.ok(pwa.includes("'./scripts/market-weather.js'"), 'PWA loader must attach market-weather.js.');
 assert.ok(serviceWorker.includes("'./market-weather.css'"), 'Offline shell must cache market-weather.css.');
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"), 'Offline shell must cache market-weather.js.');
-assert.ok(serviceWorker.includes("flappyk-app-v16"), 'The PWA cache version must advance for the account-cloud release.');
+assert.ok(serviceWorker.includes("flappyk-app-v17"), 'The PWA cache version must advance for the account-toolbar release.');
+assert.ok(serviceWorker.includes("'./account-integration.css'"), 'Offline shell must cache the account toolbar styles.');
 assert.ok(serviceWorker.includes("'./scripts/account-cloud-sync.js'"), 'Offline shell must cache the account cloud bridge.');
 
-console.log('Pixel weather arcade, staged transition, explicit ownership, stale-event cleanup, full-viewport home shell, account-cloud cache, and interaction detail contracts passed.');
+console.log('Pixel weather arcade, staged transition, explicit ownership, stale-event cleanup, full-viewport home shell, account-toolbar cache, cloud history, and interaction detail contracts passed.');
