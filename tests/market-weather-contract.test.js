@@ -3,101 +3,84 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
-const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
+const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'utf8');
 
-const index = read('index.html');
-const baseStyles = read('style.css');
-const weatherStyles = read('market-weather.css');
 const weatherScript = read('scripts/market-weather.js');
+const weatherStyles = read('market-weather.css');
+const baseStyles = read('style.css');
 const pwa = read('pwa.js');
 const serviceWorker = read('sw.js');
-const game = read('game.js');
-const experience = read('experience.js');
-const uiState = read('scripts/ui-state.js');
 
-for (const requiredAsset of [
-  '<link rel="stylesheet" href="market-weather.css">',
-  '<script src="scripts/market-weather.js"></script>',
+assert.match(weatherScript, /metrics\.playerReturn < -EPSILON/);
+assert.match(weatherScript, /metrics\.excess < -EPSILON/);
+assert.match(weatherScript, /return 'rain'/);
+assert.match(weatherScript, /return 'cloudy'/);
+assert.match(weatherScript, /return 'clear'/);
+
+for (const boundaryMessage of [
+  'RETURN BELOW ZERO',
+  'BACK IN GREEN',
+  'MARKET MOVES AHEAD',
+  'AHEAD OF MARKET',
 ]) {
-  assert.ok(pwa.includes(requiredAsset), `Missing generated weather asset in PWA loader: ${requiredAsset}`);
+  assert.ok(weatherScript.includes(boundaryMessage), `Missing weather boundary feedback: ${boundaryMessage}`);
 }
 
-for (const requiredMarkup of [
-  'id="home-weather-stage"',
-  'id="home-weather-sky"',
-  'id="home-weather-clouds"',
-  'id="home-weather-rain"',
-  'id="home-weather-haze"',
-  'id="home-weather-lightning"',
-  'id="home-weather-label"',
-  'id="home-weather-detail"',
-  'id="home-weather-player"',
-  'id="home-weather-market"',
-  'id="home-weather-excess"',
-  'id="home-weather-explanation"',
+for (const stateSelector of [
+  "[data-weather='cloudy']",
+  "[data-weather='rain']",
+  '.home-console-bezel',
+  '.home-console-screen',
+  "html[data-ui-state='home'] #game-container.arcade-weather-ready",
+  "html[data-ui-state='home'] .home-console-bezel",
+  "html[data-ui-state='home'] .home-console-screen",
+  '@media (prefers-reduced-motion: reduce)',
 ]) {
-  assert.ok(index.includes(requiredMarkup), `Missing weather HUD markup: ${requiredMarkup}`);
+  assert.ok(weatherStyles.includes(stateSelector), `Missing weather visual contract: ${stateSelector}`);
 }
 
-for (const visualContract of [
-  '.home-weather-stage',
-  '.home-weather-sky',
-  '.home-weather-clouds',
-  '.home-weather-rain',
-  '.home-weather-haze',
-  '.home-weather-lightning',
-  '.home-weather-stage[data-weather="clear"]',
-  '.home-weather-stage[data-weather="cloudy"]',
-  '.home-weather-stage[data-weather="rain"]',
-  '.home-weather-stage[data-weather="storm"]',
-  '.home-weather-stage.is-transitioning',
+for (const homeShellContract of [
+  'width: 100vw',
+  'height: 100dvh',
+  'grid-template-rows: auto minmax(0, 1fr) auto',
+  'clip-path: none',
+  'justify-content: center',
+  'The web home owns the viewport; the arcade cabinet belongs to gameplay.',
 ]) {
-  assert.ok(weatherStyles.includes(visualContract), `Missing weather visual contract: ${visualContract}`);
+  assert.ok(weatherStyles.includes(homeShellContract), `Missing full-viewport home contract: ${homeShellContract}`);
 }
 
-for (const stateContract of [
-  'function deriveWeatherState',
-  'clear',
-  'cloudy',
-  'rain',
-  'storm',
-  'transitionWeather',
-  'weatherRevision',
-  'window.setTimeout',
-  'transitionDurationMs',
-  'document.documentElement.dataset.marketWeather',
+for (const transitionContract of [
+  "Object.freeze(['clear', 'cloudy', 'rain'])",
+  'WEATHER_DEBOUNCE_MS',
+  'WEATHER_STEP_MS',
+  'EXPLICIT_WEATHER_HOLD_MS',
+  'function weatherPath(from, to)',
+  'function runWeatherTransition(target, token)',
+  "layer.dataset.weatherTransition = `${fromState}-to-${nextState}`",
+  'weatherTransitionToken += 1',
+  "setWeatherState('clear', { immediate: true, source: 'system' })",
+  "source === 'live' && currentTime < explicitWeatherUntil",
+  "source === 'manual'",
+  "applyMetrics(metrics, { source: 'live' })",
+  'function clearWeatherEvent(options = {})',
+  'if (options.silent) clearWeatherEvent()',
+  'clearWeatherEvent({ restore: false })',
+  'prefersReducedMotion()',
+  'syncWeatherStatusPlacement',
+  'function mutationElement(mutation)',
+  'function isWeatherOwnedMutation(mutation)',
+  'function scheduleSyncFromMutations(mutations)',
+  "element?.closest?.('#market-weather-layer, #weather-status')",
+  'new MutationObserver(scheduleSyncFromMutations)',
 ]) {
-  assert.ok(weatherScript.includes(stateContract), `Missing weather state-machine contract: ${stateContract}`);
-}
-
-for (const integrationContract of [
-  'window.FlappyKMarketWeather',
-  'updateWeatherHud',
-  'transitionWeather',
-  'playerReturn',
-  'marketReturn',
-  'excessReturn',
-]) {
-  assert.ok(game.includes(integrationContract) || experience.includes(integrationContract), `Missing gameplay weather integration: ${integrationContract}`);
-}
-
-for (const staleCleanupContract of [
-  'weatherRevision += 1',
-  'window.clearTimeout(weatherTransitionTimer)',
-  'window.clearTimeout(weatherSettleTimer)',
-]) {
-  assert.ok(weatherScript.includes(staleCleanupContract), `Missing stale weather cleanup: ${staleCleanupContract}`);
-}
-
-for (const homeContract of [
-  'home-surface-active',
-  'fullscreen-home-active',
-  'syncHomeViewportState',
-]) {
-  assert.ok(uiState.includes(homeContract) || baseStyles.includes(homeContract), `Missing full-viewport home contract: ${homeContract}`);
+  assert.ok(weatherScript.includes(transitionContract), `Missing staged weather contract: ${transitionContract}`);
 }
 
 for (const detailContract of [
+  'installPrimaryActionIcon',
+  'installPixelTradeGlyphs',
+  "glyph.textContent = symbol",
   "'▲'",
   "'▼'",
   "event.key !== 'Enter' && event.key !== ' '",
@@ -116,7 +99,7 @@ assert.ok(pwa.includes("'./market-weather.css'"), 'PWA loader must attach market
 assert.ok(pwa.includes("'./scripts/market-weather.js'"), 'PWA loader must attach market-weather.js.');
 assert.ok(serviceWorker.includes("'./market-weather.css'"), 'Offline shell must cache market-weather.css.');
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"), 'Offline shell must cache market-weather.js.');
-assert.ok(serviceWorker.includes("flappyk-app-v16"), 'The PWA cache version must include the account-cloud release.');
+assert.ok(serviceWorker.includes("flappyk-app-v16"), 'The PWA cache version must advance for the account-cloud release.');
 assert.ok(serviceWorker.includes("'./scripts/account-cloud-sync.js'"), 'Offline shell must cache the account cloud bridge.');
 
 console.log('Pixel weather arcade, staged transition, explicit ownership, stale-event cleanup, full-viewport home shell, account-cloud cache, and interaction detail contracts passed.');
