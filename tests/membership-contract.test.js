@@ -2,122 +2,102 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 
 const configSource = fs.readFileSync('membership-config.js', 'utf8');
-const membershipSource = fs.readFileSync('membership.js', 'utf8');
-const syncCoreSource = fs.readFileSync('scripts/cloud-run-sync-core.js', 'utf8');
-const experienceSource = fs.readFileSync('membership-experience.js', 'utf8');
-const hookSource = fs.readFileSync('membership-run-hook.js', 'utf8');
-const membershipStyles = fs.readFileSync('membership.css', 'utf8');
-const syncStyles = fs.readFileSync('membership-sync.css', 'utf8');
-const i18nStyles = fs.readFileSync('i18n.css', 'utf8');
-const premiumStyles = fs.readFileSync('premium-ui.css', 'utf8');
-const pixelStyles = fs.readFileSync('premium-ui-refinement.css', 'utf8');
+const indexSource = fs.readFileSync('index.html', 'utf8');
+const cloudSyncSource = fs.readFileSync('scripts/account-cloud-sync.js', 'utf8');
 const pwaSource = fs.readFileSync('pwa.js', 'utf8');
 const serviceWorkerSource = fs.readFileSync('sw.js', 'utf8');
 const migrationSource = fs.readFileSync('supabase/migrations/0001_membership_foundation.sql', 'utf8');
 const privacySource = fs.readFileSync('docs/CLOUD_RUN_SYNC.md', 'utf8');
 
-assert.ok(configSource.includes('enabled: true'));
-assert.ok(configSource.includes("supabaseUrl: 'https://blgwlycfcwvsupmqyqwn.supabase.co'"));
-assert.ok(configSource.includes("supabasePublishableKey: 'sb_publishable_"));
-assert.ok(configSource.includes("entitlementCode: 'flappyk.pro'"));
-assert.ok(!/sk_(live|test)_/.test(configSource));
-assert.ok(!/sb_secret_/.test(configSource));
-assert.ok(!/whsec_/.test(configSource));
-assert.ok(!/service_role/.test(configSource));
+for (const contract of [
+  'window.HaoAccountConfig',
+  'enabled: true',
+  'billingEnabled: false',
+  "supabaseUrl: 'https://blgwlycfcwvsupmqyqwn.supabase.co'",
+  "supabasePublishableKey: 'sb_publishable_",
+  "productCode: 'flappyk'",
+  "entitlementCode: 'flappyk.pro'",
+  '公共排行榜不会直接信任浏览器提交的成绩',
+]) {
+  assert.ok(configSource.includes(contract), `Missing shared FlappyK account contract: ${contract}`);
+}
+for (const forbidden of [/sk_(live|test)_/, /sb_secret_/, /whsec_/, /service_role/]) {
+  assert.ok(!forbidden.test(configSource), `FlappyK account config contains forbidden secret material: ${forbidden}`);
+}
 
-assert.ok(membershipSource.includes("if (configured) void initialise()"));
-assert.ok(membershipSource.includes("from('entitlements')"));
-assert.ok(membershipSource.includes("from('game_runs')"));
-assert.ok(membershipSource.includes("onConflict: 'user_id,local_signature'"));
-assert.ok(membershipSource.includes('ignoreDuplicates: true'));
-assert.ok(membershipSource.includes('retryPendingRuns'));
-assert.ok(membershipSource.includes('loadCloudHistory'));
-assert.ok(membershipSource.includes("window.addEventListener('online'"));
-assert.ok(membershipSource.includes("status: 'local'"));
-assert.ok(membershipSource.includes("syncQueued: 'QUEUED'"));
-assert.ok(membershipSource.includes("syncSyncing: 'SYNCING'"));
-assert.ok(membershipSource.includes("syncSaved: 'SAVED TO CLOUD'"));
-assert.ok(membershipSource.includes("syncRetry: 'RETRY NEEDED'"));
-assert.ok(membershipSource.includes('can,'));
-assert.ok(membershipSource.includes('signInWithOAuth'));
-assert.ok(membershipSource.includes('signInWithOtp'));
-assert.ok(membershipSource.includes('persistSession: true'));
-assert.ok(membershipSource.includes("flowType: 'pkce'"));
-assert.ok(membershipSource.includes('Authorization: `Bearer ${token}`'));
+for (const reference of [
+  'https://liuh886.github.io/admin/shared/account-shell.css?v=1',
+  '<script src="membership-config.js"></script>',
+  'https://liuh886.github.io/admin/shared/account-shell.js?v=1',
+  '<script src="scripts/account-cloud-sync.js"></script>',
+]) {
+  assert.ok(indexSource.includes(reference), `FlappyK page is missing ${reference}`);
+}
 
-assert.ok(syncCoreSource.includes("new Set(['local', 'queued', 'syncing', 'saved', 'retry'])"));
-assert.ok(syncCoreSource.includes('let memoryRuns = []'));
-assert.ok(syncCoreSource.includes('if (inflight) return inflight'));
-assert.ok(syncCoreSource.includes("retry: () => flush('manual-retry')"));
+for (const contract of [
+  'window.HaoAccount',
+  'window.HaoAccount.saveProductData',
+  "from('profiles')",
+  "from('game_runs')",
+  "onConflict: 'user_id,local_signature'",
+  'ignoreDuplicates: true',
+  "window.addEventListener('hao:account-changed'",
+  'mergeProfiles',
+]) {
+  assert.ok(cloudSyncSource.includes(contract), `Missing personal cloud-history contract: ${contract}`);
+}
 
-assert.ok(experienceSource.includes("utilityBar.id = 'home-utility-bar'"));
-assert.ok(experienceSource.includes("const host = document.getElementById('game-container') || document.body"));
-assert.ok(experienceSource.includes('host.appendChild(utilityBar)'));
-assert.ok(!experienceSource.includes('document.body.appendChild(utilityBar)'));
-assert.ok(experienceSource.includes("accountLabel: '账户'"));
-assert.ok(experienceSource.includes('function normalizeLauncher()'));
-assert.ok(experienceSource.includes("tierBadge.className = 'membership-launcher-tier'"));
-assert.ok(experienceSource.includes("style.id = 'flappyk-account-utility-refinement'"));
-assert.ok(experienceSource.indexOf('utilityBar.appendChild(languageToggle)')
-    < experienceSource.indexOf('utilityBar.appendChild(launcher)'));
-assert.ok(experienceSource.includes("guestAction: '登录并保存成绩'"));
-assert.ok(experienceSource.includes('membership.open?.()'));
-assert.ok(experienceSource.includes("window.addEventListener('flappyk:run-completed'"));
-assert.ok(experienceSource.includes('syncUtilityVisibility'));
-assert.ok(membershipStyles.includes('.home-utility-bar'));
-assert.ok(membershipStyles.includes('max-width: calc(100% - 24px)'));
-assert.ok(membershipStyles.includes('.membership-result-prompt'));
-assert.ok(membershipStyles.includes('.membership-result-action'));
-assert.ok(membershipStyles.includes('max-height: calc(100dvh'));
-assert.ok(syncStyles.includes('.membership-sync-card'));
-assert.ok(syncStyles.includes("data-state=\"retry\""));
-assert.ok(syncStyles.includes('[data-membership-sync-retry]'));
-assert.ok(i18nStyles.includes('--font-zh-unified'));
-assert.ok(i18nStyles.includes('font-family: var(--font-zh-unified) !important'));
-assert.ok(!i18nStyles.includes('--font-zh-display'));
-assert.ok(!i18nStyles.includes('--font-zh-ui'));
-assert.ok(i18nStyles.includes("html[lang='zh-CN'] .stats-box"));
-assert.ok(i18nStyles.includes("div:has(#target-return-display)"));
-assert.ok(i18nStyles.includes('font-size: 15px'));
-assert.ok(premiumStyles.includes('.home-secondary-actions'));
-assert.ok(premiumStyles.includes('.excess-meter-track'));
-assert.ok(pixelStyles.includes("--pixel-font-ui: 'Pixelify Sans'"));
-assert.ok(pixelStyles.includes('--pixel-grid: 4px'));
-assert.ok(pixelStyles.includes("width: min(316px, calc(100% - 108px))"));
-assert.ok(pixelStyles.includes('width: 176px'));
-assert.ok(pixelStyles.includes('clip-path: none'));
-assert.ok(pixelStyles.includes('.run-progress-panel .hud-details'));
+for (const retainedRuntime of [
+  "loadScript('flappyk-analytics-loader'",
+  "ensureStylesheet('flappyk-market-weather-styles'",
+  "loadScript('flappyk-market-weather-client'",
+]) {
+  assert.ok(pwaSource.includes(retainedRuntime), `PWA runtime lost ${retainedRuntime}`);
+}
+for (const retiredRuntime of [
+  'flappyk-membership-styles',
+  'flappyk-membership-sync-styles',
+  'flappyk-membership-client',
+  'flappyk-membership-experience',
+  'flappyk-membership-run-hook',
+  'flappyk-cloud-run-sync-core',
+]) {
+  assert.ok(!pwaSource.includes(retiredRuntime), `PWA runtime still loads retired account code: ${retiredRuntime}`);
+}
 
-assert.ok(hookSource.includes("getElementById('champagne-btn')"));
-assert.ok(hookSource.includes('isConfigured'));
-assert.ok(hookSource.includes('queueCompletedRun'));
-assert.ok(hookSource.includes('buildRunSignature'));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v16'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v16'"));
+for (const retainedAsset of [
+  "'./membership-config.js'",
+  "'./scripts/account-cloud-sync.js'",
+  "'./market-weather.css'",
+  "'./scripts/market-weather.js'",
+  "'./premium-ui.css'",
+  "'./premium-ui-refinement.css'",
+]) {
+  assert.ok(serviceWorkerSource.includes(retainedAsset), `Offline shell is missing ${retainedAsset}`);
+}
+for (const retiredAsset of [
+  "'./membership.js'",
+  "'./membership-experience.js'",
+  "'./membership-run-hook.js'",
+  "'./membership.css'",
+  "'./membership-sync.css'",
+  "'./scripts/cloud-run-sync-core.js'",
+]) {
+  assert.ok(!serviceWorkerSource.includes(retiredAsset), `Offline shell still caches retired account code: ${retiredAsset}`);
+}
 
-assert.ok(!pwaSource.includes('hud-compact.css'));
-assert.ok(pwaSource.includes("loadScript('flappyk-membership-config', './membership-config.js')"));
-assert.ok(pwaSource.includes("loadScript('flappyk-cloud-run-sync-core', './scripts/cloud-run-sync-core.js')"));
-assert.ok(pwaSource.includes("loadScript('flappyk-membership-client', './membership.js')"));
-assert.ok(pwaSource.includes("loadScript('flappyk-membership-experience', './membership-experience.js')"));
-assert.ok(pwaSource.includes("loadScript('flappyk-membership-run-hook', './membership-run-hook.js')"));
-assert.ok(pwaSource.includes("ensureStylesheet('flappyk-membership-styles', './membership.css')"));
-assert.ok(pwaSource.includes("ensureStylesheet('flappyk-membership-sync-styles', './membership-sync.css')"));
-assert.ok(pwaSource.includes("ensureStylesheet('flappyk-market-weather-styles', './market-weather.css')"));
-assert.ok(pwaSource.includes("loadScript('flappyk-market-weather-client', './scripts/market-weather.js')"));
-
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v15'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v15'"));
-assert.ok(serviceWorkerSource.includes("'./membership-config.js'"));
-assert.ok(serviceWorkerSource.includes("'./scripts/cloud-run-sync-core.js'"));
-assert.ok(serviceWorkerSource.includes("'./membership.js'"));
-assert.ok(serviceWorkerSource.includes("'./membership-experience.js'"));
-assert.ok(serviceWorkerSource.includes("'./membership-run-hook.js'"));
-assert.ok(serviceWorkerSource.includes("'./membership.css'"));
-assert.ok(serviceWorkerSource.includes("'./membership-sync.css'"));
-assert.ok(serviceWorkerSource.includes("'./premium-ui.css'"));
-assert.ok(serviceWorkerSource.includes("'./premium-ui-refinement.css'"));
-assert.ok(serviceWorkerSource.includes("'./market-weather.css'"));
-assert.ok(serviceWorkerSource.includes("'./scripts/market-weather.js'"));
-assert.ok(!serviceWorkerSource.includes("'./hud-compact.css'"));
+for (const retiredFile of [
+  'membership.js',
+  'membership-experience.js',
+  'membership-run-hook.js',
+  'membership.css',
+  'membership-sync.css',
+  'scripts/cloud-run-sync-core.js',
+]) {
+  assert.equal(fs.existsSync(retiredFile), false, `Retired account file still exists: ${retiredFile}`);
+}
 
 assert.ok(migrationSource.includes('alter table public.profiles enable row level security'));
 assert.ok(migrationSource.includes('alter table public.game_runs enable row level security'));
@@ -128,8 +108,13 @@ assert.ok(migrationSource.includes('grant select on public.entitlements to authe
 assert.ok(!migrationSource.includes('grant insert on public.entitlements to authenticated'));
 assert.ok(!migrationSource.includes('grant update on public.entitlements to authenticated'));
 
-assert.ok(privacySource.includes('Only a completed three-game run summary is eligible for upload'));
-assert.ok(privacySource.includes('Partial runs, keystrokes'));
-assert.ok(privacySource.includes('not automatically trusted as public leaderboard evidence'));
+for (const privacyContract of [
+  'Partial runs, keystrokes',
+  'personal durability data',
+  'must use a separate server-side validation path',
+  'does not read data from Ownly, RhythmCoach, NewsFlow, or AlphaEngine',
+]) {
+  assert.ok(privacySource.includes(privacyContract), `Cloud-history documentation is missing ${privacyContract}`);
+}
 
-console.log('Membership, reliable cloud sync, typography, full-viewport home, unified HUD rail, staged market weather, privacy, result guidance, and RLS boundary validated');
+console.log('Shared account, personal cloud history, PWA, privacy, trusted-ranking separation, and RLS boundaries validated');
