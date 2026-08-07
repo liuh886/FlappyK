@@ -7,6 +7,7 @@ const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'u
 
 const weatherScript = read('scripts/market-weather.js');
 const weatherStyles = read('market-weather.css');
+const uiStyles = read('premium-ui-refinement.css');
 const baseStyles = read('style.css');
 const pwa = read('pwa.js');
 const serviceWorker = read('sw.js');
@@ -32,27 +33,29 @@ for (const boundaryMessage of [
 }
 
 for (const stateSelector of [
+  '.market-weather-layer',
   "[data-weather='cloudy']",
   "[data-weather='rain']",
-  '.home-console-bezel',
-  '.home-console-screen',
-  "html[data-ui-state='home'] #game-container.arcade-weather-ready",
-  "html[data-ui-state='home'] .home-console-bezel",
-  "html[data-ui-state='home'] .home-console-screen",
+  '.weather-status',
   '@media (prefers-reduced-motion: reduce)',
 ]) {
   assert.ok(weatherStyles.includes(stateSelector), `Missing weather visual contract: ${stateSelector}`);
 }
 
+assert.ok(!weatherStyles.includes('.home-console-bezel'), 'Weather styles must not own the home shell.');
+assert.ok(!weatherStyles.includes('.home-console-screen'), 'Weather styles must not own the home screen composition.');
+assert.ok(!weatherStyles.includes('.home-primary-actions'), 'Weather styles must not own home action hierarchy.');
+
 for (const homeShellContract of [
+  "html[data-ui-state='home'] #game-container.arcade-weather-ready",
+  '#start-screen.arcade-home',
+  '.home-console-bezel',
+  '.home-console-screen',
   'width: 100vw',
   'height: 100dvh',
   'grid-template-rows: auto minmax(0, 1fr) auto',
-  'clip-path: none',
-  'justify-content: center',
-  'The web home owns the viewport; the arcade cabinet belongs to gameplay.',
 ]) {
-  assert.ok(weatherStyles.includes(homeShellContract), `Missing full-viewport home contract: ${homeShellContract}`);
+  assert.ok(uiStyles.includes(homeShellContract), `Missing curated home shell contract: ${homeShellContract}`);
 }
 
 for (const transitionContract of [
@@ -113,4 +116,4 @@ assert.ok(serviceWorker.includes("'./scripts/home-story.js'"), 'Offline shell mu
 assert.ok(serviceWorker.includes("'./account-integration.css'"), 'Offline shell must cache the account toolbar styles.');
 assert.ok(serviceWorker.includes("'./scripts/account-cloud-sync.js'"), 'Offline shell must cache the account cloud bridge.');
 
-console.log('Pixel weather arcade, staged transition, explicit weather-event ownership, two-page home shell, account-toolbar cache, cloud history, and PWA v23 contracts passed.');
+console.log('Isolated market weather, staged transitions, explicit event ownership, curated home shell, account toolbar, cloud history, and PWA v23 contracts passed.');
