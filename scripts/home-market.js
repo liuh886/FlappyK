@@ -331,7 +331,9 @@
         const text = currentCopy();
         document.querySelectorAll('[data-home-copy]').forEach((element) => {
             const key = element.dataset.homeCopy;
-            if (text[key]) element.textContent = text[key];
+            const challengeOwnsPrimaryAction = key === 'play'
+                && Boolean(document.getElementById('friend-challenge-invite'));
+            if (!challengeOwnsPrimaryAction && text[key]) element.textContent = text[key];
         });
         updateResources();
         const cashRow = document.querySelector('.hud-cash-resource');

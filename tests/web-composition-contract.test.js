@@ -95,7 +95,7 @@ for (const homeSceneContract of [
   '.resource-glyph--coin',
   '.resource-glyph--stock',
   '.hud-cash-resource',
-  "grid-template-columns: repeat(4, minmax(0, 1fr))",
+  "grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.82fr) minmax(0, 0.9fr) minmax(0, 1.13fr)",
   '@media (max-width: 780px), (pointer: coarse)',
 ]) {
   assert.ok(homeCss.includes(homeSceneContract), `Missing interactive home composition contract: ${homeSceneContract}`);
@@ -135,8 +135,8 @@ assert.ok(weatherCss.includes('height: 100dvh'));
 assert.ok(weatherCss.includes('The home scene itself belongs to home-market.css.'));
 assert.ok(!weatherCss.includes('.home-console-screen'));
 
-assert.ok(serviceWorker.includes("flappyk-app-v21"));
-assert.ok(serviceWorker.includes("flappyk-runtime-v21"));
+assert.ok(serviceWorker.includes("flappyk-app-v22"));
+assert.ok(serviceWorker.includes("flappyk-runtime-v22"));
 assert.ok(!serviceWorker.includes("'./hud-compact.css'"));
 assert.ok(serviceWorker.includes("'./account-integration.css'"));
 assert.ok(serviceWorker.includes("'./scripts/account-cloud-sync.js'"));
@@ -151,4 +151,4 @@ assert.ok(!serviceWorker.includes("'./membership-sync.css'"));
 assert.ok(serviceWorker.includes("'./market-weather.css'"));
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"));
 
-console.log('Interactive market home, unified coin HUD, tactical indicator deck, explicit ownership, coordinated controls, pixel typography, responsive layout, cloud history, and PWA v21 contracts passed');
+console.log('Interactive market home, unified coin HUD, tactical indicator deck, explicit ownership, coordinated controls, pixel typography, responsive layout, cloud history, and PWA v22 contracts passed');

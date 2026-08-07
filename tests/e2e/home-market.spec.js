@@ -112,6 +112,7 @@ test('desktop home is one interactive perspective market scene', async ({ page }
 
   await page.locator('#start-btn').click();
   await expect(home).not.toHaveClass(/active/);
+  await expect(home).toBeHidden();
   await expect(page.locator('#game-hud-rail')).toBeVisible();
   await expect(page.locator('.hud-cash-resource')).toBeVisible();
   await expect(page.locator('.hud-cash-resource .resource-glyph--coin')).toBeVisible();

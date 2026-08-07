@@ -85,8 +85,8 @@ assert.ok(indicatorStyles.includes('.indicator-card-deck'));
 assert.ok(indicatorStyles.includes('#indicator-overlay'));
 assert.ok(indicatorSource.includes('window.FlappyKIndicatorCards'));
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v21'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v21'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v22'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v22'"));
 for (const asset of [
   "'./data.js'",
   "'./analytics.js'",
@@ -152,4 +152,4 @@ assert.ok(analyticsSource.includes("track('level_complete'"));
 assert.ok(analyticsSource.includes("track('run_complete'"));
 assert.ok(analyticsSource.includes("track('pwa_install'"));
 
-console.log('PWA manifest, icons, install UI, analytics, interactive market home, coin HUD, tactical cards, weather, account toolbar, cloud history, and v21 offline cache checks passed');
+console.log('PWA manifest, icons, install UI, analytics, interactive market home, coin HUD, tactical cards, weather, account toolbar, cloud history, and v22 offline cache checks passed');

@@ -107,7 +107,7 @@ assert.ok(pwa.includes("'./indicator-cards.css'"), 'PWA loader must retain indic
 assert.ok(pwa.includes("'./scripts/indicator-cards.js'"), 'PWA loader must retain indicator card behavior.');
 assert.ok(serviceWorker.includes("'./market-weather.css'"), 'Offline shell must cache market-weather.css.');
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"), 'Offline shell must cache scripts/market-weather.js.');
-assert.ok(serviceWorker.includes("flappyk-app-v21"), 'The PWA cache version must advance for the integrated home release.');
+assert.ok(serviceWorker.includes("flappyk-app-v22"), 'The PWA cache version must advance for the integrated home release.');
 assert.ok(serviceWorker.includes("'./home-market.css'"), 'Offline shell must cache the interactive home styles.');
 assert.ok(serviceWorker.includes("'./scripts/home-market.js'"), 'Offline shell must cache the interactive home behavior.');
 assert.ok(serviceWorker.includes("'./indicator-cards.css'"), 'Offline shell must retain tactical card styles.');
@@ -116,4 +116,4 @@ assert.ok(serviceWorker.includes("'./account-integration.css'"), 'Offline shell 
 assert.ok(serviceWorker.includes("'./scripts/account-cloud-sync.js'"), 'Offline shell must cache the account cloud bridge.');
 assert.ok(!serviceWorker.includes('home-story'));
 
-console.log('Staged market weather, static interactive home ownership, tactical cards, shared arcade feedback, account toolbar, cloud history, and v21 offline contracts passed.');
+console.log('Staged market weather, static interactive home ownership, tactical cards, shared arcade feedback, account toolbar, cloud history, and v22 offline contracts passed.');

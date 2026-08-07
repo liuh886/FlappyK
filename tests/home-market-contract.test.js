@@ -50,7 +50,7 @@ for (const contract of [
   '.home-demo-trade--sell',
   '.home-market-feedback.is-visible',
   '.hud-cash-resource',
-  "grid-template-columns: repeat(4, minmax(0, 1fr))",
+  "grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.82fr) minmax(0, 0.9fr) minmax(0, 1.13fr)",
   '@media (max-width: 780px), (pointer: coarse)',
   '@media (orientation: landscape) and (max-height: 520px)',
   '@media (prefers-reduced-motion: reduce)',
@@ -61,12 +61,12 @@ for (const contract of [
 assert.ok(pwa.includes("ensureStylesheet('flappyk-market-weather-styles', './market-weather.css')"));
 assert.ok(pwa.includes("ensureStylesheet('flappyk-home-market-styles', './home-market.css')"));
 assert.ok(pwa.indexOf('flappyk-home-market-styles') > pwa.indexOf('flappyk-market-weather-styles'));
-assert.ok(serviceWorker.includes("flappyk-app-v21"));
-assert.ok(serviceWorker.includes("flappyk-runtime-v21"));
+assert.ok(serviceWorker.includes("flappyk-app-v22"));
+assert.ok(serviceWorker.includes("flappyk-runtime-v22"));
 assert.ok(serviceWorker.includes("'./home-market.css'"));
 assert.ok(serviceWorker.includes("'./scripts/home-market.js'"));
 assert.ok(serviceWorker.includes("'./indicator-cards.css'"));
 assert.ok(serviceWorker.includes("'./scripts/indicator-cards.js'"));
 assert.ok(!serviceWorker.includes('home-story'));
 
-console.log('Interactive 2.5D market home, keyboard/touch demo trading, shared coin resource language, retained tactical cards, responsive layout, and PWA v21 contracts passed');
+console.log('Interactive 2.5D market home, keyboard/touch demo trading, shared coin resource language, retained tactical cards, responsive layout, and PWA v22 contracts passed');

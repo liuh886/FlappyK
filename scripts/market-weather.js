@@ -338,6 +338,9 @@
     }
 
     function applyMetrics(metrics, options = {}) {
+        if (options.source === 'live' && clockNow() < explicitWeatherUntil) {
+            return requestedWeather;
+        }
         if (options.silent) clearWeatherEvent();
         const state = classifyWeather(metrics);
         setWeatherState(state, {
