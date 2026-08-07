@@ -22,9 +22,7 @@
     let deferredInstallPrompt = null;
     const isIos = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
 
-    if (isStandalone) {
-        document.documentElement.classList.add('pwa-standalone');
-    }
+    if (isStandalone) document.documentElement.classList.add('pwa-standalone');
 
     function ensureInstallButton() {
         const actions = document.querySelector('#start-screen .start-actions');
@@ -44,12 +42,9 @@
                 button.dataset.ready = 'false';
                 await prompt.prompt();
                 const choice = await prompt.userChoice;
-                if (choice?.outcome !== 'accepted') {
-                    button.dataset.ready = 'true';
-                }
+                if (choice?.outcome !== 'accepted') button.dataset.ready = 'true';
                 return;
             }
-
             window.alert(isIos ? copy.iosHelp : copy.unavailable);
         });
         actions.appendChild(button);
@@ -113,13 +108,32 @@
         });
     }
 
+    function normalizeStylesheetPath(href) {
+        return href.replace(/^\.\//, '');
+    }
+
+    function findStylesheet(href) {
+        const suffix = `/${normalizeStylesheetPath(href)}`;
+        return Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+            .find((link) => {
+                try {
+                    return new URL(link.href, window.location.href).pathname.endsWith(suffix);
+                } catch {
+                    return false;
+                }
+            }) || null;
+    }
+
     function ensureStylesheet(id, href) {
-        if (document.getElementById(id)) return;
-        const link = document.createElement('link');
+        let link = document.getElementById(id) || findStylesheet(href);
+        if (!link) {
+            link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = href;
+        }
         link.id = id;
-        link.rel = 'stylesheet';
-        link.href = href;
         document.head.appendChild(link);
+        return link;
     }
 
     void loadScript('flappyk-analytics-loader', './analytics.js').catch((error) => {
@@ -127,6 +141,7 @@
     });
 
     ensureStylesheet('flappyk-market-weather-styles', './market-weather.css');
+    ensureStylesheet('flappyk-home-market-styles', './home-market.css');
     void loadScript('flappyk-market-weather-client', './scripts/market-weather.js').catch((error) => {
         console.warn('FlappyK market weather could not be loaded. Gameplay is unaffected.', error);
     });

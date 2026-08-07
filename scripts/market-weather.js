@@ -16,6 +16,8 @@
     const PRESS_SELECTOR = [
         '#start-btn',
         '#daily-run-btn',
+        '#home-demo-buy',
+        '#home-demo-sell',
         '#btn-buy',
         '#btn-sell',
         '.speed-step',
@@ -23,6 +25,7 @@
         '#pause-btn',
         '.home-secondary-actions button',
     ].join(', ');
+
     let previousMetrics = null;
     let eventTimer = 0;
     let syncFrame = 0;
@@ -160,51 +163,6 @@
         gameContainer.classList.add('arcade-weather-ready');
         root.dataset.marketWeather = 'clear';
         root.dataset.marketWeatherVisual = 'clear';
-    }
-
-    function installHomeConsole() {
-        if (!startScreen || startScreen.querySelector('.home-console-bezel')) return;
-
-        const legacyIntroParagraphs = Array.from(startScreen.querySelectorAll(':scope > p'));
-        const bezel = createElement('div', 'home-console-bezel');
-        const topLine = createElement('div', 'home-console-topline');
-        const brand = createElement('span', 'home-console-brand', 'FLAPPYK · POCKET MARKET ARCADE');
-        const lamps = createElement('span', 'home-console-lamps');
-        lamps.setAttribute('aria-hidden', 'true');
-        lamps.append(document.createElement('span'), document.createElement('span'), document.createElement('span'));
-        topLine.append(brand, lamps);
-
-        const screen = createElement('div', 'home-console-screen');
-        const kicker = createElement('div', 'home-console-kicker', text('HIDDEN MARKET · PRESS PLAY', '隐藏市场 · 按下开始'));
-        screen.appendChild(kicker);
-        [...startScreen.children].forEach((child) => {
-            if (legacyIntroParagraphs.includes(child)) {
-                const visibleCopy = child.cloneNode(true);
-                visibleCopy.classList.add('home-console-intro-copy');
-                screen.appendChild(visibleCopy);
-                return;
-            }
-            screen.appendChild(child);
-        });
-
-        const footer = createElement('div', 'home-console-footer');
-        const speaker = createElement('span', 'home-console-speaker');
-        speaker.setAttribute('aria-hidden', 'true');
-        for (let index = 0; index < 14; index += 1) speaker.appendChild(document.createElement('span'));
-        const legend = createElement('span', 'home-console-legend', text('BUY · SELL · BEAT THE MARKET', '买入 · 卖出 · 跑赢市场'));
-        footer.append(speaker, legend);
-
-        bezel.append(topLine, screen, footer);
-        legacyIntroParagraphs.forEach((paragraph) => {
-            paragraph.hidden = true;
-            paragraph.setAttribute('aria-hidden', 'true');
-            paragraph.classList.add('home-console-legacy-intro');
-        });
-        startScreen.replaceChildren(bezel, ...legacyIntroParagraphs);
-        startScreen.classList.add('arcade-home');
-        installPrimaryActionIcon();
-        syncPrimaryActionLabel();
-        syncHomeUtilityPlacement();
     }
 
     function readLiveMetrics() {
@@ -346,15 +304,12 @@
         status.classList.remove('is-event');
         status.style.removeProperty('transform');
         delete status.dataset.tone;
-        if (options.restore !== false) {
-            setText(status, stateLabel(visualWeather));
-        }
+        if (options.restore !== false) setText(status, stateLabel(visualWeather));
     }
 
     function showWeatherEvent(message, tone) {
         const status = document.getElementById('weather-status');
         if (!status) return;
-
         clearWeatherEvent({ restore: false });
         setText(status, message);
         status.dataset.tone = tone;
@@ -365,7 +320,6 @@
 
     function detectCrossing(previous, current) {
         if (!previous || !current) return;
-
         if (previous.playerReturn >= -EPSILON && current.playerReturn < -EPSILON) {
             showWeatherEvent(text('RETURN BELOW ZERO', '收益转负'), 'negative');
             return;
@@ -384,6 +338,9 @@
     }
 
     function applyMetrics(metrics, options = {}) {
+        if (options.source === 'live' && clockNow() < explicitWeatherUntil) {
+            return requestedWeather;
+        }
         if (options.silent) clearWeatherEvent();
         const state = classifyWeather(metrics);
         setWeatherState(state, {
@@ -407,9 +364,7 @@
             setWeatherState('clear', { immediate: true, source: 'system' });
             previousMetrics = null;
             const status = document.getElementById('weather-status');
-            if (status) {
-                setText(status, text('CLEAR · READY', '晴空 · 准备开始'));
-            }
+            if (status) setText(status, text('CLEAR · READY', '晴空 · 准备开始'));
             return;
         }
 
@@ -438,9 +393,7 @@
     }
 
     function scheduleSyncFromMutations(mutations) {
-        if (mutations.some((mutation) => !isWeatherOwnedMutation(mutation))) {
-            scheduleSync();
-        }
+        if (mutations.some((mutation) => !isWeatherOwnedMutation(mutation))) scheduleSync();
     }
 
     function setPressed(element, pressed) {
@@ -481,12 +434,6 @@
     }
 
     function updateLanguage() {
-        const brand = document.querySelector('.home-console-brand');
-        const kicker = document.querySelector('.home-console-kicker');
-        const legend = document.querySelector('.home-console-legend');
-        setText(brand, 'FLAPPYK · POCKET MARKET ARCADE');
-        setText(kicker, text('HIDDEN MARKET · PRESS PLAY', '隐藏市场 · 按下开始'));
-        setText(legend, text('BUY · SELL · BEAT THE MARKET', '买入 · 卖出 · 跑赢市场'));
         installPrimaryActionIcon();
         installPixelTradeGlyphs();
         syncPrimaryActionLabel();
@@ -497,7 +444,7 @@
     function init() {
         root.style.setProperty('--pixel-font-readable', "var(--pixel-font-ui, 'Pixelify Sans', monospace)");
         installWeatherLayer();
-        installHomeConsole();
+        installPrimaryActionIcon();
         installPixelTradeGlyphs();
         bindPressFeedback();
         syncWeather();
