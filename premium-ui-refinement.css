@@ -1182,6 +1182,14 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
 }
 
 
+/* Home never exposes gameplay controls, regardless of later gameplay/mobile rules. */
+html[data-ui-state='home'] body #game-container #mobile-controls,
+html[data-ui-state='home'] body #game-container #mobile-controls:not([hidden]),
+html[data-ui-state='home'] body #game-container .controls-hint,
+html[data-ui-state='home'] body #game-container #game-top-controls {
+    display: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .guide-target {
         animation: none;
