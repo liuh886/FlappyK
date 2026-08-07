@@ -6,6 +6,9 @@ from typing import Any
 
 
 DATA_FILE = Path(__file__).resolve().parents[1] / "data.js"
+CHALLENGE_DAYS = 250
+INDICATOR_WARMUP_DAYS = 35
+MIN_INDICATOR_ROWS = CHALLENGE_DAYS + INDICATOR_WARMUP_DAYS
 
 KNOWN_SPLITS = [
     ("Amazon (US)", "2022-06-03", "2022-06-06", "20-for-1"),
@@ -32,6 +35,46 @@ def load_stock_data() -> dict[str, dict[str, list[dict[str, Any]]]]:
 
 def rows_by_date(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
     return {row["date"]: row for row in rows}
+
+
+def audit_indicator_history(
+    data: dict[str, dict[str, list[dict[str, Any]]]]
+) -> None:
+    checked = 0
+    for market, assets in data.items():
+        for asset, rows in assets.items():
+            checked += 1
+            if len(rows) < MIN_INDICATOR_ROWS:
+                raise AssertionError(
+                    f"{market}/{asset} has only {len(rows)} rows; "
+                    f"BOLL/MACD gameplay requires at least {MIN_INDICATOR_ROWS} "
+                    f"({CHALLENGE_DAYS} challenge + {INDICATOR_WARMUP_DAYS} warm-up)."
+                )
+
+            dates = [str(row.get("date", "")) for row in rows]
+            if dates != sorted(dates) or len(dates) != len(set(dates)):
+                raise AssertionError(f"{market}/{asset} dates are not strictly ordered and unique")
+
+            for row in rows:
+                for field in ("open", "high", "low", "close"):
+                    try:
+                        value = float(row[field])
+                    except (KeyError, TypeError, ValueError) as error:
+                        raise AssertionError(
+                            f"{market}/{asset} has invalid {field} on {row.get('date')}"
+                        ) from error
+                    if value <= 0:
+                        raise AssertionError(
+                            f"{market}/{asset} has non-positive {field} on {row.get('date')}"
+                        )
+
+    if checked == 0:
+        raise AssertionError("Bundled stockData contains no playable assets")
+
+    print(
+        f"PASS: {checked} bundled assets each provide at least "
+        f"{MIN_INDICATOR_ROWS} ordered OHLC rows for BOLL/MACD gameplay."
+    )
 
 
 def audit_known_splits(data: dict[str, dict[str, list[dict[str, Any]]]]) -> None:
@@ -93,11 +136,12 @@ def audit_extreme_equity_gaps(
 
 def main() -> None:
     data = load_stock_data()
+    audit_indicator_history(data)
     audit_known_splits(data)
     audit_extreme_equity_gaps(data)
     print(
-        "Bundled equity OHLC passes split-continuity checks. "
-        "Dividend adjustment is guaranteed for future refreshes by explicit "
+        "Bundled OHLC is indicator-ready and passes equity split-continuity checks. "
+        "Dividend adjustment is guaranteed for future equity refreshes by explicit "
         "yfinance auto_adjust=True, but cannot be proven from OHLC continuity alone."
     )
 
