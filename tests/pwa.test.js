@@ -9,8 +9,8 @@ const analyticsSource = fs.readFileSync('analytics.js', 'utf8');
 const pixelStyles = fs.readFileSync('premium-ui-refinement.css', 'utf8');
 const accountStyles = fs.readFileSync('account-integration.css', 'utf8');
 const baseStyles = fs.readFileSync('style.css', 'utf8');
-const homeStoryStyles = fs.readFileSync('home-story.css', 'utf8');
-const homeStorySource = fs.readFileSync('scripts/home-story.js', 'utf8');
+const homeMarketStyles = fs.readFileSync('home-market.css', 'utf8');
+const homeMarketSource = fs.readFileSync('scripts/home-market.js', 'utf8');
 const indicatorStyles = fs.readFileSync('indicator-cards.css', 'utf8');
 const indicatorSource = fs.readFileSync('scripts/indicator-cards.js', 'utf8');
 
@@ -49,14 +49,15 @@ assert.ok(!indexSource.includes('visual-polish.css'));
 assert.ok(indexSource.includes('pwa.css'));
 assert.ok(indexSource.includes('premium-ui.css'));
 assert.ok(indexSource.includes('premium-ui-refinement.css'));
-assert.ok(indexSource.includes('home-story.css'));
+assert.ok(indexSource.includes('home-market.css'));
 assert.ok(indexSource.includes('scripts/ui-state.js'));
 assert.ok(indexSource.includes('scripts/premium-ui.js'));
-assert.ok(indexSource.includes('scripts/home-story.js'));
+assert.ok(indexSource.includes('scripts/home-market.js'));
 assert.ok(indexSource.includes('pwa.js'));
 assert.ok(indexSource.includes('https://liuh886.github.io/admin/shared/account-shell.css?v=2'));
 assert.ok(indexSource.includes('async src="https://liuh886.github.io/admin/shared/account-shell.js?v=2"'));
 assert.ok(indexSource.includes('scripts/account-cloud-sync.js'));
+assert.ok(!indexSource.includes('home-story'));
 
 assert.ok(pixelStyles.includes("family=Pixelify+Sans"));
 assert.ok(pixelStyles.includes('--pixel-shadow-step'));
@@ -72,33 +73,41 @@ assert.ok(baseStyles.includes('HUD instrument system: one shell, one divider, on
 assert.ok(baseStyles.includes('--hud-shell:'));
 assert.ok(baseStyles.includes('--hud-divider:'));
 assert.ok(baseStyles.includes('.weather-status::before'));
-assert.ok(homeStoryStyles.includes('.home-story-slide'));
-assert.ok(homeStoryStyles.includes('.home-story-chart'));
-assert.ok(homeStorySource.includes("event.key === 'ArrowRight'"));
-assert.ok(homeStorySource.includes("event.key === 'ArrowLeft'"));
+assert.ok(homeMarketStyles.includes('.home-market-canvas'));
+assert.ok(homeMarketStyles.includes('.home-market-wallet'));
+assert.ok(homeMarketStyles.includes('.resource-glyph--coin'));
+assert.ok(homeMarketStyles.includes('.hud-cash-resource'));
+assert.ok(homeMarketSource.includes("event.key === 'ArrowUp'"));
+assert.ok(homeMarketSource.includes("event.key === 'ArrowDown'"));
+assert.ok(homeMarketSource.includes('function drawFloor('));
+assert.ok(homeMarketSource.includes('function promoteGameCashResource()'));
 assert.ok(indicatorStyles.includes('.indicator-card-deck'));
 assert.ok(indicatorStyles.includes('#indicator-overlay'));
-assert.ok(indicatorSource.includes("event.key === '1'"));
-assert.ok(indicatorSource.includes("event.key === '2'"));
+assert.ok(indicatorSource.includes('window.FlappyKIndicatorCards'));
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v20'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v20'"));
-assert.ok(serviceWorkerSource.includes("'./data.js'"));
-assert.ok(serviceWorkerSource.includes("'./analytics.js'"));
-assert.ok(serviceWorkerSource.includes("'./membership-config.js'"));
-assert.ok(serviceWorkerSource.includes("'./account-integration.css'"));
-assert.ok(serviceWorkerSource.includes("'./scripts/account-cloud-sync.js'"));
-assert.ok(serviceWorkerSource.includes("'./premium-ui.css'"));
-assert.ok(serviceWorkerSource.includes("'./premium-ui-refinement.css'"));
-assert.ok(serviceWorkerSource.includes("'./home-story.css'"));
-assert.ok(serviceWorkerSource.includes("'./scripts/home-story.js'"));
-assert.ok(serviceWorkerSource.includes("'./indicator-cards.css'"));
-assert.ok(serviceWorkerSource.includes("'./scripts/indicator-core.js'"));
-assert.ok(serviceWorkerSource.includes("'./scripts/indicator-history.js'"));
-assert.ok(serviceWorkerSource.includes("'./scripts/indicator-card-store.js'"));
-assert.ok(serviceWorkerSource.includes("'./scripts/indicator-cards.js'"));
-assert.ok(serviceWorkerSource.includes("'./market-weather.css'"));
-assert.ok(serviceWorkerSource.includes("'./scripts/market-weather.js'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v21'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v21'"));
+for (const asset of [
+  "'./data.js'",
+  "'./analytics.js'",
+  "'./membership-config.js'",
+  "'./account-integration.css'",
+  "'./scripts/account-cloud-sync.js'",
+  "'./premium-ui.css'",
+  "'./premium-ui-refinement.css'",
+  "'./home-market.css'",
+  "'./scripts/home-market.js'",
+  "'./indicator-cards.css'",
+  "'./scripts/indicator-core.js'",
+  "'./scripts/indicator-history.js'",
+  "'./scripts/indicator-card-store.js'",
+  "'./scripts/indicator-cards.js'",
+  "'./market-weather.css'",
+  "'./scripts/market-weather.js'",
+]) {
+  assert.ok(serviceWorkerSource.includes(asset), `PWA shell missing ${asset}`);
+}
+assert.ok(!serviceWorkerSource.includes('home-story'));
 assert.ok(!serviceWorkerSource.includes("'./membership.js'"));
 assert.ok(!serviceWorkerSource.includes("'./membership-experience.js'"));
 assert.ok(!serviceWorkerSource.includes("'./membership-run-hook.js'"));
@@ -125,11 +134,10 @@ assert.ok(pwaSource.includes("button.id = 'pwa-install-btn'"));
 assert.ok(pwaSource.includes("loadScript('flappyk-analytics-loader', './analytics.js')"));
 assert.ok(!pwaSource.includes('hud-compact.css'));
 assert.ok(pwaSource.includes("ensureStylesheet('flappyk-market-weather-styles', './market-weather.css')"));
-assert.ok(pwaSource.includes("loadScript('flappyk-market-weather-client', './scripts/market-weather.js')"));
+assert.ok(pwaSource.includes("ensureStylesheet('flappyk-home-market-styles', './home-market.css')"));
+assert.ok(pwaSource.indexOf('flappyk-home-market-styles') > pwaSource.indexOf('flappyk-market-weather-styles'));
 assert.ok(pwaSource.includes("ensureStylesheet('flappyk-indicator-card-styles', './indicator-cards.css')"));
 assert.ok(pwaSource.includes("loadScript('flappyk-indicator-core', './scripts/indicator-core.js')"));
-assert.ok(pwaSource.includes("loadScript('flappyk-indicator-history', './scripts/indicator-history.js')"));
-assert.ok(pwaSource.includes("loadScript('flappyk-indicator-card-store', './scripts/indicator-card-store.js')"));
 assert.ok(pwaSource.includes("loadScript('flappyk-indicator-cards', './scripts/indicator-cards.js')"));
 assert.ok(!pwaSource.includes('flappyk-membership-client'));
 assert.ok(!pwaSource.includes('flappyk-membership-experience'));
@@ -144,4 +152,4 @@ assert.ok(analyticsSource.includes("track('level_complete'"));
 assert.ok(analyticsSource.includes("track('run_complete'"));
 assert.ok(analyticsSource.includes("track('pwa_install'"));
 
-console.log('PWA manifest, icons, install UI, analytics, two-page home, unified HUD, tactical indicator cards, account cloud history, and v20 offline cache checks passed');
+console.log('PWA manifest, icons, install UI, analytics, interactive market home, coin HUD, tactical cards, weather, account toolbar, cloud history, and v21 offline cache checks passed');
