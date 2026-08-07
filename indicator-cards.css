@@ -1,0 +1,289 @@
+#indicator-overlay {
+    position: absolute;
+    z-index: 3;
+    display: block;
+    pointer-events: none;
+    image-rendering: pixelated;
+}
+
+.indicator-card-deck {
+    position: absolute;
+    right: 18px;
+    bottom: 16px;
+    z-index: 34;
+    display: grid;
+    width: min(330px, calc(100% - 36px));
+    gap: 7px;
+    pointer-events: none;
+}
+
+.indicator-card-deck[hidden] {
+    display: none !important;
+}
+
+.indicator-card-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+}
+
+#game-container .indicator-card,
+#game-container .indicator-card-draw {
+    position: relative;
+    margin: 0;
+    border-radius: 0;
+    font-family: var(--pixel-font-ui, monospace);
+    pointer-events: auto;
+    touch-action: manipulation;
+    clip-path: polygon(0 5px, 5px 5px, 5px 0, calc(100% - 5px) 0, calc(100% - 5px) 5px, 100% 5px, 100% calc(100% - 5px), calc(100% - 5px) calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%, 5px calc(100% - 5px), 0 calc(100% - 5px));
+}
+
+#game-container .indicator-card {
+    display: grid;
+    grid-template-columns: 27px 1fr auto;
+    min-height: 54px;
+    padding: 7px 8px;
+    align-items: center;
+    gap: 7px;
+    border: 2px solid rgba(169, 181, 199, 0.78);
+    background: rgba(8, 13, 22, 0.94);
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.78);
+    color: #f7fbff;
+    text-align: left;
+}
+
+#game-container .indicator-card:hover,
+#game-container .indicator-card:focus-visible {
+    transform: translate(-1px, -1px);
+    border-color: #5ce7f2;
+    box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.78);
+    outline: none;
+}
+
+#game-container .indicator-card:active {
+    transform: translate(3px, 3px);
+    box-shadow: none;
+}
+
+.indicator-card-key {
+    display: grid;
+    width: 27px;
+    height: 27px;
+    place-items: center;
+    border: 1px solid rgba(247, 251, 255, 0.78);
+    background: #111827;
+    color: #f7fbff;
+    font-family: var(--pixel-font-display, monospace);
+    font-size: 9px;
+    line-height: 1;
+}
+
+.indicator-card-copy {
+    display: grid;
+    min-width: 0;
+    gap: 3px;
+}
+
+.indicator-card-copy strong {
+    font-family: var(--pixel-font-display, monospace);
+    font-size: 9px;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: 0.04em;
+}
+
+.indicator-card-copy small {
+    overflow: hidden;
+    color: #a9b5c7;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.indicator-card-count {
+    color: #ffd84a;
+    font-family: var(--pixel-font-display, monospace);
+    font-size: 9px;
+    line-height: 1;
+}
+
+.indicator-card--boll {
+    border-top-color: rgba(92, 231, 242, 0.92) !important;
+}
+
+.indicator-card--macd {
+    border-top-color: rgba(173, 145, 255, 0.92) !important;
+}
+
+#game-container .indicator-card.is-active {
+    border-color: #46e08a;
+    background: rgba(8, 46, 31, 0.96);
+    box-shadow: 0 0 0 2px rgba(70, 224, 138, 0.18), 4px 4px 0 rgba(0, 0, 0, 0.78);
+}
+
+.indicator-card.is-active .indicator-card-key {
+    border-color: #dfffea;
+    background: #46e08a;
+    color: #062313;
+}
+
+.indicator-card.is-active .indicator-card-count {
+    color: #dfffea;
+}
+
+#game-container .indicator-card.is-empty {
+    border-color: rgba(255, 103, 116, 0.58);
+    opacity: 0.72;
+}
+
+#game-container .indicator-card.is-locked {
+    filter: saturate(0.45);
+}
+
+#game-container .indicator-card-draw {
+    min-height: 30px;
+    padding: 6px 9px;
+    border: 1px solid rgba(255, 216, 74, 0.72);
+    background: rgba(55, 42, 9, 0.92);
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.78);
+    color: #ffd84a;
+    font-family: var(--pixel-font-display, monospace);
+    font-size: 7px;
+    line-height: 1.3;
+    letter-spacing: 0.025em;
+    text-align: center;
+}
+
+#game-container .indicator-card-draw:not(:disabled):hover,
+#game-container .indicator-card-draw:not(:disabled):focus-visible {
+    border-color: #fff0a6;
+    background: rgba(84, 63, 11, 0.96);
+    outline: none;
+}
+
+#game-container .indicator-card-draw:disabled {
+    border-color: rgba(169, 181, 199, 0.34);
+    background: rgba(8, 13, 22, 0.86);
+    color: #7d8999;
+    cursor: not-allowed;
+}
+
+#game-container .indicator-card-draw[data-mode='signin'] {
+    border-color: rgba(92, 231, 242, 0.68);
+    background: rgba(8, 35, 47, 0.94);
+    color: #aef8ff;
+}
+
+.indicator-card-feedback {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 8px);
+    max-width: 100%;
+    min-height: 28px;
+    padding: 7px 9px;
+    border: 1px solid rgba(169, 181, 199, 0.66);
+    background: rgba(5, 9, 16, 0.96);
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.78);
+    color: #f7fbff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(4px);
+    transition: opacity 120ms steps(2, end), transform 120ms steps(2, end);
+}
+
+.indicator-card-feedback.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.indicator-card-feedback[data-kind='success'] {
+    border-color: rgba(70, 224, 138, 0.78);
+    color: #baffd6;
+}
+
+.indicator-card-feedback[data-kind='empty'],
+.indicator-card-feedback[data-kind='locked'] {
+    border-color: rgba(255, 103, 116, 0.72);
+    color: #ffb2ba;
+}
+
+@media (max-width: 720px), (pointer: coarse) {
+    .indicator-card-deck {
+        right: max(8px, env(safe-area-inset-right));
+        bottom: calc(max(86px, env(safe-area-inset-bottom) + 78px));
+        width: min(300px, calc(100% - 16px));
+        gap: 5px;
+    }
+
+    .indicator-card-row {
+        gap: 5px;
+    }
+
+    #game-container .indicator-card {
+        grid-template-columns: 24px 1fr auto;
+        min-height: 48px;
+        padding: 6px;
+        gap: 5px;
+        box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.78);
+    }
+
+    .indicator-card-key {
+        width: 24px;
+        height: 24px;
+        font-size: 8px;
+    }
+
+    .indicator-card-copy strong,
+    .indicator-card-count {
+        font-size: 8px;
+    }
+
+    .indicator-card-copy small {
+        font-size: 8px;
+    }
+
+    #game-container .indicator-card-draw {
+        min-height: 28px;
+        padding: 5px 7px;
+        font-size: 6px;
+    }
+}
+
+@media (max-width: 430px) {
+    .indicator-card-deck {
+        left: 8px;
+        right: 8px;
+        width: auto;
+    }
+
+    .indicator-card-key {
+        display: none;
+    }
+
+    #game-container .indicator-card {
+        grid-template-columns: 1fr auto;
+    }
+}
+
+@media (max-height: 650px) and (min-width: 721px) {
+    .indicator-card-deck {
+        right: 12px;
+        bottom: 10px;
+        width: 290px;
+    }
+
+    #game-container .indicator-card {
+        min-height: 46px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .indicator-card-feedback {
+        transition: none;
+    }
+}
