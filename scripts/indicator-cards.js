@@ -84,6 +84,10 @@
         return snapshot.playing || state === 'playing' || state === 'paused';
     }
 
+    function hasCardAccess() {
+        return store.getSnapshot().signedIn === true;
+    }
+
     function syncOverlaySize() {
         const width = baseCanvas.width;
         const height = baseCanvas.height;
@@ -95,16 +99,20 @@
         overlay.style.height = `${baseCanvas.clientHeight}px`;
     }
 
-    function resetLevel(data) {
-        lastData = data;
-        calculationData = null;
-        bollValues = [];
-        macdValues = [];
+    function clearActiveCards() {
         active = { boll: false, macd: false };
         revealStartedAt = { boll: 0, macd: 0 };
         deck.querySelectorAll('.indicator-card').forEach((button) => {
             button.classList.remove('is-active', 'is-revealing');
         });
+    }
+
+    function resetLevel(data) {
+        lastData = data;
+        calculationData = null;
+        bollValues = [];
+        macdValues = [];
+        clearActiveCards();
         renderDeck();
     }
 
@@ -212,7 +220,9 @@
             if (!upperStarted) {
                 context.moveTo(x, y);
                 upperStarted = true;
-            } else context.lineTo(x, y);
+            } else {
+                context.lineTo(x, y);
+            }
         }
         for (let index = snapshot.day; index >= geometry.start; index -= 1) {
             const value = Number(bollValues[index]?.lower);
@@ -252,7 +262,9 @@
             if (!started) {
                 context.moveTo(x, pointY);
                 started = true;
-            } else context.lineTo(x, pointY);
+            } else {
+                context.lineTo(x, pointY);
+            }
         }
         if (!started) return;
         context.strokeStyle = color;
@@ -308,7 +320,9 @@
             if (!started) {
                 context.moveTo(x, pointY);
                 started = true;
-            } else context.lineTo(x, pointY);
+            } else {
+                context.lineTo(x, pointY);
+            }
         }
         if (started) {
             context.strokeStyle = '#ffd84a';
@@ -371,7 +385,9 @@
             if (!Number.isFinite(histogram)) continue;
             const x = geometry.x(index);
             const barY = y(histogram);
-            context.fillStyle = histogram >= 0 ? 'rgba(70, 224, 138, 0.74)' : 'rgba(255, 103, 116, 0.74)';
+            context.fillStyle = histogram >= 0
+                ? 'rgba(70, 224, 138, 0.74)'
+                : 'rgba(255, 103, 116, 0.74)';
             context.fillRect(
                 x - Math.max(1, geometry.candleWidth * 0.25),
                 Math.min(zero, barY),
@@ -404,14 +420,10 @@
     function activate(type) {
         const snapshot = gameSnapshot();
         if (!TYPES.includes(type) || !isGameVisible(snapshot) || !snapshot.data.length) return;
+        const inventory = store.getSnapshot();
+        if (!inventory.signedIn) return;
         if (active[type]) {
             showFeedback(text(`${type.toUpperCase()} already revealed`, `${type.toUpperCase()} 已显示`));
-            return;
-        }
-        const inventory = store.getSnapshot();
-        if (!inventory.signedIn) {
-            showFeedback(text('Sign in · starter hand BOLL ×3 + MACD ×3', '登录即可获得起始手牌：BOLL ×3 + MACD ×3'), 'locked');
-            window.HaoAccount?.open?.();
             return;
         }
         if (!store.consume(type)) {
@@ -442,6 +454,7 @@
     }
 
     function drawCard() {
+        if (!store.getSnapshot().isPro) return;
         const type = store.draw(randomUnit());
         if (!type) return;
         navigator.vibrate?.(24);
@@ -461,21 +474,15 @@
         TYPES.forEach((type) => {
             const button = buttons[type];
             const count = deck.querySelector(`[data-card-count="${type}"]`);
-            if (count) count.textContent = inventory.signedIn ? `×${inventory[type]}` : '+3';
+            if (count) count.textContent = `×${inventory[type]}`;
             if (!button) return;
-            button.classList.toggle('is-active', active[type]);
+            button.classList.toggle('is-active', inventory.signedIn && active[type]);
             button.classList.toggle('is-empty', inventory.signedIn && inventory[type] < 1 && !active[type]);
-            button.classList.toggle('is-locked', !inventory.signedIn);
-            button.setAttribute('aria-pressed', String(active[type]));
-            button.setAttribute('aria-label', inventory.signedIn
-                ? text(
-                    `Use ${type.toUpperCase()} card. ${inventory[type]} remaining.`,
-                    `使用 ${type.toUpperCase()} 卡牌，剩余 ${inventory[type]} 张。`
-                )
-                : text(
-                    `Sign in to receive 3 ${type.toUpperCase()} cards.`,
-                    `登录领取 3 张 ${type.toUpperCase()} 卡牌。`
-                ));
+            button.setAttribute('aria-pressed', String(inventory.signedIn && active[type]));
+            button.setAttribute('aria-label', text(
+                `Use ${type.toUpperCase()} card. ${inventory[type]} remaining.`,
+                `使用 ${type.toUpperCase()} 卡牌，剩余 ${inventory[type]} 张。`
+            ));
         });
 
         if (!inventory.isPro) {
@@ -507,11 +514,11 @@
     drawButton.addEventListener('click', (event) => {
         event.preventDefault();
         event.stopPropagation();
-        if (store.getSnapshot().isPro) drawCard();
+        drawCard();
     });
 
     window.addEventListener('keydown', (event) => {
-        if (event.repeat || event.altKey || event.ctrlKey || event.metaKey) return;
+        if (event.repeat || event.altKey || event.ctrlKey || event.metaKey || !hasCardAccess()) return;
         if (event.key === '1' || event.code === 'Digit1') {
             event.preventDefault();
             activate('boll');
@@ -521,7 +528,10 @@
         }
     }, true);
 
-    window.addEventListener('flappyk:indicator-cards', renderDeck);
+    window.addEventListener('flappyk:indicator-cards', (event) => {
+        if (event.detail?.signedIn === false) clearActiveCards();
+        renderDeck();
+    });
     window.addEventListener('flappyk:ui-state', renderDeck);
     window.addEventListener('flappyk:language-changed', renderDeck);
 
@@ -529,10 +539,11 @@
         const snapshot = gameSnapshot();
         if (snapshot.data !== lastData && snapshot.data.length) resetLevel(snapshot.data);
         const visible = isGameVisible(snapshot);
-        deck.hidden = !visible;
+        const cardAccess = hasCardAccess();
+        deck.hidden = !visible || !cardAccess;
         syncOverlaySize();
         context.clearRect(0, 0, overlay.width, overlay.height);
-        if (visible && snapshot.data.length && (active.boll || active.macd)) {
+        if (visible && cardAccess && snapshot.data.length && (active.boll || active.macd)) {
             ensureCalculations(snapshot.data);
             const geometry = visibleGeometry(snapshot);
             if (geometry) {
