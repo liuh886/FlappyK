@@ -604,6 +604,7 @@ html body #game-container #game-hud-rail .stats-box[data-composition='returns-on
     padding: 0 !important;
     border: 0 !important;
     border-right: 1px solid var(--hud-divider) !important;
+    backdrop-filter: none !important;
 }
 
 html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] .hud-main {
@@ -802,6 +803,7 @@ html body #game-container #game-hud-rail #game-top-controls .speed-readout {
         min-width: 28px !important;
         padding: 4px !important;
         border: 1px solid #52647c !important;
+        border-radius: 0 !important;
         background: var(--hud-cell) !important;
         color: var(--hud-warning) !important;
         box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.42) !important;

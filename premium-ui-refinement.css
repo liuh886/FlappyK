@@ -548,6 +548,7 @@ html[data-ui-state='home'] #game-container::after {
     left: 12px;
     z-index: 62;
     display: grid;
+    grid-template-rows: minmax(0, 1fr);
     align-items: stretch;
     pointer-events: none;
 }
@@ -564,6 +565,7 @@ html[data-ui-state='home'] #game-container::after {
     position: static !important;
     inset: auto !important;
     min-width: 0 !important;
+    min-height: 0 !important;
     margin: 0 !important;
 }
 
