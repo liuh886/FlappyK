@@ -557,6 +557,16 @@ html[data-ui-state='home'] #game-container::after {
     pointer-events: auto;
 }
 
+#game-hud-rail .weather-status,
+#game-hud-rail .stats-box[data-composition='returns-only'],
+#game-hud-rail .run-progress-panel,
+#game-hud-rail #game-top-controls {
+    position: static !important;
+    inset: auto !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+}
+
 html[data-virtual-controls='true'] #game-top-controls .desktop-speed-control {
     display: none !important;
 }
@@ -755,6 +765,33 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
 @media (max-width: 720px), (pointer: coarse) {
     body::before {
         opacity: 0.12;
+    }
+
+    #game-hud-rail {
+        top: max(6px, env(safe-area-inset-top));
+        right: max(6px, env(safe-area-inset-right));
+        left: max(6px, env(safe-area-inset-left));
+        grid-template-areas:
+            'performance controls'
+            'weather progress';
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-rows: auto auto;
+    }
+
+    #game-hud-rail .stats-box[data-composition='returns-only'] {
+        grid-area: performance;
+    }
+
+    #game-hud-rail #game-top-controls {
+        grid-area: controls;
+    }
+
+    #game-hud-rail .weather-status {
+        grid-area: weather;
+    }
+
+    #game-hud-rail .run-progress-panel {
+        grid-area: progress;
     }
 
     html[data-ui-state='home'] #game-container.arcade-weather-ready {
