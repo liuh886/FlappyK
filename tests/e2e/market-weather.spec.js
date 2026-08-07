@@ -79,7 +79,7 @@ test('home opens as a full-viewport market scene with immediate play', async ({ 
   await expect(page.locator('html')).toHaveAttribute('data-ui-state', 'home');
   await expect(page.locator('.home-console-bezel')).toBeVisible();
   await expect(page.locator('.home-console-screen')).toBeVisible();
-  await expect(page.locator('.home-market-kicker')).toHaveText('LIVE DEMO · USE ↑ / ↓');
+  await expect(page.locator('.home-console-kicker')).toHaveText('HIDDEN MARKET · PRESS PLAY');
   await expect(page.getByRole('button', { name: 'PLAY', exact: true })).toBeVisible();
   await expect(page.locator('#market-weather-layer')).toHaveAttribute('data-weather', 'clear');
 

@@ -137,9 +137,9 @@ test('Chinese desktop game typography stays consistent around the account toolba
     return {
       statsSize: style('.stats-box').fontSize,
       statsFamily: style('.stats-box').fontFamily,
-      introSize: style('.home-market-tagline').fontSize,
-      introLineHeight: style('.home-market-tagline').lineHeight,
-      introFamily: style('.home-market-tagline').fontFamily,
+      introSize: style('#start-screen > p').fontSize,
+      introLineHeight: style('#start-screen > p').lineHeight,
+      introFamily: style('#start-screen > p').fontFamily,
       buttonFamily: style('#start-btn').fontFamily,
       languageFamily: style('#language-toggle-btn').fontFamily,
       accountFamily: style('.hao-account-trigger').fontFamily,
@@ -148,8 +148,8 @@ test('Chinese desktop game typography stays consistent around the account toolba
   });
 
   expect(Number.parseFloat(typography.statsSize)).toBeGreaterThanOrEqual(12);
-  expect(Number.parseFloat(typography.introSize)).toBeGreaterThanOrEqual(18);
-  expect(Number.parseFloat(typography.introLineHeight)).toBeGreaterThanOrEqual(21);
+  expect(typography.introSize).toBe('17px');
+  expect(Number.parseFloat(typography.introLineHeight)).toBeGreaterThanOrEqual(28);
   for (const family of [typography.statsFamily, typography.introFamily, typography.buttonFamily, typography.languageFamily, typography.accountFamily]) {
     expect(family).toContain('ZCOOL QingKe HuangYou');
   }

@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const configSource = fs.readFileSync('membership-config.js', 'utf8');
 const indexSource = fs.readFileSync('index.html', 'utf8');
 const cloudSyncSource = fs.readFileSync('scripts/account-cloud-sync.js', 'utf8');
-const indicatorStoreSource = fs.readFileSync('scripts/indicator-card-store.js', 'utf8');
+const cardStoreSource = fs.readFileSync('scripts/indicator-card-store.js', 'utf8');
 const pwaSource = fs.readFileSync('pwa.js', 'utf8');
 const serviceWorkerSource = fs.readFileSync('sw.js', 'utf8');
 const migrationSource = fs.readFileSync('supabase/migrations/0001_membership_foundation.sql', 'utf8');
@@ -64,20 +64,22 @@ for (const contract of [
   "const STATE_KEY = 'indicator_cards'",
   'const STARTER_COUNT = 3',
   'const DAILY_DRAW_LIMIT = 3',
+  'accountState?.isPro === true',
   'window.HaoAccount.saveProductData',
+  '[STATE_KEY]: payload',
   "window.addEventListener('hao:account-changed'",
-  'starterGranted: true',
-  'dailyDrawsRemaining',
 ]) {
-  assert.ok(indicatorStoreSource.includes(contract), `Missing account-backed indicator card contract: ${contract}`);
+  assert.ok(cardStoreSource.includes(contract), `Missing account-backed indicator card contract: ${contract}`);
 }
+assert.ok(!cardStoreSource.includes('localStorage'), 'Indicator card entitlement must not use a browser-local membership fallback.');
 
 for (const retainedRuntime of [
   "loadScript('flappyk-analytics-loader'",
   "ensureStylesheet('flappyk-market-weather-styles'",
-  "ensureStylesheet('flappyk-home-market-styles'",
   "loadScript('flappyk-market-weather-client'",
   "ensureStylesheet('flappyk-indicator-card-styles'",
+  "loadScript('flappyk-indicator-core'",
+  "loadScript('flappyk-indicator-history'",
   "loadScript('flappyk-indicator-card-store'",
   "loadScript('flappyk-indicator-cards'",
 ]) {
@@ -94,8 +96,8 @@ for (const retiredRuntime of [
   assert.ok(!pwaSource.includes(retiredRuntime), `PWA runtime still loads retired account code: ${retiredRuntime}`);
 }
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v22'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v22'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v23'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v23'"));
 for (const retainedAsset of [
   "'./membership-config.js'",
   "'./account-integration.css'",
@@ -104,9 +106,11 @@ for (const retainedAsset of [
   "'./scripts/market-weather.js'",
   "'./premium-ui.css'",
   "'./premium-ui-refinement.css'",
-  "'./home-market.css'",
-  "'./scripts/home-market.js'",
+  "'./home-story.css'",
+  "'./scripts/home-story.js'",
   "'./indicator-cards.css'",
+  "'./scripts/indicator-core.js'",
+  "'./scripts/indicator-history.js'",
   "'./scripts/indicator-card-store.js'",
   "'./scripts/indicator-cards.js'",
 ]) {
@@ -119,10 +123,8 @@ for (const retiredAsset of [
   "'./membership.css'",
   "'./membership-sync.css'",
   "'./scripts/cloud-run-sync-core.js'",
-  "'./home-story.css'",
-  "'./scripts/home-story.js'",
 ]) {
-  assert.ok(!serviceWorkerSource.includes(retiredAsset), `Offline shell still caches retired code: ${retiredAsset}`);
+  assert.ok(!serviceWorkerSource.includes(retiredAsset), `Offline shell still caches retired account code: ${retiredAsset}`);
 }
 
 for (const retiredFile of [
@@ -132,10 +134,8 @@ for (const retiredFile of [
   'membership.css',
   'membership-sync.css',
   'scripts/cloud-run-sync-core.js',
-  'home-story.css',
-  'scripts/home-story.js',
 ]) {
-  assert.equal(fs.existsSync(retiredFile), false, `Retired file still exists: ${retiredFile}`);
+  assert.equal(fs.existsSync(retiredFile), false, `Retired account file still exists: ${retiredFile}`);
 }
 
 assert.ok(migrationSource.includes('alter table public.profiles enable row level security'));
@@ -156,4 +156,4 @@ for (const privacyContract of [
   assert.ok(privacySource.includes(privacyContract), `Cloud-history documentation is missing ${privacyContract}`);
 }
 
-console.log('Shared account, static home toolbar, personal cloud history, account-backed tactical cards, PWA v22, privacy, trusted-ranking separation, and RLS boundaries validated');
+console.log('Shared account, account-backed card inventory, personal cloud history, PWA v23, trusted entitlement boundary, privacy, rankings, and RLS checks validated');

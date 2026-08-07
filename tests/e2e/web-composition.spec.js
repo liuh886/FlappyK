@@ -178,7 +178,7 @@ test('desktop game uses one compact pixel HUD rail around the dominant chart', a
   expect(layout.stats.width).toBeGreaterThanOrEqual(330);
   expect(layout.stats.width).toBeLessThanOrEqual(380);
   expect(layout.run.width).toBeLessThanOrEqual(180);
-  expect(layout.statsColumns).toBe(4);
+  expect(layout.statsColumns).toBe(3);
   expect(layout.hudMainDisplay).toBe('contents');
   expect(layout.metricsFit).toBe(true);
 
@@ -277,7 +277,7 @@ test('mobile uses a readable two-row HUD rail above virtual controls', async ({ 
   expect(positions.statsHeight).toBeLessThanOrEqual(48);
   expect(positions.runWidth).toBeLessThanOrEqual(132);
   expect(positions.runHeight).toBeLessThanOrEqual(38);
-  expect(positions.statsColumns).toBe(4);
+  expect(positions.statsColumns).toBe(3);
   expect(positions.metricsFit).toBe(true);
 
   expect(parseFloat(positions.buySize)).toBeGreaterThanOrEqual(14);
