@@ -95,9 +95,10 @@ assert.ok(indicatorSource.includes("event.key === '1'"));
 assert.ok(indicatorSource.includes("event.key === '2'"));
 assert.ok(indicatorSource.includes('function drawProfitLane'));
 assert.ok(indicatorSource.includes('const REVEAL_MS = 440'));
+assert.ok(indicatorSource.includes('deck.hidden = !visible || !cardAccess'));
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v24'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v24'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v25'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v25'"));
 assert.ok(serviceWorkerSource.includes("'./data.js'"));
 assert.ok(serviceWorkerSource.includes("'./analytics.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership-config.js'"));
@@ -161,4 +162,4 @@ assert.ok(analyticsSource.includes("track('level_complete'"));
 assert.ok(analyticsSource.includes("track('run_complete'"));
 assert.ok(analyticsSource.includes("track('pwa_install'"));
 
-console.log('PWA manifest, icons, install UI, analytics, curated home, modular HUD, tactical indicator cards, account cloud history, and v24 cache checks passed');
+console.log('PWA manifest, icons, install UI, analytics, curated home, modular HUD, account-only tactical indicator cards, account cloud history, and v25 cache checks passed');
