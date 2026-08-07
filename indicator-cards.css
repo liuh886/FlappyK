@@ -8,7 +8,7 @@
 
 .indicator-card-deck {
     position: absolute;
-    right: 14px;
+    left: 14px;
     bottom: 14px;
     z-index: 34;
     display: grid;
@@ -23,7 +23,7 @@
 }
 
 .indicator-hand-label {
-    justify-self: end;
+    justify-self: start;
     min-height: 18px;
     padding: 4px 6px 3px;
     border: 1px solid var(--hud-divider, rgba(159, 176, 196, 0.28));
@@ -208,7 +208,7 @@
 }
 
 #game-container .indicator-card-draw {
-    justify-self: end;
+    justify-self: start;
     min-height: 26px;
     padding: 5px 8px;
     border: 1px solid rgba(242, 207, 91, 0.66);
@@ -238,7 +238,7 @@
 
 .indicator-card-feedback {
     position: absolute;
-    right: 0;
+    left: 0;
     bottom: calc(100% + 7px);
     max-width: 100%;
     min-height: 26px;
@@ -279,7 +279,7 @@
 
 @media (max-width: 720px), (pointer: coarse) {
     .indicator-card-deck {
-        right: max(8px, env(safe-area-inset-right));
+        left: max(8px, env(safe-area-inset-left));
         bottom: calc(max(96px, env(safe-area-inset-bottom) + 88px));
         width: min(276px, calc(100% - 16px));
         gap: 4px;
@@ -325,9 +325,7 @@
 
 @media (max-width: 430px) {
     .indicator-card-deck {
-        left: 8px;
-        right: 8px;
-        width: auto;
+        width: min(276px, calc(100% - 16px));
     }
 
     .indicator-card-key {
@@ -341,7 +339,7 @@
 
 @media (max-height: 650px) and (min-width: 721px) {
     .indicator-card-deck {
-        right: 10px;
+        left: 10px;
         bottom: 10px;
         width: 238px;
     }
