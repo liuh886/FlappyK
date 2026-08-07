@@ -19,6 +19,7 @@ assert.ok(uiStyles.includes('@media (max-width: 430px) and (max-height: 700px)')
 assert.ok(uiStyles.includes('(orientation: landscape) and (max-height: 500px)'));
 assert.ok(uiStyles.includes('#mobile-controls .mobile-trade-primary'));
 assert.ok(uiStyles.includes('font-size: 14px'));
+assert.ok(uiStyles.includes("html[data-ui-state='home'] body #game-container #mobile-controls:not([hidden])"));
 
 // Gameplay control chrome remains owned by the established HUD/instrument system.
 assert.ok(baseStyles.includes("#mobile-controls:not([hidden])"));
