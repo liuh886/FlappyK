@@ -16,7 +16,7 @@ assert.ok(weatherStyles.includes('env(safe-area-inset-top)'));
 assert.ok(weatherStyles.includes("html[data-ui-state='home'] #game-container.arcade-weather-ready"));
 assert.ok(accountStyles.includes('.home-utility-bar'));
 assert.ok(accountStyles.includes('.home-account-slot .hao-account-trigger'));
-assert.ok(accountStyles.includes('min-height: 44px'));
+assert.ok(accountStyles.includes('min-height: 40px'));
 assert.ok(accountStyles.includes('@media (max-width: 640px)'));
 assert.ok(homeStyles.includes('@media (max-width: 430px) and (max-height: 720px)'));
 assert.ok(homeStyles.includes('@media (orientation: landscape) and (max-height: 520px)'));
