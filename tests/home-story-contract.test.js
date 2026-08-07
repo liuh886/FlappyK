@@ -46,10 +46,10 @@ for (const contract of [
 assert.equal((storyJs.match(/home-story-marker home-story-marker--/g) || []).length, 3);
 assert.ok(!storyJs.includes('new Swiper'));
 assert.ok(!storyJs.includes('setInterval('));
-assert.ok(serviceWorker.includes("flappyk-app-v23"));
-assert.ok(serviceWorker.includes("flappyk-runtime-v23"));
+assert.ok(serviceWorker.includes("flappyk-app-v24"));
+assert.ok(serviceWorker.includes("flappyk-runtime-v24"));
 assert.ok(serviceWorker.includes("'./home-story.css'"));
 assert.ok(serviceWorker.includes("'./scripts/home-story.js'"));
 assert.ok(!serviceWorker.includes('home-market'));
 
-console.log('Two-page pixel home story, decisive-trades message, bilingual copy, keyboard navigation, mobile layout, and PWA v23 contracts passed');
+console.log('Two-page pixel home story, decisive-trades message, bilingual copy, keyboard navigation, mobile layout, and PWA v24 contracts passed');
