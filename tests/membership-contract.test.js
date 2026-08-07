@@ -62,6 +62,7 @@ for (const contract of [
 for (const retainedRuntime of [
   "loadScript('flappyk-analytics-loader'",
   "ensureStylesheet('flappyk-market-weather-styles'",
+  "ensureStylesheet('flappyk-home-market-styles'",
   "loadScript('flappyk-market-weather-client'",
 ]) {
   assert.ok(pwaSource.includes(retainedRuntime), `PWA runtime lost ${retainedRuntime}`);
@@ -77,8 +78,8 @@ for (const retiredRuntime of [
   assert.ok(!pwaSource.includes(retiredRuntime), `PWA runtime still loads retired account code: ${retiredRuntime}`);
 }
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v19'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v19'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v20'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v20'"));
 for (const retainedAsset of [
   "'./membership-config.js'",
   "'./account-integration.css'",
@@ -87,8 +88,8 @@ for (const retainedAsset of [
   "'./scripts/market-weather.js'",
   "'./premium-ui.css'",
   "'./premium-ui-refinement.css'",
-  "'./home-story.css'",
-  "'./scripts/home-story.js'",
+  "'./home-market.css'",
+  "'./scripts/home-market.js'",
 ]) {
   assert.ok(serviceWorkerSource.includes(retainedAsset), `Offline shell is missing ${retainedAsset}`);
 }
@@ -99,8 +100,10 @@ for (const retiredAsset of [
   "'./membership.css'",
   "'./membership-sync.css'",
   "'./scripts/cloud-run-sync-core.js'",
+  "'./home-story.css'",
+  "'./scripts/home-story.js'",
 ]) {
-  assert.ok(!serviceWorkerSource.includes(retiredAsset), `Offline shell still caches retired account code: ${retiredAsset}`);
+  assert.ok(!serviceWorkerSource.includes(retiredAsset), `Offline shell still caches retired code: ${retiredAsset}`);
 }
 
 for (const retiredFile of [
@@ -110,8 +113,10 @@ for (const retiredFile of [
   'membership.css',
   'membership-sync.css',
   'scripts/cloud-run-sync-core.js',
+  'home-story.css',
+  'scripts/home-story.js',
 ]) {
-  assert.equal(fs.existsSync(retiredFile), false, `Retired account file still exists: ${retiredFile}`);
+  assert.equal(fs.existsSync(retiredFile), false, `Retired file still exists: ${retiredFile}`);
 }
 
 assert.ok(migrationSource.includes('alter table public.profiles enable row level security'));
@@ -132,4 +137,4 @@ for (const privacyContract of [
   assert.ok(privacySource.includes(privacyContract), `Cloud-history documentation is missing ${privacyContract}`);
 }
 
-console.log('Shared account, dedicated home toolbar, personal cloud history, PWA v19, privacy, trusted-ranking separation, and RLS boundaries validated');
+console.log('Shared account, static home toolbar, personal cloud history, PWA v20, privacy, trusted-ranking separation, and RLS boundaries validated');
