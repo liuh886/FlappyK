@@ -280,7 +280,7 @@
 @media (max-width: 720px), (pointer: coarse) {
     .indicator-card-deck {
         right: max(8px, env(safe-area-inset-right));
-        bottom: calc(max(86px, env(safe-area-inset-bottom) + 78px));
+        bottom: calc(max(96px, env(safe-area-inset-bottom) + 88px));
         width: min(276px, calc(100% - 16px));
         gap: 4px;
     }
