@@ -1,0 +1,19 @@
+name: Fix weather live ownership
+
+on:
+  push:
+    branches:
+      - agent/revert-home-market-v2
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: python scripts/fix-weather-live-ownership.py
