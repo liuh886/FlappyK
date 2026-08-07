@@ -7,6 +7,7 @@ const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), 'u
 
 const weatherScript = read('scripts/market-weather.js');
 const weatherStyles = read('market-weather.css');
+const homeStyles = read('home-market.css');
 const baseStyles = read('style.css');
 const pwa = read('pwa.js');
 const serviceWorker = read('sw.js');
@@ -29,26 +30,25 @@ for (const boundaryMessage of [
 for (const stateSelector of [
   "[data-weather='cloudy']",
   "[data-weather='rain']",
-  '.home-console-bezel',
-  '.home-console-screen',
   "html[data-ui-state='home'] #game-container.arcade-weather-ready",
-  "html[data-ui-state='home'] .home-console-bezel",
-  "html[data-ui-state='home'] .home-console-screen",
   '@media (prefers-reduced-motion: reduce)',
 ]) {
   assert.ok(weatherStyles.includes(stateSelector), `Missing weather visual contract: ${stateSelector}`);
 }
 
-for (const homeShellContract of [
-  'width: 100vw',
-  'height: 100dvh',
-  'grid-template-rows: auto minmax(0, 1fr) auto',
-  'clip-path: none',
-  'justify-content: center',
-  'The web home owns the viewport; the arcade cabinet belongs to gameplay.',
+for (const homeOwnershipContract of [
+  '.home-market-screen',
+  '.home-market-canvas',
+  '.home-market-wallet',
+  'width: 100%',
+  'height: 100%',
 ]) {
-  assert.ok(weatherStyles.includes(homeShellContract), `Missing full-viewport home contract: ${homeShellContract}`);
+  assert.ok(homeStyles.includes(homeOwnershipContract), `Missing static home ownership contract: ${homeOwnershipContract}`);
 }
+assert.ok(weatherStyles.includes('The home scene itself belongs to home-market.css.'));
+assert.ok(!weatherStyles.includes('.home-console-screen'));
+assert.ok(!weatherScript.includes('function installHomeConsole()'));
+assert.ok(!weatherScript.includes('replaceChildren(bezel'));
 
 for (const transitionContract of [
   "Object.freeze(['clear', 'cloudy', 'rain'])",
@@ -83,6 +83,8 @@ for (const detailContract of [
   "glyph.textContent = symbol",
   "'▲'",
   "'▼'",
+  "'#home-demo-buy'",
+  "'#home-demo-sell'",
   "event.key !== 'Enter' && event.key !== ' '",
 ]) {
   assert.ok(weatherScript.includes(detailContract), `Missing arcade detail contract: ${detailContract}`);
@@ -99,13 +101,15 @@ assert.ok(baseStyles.includes('--hud-warning:'));
 assert.ok(!baseStyles.includes('"Apple Color Emoji"'), 'Native color emoji must not own trade-button styling.');
 
 assert.ok(pwa.includes("'./market-weather.css'"), 'PWA loader must attach market-weather.css.');
+assert.ok(pwa.includes("'./home-market.css'"), 'PWA loader must place home-market.css after weather styles.');
 assert.ok(pwa.includes("'./scripts/market-weather.js'"), 'PWA loader must attach market-weather.js.');
 assert.ok(serviceWorker.includes("'./market-weather.css'"), 'Offline shell must cache market-weather.css.');
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"), 'Offline shell must cache scripts/market-weather.js.');
-assert.ok(serviceWorker.includes("flappyk-app-v19"), 'The PWA cache version must advance for the two-page home release.');
-assert.ok(serviceWorker.includes("'./home-story.css'"), 'Offline shell must cache the second home panel styles.');
-assert.ok(serviceWorker.includes("'./scripts/home-story.js'"), 'Offline shell must cache the second home panel behavior.');
+assert.ok(serviceWorker.includes("flappyk-app-v20"), 'The PWA cache version must advance for the interactive home release.');
+assert.ok(serviceWorker.includes("'./home-market.css'"), 'Offline shell must cache the interactive home styles.');
+assert.ok(serviceWorker.includes("'./scripts/home-market.js'"), 'Offline shell must cache the interactive home behavior.');
 assert.ok(serviceWorker.includes("'./account-integration.css'"), 'Offline shell must cache the account toolbar styles.');
 assert.ok(serviceWorker.includes("'./scripts/account-cloud-sync.js'"), 'Offline shell must cache the account cloud bridge.');
+assert.ok(!serviceWorker.includes('home-story'));
 
-console.log('Pixel weather arcade, staged transition, restrained HUD status-light language, explicit ownership, stale-event cleanup, two-page full-viewport home shell, account-toolbar cache, cloud history, and interaction detail contracts passed.');
+console.log('Staged market weather with explicit ownership, static interactive home scene, shared arcade press feedback, account toolbar, cloud history, and v20 offline contracts passed.');
