@@ -486,6 +486,7 @@ button:active {
 html body #game-container #game-hud-rail {
     grid-template-columns: minmax(118px, 0.48fr) minmax(336px, 1.42fr) minmax(154px, 0.7fr) auto !important;
     min-height: 52px !important;
+    height: 52px !important;
     overflow: hidden !important;
     border: 2px solid var(--hud-frame) !important;
     background: var(--hud-shell) !important;
@@ -603,6 +604,7 @@ html body #game-container #game-hud-rail .stats-box[data-composition='returns-on
     padding: 0 !important;
     border: 0 !important;
     border-right: 1px solid var(--hud-divider) !important;
+    backdrop-filter: none !important;
 }
 
 html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] .hud-main {
@@ -731,6 +733,7 @@ html body #game-container #game-hud-rail #game-top-controls > button {
     margin: 0 !important;
     padding: 0 !important;
     border: 1px solid #52647c !important;
+    border-radius: 0 !important;
     background: var(--hud-cell) !important;
     box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.42) !important;
     color: var(--hud-value) !important;
@@ -800,6 +803,7 @@ html body #game-container #game-hud-rail #game-top-controls .speed-readout {
         min-width: 28px !important;
         padding: 4px !important;
         border: 1px solid #52647c !important;
+        border-radius: 0 !important;
         background: var(--hud-cell) !important;
         color: var(--hud-warning) !important;
         box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.42) !important;
@@ -811,6 +815,7 @@ html body #game-container #game-hud-rail #game-top-controls .speed-readout {
         grid-template-columns: minmax(0, 1fr) auto !important;
         grid-template-rows: auto auto !important;
         min-height: 78px !important;
+        height: auto !important;
     }
 
     html body #game-container #game-hud-rail .weather-status {
