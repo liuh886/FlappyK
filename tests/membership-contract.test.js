@@ -96,8 +96,8 @@ for (const retiredRuntime of [
   assert.ok(!pwaSource.includes(retiredRuntime), `PWA runtime still loads retired account code: ${retiredRuntime}`);
 }
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v23'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v23'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v24'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v24'"));
 for (const retainedAsset of [
   "'./membership-config.js'",
   "'./account-integration.css'",
@@ -156,4 +156,4 @@ for (const privacyContract of [
   assert.ok(privacySource.includes(privacyContract), `Cloud-history documentation is missing ${privacyContract}`);
 }
 
-console.log('Shared account, account-backed card inventory, personal cloud history, PWA v23, trusted entitlement boundary, privacy, rankings, and RLS checks validated');
+console.log('Shared account, account-backed card inventory, personal cloud history, PWA v24, trusted entitlement boundary, privacy, rankings, and RLS checks validated');

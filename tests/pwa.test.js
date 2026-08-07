@@ -87,12 +87,17 @@ assert.ok(homeStoryStyles.includes('.home-story-chart'));
 assert.ok(homeStorySource.includes("event.key === 'ArrowRight'"));
 assert.ok(homeStorySource.includes("event.key === 'ArrowLeft'"));
 assert.ok(indicatorStyles.includes('.indicator-card-deck'));
+assert.ok(indicatorStyles.includes('.indicator-hand-label'));
+assert.ok(indicatorStyles.includes('.indicator-card.is-revealing'));
+assert.ok(indicatorStyles.includes('var(--hud-shell'));
 assert.ok(indicatorStyles.includes('#indicator-overlay'));
 assert.ok(indicatorSource.includes("event.key === '1'"));
 assert.ok(indicatorSource.includes("event.key === '2'"));
+assert.ok(indicatorSource.includes('function drawProfitLane'));
+assert.ok(indicatorSource.includes('const REVEAL_MS = 440'));
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v23'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v23'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v24'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v24'"));
 assert.ok(serviceWorkerSource.includes("'./data.js'"));
 assert.ok(serviceWorkerSource.includes("'./analytics.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership-config.js'"));
@@ -156,4 +161,4 @@ assert.ok(analyticsSource.includes("track('level_complete'"));
 assert.ok(analyticsSource.includes("track('run_complete'"));
 assert.ok(analyticsSource.includes("track('pwa_install'"));
 
-console.log('PWA manifest, icons, install UI, analytics, curated two-page home, modular gameplay HUD, indicator cards, account cloud history, and v23 cache checks passed');
+console.log('PWA manifest, icons, install UI, analytics, curated home, modular HUD, tactical indicator cards, account cloud history, and v24 cache checks passed');

@@ -69,19 +69,29 @@ for (const contract of [
   "if (active[type])",
   "if (!store.consume(type))",
   "window.HaoAccount?.open?.()",
+  'const REVEAL_MS = 440',
+  'function revealProgress',
+  'function drawScanEdge',
+  'function drawProfitLane',
+  "context.fillText('P/L'",
+  "drawButton.hidden = true",
+  "text('TACTICAL HAND', '战术手牌')",
 ]) {
-  assert.ok(cardsSource.includes(contract), `Missing indicator card interaction contract: ${contract}`);
+  assert.ok(cardsSource.includes(contract), `Missing tactical indicator card contract: ${contract}`);
 }
 
 for (const contract of [
   '#indicator-overlay',
   '.indicator-card-deck',
+  '.indicator-hand-label',
   '.indicator-card.is-active',
-  '.indicator-card.is-empty',
+  '.indicator-card.is-revealing',
+  '@keyframes indicator-card-decode',
   "@media (max-width: 720px), (pointer: coarse)",
   'touch-action: manipulation',
+  'var(--hud-shell',
 ]) {
-  assert.ok(cardsStyles.includes(contract), `Missing indicator card visual contract: ${contract}`);
+  assert.ok(cardsStyles.includes(contract), `Missing tactical card visual contract: ${contract}`);
 }
 
 for (const contract of [
@@ -94,8 +104,8 @@ for (const contract of [
   assert.ok(pwaSource.includes(contract), `Missing indicator runtime load contract: ${contract}`);
 }
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v23'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v23'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v24'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v24'"));
 for (const asset of [
   "'./indicator-cards.css'",
   "'./scripts/indicator-core.js'",
@@ -103,7 +113,7 @@ for (const asset of [
   "'./scripts/indicator-card-store.js'",
   "'./scripts/indicator-cards.js'",
 ]) {
-  assert.ok(serviceWorkerSource.includes(asset), `PWA v23 is missing ${asset}`);
+  assert.ok(serviceWorkerSource.includes(asset), `PWA v24 is missing ${asset}`);
 }
 
-console.log('BOLL, MACD, pre-window history, tactical card inventory, account entitlement, mobile controls, and PWA v23 contracts validated');
+console.log('BOLL, MACD, pre-window history, tactical scan reveal, preserved P/L lane, account inventory, mobile controls, and PWA v24 contracts validated');

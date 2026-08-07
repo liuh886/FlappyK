@@ -8,23 +8,39 @@
 
 .indicator-card-deck {
     position: absolute;
-    right: 18px;
-    bottom: 16px;
+    left: 14px;
+    bottom: 14px;
     z-index: 34;
     display: grid;
-    width: min(330px, calc(100% - 36px));
-    gap: 7px;
+    width: min(258px, calc(100% - 28px));
+    gap: 5px;
     pointer-events: none;
 }
 
-.indicator-card-deck[hidden] {
+.indicator-card-deck[hidden],
+.indicator-card-draw[hidden] {
     display: none !important;
+}
+
+.indicator-hand-label {
+    justify-self: start;
+    min-height: 18px;
+    padding: 4px 6px 3px;
+    border: 1px solid var(--hud-divider, rgba(159, 176, 196, 0.28));
+    background: var(--hud-shell, rgba(6, 12, 20, 0.94));
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.56);
+    color: var(--hud-label, #91a0b3);
+    font-family: var(--pixel-font-display, monospace);
+    font-size: 6px;
+    line-height: 1;
+    letter-spacing: 0.07em;
+    clip-path: var(--pixel-cut, none);
 }
 
 .indicator-card-row {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 7px;
+    gap: 5px;
 }
 
 #game-container .indicator-card,
@@ -35,46 +51,88 @@
     font-family: var(--pixel-font-ui, monospace);
     pointer-events: auto;
     touch-action: manipulation;
-    clip-path: polygon(0 5px, 5px 5px, 5px 0, calc(100% - 5px) 0, calc(100% - 5px) 5px, 100% 5px, 100% calc(100% - 5px), calc(100% - 5px) calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%, 5px calc(100% - 5px), 0 calc(100% - 5px));
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    clip-path: polygon(0 4px, 4px 4px, 4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px));
 }
 
 #game-container .indicator-card {
+    --card-accent: var(--hud-neutral, #70d8e4);
     display: grid;
-    grid-template-columns: 27px 1fr auto;
-    min-height: 54px;
-    padding: 7px 8px;
+    grid-template-columns: 20px 1fr auto;
+    min-height: 48px;
+    padding: 6px 7px;
     align-items: center;
-    gap: 7px;
-    border: 2px solid rgba(169, 181, 199, 0.78);
-    background: rgba(8, 13, 22, 0.94);
-    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.78);
-    color: #f7fbff;
+    gap: 6px;
+    overflow: hidden;
+    border: 2px solid var(--hud-frame, #9fb0c4);
+    background:
+        linear-gradient(to bottom, var(--card-accent) 0 3px, transparent 3px),
+        var(--hud-shell, rgba(6, 12, 20, 0.94));
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.62);
+    color: var(--hud-value, #f4f8fc);
     text-align: left;
+    transition:
+        transform 80ms steps(2, end),
+        box-shadow 80ms steps(2, end),
+        border-color 120ms steps(3, end),
+        background-color 120ms steps(3, end);
+}
+
+#game-container .indicator-card::before {
+    position: absolute;
+    inset: 5px;
+    border: 1px solid color-mix(in srgb, var(--card-accent) 18%, transparent);
+    content: '';
+    pointer-events: none;
+}
+
+#game-container .indicator-card::after {
+    position: absolute;
+    inset: 3px;
+    background: repeating-linear-gradient(
+        to bottom,
+        transparent 0 3px,
+        color-mix(in srgb, var(--card-accent) 18%, transparent) 3px 4px
+    );
+    content: '';
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-105%);
 }
 
 #game-container .indicator-card:hover,
 #game-container .indicator-card:focus-visible {
     transform: translate(-1px, -1px);
-    border-color: #5ce7f2;
-    box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.78);
+    border-color: var(--card-accent);
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.62);
     outline: none;
 }
 
 #game-container .indicator-card:active {
-    transform: translate(3px, 3px);
+    transform: translate(2px, 2px);
     box-shadow: none;
+}
+
+.indicator-card--boll {
+    --card-accent: #5ce7f2 !important;
+}
+
+.indicator-card--macd {
+    --card-accent: #ad91ff !important;
 }
 
 .indicator-card-key {
     display: grid;
-    width: 27px;
-    height: 27px;
+    width: 20px;
+    height: 20px;
     place-items: center;
-    border: 1px solid rgba(247, 251, 255, 0.78);
-    background: #111827;
-    color: #f7fbff;
+    border: 1px solid #52647c;
+    background: var(--hud-cell, rgba(18, 29, 43, 0.72));
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.46);
+    color: var(--card-accent);
     font-family: var(--pixel-font-display, monospace);
-    font-size: 9px;
+    font-size: 7px;
     line-height: 1;
 }
 
@@ -85,8 +143,9 @@
 }
 
 .indicator-card-copy strong {
+    color: var(--hud-value, #f4f8fc);
     font-family: var(--pixel-font-display, monospace);
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 400;
     line-height: 1;
     letter-spacing: 0.04em;
@@ -94,8 +153,8 @@
 
 .indicator-card-copy small {
     overflow: hidden;
-    color: #a9b5c7;
-    font-size: 9px;
+    color: var(--hud-label, #91a0b3);
+    font-size: 7px;
     font-weight: 700;
     line-height: 1;
     text-overflow: ellipsis;
@@ -103,55 +162,62 @@
 }
 
 .indicator-card-count {
-    color: #ffd84a;
+    color: var(--hud-warning, #f2cf5b);
     font-family: var(--pixel-font-display, monospace);
-    font-size: 9px;
+    font-size: 8px;
     line-height: 1;
 }
 
-.indicator-card--boll {
-    border-top-color: rgba(92, 231, 242, 0.92) !important;
-}
-
-.indicator-card--macd {
-    border-top-color: rgba(173, 145, 255, 0.92) !important;
-}
-
 #game-container .indicator-card.is-active {
-    border-color: #46e08a;
-    background: rgba(8, 46, 31, 0.96);
-    box-shadow: 0 0 0 2px rgba(70, 224, 138, 0.18), 4px 4px 0 rgba(0, 0, 0, 0.78);
+    border-color: var(--card-accent);
+    background:
+        linear-gradient(to bottom, var(--card-accent) 0 3px, transparent 3px),
+        color-mix(in srgb, var(--card-accent) 10%, var(--hud-shell, #060c14));
+    box-shadow:
+        inset 0 0 0 1px color-mix(in srgb, var(--card-accent) 24%, transparent),
+        3px 3px 0 rgba(0, 0, 0, 0.62);
 }
 
 .indicator-card.is-active .indicator-card-key {
-    border-color: #dfffea;
-    background: #46e08a;
-    color: #062313;
+    border-color: var(--card-accent);
+    background: var(--card-accent);
+    color: #071019;
 }
 
 .indicator-card.is-active .indicator-card-count {
-    color: #dfffea;
+    color: var(--card-accent);
+}
+
+#game-container .indicator-card.is-revealing::after {
+    opacity: 1;
+    animation: indicator-card-decode 440ms steps(8, end) both;
 }
 
 #game-container .indicator-card.is-empty {
-    border-color: rgba(255, 103, 116, 0.58);
+    border-color: rgba(255, 119, 116, 0.54);
+    filter: saturate(0.55);
     opacity: 0.72;
 }
 
 #game-container .indicator-card.is-locked {
-    filter: saturate(0.45);
+    filter: saturate(0.35);
+}
+
+#game-container .indicator-card.is-locked .indicator-card-count {
+    color: #aef8ff;
 }
 
 #game-container .indicator-card-draw {
-    min-height: 30px;
-    padding: 6px 9px;
-    border: 1px solid rgba(255, 216, 74, 0.72);
-    background: rgba(55, 42, 9, 0.92);
-    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.78);
-    color: #ffd84a;
+    justify-self: start;
+    min-height: 26px;
+    padding: 5px 8px;
+    border: 1px solid rgba(242, 207, 91, 0.66);
+    background: color-mix(in srgb, var(--hud-warning, #f2cf5b) 10%, var(--hud-shell, #060c14));
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.56);
+    color: var(--hud-warning, #f2cf5b);
     font-family: var(--pixel-font-display, monospace);
-    font-size: 7px;
-    line-height: 1.3;
+    font-size: 6px;
+    line-height: 1.25;
     letter-spacing: 0.025em;
     text-align: center;
 }
@@ -159,41 +225,35 @@
 #game-container .indicator-card-draw:not(:disabled):hover,
 #game-container .indicator-card-draw:not(:disabled):focus-visible {
     border-color: #fff0a6;
-    background: rgba(84, 63, 11, 0.96);
+    background: color-mix(in srgb, var(--hud-warning, #f2cf5b) 16%, var(--hud-shell, #060c14));
     outline: none;
 }
 
 #game-container .indicator-card-draw:disabled {
-    border-color: rgba(169, 181, 199, 0.34);
-    background: rgba(8, 13, 22, 0.86);
-    color: #7d8999;
+    border-color: var(--hud-divider, rgba(159, 176, 196, 0.28));
+    background: var(--hud-shell, rgba(6, 12, 20, 0.94));
+    color: #6f7d8d;
     cursor: not-allowed;
-}
-
-#game-container .indicator-card-draw[data-mode='signin'] {
-    border-color: rgba(92, 231, 242, 0.68);
-    background: rgba(8, 35, 47, 0.94);
-    color: #aef8ff;
 }
 
 .indicator-card-feedback {
     position: absolute;
-    right: 0;
-    bottom: calc(100% + 8px);
+    left: 0;
+    bottom: calc(100% + 7px);
     max-width: 100%;
-    min-height: 28px;
-    padding: 7px 9px;
-    border: 1px solid rgba(169, 181, 199, 0.66);
-    background: rgba(5, 9, 16, 0.96);
-    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.78);
-    color: #f7fbff;
-    font-size: 11px;
+    min-height: 26px;
+    padding: 6px 8px;
+    border: 1px solid var(--hud-divider, rgba(159, 176, 196, 0.28));
+    background: var(--hud-shell, rgba(6, 12, 20, 0.96));
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.62);
+    color: var(--hud-value, #f4f8fc);
+    font-size: 10px;
     font-weight: 700;
     line-height: 1.2;
     opacity: 0;
     pointer-events: none;
     transform: translateY(4px);
-    transition: opacity 120ms steps(2, end), transform 120ms steps(2, end);
+    transition: opacity 100ms steps(2, end), transform 100ms steps(2, end);
 }
 
 .indicator-card-feedback.is-visible {
@@ -202,40 +262,49 @@
 }
 
 .indicator-card-feedback[data-kind='success'] {
-    border-color: rgba(70, 224, 138, 0.78);
+    border-color: rgba(70, 224, 138, 0.72);
     color: #baffd6;
 }
 
 .indicator-card-feedback[data-kind='empty'],
 .indicator-card-feedback[data-kind='locked'] {
-    border-color: rgba(255, 103, 116, 0.72);
-    color: #ffb2ba;
+    border-color: rgba(255, 119, 116, 0.68);
+    color: #ffb7b5;
+}
+
+@keyframes indicator-card-decode {
+    0% { transform: translateX(-105%); }
+    100% { transform: translateX(105%); }
 }
 
 @media (max-width: 720px), (pointer: coarse) {
     .indicator-card-deck {
-        right: max(8px, env(safe-area-inset-right));
-        bottom: calc(max(86px, env(safe-area-inset-bottom) + 78px));
-        width: min(300px, calc(100% - 16px));
-        gap: 5px;
+        left: max(8px, env(safe-area-inset-left));
+        bottom: calc(max(96px, env(safe-area-inset-bottom) + 88px));
+        width: min(276px, calc(100% - 16px));
+        gap: 4px;
+    }
+
+    .indicator-hand-label {
+        display: none;
     }
 
     .indicator-card-row {
-        gap: 5px;
+        gap: 4px;
     }
 
     #game-container .indicator-card {
-        grid-template-columns: 24px 1fr auto;
-        min-height: 48px;
+        grid-template-columns: 18px 1fr auto;
+        min-height: 46px;
         padding: 6px;
         gap: 5px;
-        box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.78);
+        box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.6);
     }
 
     .indicator-card-key {
-        width: 24px;
-        height: 24px;
-        font-size: 8px;
+        width: 18px;
+        height: 18px;
+        font-size: 6px;
     }
 
     .indicator-card-copy strong,
@@ -244,21 +313,19 @@
     }
 
     .indicator-card-copy small {
-        font-size: 8px;
+        font-size: 7px;
     }
 
     #game-container .indicator-card-draw {
-        min-height: 28px;
-        padding: 5px 7px;
+        min-height: 24px;
+        padding: 4px 7px;
         font-size: 6px;
     }
 }
 
 @media (max-width: 430px) {
     .indicator-card-deck {
-        left: 8px;
-        right: 8px;
-        width: auto;
+        width: min(276px, calc(100% - 16px));
     }
 
     .indicator-card-key {
@@ -272,18 +339,24 @@
 
 @media (max-height: 650px) and (min-width: 721px) {
     .indicator-card-deck {
-        right: 12px;
+        left: 10px;
         bottom: 10px;
-        width: 290px;
+        width: 238px;
     }
 
     #game-container .indicator-card {
-        min-height: 46px;
+        min-height: 44px;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .indicator-card-feedback {
+    .indicator-card-feedback,
+    #game-container .indicator-card {
         transition: none;
+    }
+
+    #game-container .indicator-card.is-revealing::after {
+        animation: none;
+        opacity: 0;
     }
 }
