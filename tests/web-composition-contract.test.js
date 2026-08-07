@@ -127,8 +127,8 @@ assert.ok(weatherCss.includes('.market-weather-layer'));
 assert.ok(weatherCss.includes("[data-weather='rain']"));
 assert.ok(weatherCss.includes('@media (prefers-reduced-motion: reduce)'));
 
-assert.ok(serviceWorker.includes("flappyk-app-v23"));
-assert.ok(serviceWorker.includes("flappyk-runtime-v23"));
+assert.ok(serviceWorker.includes("flappyk-app-v24"));
+assert.ok(serviceWorker.includes("flappyk-runtime-v24"));
 assert.ok(!serviceWorker.includes("'./hud-compact.css'"));
 assert.ok(serviceWorker.includes("'./account-integration.css'"));
 assert.ok(serviceWorker.includes("'./scripts/account-cloud-sync.js'"));
@@ -142,4 +142,4 @@ assert.ok(!serviceWorker.includes("'./membership-sync.css'"));
 assert.ok(serviceWorker.includes("'./market-weather.css'"));
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"));
 
-console.log('Curated full-viewport home, static HUD geometry ownership, unified gameplay instrument system, responsive controls, isolated weather, and PWA v23 contracts passed.');
+console.log('Curated full-viewport home, static HUD geometry ownership, unified gameplay instrument system, tactical cards, responsive controls, isolated weather, and PWA v24 contracts passed.');
