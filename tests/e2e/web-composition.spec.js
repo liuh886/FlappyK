@@ -74,7 +74,7 @@ test('desktop game uses one compact pixel HUD rail around the dominant chart', a
   expect(homeTypography.playFont).toContain('Pixelify Sans');
   expect(homeTypography.playSize).toBe('22px');
   expect(homeTypography.dailySize).toBe('16px');
-  expect(homeTypography.playRadius).toBe('0px');
+  expect(homeTypography.playRadius).toBe('18px');
   expect(homeTypography.playShadow).not.toBe('none');
 
   await page.getByRole('button', { name: 'PLAY', exact: true }).click();

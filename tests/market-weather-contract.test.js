@@ -110,10 +110,10 @@ assert.ok(pwa.includes("'./market-weather.css'"), 'PWA loader must attach market
 assert.ok(pwa.includes("'./scripts/market-weather.js'"), 'PWA loader must attach market-weather.js.');
 assert.ok(serviceWorker.includes("'./market-weather.css'"), 'Offline shell must cache market-weather.css.');
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"), 'Offline shell must cache scripts/market-weather.js.');
-assert.ok(serviceWorker.includes("flappyk-app-v24"), 'The tactical-card PWA cache version must be v24.');
+assert.ok(serviceWorker.includes("flappyk-app-v25"), 'The tactical-card PWA cache version must be v24.');
 assert.ok(serviceWorker.includes("'./home-story.css'"), 'Offline shell must cache the second home panel styles.');
 assert.ok(serviceWorker.includes("'./scripts/home-story.js'"), 'Offline shell must cache the second home panel behavior.');
 assert.ok(serviceWorker.includes("'./account-integration.css'"), 'Offline shell must cache the account toolbar styles.');
 assert.ok(serviceWorker.includes("'./scripts/account-cloud-sync.js'"), 'Offline shell must cache the account cloud bridge.');
 
-console.log('Isolated market weather, staged transitions, explicit event ownership, curated home shell, account toolbar, cloud history, and PWA v24 contracts passed.');
+console.log('Isolated market weather, staged transitions, explicit event ownership, curated home shell, account toolbar, cloud history, and PWA v25 contracts passed.');

@@ -102,7 +102,7 @@ test('home arrow reveals one focused decisive-trades story and returns cleanly',
   expect(layout.horizontalOverflow).toBe(false);
   expect(layout.titleFont).toContain('Press Start 2P');
   expect(parseFloat(layout.titleSize)).toBeGreaterThanOrEqual(24);
-  expect(layout.arrowRadius).toBe('0px');
+  expect(layout.arrowRadius).toBe('14px');
   expect(layout.arrowShadow).not.toBe('none');
 
   await page.keyboard.press('ArrowLeft');

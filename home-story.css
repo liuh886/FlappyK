@@ -355,9 +355,9 @@
     justify-content: center;
     gap: 7px;
     border: 2px solid var(--pixel-line-strong);
-    border-radius: 0;
-    background: rgba(12, 19, 31, 0.94);
-    box-shadow: 4px 4px 0 var(--pixel-shadow);
+    border-radius: 14px;
+    background: linear-gradient(180deg, #123a68, #082846);
+    box-shadow: 0 4px 0 rgba(2, 12, 26, 0.72);
     color: var(--pixel-text);
     font-family: var(--pixel-font-display);
     font-size: 11px;

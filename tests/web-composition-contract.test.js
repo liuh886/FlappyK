@@ -105,11 +105,12 @@ for (const hierarchyContract of [
   '.local-records-summary',
   '.daily-mode-card',
   '.home-secondary-actions button',
-  'min-height: 64px',
+  '--menu-radius-lg: 18px',
+  'min-height: 78px',
   'font-size: 22px',
-  'min-height: 44px',
-  'font-size: 16px',
-  'box-shadow: var(--pixel-shadow-small) !important',
+  "'copy action'",
+  '.home-console-speaker::before',
+  'border-radius: var(--menu-radius-lg) !important',
 ]) {
   assert.ok(refinementCss.includes(hierarchyContract), `Missing curated home hierarchy contract: ${hierarchyContract}`);
 }
@@ -127,8 +128,8 @@ assert.ok(weatherCss.includes('.market-weather-layer'));
 assert.ok(weatherCss.includes("[data-weather='rain']"));
 assert.ok(weatherCss.includes('@media (prefers-reduced-motion: reduce)'));
 
-assert.ok(serviceWorker.includes("flappyk-app-v24"));
-assert.ok(serviceWorker.includes("flappyk-runtime-v24"));
+assert.ok(serviceWorker.includes("flappyk-app-v25"));
+assert.ok(serviceWorker.includes("flappyk-runtime-v25"));
 assert.ok(!serviceWorker.includes("'./hud-compact.css'"));
 assert.ok(serviceWorker.includes("'./account-integration.css'"));
 assert.ok(serviceWorker.includes("'./scripts/account-cloud-sync.js'"));
@@ -142,4 +143,4 @@ assert.ok(!serviceWorker.includes("'./membership-sync.css'"));
 assert.ok(serviceWorker.includes("'./market-weather.css'"));
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"));
 
-console.log('Curated full-viewport home, static HUD geometry ownership, unified gameplay instrument system, tactical cards, responsive controls, isolated weather, and PWA v24 contracts passed.');
+console.log('Curated full-viewport home, static HUD geometry ownership, unified gameplay instrument system, tactical cards, responsive controls, isolated weather, and PWA v25 contracts passed.');

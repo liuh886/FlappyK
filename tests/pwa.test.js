@@ -69,7 +69,10 @@ assert.ok(pixelStyles.includes('.hud-metric-label'));
 assert.ok(pixelStyles.includes("html[data-ui-state='home'] #game-container.arcade-weather-ready"));
 assert.ok(pixelStyles.includes('.home-primary-actions #start-btn'));
 assert.ok(pixelStyles.includes('font-size: 22px'));
-assert.ok(pixelStyles.includes('min-height: 64px'));
+assert.ok(pixelStyles.includes('min-height: 78px'));
+assert.ok(pixelStyles.includes('--menu-radius-lg: 18px'));
+assert.ok(pixelStyles.includes('.home-console-speaker::before'));
+assert.ok(pixelStyles.includes("'copy action'"));
 
 // Gameplay instrument visuals remain centralized in style.css.
 assert.ok(baseStyles.includes('HUD instrument system: one shell, one divider, one label/value hierarchy.'));
@@ -96,8 +99,8 @@ assert.ok(indicatorSource.includes("event.key === '2'"));
 assert.ok(indicatorSource.includes('function drawProfitLane'));
 assert.ok(indicatorSource.includes('const REVEAL_MS = 440'));
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v24'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v24'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v25'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v25'"));
 assert.ok(serviceWorkerSource.includes("'./data.js'"));
 assert.ok(serviceWorkerSource.includes("'./analytics.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership-config.js'"));
