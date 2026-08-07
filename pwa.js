@@ -133,6 +133,7 @@
 
     ensureStylesheet('flappyk-indicator-card-styles', './indicator-cards.css');
     void loadScript('flappyk-indicator-core', './scripts/indicator-core.js')
+        .then(() => loadScript('flappyk-indicator-history', './scripts/indicator-history.js'))
         .then(() => loadScript('flappyk-indicator-card-store', './scripts/indicator-card-store.js'))
         .then(() => loadScript('flappyk-indicator-cards', './scripts/indicator-cards.js'))
         .catch((error) => {
