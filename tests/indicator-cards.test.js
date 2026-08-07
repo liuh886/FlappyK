@@ -30,6 +30,9 @@ const historySource = fs.readFileSync('scripts/indicator-history.js', 'utf8');
 const storeSource = fs.readFileSync('scripts/indicator-card-store.js', 'utf8');
 const cardsSource = fs.readFileSync('scripts/indicator-cards.js', 'utf8');
 const cardsStyles = fs.readFileSync('indicator-cards.css', 'utf8');
+const auditSource = fs.readFileSync('scripts/audit_bundled_data.py', 'utf8');
+const refreshSource = fs.readFileSync('fetch_all_data.py', 'utf8');
+const weatherStyles = fs.readFileSync('market-weather.css', 'utf8');
 const pwaSource = fs.readFileSync('pwa.js', 'utf8');
 const serviceWorkerSource = fs.readFileSync('sw.js', 'utf8');
 
@@ -68,7 +71,6 @@ for (const contract of [
   "deck.id = 'indicator-card-deck'",
   "if (active[type])",
   "if (!store.consume(type))",
-  "window.HaoAccount?.open?.()",
   'const REVEAL_MS = 440',
   'function revealProgress',
   'function drawScanEdge',
@@ -76,12 +78,19 @@ for (const contract of [
   "context.fillText('P/L'",
   "drawButton.hidden = true",
   "text('TACTICAL HAND', '战术手牌')",
+  'function hasCardAccess()',
+  'deck.hidden = !visible || !cardAccess',
+  'visible && cardAccess && snapshot.data.length',
+  'if (event.detail?.signedIn === false) clearActiveCards()',
 ]) {
   assert.ok(cardsSource.includes(contract), `Missing tactical indicator card contract: ${contract}`);
 }
+assert.ok(!cardsSource.includes('is-locked'), 'Guests must not receive a visible locked-card presentation.');
+assert.ok(!cardsSource.includes('window.HaoAccount?.open?.()'), 'Hidden guest cards must not open account UI through secret keyboard shortcuts.');
 
 for (const contract of [
   '#indicator-overlay',
+  'z-index: 10',
   '.indicator-card-deck',
   '.indicator-hand-label',
   '.indicator-card.is-active',
@@ -93,6 +102,19 @@ for (const contract of [
 ]) {
   assert.ok(cardsStyles.includes(contract), `Missing tactical card visual contract: ${contract}`);
 }
+assert.ok(weatherStyles.includes('#game-canvas'));
+assert.ok(weatherStyles.includes('z-index: 8'));
+assert.ok(!cardsStyles.includes('.indicator-card.is-locked'), 'Retired guest-card styling must be deleted, not retained as a compatibility state.');
+
+for (const contract of [
+  'CHALLENGE_DAYS = 250',
+  'INDICATOR_WARMUP_DAYS = 35',
+  'MIN_INDICATOR_ROWS = CHALLENGE_DAYS + INDICATOR_WARMUP_DAYS',
+  'audit_indicator_history(data)',
+]) {
+  assert.ok(auditSource.includes(contract), `Missing bundled indicator-data readiness contract: ${contract}`);
+}
+assert.ok(refreshSource.includes('DAYS_REQUIRED = 300'), 'Data refresh must retain more than the 285 rows required for a 250-day challenge plus indicator warm-up.');
 
 for (const contract of [
   "ensureStylesheet('flappyk-indicator-card-styles', './indicator-cards.css')",
@@ -116,4 +138,4 @@ for (const asset of [
   assert.ok(serviceWorkerSource.includes(asset), `PWA v24 is missing ${asset}`);
 }
 
-console.log('BOLL, MACD, pre-window history, tactical scan reveal, preserved P/L lane, account inventory, mobile controls, and PWA v24 contracts validated');
+console.log('BOLL, MACD, 285-row data readiness, guest gating, visible overlay stacking, tactical scan reveal, preserved P/L lane, account inventory, mobile controls, and PWA v24 contracts validated');
