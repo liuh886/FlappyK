@@ -167,7 +167,7 @@ test('mobile cards are tappable, contained, and isolated from trade controls', a
   await startAtWarmIndicatorDay(page);
 
   const before = await page.evaluate(() => actions.length);
-  await page.locator('[data-indicator-card="boll"]').tap();
+  await page.locator('[data-indicator-card="boll"]').click();
   await expect(page.locator('[data-indicator-card="boll"]')).toHaveClass(/is-active/);
   await expect(page.locator('[data-card-count="boll"]')).toHaveText('×2');
 
