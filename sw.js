@@ -35,6 +35,7 @@ const APP_SHELL = [
     './scripts/i18n.js',
     './scripts/market-weather.js',
     './scripts/indicator-core.js',
+    './scripts/indicator-history.js',
     './scripts/indicator-card-store.js',
     './scripts/indicator-cards.js',
     './game.js',
