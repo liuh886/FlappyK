@@ -7,9 +7,8 @@
     --pixel-bg: #070a0f;
     --pixel-panel: #101722;
     --pixel-panel-raised: #162132;
-    --pixel-panel-soft: rgba(11, 18, 29, 0.9);
     --pixel-line: #344056;
-    --pixel-line-soft: rgba(216, 226, 239, 0.2);
+    --pixel-line-soft: rgba(216, 226, 239, 0.22);
     --pixel-line-strong: #d8e2ef;
     --pixel-text: #f7fbff;
     --pixel-muted: #a9b5c7;
@@ -56,6 +55,12 @@ html:not([data-ui-state='home']):not([data-ui-state='run-complete']) .home-utili
     display: none !important;
 }
 
+html[data-ui-state='home'] .controls-hint,
+html[data-ui-state='home'] #mobile-controls,
+html[data-ui-state='home'] #game-top-controls {
+    display: none !important;
+}
+
 html[data-ui-state='paused'] #btn-buy,
 html[data-ui-state='paused'] #btn-sell {
     opacity: 0.48;
@@ -65,8 +70,8 @@ html[data-ui-state='paused'] #btn-sell {
 
 body {
     background:
-        linear-gradient(rgba(255, 255, 255, 0.014) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.014) 1px, transparent 1px),
+        linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px),
         #090d14;
     background-size: 16px 16px;
     font-family: var(--pixel-font-ui);
@@ -79,40 +84,20 @@ body::before {
     z-index: 9999;
     background: repeating-linear-gradient(
         180deg,
-        rgba(255, 255, 255, 0.012) 0,
-        rgba(255, 255, 255, 0.012) 1px,
+        rgba(255, 255, 255, 0.01) 0,
+        rgba(255, 255, 255, 0.01) 1px,
         transparent 1px,
         transparent 4px
     );
     content: '';
-    opacity: 0.22;
+    opacity: 0.18;
     pointer-events: none;
 }
 
 #game-container {
-    border: 2px solid var(--pixel-line-strong);
     border-radius: 0;
     background: var(--pixel-bg);
-    box-shadow: var(--pixel-shadow-step);
     image-rendering: pixelated;
-}
-
-#game-container::after {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    border: 1px solid rgba(7, 10, 15, 0.82);
-    content: '';
-    pointer-events: none;
-}
-
-.screen {
-    background:
-        radial-gradient(circle at 50% 34%, rgba(92, 231, 242, 0.035), transparent 40%),
-        linear-gradient(rgba(255, 255, 255, 0.014) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.014) 1px, transparent 1px),
-        rgba(7, 10, 15, 0.97);
-    background-size: auto, 16px 16px, 16px 16px, auto;
 }
 
 #game-title,
@@ -150,7 +135,7 @@ html:not([lang='zh-CN']) body :where(button, output, .hud-stat-row, .excess-mete
     letter-spacing: 0.015em;
 }
 
-/* Home presentation: one deliberate hierarchy, one spacing system, no cabinet-on-top-of-cabinet chrome. */
+/* Home: one full-viewport scene with a clear primary action hierarchy. */
 html[data-ui-state='home'] body {
     align-items: stretch;
     justify-content: stretch;
@@ -193,7 +178,7 @@ html[data-ui-state='home'] #game-container::after {
     position: relative;
     z-index: 12;
     display: flex;
-    min-height: 54px;
+    min-height: 58px;
     min-width: 0;
     align-items: center;
     gap: var(--space-3);
@@ -243,12 +228,13 @@ html[data-ui-state='home'] #game-container::after {
     gap: var(--space-1) !important;
     max-width: none !important;
     margin-left: auto;
-    padding: 0 !important;
+    padding: 4px !important;
     overflow: visible !important;
-    border: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    clip-path: none !important;
+    border: 2px solid #4c5b70 !important;
+    border-radius: 0 !important;
+    background: #0b111c !important;
+    box-shadow: var(--pixel-shadow-small) !important;
+    clip-path: var(--pixel-cut);
     backdrop-filter: none !important;
 }
 
@@ -260,16 +246,15 @@ html[data-ui-state='home'] #game-container::after {
     padding-inline: 10px !important;
     border: 1px solid #526078 !important;
     border-radius: 0 !important;
-    background: rgba(10, 18, 29, 0.82) !important;
+    background: #121b2a !important;
     box-shadow: none !important;
     color: #dbe5ef !important;
-    clip-path: var(--pixel-cut);
 }
 
 .home-utility-bar #language-toggle-btn:hover,
 .home-utility-bar .membership-launcher:hover {
     border-color: #8292a8 !important;
-    background: #172235 !important;
+    background: #1a2739 !important;
 }
 
 .membership-launcher-tier {
@@ -286,8 +271,8 @@ html[data-ui-state='home'] #game-container::after {
     padding: clamp(20px, 4vh, 44px) clamp(18px, 5.5vw, 74px) clamp(18px, 3vh, 34px);
     overflow: hidden;
     background:
-        radial-gradient(circle at 50% 14%, rgba(222, 246, 255, 0.22), transparent 34%),
-        linear-gradient(rgba(5, 13, 23, 0.12), rgba(5, 13, 23, 0.56)),
+        radial-gradient(circle at 50% 14%, rgba(222, 246, 255, 0.2), transparent 34%),
+        linear-gradient(rgba(5, 13, 23, 0.1), rgba(5, 13, 23, 0.55)),
         linear-gradient(180deg, #7fc6e8 0%, #5b93b1 44%, #234259 100%);
 }
 
@@ -304,13 +289,13 @@ html[data-ui-state='home'] #game-container::after {
     background:
         linear-gradient(135deg, transparent 27%, rgba(26, 65, 81, 0.7) 27% 49%, transparent 49%) 0 0 / 260px 100%,
         linear-gradient(45deg, transparent 31%, rgba(14, 39, 55, 0.86) 31% 59%, transparent 59%) 96px 0 / 330px 100%;
-    opacity: 0.72;
+    opacity: 0.68;
 }
 
 .home-console-screen::after {
     inset: 0;
-    background: linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px) 0 0 / 4px 4px;
-    opacity: 0.34;
+    background: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px) 0 0 / 4px 4px;
+    opacity: 0.28;
 }
 
 .home-console-screen > * {
@@ -353,7 +338,7 @@ html[data-ui-state='home'] #game-container::after {
 }
 
 .home-primary-actions {
-    width: min(320px, 92%);
+    width: min(340px, 92%);
     margin-top: clamp(18px, 2.8vh, 26px);
 }
 
@@ -368,16 +353,16 @@ html[data-ui-state='home'] #game-container::after {
 
 .home-primary-actions #start-btn {
     width: 100%;
-    min-height: 58px;
+    min-height: 64px;
     margin: 0;
     padding: 12px 18px;
     border: 2px solid #e8fff0;
     background: var(--pixel-green);
     box-shadow: var(--pixel-shadow-step);
     color: #062313;
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 700;
-    letter-spacing: 0.055em;
+    letter-spacing: 0.06em;
 }
 
 .home-primary-actions #start-btn:hover {
@@ -401,8 +386,8 @@ html[data-ui-state='home'] #game-container::after {
     width: min(560px, 92%);
     margin: 12px 0 0;
     padding: 8px 12px;
-    border: 1px solid rgba(226, 239, 247, 0.26);
-    background: rgba(7, 18, 31, 0.56);
+    border: 1px solid rgba(226, 239, 247, 0.28);
+    background: rgba(7, 18, 31, 0.58);
     box-shadow: none;
     color: #c5d3df;
     font-size: 13px;
@@ -416,9 +401,9 @@ html[data-ui-state='home'] #game-container::after {
 
 .daily-mode-card {
     gap: var(--space-3) var(--space-4);
-    padding: 12px 14px;
+    padding: 13px 14px;
     border: 1px solid rgba(216, 207, 255, 0.55);
-    background: rgba(11, 21, 34, 0.72);
+    background: rgba(11, 21, 34, 0.76);
     box-shadow: var(--pixel-shadow-small);
 }
 
@@ -431,13 +416,13 @@ html[data-ui-state='home'] #game-container::after {
 
 .daily-mode-copy span {
     color: var(--pixel-text);
-    font-size: 14px;
-    line-height: 1.2;
+    font-size: 16px;
+    line-height: 1.22;
 }
 
 .daily-mode-card #daily-run-btn {
-    min-width: 138px;
-    min-height: 42px;
+    min-width: 148px;
+    min-height: 44px;
     margin: 0;
     padding: 9px 12px;
     border: 1px solid #dcd4ff;
@@ -453,12 +438,12 @@ html[data-ui-state='home'] #game-container::after {
 
 .home-secondary-actions button,
 #pwa-install-btn {
-    min-height: 36px;
+    min-height: 38px;
     margin-top: 0;
     padding: 7px 11px;
     border: 1px solid #526078;
-    background: rgba(11, 19, 31, 0.78);
-    box-shadow: none;
+    background: rgba(11, 19, 31, 0.82);
+    box-shadow: var(--pixel-shadow-small);
     color: #c3d0dc;
     font-size: 12px;
 }
@@ -473,7 +458,7 @@ html[data-ui-state='home'] #game-container::after {
 #start-screen.arcade-home .start-data-ticker {
     max-width: min(560px, 92%);
     margin-top: var(--space-3);
-    opacity: 0.66;
+    opacity: 0.64;
 }
 
 .home-console-footer {
@@ -507,7 +492,7 @@ html[data-ui-state='home'] #game-container::after {
     box-shadow: inset 1px 1px 0 #33445b;
 }
 
-/* Runtime compatibility rules are static here so presentation can be reviewed without injected CSS. */
+/* Structural rules previously injected from JavaScript. Visual HUD language stays in style.css. */
 .stats-box[data-composition='returns-only'] .hud-total::before,
 .stats-box[data-composition='returns-only'] .hud-return::before,
 .run-progress-panel .hud-game::before,
@@ -522,10 +507,10 @@ html[data-ui-state='home'] #game-container::after {
     display: block;
     color: var(--pixel-muted);
     font-family: var(--pixel-font-display);
-    font-size: 7px;
+    font-size: 8px;
     font-weight: 400;
-    line-height: 1.2;
-    letter-spacing: 0.025em;
+    line-height: 1.25;
+    letter-spacing: 0.035em;
     white-space: nowrap;
 }
 
@@ -534,14 +519,14 @@ html[data-ui-state='home'] #game-container::after {
 }
 
 .run-progress-panel .hud-metric-label {
-    font-size: 6px;
+    font-size: 7px;
 }
 
 .run-progress-panel #level-display::after,
 .run-progress-panel #day-display::after {
     margin-left: 2px;
     color: var(--pixel-muted);
-    font-size: 10px;
+    font-size: 11px;
 }
 
 .run-progress-panel #level-display::after { content: '/3'; }
@@ -558,297 +543,18 @@ html[data-ui-state='home'] #game-container::after {
 
 #game-hud-rail {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    left: 10px;
+    top: 12px;
+    right: 12px;
+    left: 12px;
     z-index: 62;
     display: grid;
-    grid-template-columns: minmax(96px, 0.42fr) minmax(270px, 1.28fr) minmax(142px, 0.68fr) auto;
-    min-height: 48px;
     align-items: stretch;
-    overflow: hidden;
-    border: 1px solid rgba(216, 226, 239, 0.48);
-    background: rgba(7, 12, 20, 0.86);
-    box-shadow: var(--pixel-shadow-small);
-    clip-path: var(--pixel-cut);
     pointer-events: none;
 }
 
 #game-hud-rail > * {
     min-width: 0;
     pointer-events: auto;
-}
-
-#game-hud-rail .weather-status {
-    position: static !important;
-    display: flex;
-    width: auto !important;
-    min-width: 0 !important;
-    max-width: none !important;
-    margin: 0 !important;
-    padding: 0 8px !important;
-    align-items: center;
-    justify-content: flex-start;
-    overflow: hidden;
-    border: 0 !important;
-    border-left: 2px solid var(--pixel-cyan) !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    color: var(--pixel-text);
-    font-size: 8px;
-    line-height: 1.15;
-    letter-spacing: 0.025em;
-    text-align: left;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    opacity: 0.74 !important;
-    transform: none !important;
-    transition: background 160ms steps(3, end), border-color 160ms steps(3, end), opacity 160ms steps(3, end);
-}
-
-#game-hud-rail .weather-status.is-event {
-    background: rgba(25, 39, 57, 0.86) !important;
-    opacity: 1 !important;
-}
-
-#game-hud-rail .weather-status[data-tone='positive'] {
-    border-left-color: var(--pixel-green) !important;
-    background: rgba(12, 64, 45, 0.68) !important;
-}
-
-#game-hud-rail .weather-status[data-tone='negative'] {
-    border-left-color: var(--pixel-red) !important;
-    background: rgba(87, 31, 36, 0.7) !important;
-}
-
-.stats-box[data-composition='returns-only'] {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(96px, 0.8fr);
-    align-items: center;
-    gap: 8px;
-    min-width: 0;
-    border-radius: 0;
-    clip-path: none;
-    backdrop-filter: none;
-}
-
-#game-hud-rail .stats-box[data-composition='returns-only'] {
-    position: static !important;
-    display: grid !important;
-    width: auto !important;
-    min-width: 0 !important;
-    margin: 0 !important;
-    padding: 6px 9px !important;
-    border: 0 !important;
-    border-left: 1px solid var(--pixel-line-soft) !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    clip-path: none !important;
-}
-
-.stats-box[data-composition='returns-only'] .hud-main {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px;
-    margin: 0;
-    padding: 0;
-}
-
-.stats-box[data-composition='returns-only'] .hud-main .hud-stat-row {
-    display: flex;
-    min-width: 0;
-    align-items: baseline;
-    gap: 3px;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: var(--pixel-text);
-    font-size: 0;
-    line-height: 1;
-}
-
-.stats-box[data-composition='returns-only'] .hud-total span,
-.stats-box[data-composition='returns-only'] .hud-return span,
-.excess-meter-label strong {
-    min-width: 0;
-    overflow: hidden;
-    color: var(--pixel-text);
-    font-size: 12px;
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-    line-height: 1;
-    text-overflow: ellipsis;
-}
-
-.stats-box[data-composition='returns-only'] .hud-return span.positive,
-.excess-meter[data-leading='true'] .excess-meter-label strong {
-    color: var(--pixel-green);
-}
-
-.stats-box[data-composition='returns-only'] .hud-return span.negative,
-.excess-meter-label strong {
-    color: var(--pixel-red);
-}
-
-.excess-meter {
-    min-width: 0;
-    margin: 0;
-}
-
-.excess-meter-label {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 5px;
-    color: var(--pixel-muted);
-    font-family: var(--pixel-font-display);
-    font-size: 6px;
-    line-height: 1;
-    opacity: 0.88;
-}
-
-.excess-meter-track {
-    height: 4px;
-    margin-top: 3px;
-    border: 1px solid #29364b;
-    background: #05080d;
-}
-
-.excess-meter-negative,
-.excess-meter-positive {
-    top: 0;
-    bottom: 0;
-    opacity: 0.58;
-}
-
-.excess-meter-zero {
-    top: -2px;
-    bottom: -2px;
-    width: 1px;
-    background: var(--pixel-line-strong);
-}
-
-.excess-meter-indicator {
-    width: 7px;
-    height: 7px;
-    border: 1px solid #fff;
-    border-radius: 0;
-    background: var(--pixel-red);
-    box-shadow: none;
-}
-
-.excess-meter[data-leading='true'] .excess-meter-indicator {
-    background: var(--pixel-green);
-}
-
-.run-progress-panel {
-    display: none;
-    color: var(--pixel-muted);
-    font-size: 10px;
-    line-height: 1.15;
-}
-
-html[data-ui-state='playing'] .run-progress-panel,
-html[data-ui-state='paused'] .run-progress-panel {
-    display: block;
-}
-
-#game-hud-rail .run-progress-panel {
-    position: static !important;
-    width: auto !important;
-    min-width: 0 !important;
-    margin: 0 !important;
-    padding: 6px 9px !important;
-    border: 0 !important;
-    border-left: 1px solid var(--pixel-line-soft) !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    clip-path: none !important;
-}
-
-.run-progress-panel .hud-header {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 7px;
-    color: var(--pixel-text);
-}
-
-.run-progress-panel .hud-game,
-.run-progress-panel .hud-day {
-    display: flex;
-    align-items: baseline;
-    gap: 3px;
-    padding: 0;
-    border: 0;
-    background: transparent;
-}
-
-.run-progress-panel .hud-game span,
-.run-progress-panel .hud-day span {
-    color: var(--pixel-text);
-    font-size: 11px;
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-    line-height: 1;
-}
-
-.run-progress-panel .day-progress {
-    height: 3px;
-    margin-top: 4px;
-    border: 1px solid #29364b;
-    background: #05080d;
-}
-
-.run-progress-panel .day-progress-fill {
-    border-radius: 0;
-    background: var(--pixel-yellow);
-    transition: width 120ms steps(4, end);
-}
-
-.run-progress-panel .hud-details {
-    display: none;
-}
-
-#game-hud-rail #game-top-controls {
-    position: static !important;
-    inset: auto !important;
-    align-self: stretch;
-    gap: 3px !important;
-    margin: 0 !important;
-    padding: 6px 7px !important;
-    border: 0 !important;
-    border-left: 1px solid var(--pixel-line-soft) !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    clip-path: none !important;
-}
-
-#game-hud-rail #game-top-controls .desktop-speed-control {
-    grid-template-columns: 27px 42px 27px !important;
-    gap: 2px !important;
-    margin: 0 4px 0 0 !important;
-    padding-right: 6px !important;
-    border-right: 1px solid var(--pixel-line-soft) !important;
-}
-
-#game-hud-rail #game-top-controls .speed-step,
-#game-hud-rail #game-top-controls > button {
-    width: 28px !important;
-    min-width: 28px !important;
-    height: 28px !important;
-    min-height: 28px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: 1px solid #526078 !important;
-    border-radius: 0 !important;
-    background: #111b2a !important;
-    box-shadow: none !important;
-}
-
-#game-hud-rail #game-top-controls .speed-readout {
-    min-width: 42px !important;
-    color: var(--pixel-yellow);
-    font-size: 13px !important;
 }
 
 html[data-virtual-controls='true'] #game-top-controls .desktop-speed-control {
@@ -859,74 +565,14 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
     display: none !important;
 }
 
-@media (min-width: 1025px) and (pointer: fine) {
-    #game-container {
-        width: min(896px, calc(100vw - 32px), calc(133.333vh - 40px));
-        aspect-ratio: 4 / 3;
-    }
-
-    .controls-hint {
-        position: absolute !important;
-        bottom: 12px !important;
-        left: 50% !important;
-        z-index: 62 !important;
-        display: block !important;
-        width: auto !important;
-        margin: 0 !important;
-        padding: 4px !important;
-        overflow: hidden;
-        border: 1px solid rgba(216, 226, 239, 0.42) !important;
-        background: rgba(7, 12, 20, 0.82) !important;
-        box-shadow: var(--pixel-shadow-small) !important;
-        clip-path: var(--pixel-cut);
-        opacity: 0.86 !important;
-        transform: translateX(-50%);
-    }
-
-    .trade-key-hints {
-        display: grid !important;
-        grid-template-columns: repeat(2, auto) !important;
-        gap: 0 !important;
-    }
-
-    .trade-key-hint {
-        min-height: 28px !important;
-        margin: 0 !important;
-        padding: 4px 8px 4px 4px !important;
-        border: 0 !important;
-        background: transparent !important;
-        box-shadow: none !important;
-        clip-path: none !important;
-        color: rgba(247, 251, 255, 0.84);
-        font-size: 12px;
-    }
-
-    .trade-key-hint + .trade-key-hint {
-        padding-left: 8px !important;
-        border-left: 1px solid var(--pixel-line-soft) !important;
-    }
-
-    .trade-key-hint .key {
-        min-width: 25px;
-        padding: 4px;
-        border: 0;
-        border-radius: 0;
-        background: var(--pixel-yellow);
-        box-shadow: none;
-        color: #171104;
-        font-family: var(--pixel-font-display);
-        font-size: 8px;
-    }
-}
-
-/* Coachmark is an in-game message, not another modal. */
+/* Secondary screens reuse the same restrained pixel grammar. */
 .game-coachmark {
     right: 16px;
     bottom: 16px;
     left: 16px;
     max-width: 688px;
     padding: 12px 14px;
-    border: 1px solid var(--pixel-cyan);
+    border: 2px solid var(--pixel-cyan);
     border-radius: 0;
     background: #0c1420;
     box-shadow: var(--pixel-shadow-step);
@@ -952,9 +598,9 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
 }
 
 .game-coachmark button {
-    min-height: 34px;
+    min-height: 36px;
     padding: 7px 10px;
-    border: 1px solid var(--pixel-line);
+    border: 2px solid var(--pixel-line);
     border-radius: 0;
     background: #111b2a;
     box-shadow: var(--pixel-shadow-small);
@@ -973,7 +619,6 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
     50% { filter: brightness(1.35); }
 }
 
-/* Settlement and secondary panels share the same restrained shell. */
 .profit-card,
 .leaderboard-panel,
 .custom-challenge-panel,
@@ -1100,14 +745,16 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
     white-space: nowrap;
 }
 
+@media (min-width: 1025px) and (pointer: fine) {
+    #game-container {
+        width: min(896px, calc(100vw - 32px), calc(133.333vh - 40px));
+        aspect-ratio: 4 / 3;
+    }
+}
+
 @media (max-width: 720px), (pointer: coarse) {
     body::before {
-        opacity: 0.14;
-    }
-
-    #game-container {
-        border: 0;
-        box-shadow: none;
+        opacity: 0.12;
     }
 
     html[data-ui-state='home'] #game-container.arcade-weather-ready {
@@ -1116,7 +763,7 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
     }
 
     .home-console-topline {
-        min-height: 48px;
+        min-height: 50px;
         gap: 6px;
         padding:
             max(8px, env(safe-area-inset-top))
@@ -1132,6 +779,10 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
 
     .home-console-lamps {
         display: none;
+    }
+
+    .home-console-topline > .home-utility-bar[data-arcade-placement='console'] {
+        padding: 3px !important;
     }
 
     .home-utility-bar #language-toggle-btn,
@@ -1163,7 +814,7 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
     }
 
     .home-primary-actions {
-        width: min(286px, 94%);
+        width: min(292px, 94%);
         margin-top: 14px;
     }
 
@@ -1198,7 +849,7 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
 
     .daily-mode-card #daily-run-btn {
         min-width: 118px;
-        min-height: 40px;
+        min-height: 44px;
         padding-inline: 9px;
         font-size: 12px;
     }
@@ -1227,137 +878,12 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
         display: none;
     }
 
-    html[lang='zh-CN'] .stats-box[data-composition='returns-only'] {
-        font-size: 12px !important;
-    }
-
-    #game-hud-rail {
-        top: max(6px, env(safe-area-inset-top));
-        right: max(6px, env(safe-area-inset-right));
-        left: max(6px, env(safe-area-inset-left));
-        grid-template-areas:
-            'performance controls'
-            'weather progress';
-        grid-template-columns: minmax(0, 1fr) auto;
-        grid-template-rows: auto auto;
-        min-height: 70px;
-        border-width: 1px;
-        box-shadow: none;
-    }
-
-    #game-hud-rail .stats-box[data-composition='returns-only'] {
-        grid-area: performance;
-        grid-template-columns: minmax(0, 1fr) minmax(78px, 0.7fr) !important;
-        padding: 5px 7px !important;
-        border-left: 0 !important;
-        border-bottom: 1px solid var(--pixel-line-soft) !important;
-    }
-
-    #game-hud-rail .stats-box[data-composition='returns-only'] .hud-total span,
-    #game-hud-rail .stats-box[data-composition='returns-only'] .hud-return span,
-    #game-hud-rail .excess-meter-label strong {
-        font-size: 10px;
-    }
-
-    #game-hud-rail .hud-metric-label,
-    #game-hud-rail .excess-meter-label {
-        font-size: 6px;
-    }
-
-    #game-hud-rail .weather-status {
-        grid-area: weather;
-        min-height: 27px;
-        padding: 4px 6px !important;
-        border-top: 1px solid var(--pixel-line-soft) !important;
-        border-left-width: 2px !important;
-        font-size: 7px;
-    }
-
-    #game-hud-rail .run-progress-panel {
-        grid-area: progress;
-        min-width: 116px !important;
-        padding: 4px 6px !important;
-        border-top: 1px solid var(--pixel-line-soft) !important;
-        border-left: 1px solid var(--pixel-line-soft) !important;
-    }
-
-    #game-hud-rail .run-progress-panel .hud-metric-label { font-size: 5px; }
-    #game-hud-rail .run-progress-panel #level-display::after,
-    #game-hud-rail .run-progress-panel #day-display::after { font-size: 8px; }
-
-    #game-hud-rail #game-top-controls {
-        grid-area: controls;
-        min-width: 64px;
-        padding: 4px !important;
-        border-bottom: 1px solid var(--pixel-line-soft) !important;
-        border-left: 1px solid var(--pixel-line-soft) !important;
-    }
-
-    #game-hud-rail #game-top-controls .desktop-speed-control {
-        display: none !important;
-    }
-
-    #game-hud-rail #game-top-controls > button {
-        width: 26px !important;
-        min-width: 26px !important;
-        height: 26px !important;
-        min-height: 26px !important;
-    }
-
-    .controls-hint {
-        display: none !important;
-    }
-
-    #mobile-controls:not([hidden]) {
-        grid-template-columns: 74px minmax(98px, 1fr) 74px;
-        gap: 6px;
-        padding: 8px 8px calc(10px + env(safe-area-inset-bottom)) !important;
-        border-top: 1px solid rgba(216, 226, 239, 0.3);
-        background: linear-gradient(to top, rgba(7, 10, 15, 0.96), rgba(7, 10, 15, 0.72) 64%, rgba(7, 10, 15, 0)) !important;
-        box-shadow: none;
-    }
-
     #mobile-controls .mobile-trade-primary {
-        width: 70px;
-        height: 70px;
-        border-width: 2px;
-        border-radius: 0;
-        background: #0d1623;
-        box-shadow: var(--pixel-shadow-step);
-        clip-path: var(--pixel-cut);
         font-size: 14px;
     }
 
-    #mobile-controls .buy-btn {
-        border-color: var(--pixel-green);
-        color: var(--pixel-green);
-    }
-
-    #mobile-controls .sell-btn {
-        border-color: var(--pixel-red);
-        color: var(--pixel-red);
-    }
-
-    .mobile-speed-control {
-        padding: 4px;
-        border: 1px solid var(--pixel-line);
-        border-radius: 0;
-        background: #0b111c;
-        box-shadow: var(--pixel-shadow-small);
-        clip-path: var(--pixel-cut);
-        backdrop-filter: none;
-    }
-
-    .mobile-speed-control .small-btn {
-        border: 1px solid #4b5870;
-        border-radius: 0;
-        background: #121b2a;
-        box-shadow: none;
-    }
-
     .mobile-speed-control .speed-readout {
-        font-size: 13px;
-        font-weight: 600;
+        font-size: 14px;
     }
 
     .game-coachmark {
@@ -1396,28 +922,12 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
         max-width: 92px;
         padding-inline: 7px !important;
     }
-
-    #mobile-controls:not([hidden]) {
-        grid-template-columns: 68px minmax(92px, 1fr) 68px;
-        padding-inline: 6px !important;
-    }
-
-    #mobile-controls .mobile-trade-primary {
-        width: 64px;
-        height: 64px;
-        font-size: 13px;
-    }
-
-    .mobile-speed-control {
-        grid-template-columns: 27px 40px 27px;
-        gap: 2px;
-    }
 }
 
 @media (max-width: 430px) and (max-height: 700px),
        (orientation: landscape) and (max-height: 500px) {
     .home-console-topline {
-        min-height: 42px;
+        min-height: 44px;
         padding-top: max(5px, env(safe-area-inset-top));
     }
 
@@ -1447,7 +957,7 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
     }
 
     .home-primary-actions #start-btn {
-        min-height: 44px;
+        min-height: 48px;
         font-size: 15px;
     }
 
