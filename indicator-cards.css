@@ -1,6 +1,6 @@
 #indicator-overlay {
     position: absolute;
-    z-index: 3;
+    z-index: 10;
     display: block;
     pointer-events: none;
     image-rendering: pixelated;
@@ -199,14 +199,6 @@
     opacity: 0.72;
 }
 
-#game-container .indicator-card.is-locked {
-    filter: saturate(0.35);
-}
-
-#game-container .indicator-card.is-locked .indicator-card-count {
-    color: #aef8ff;
-}
-
 #game-container .indicator-card-draw {
     justify-self: start;
     min-height: 26px;
@@ -266,8 +258,7 @@
     color: #baffd6;
 }
 
-.indicator-card-feedback[data-kind='empty'],
-.indicator-card-feedback[data-kind='locked'] {
+.indicator-card-feedback[data-kind='empty'] {
     border-color: rgba(255, 119, 116, 0.68);
     color: #ffb7b5;
 }
