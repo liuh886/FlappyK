@@ -16,6 +16,11 @@ assert.match(weatherScript, /metrics\.excess < -EPSILON/);
 assert.match(weatherScript, /return 'rain'/);
 assert.match(weatherScript, /return 'cloudy'/);
 assert.match(weatherScript, /return 'clear'/);
+assert.match(
+  weatherScript,
+  /function applyMetrics\(metrics, options = \{\}\) \{\s+if \(options\.source === 'live' && clockNow\(\) < explicitWeatherUntil\) \{\s+return requestedWeather;/s,
+  'Live observers must not overwrite an explicit/manual weather event during its hold window.',
+);
 
 for (const boundaryMessage of [
   'RETURN BELOW ZERO',
@@ -102,10 +107,10 @@ assert.ok(pwa.includes("'./market-weather.css'"), 'PWA loader must attach market
 assert.ok(pwa.includes("'./scripts/market-weather.js'"), 'PWA loader must attach market-weather.js.');
 assert.ok(serviceWorker.includes("'./market-weather.css'"), 'Offline shell must cache market-weather.css.');
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"), 'Offline shell must cache scripts/market-weather.js.');
-assert.ok(serviceWorker.includes("flappyk-app-v23"), 'The PWA cache version must advance for the indicator-card release.');
+assert.ok(serviceWorker.includes("flappyk-app-v23"), 'The rollback PWA cache version must be v23.');
 assert.ok(serviceWorker.includes("'./home-story.css'"), 'Offline shell must cache the second home panel styles.');
 assert.ok(serviceWorker.includes("'./scripts/home-story.js'"), 'Offline shell must cache the second home panel behavior.');
 assert.ok(serviceWorker.includes("'./account-integration.css'"), 'Offline shell must cache the account toolbar styles.');
 assert.ok(serviceWorker.includes("'./scripts/account-cloud-sync.js'"), 'Offline shell must cache the account cloud bridge.');
 
-console.log('Pixel weather arcade, staged transition, restrained HUD status-light language, explicit ownership, stale-event cleanup, two-page home shell, account-toolbar cache, cloud history, and PWA v23 contracts passed.');
+console.log('Pixel weather arcade, staged transition, explicit weather-event ownership, two-page home shell, account-toolbar cache, cloud history, and PWA v23 contracts passed.');
