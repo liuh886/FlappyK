@@ -84,14 +84,15 @@
         if (!signedIn() || !window.HaoAccount?.saveProductData) return Promise.resolve();
         const accountId = String(accountState.user.id);
         const payload = normalize(cards);
-        const productState = {
-            ...(accountState.productAccount?.state || {}),
-            [STATE_KEY]: payload,
-        };
         saveQueue = saveQueue
             .catch(() => undefined)
             .then(async () => {
                 if (!accountState?.user || String(accountState.user.id) !== accountId) return;
+                const liveState = window.HaoAccount.getState?.() || accountState;
+                const productState = {
+                    ...(liveState?.productAccount?.state || {}),
+                    [STATE_KEY]: payload,
+                };
                 await window.HaoAccount.saveProductData({ productState });
             })
             .catch((error) => {
