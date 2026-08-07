@@ -13,6 +13,7 @@ const serviceWorker = fs.readFileSync('sw.js', 'utf8');
 assert.ok(hardeningJs.includes('levelDisp.textContent = String(visibleGame)'));
 assert.ok(!hardeningJs.includes('levelDisp.textContent = `${visibleGame}/3`'));
 
+// JavaScript owns composition/state only; presentation must stay static and reviewable.
 assert.ok(refinementJs.includes('const DESKTOP_CANVAS_WIDTH = 896'));
 assert.ok(refinementJs.includes('const DESKTOP_CANVAS_HEIGHT = 672'));
 assert.ok(refinementJs.includes("const HUD_RAIL_ID = 'game-hud-rail'"));
@@ -32,37 +33,27 @@ assert.ok(!refinementJs.includes('PIXEL_COMPATIBILITY_STYLE_ID'));
 assert.ok(!refinementJs.includes('style.textContent = `'));
 assert.ok(!refinementJs.includes('installPixelCompatibilityStyles'));
 
-assert.ok(refinementCss.includes("family=Pixelify+Sans"));
-assert.ok(refinementCss.includes("--pixel-font-display: 'Press Start 2P'"));
-assert.ok(refinementCss.includes("--pixel-font-ui: 'Pixelify Sans'"));
-assert.ok(refinementCss.includes('--pixel-grid: 4px'));
-assert.ok(refinementCss.includes('--pixel-shadow-step: 4px 4px'));
-assert.ok(refinementCss.includes('--pixel-cut: polygon'));
-assert.ok(refinementCss.includes('--space-1: 4px'));
-assert.ok(refinementCss.includes('--space-6: 24px'));
-assert.ok(refinementCss.includes(".stats-box[data-composition='returns-only']"));
-assert.ok(refinementCss.includes('.run-progress-panel'));
-assert.ok(refinementCss.includes('width: min(896px'));
-assert.ok(refinementCss.includes('.trade-key-hints'));
-assert.ok(refinementCss.includes('#game-hud-rail #game-top-controls .desktop-speed-control'));
-assert.ok(refinementCss.includes('backdrop-filter: none'));
-assert.ok(refinementCss.includes("html[data-virtual-controls='true'] #game-top-controls .desktop-speed-control"));
-assert.ok(refinementCss.includes("grid-template-areas:"));
-assert.ok(refinementCss.includes("'performance controls'"));
-assert.ok(refinementCss.includes("'weather progress'"));
-assert.ok(refinementCss.includes("#mobile-controls:not([hidden])"));
-assert.ok(refinementCss.includes('transform: translateX(-50%)'));
-assert.ok(refinementCss.includes('.run-progress-panel .hud-details'));
-assert.ok(refinementCss.includes('.hud-metric-label'));
-assert.ok(refinementCss.includes('white-space: nowrap'));
-assert.ok(refinementCss.includes('box-shadow: none'));
-assert.ok(refinementCss.includes('clip-path: none'));
-assert.ok(accountCss.includes('.home-utility-bar'));
-assert.ok(accountCss.includes('.home-account-slot .hao-account-trigger'));
-assert.ok(accountCss.includes("html:not([data-ui-state='home']) .home-utility-bar"));
-assert.ok(!pwaSource.includes('hud-compact.css'));
-assert.ok(!pwaSource.includes('flappyk-membership-client'));
+// Curated presentation layer owns typography, home, structural composition, and secondary screens.
+for (const contract of [
+  "family=Pixelify+Sans",
+  "--pixel-font-display: 'Press Start 2P'",
+  "--pixel-font-ui: 'Pixelify Sans'",
+  '--pixel-grid: 4px',
+  '--pixel-shadow-step: 4px 4px',
+  '--pixel-cut: polygon',
+  '--space-1: 4px',
+  '--space-6: 24px',
+  '#ui-layer[data-hud-composition=',
+  '#game-hud-rail',
+  '.hud-metric-label',
+  'width: min(896px',
+  "html[data-virtual-controls='true'] #game-top-controls .desktop-speed-control",
+  "html[data-ui-state='home'] .controls-hint",
+]) {
+  assert.ok(refinementCss.includes(contract), `Missing curated presentation contract: ${contract}`);
+}
 
+// The established gameplay instrument system remains the sole owner of HUD/control visual details.
 for (const hudLanguageContract of [
   'HUD instrument system: one shell, one divider, one label/value hierarchy.',
   '--hud-shell:',
@@ -77,6 +68,8 @@ for (const hudLanguageContract of [
   '.run-progress-panel .hud-header',
   '#game-top-controls .speed-step:hover',
   '.trade-key-hint + .trade-key-hint',
+  "#mobile-controls:not([hidden])",
+  '#mobile-controls .mobile-btn',
 ]) {
   assert.ok(baseStyles.includes(hudLanguageContract), `Missing unified HUD language contract: ${hudLanguageContract}`);
 }
@@ -100,13 +93,22 @@ for (const hierarchyContract of [
   '.local-records-summary',
   '.daily-mode-card',
   '.home-secondary-actions button',
-  'min-height: 58px',
-  'min-height: 42px',
-  'border: 1px solid rgba(216, 207, 255, 0.55)',
+  'min-height: 64px',
+  'font-size: 22px',
+  'min-height: 44px',
+  'font-size: 16px',
+  'box-shadow: var(--pixel-shadow-small) !important',
 ]) {
   assert.ok(refinementCss.includes(hierarchyContract), `Missing curated home hierarchy contract: ${hierarchyContract}`);
 }
 
+assert.ok(accountCss.includes('.home-utility-bar'));
+assert.ok(accountCss.includes('.home-account-slot .hao-account-trigger'));
+assert.ok(accountCss.includes("html:not([data-ui-state='home']) .home-utility-bar"));
+assert.ok(!pwaSource.includes('hud-compact.css'));
+assert.ok(!pwaSource.includes('flappyk-membership-client'));
+
+// Weather owns weather only.
 assert.ok(!weatherCss.includes('.home-console-bezel'), 'Weather stylesheet must not own home layout.');
 assert.ok(!weatherCss.includes('.home-primary-actions'), 'Weather stylesheet must remain presentation-isolated.');
 assert.ok(weatherCss.includes('.market-weather-layer'));
@@ -128,4 +130,4 @@ assert.ok(!serviceWorker.includes("'./membership-sync.css'"));
 assert.ok(serviceWorker.includes("'./market-weather.css'"));
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"));
 
-console.log('Curated full-viewport home, static UI ownership, unified HUD instrument language, tactical indicator deck, account toolbar, coordinated input dock, responsive controls, and PWA v23 cache contracts passed');
+console.log('Curated full-viewport home, static presentation ownership, unified gameplay instrument system, responsive controls, isolated weather, and PWA v23 contracts passed.');
