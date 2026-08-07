@@ -49,6 +49,15 @@ for (const contract of [
   'width: min(896px',
   "html[data-virtual-controls='true'] #game-top-controls .desktop-speed-control",
   "html[data-ui-state='home'] .controls-hint",
+  "#game-hud-rail .stats-box[data-composition='returns-only']",
+  "position: static !important",
+  'grid-template-areas:',
+  "'performance controls'",
+  "'weather progress'",
+  'grid-area: performance',
+  'grid-area: controls',
+  'grid-area: weather',
+  'grid-area: progress',
 ]) {
   assert.ok(refinementCss.includes(contract), `Missing curated presentation contract: ${contract}`);
 }
@@ -70,6 +79,9 @@ for (const hudLanguageContract of [
   '.trade-key-hint + .trade-key-hint',
   "#mobile-controls:not([hidden])",
   '#mobile-controls .mobile-btn',
+  'height: 52px !important',
+  'border-radius: 0 !important',
+  'height: auto !important',
 ]) {
   assert.ok(baseStyles.includes(hudLanguageContract), `Missing unified HUD language contract: ${hudLanguageContract}`);
 }
@@ -130,4 +142,4 @@ assert.ok(!serviceWorker.includes("'./membership-sync.css'"));
 assert.ok(serviceWorker.includes("'./market-weather.css'"));
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"));
 
-console.log('Curated full-viewport home, static presentation ownership, unified gameplay instrument system, responsive controls, isolated weather, and PWA v23 contracts passed.');
+console.log('Curated full-viewport home, static HUD geometry ownership, unified gameplay instrument system, responsive controls, isolated weather, and PWA v23 contracts passed.');
