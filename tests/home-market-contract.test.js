@@ -61,10 +61,12 @@ for (const contract of [
 assert.ok(pwa.includes("ensureStylesheet('flappyk-market-weather-styles', './market-weather.css')"));
 assert.ok(pwa.includes("ensureStylesheet('flappyk-home-market-styles', './home-market.css')"));
 assert.ok(pwa.indexOf('flappyk-home-market-styles') > pwa.indexOf('flappyk-market-weather-styles'));
-assert.ok(serviceWorker.includes("flappyk-app-v20"));
-assert.ok(serviceWorker.includes("flappyk-runtime-v20"));
+assert.ok(serviceWorker.includes("flappyk-app-v21"));
+assert.ok(serviceWorker.includes("flappyk-runtime-v21"));
 assert.ok(serviceWorker.includes("'./home-market.css'"));
 assert.ok(serviceWorker.includes("'./scripts/home-market.js'"));
+assert.ok(serviceWorker.includes("'./indicator-cards.css'"));
+assert.ok(serviceWorker.includes("'./scripts/indicator-cards.js'"));
 assert.ok(!serviceWorker.includes('home-story'));
 
-console.log('Interactive 2.5D market home, keyboard/touch demo trading, shared coin resource language, responsive layout, and PWA v20 contracts passed');
+console.log('Interactive 2.5D market home, keyboard/touch demo trading, shared coin resource language, retained tactical cards, responsive layout, and PWA v21 contracts passed');
