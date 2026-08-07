@@ -8,6 +8,8 @@ const serviceWorker = fs.readFileSync('sw.js', 'utf8');
 
 assert.ok(index.includes('<link rel="stylesheet" href="home-story.css">'));
 assert.ok(index.includes('<script src="scripts/home-story.js"></script>'));
+assert.ok(!index.includes('home-market.css'));
+assert.ok(!index.includes('scripts/home-market.js'));
 assert.ok(index.indexOf('home-story.css') > index.indexOf('premium-ui-refinement.css'));
 assert.ok(index.indexOf('scripts/home-story.js') > index.indexOf('scripts/premium-ui-refinement.js'));
 
@@ -48,5 +50,6 @@ assert.ok(serviceWorker.includes("flappyk-app-v23"));
 assert.ok(serviceWorker.includes("flappyk-runtime-v23"));
 assert.ok(serviceWorker.includes("'./home-story.css'"));
 assert.ok(serviceWorker.includes("'./scripts/home-story.js'"));
+assert.ok(!serviceWorker.includes('home-market'));
 
 console.log('Two-page pixel home story, decisive-trades message, bilingual copy, keyboard navigation, mobile layout, and PWA v23 contracts passed');
