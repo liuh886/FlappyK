@@ -94,17 +94,19 @@ for (const homeShellContract of [
   assert.ok(weatherCss.includes(homeShellContract), `Missing web home shell contract: ${homeShellContract}`);
 }
 
-assert.ok(serviceWorker.includes("flappyk-app-v19"));
-assert.ok(serviceWorker.includes("flappyk-runtime-v19"));
+assert.ok(serviceWorker.includes("flappyk-app-v20"));
+assert.ok(serviceWorker.includes("flappyk-runtime-v20"));
 assert.ok(!serviceWorker.includes("'./hud-compact.css'"));
 assert.ok(serviceWorker.includes("'./account-integration.css'"));
 assert.ok(serviceWorker.includes("'./scripts/account-cloud-sync.js'"));
 assert.ok(serviceWorker.includes("'./membership-config.js'"));
 assert.ok(serviceWorker.includes("'./home-story.css'"));
 assert.ok(serviceWorker.includes("'./scripts/home-story.js'"));
+assert.ok(serviceWorker.includes("'./indicator-cards.css'"));
+assert.ok(serviceWorker.includes("'./scripts/indicator-cards.js'"));
 assert.ok(!serviceWorker.includes("'./scripts/cloud-run-sync-core.js'"));
 assert.ok(!serviceWorker.includes("'./membership-sync.css'"));
 assert.ok(serviceWorker.includes("'./market-weather.css'"));
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"));
 
-console.log('Full-viewport two-page web home, unified HUD instrument language, dedicated account toolbar, coordinated input dock, modern pixel typography, semantic counters, responsive controls, personal cloud history, and PWA v19 cache contracts passed');
+console.log('Full-viewport two-page web home, unified HUD instrument language, tactical indicator deck, account toolbar, coordinated input dock, pixel typography, semantic counters, responsive controls, personal cloud history, and PWA v20 cache contracts passed');
