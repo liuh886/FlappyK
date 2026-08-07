@@ -1,5 +1,5 @@
-const APP_CACHE = 'flappyk-app-v22';
-const RUNTIME_CACHE = 'flappyk-runtime-v22';
+const APP_CACHE = 'flappyk-app-v23';
+const RUNTIME_CACHE = 'flappyk-runtime-v23';
 
 const APP_SHELL = [
     './',
@@ -22,7 +22,7 @@ const APP_SHELL = [
     './pwa.css',
     './premium-ui.css',
     './premium-ui-refinement.css',
-    './home-market.css',
+    './home-story.css',
     './indicator-cards.css',
     './account-integration.css',
     './market-weather.css',
@@ -60,7 +60,7 @@ const APP_SHELL = [
     './scripts/ui-state.js',
     './scripts/premium-ui.js',
     './scripts/premium-ui-refinement.js',
-    './scripts/home-market.js',
+    './scripts/home-story.js',
     './analytics.js',
     './membership-config.js',
     './data/leaderboard.json',

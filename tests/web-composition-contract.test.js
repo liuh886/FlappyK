@@ -6,10 +6,6 @@ const refinementJs = fs.readFileSync('scripts/premium-ui-refinement.js', 'utf8')
 const refinementCss = fs.readFileSync('premium-ui-refinement.css', 'utf8');
 const baseStyles = fs.readFileSync('style.css', 'utf8');
 const weatherCss = fs.readFileSync('market-weather.css', 'utf8');
-const homeCss = fs.readFileSync('home-market.css', 'utf8');
-const homeJs = fs.readFileSync('scripts/home-market.js', 'utf8');
-const indicatorCss = fs.readFileSync('indicator-cards.css', 'utf8');
-const indicatorJs = fs.readFileSync('scripts/indicator-cards.js', 'utf8');
 const accountCss = fs.readFileSync('account-integration.css', 'utf8');
 const pwaSource = fs.readFileSync('pwa.js', 'utf8');
 const serviceWorker = fs.readFileSync('sw.js', 'utf8');
@@ -79,6 +75,7 @@ for (const hudLanguageContract of [
   '--hud-negative:',
   '#game-hud-rail .weather-status::before',
   "html[data-market-weather='cloudy']",
+  "grid-template-columns: repeat(3, minmax(0, 1fr))",
   '.run-progress-panel .hud-header',
   '#game-top-controls .speed-step:hover',
   '.trade-key-hint + .trade-key-hint',
@@ -86,69 +83,30 @@ for (const hudLanguageContract of [
   assert.ok(baseStyles.includes(hudLanguageContract), `Missing unified HUD language contract: ${hudLanguageContract}`);
 }
 
-for (const homeSceneContract of [
-  '.home-market-screen',
-  '.home-market-canvas',
-  '.home-market-wallet',
-  '.home-market-controls',
-  '.home-market-menu',
-  '.resource-glyph--coin',
-  '.resource-glyph--stock',
-  '.hud-cash-resource',
-  "grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.82fr) minmax(0, 0.9fr) minmax(0, 1.13fr)",
-  '@media (max-width: 780px), (pointer: coarse)',
+for (const homeShellContract of [
+  "html[data-ui-state='home'] #game-container.arcade-weather-ready",
+  "html[data-ui-state='home'] .home-console-bezel",
+  "html[data-ui-state='home'] .home-console-screen",
+  'width: 100vw',
+  'height: 100dvh',
+  'grid-template-rows: auto minmax(0, 1fr) auto',
 ]) {
-  assert.ok(homeCss.includes(homeSceneContract), `Missing interactive home composition contract: ${homeSceneContract}`);
+  assert.ok(weatherCss.includes(homeShellContract), `Missing web home shell contract: ${homeShellContract}`);
 }
 
-for (const homeBehaviorContract of [
-  'function drawFloor(',
-  'function drawCandles(',
-  "event.key === 'ArrowUp'",
-  "event.key === 'ArrowDown'",
-  'function promoteGameCashResource()',
-  "window.FlappyKHomeMarket",
-]) {
-  assert.ok(homeJs.includes(homeBehaviorContract), `Missing interactive home behavior contract: ${homeBehaviorContract}`);
-}
-
-for (const indicatorContract of [
-  '#indicator-overlay',
-  '.indicator-card-deck',
-  '.indicator-card.is-active',
-  "@media (max-width: 720px), (pointer: coarse)",
-]) {
-  assert.ok(indicatorCss.includes(indicatorContract), `Missing tactical card composition contract: ${indicatorContract}`);
-}
-for (const indicatorBehavior of [
-  "event.key === '1'",
-  "event.key === '2'",
-  "overlay.id = 'indicator-overlay'",
-  "deck.id = 'indicator-card-deck'",
-]) {
-  assert.ok(indicatorJs.includes(indicatorBehavior), `Missing tactical card behavior contract: ${indicatorBehavior}`);
-}
-
-assert.ok(weatherCss.includes("html[data-ui-state='home'] #game-container.arcade-weather-ready"));
-assert.ok(weatherCss.includes('width: 100vw'));
-assert.ok(weatherCss.includes('height: 100dvh'));
-assert.ok(weatherCss.includes('The home scene itself belongs to home-market.css.'));
-assert.ok(!weatherCss.includes('.home-console-screen'));
-
-assert.ok(serviceWorker.includes("flappyk-app-v22"));
-assert.ok(serviceWorker.includes("flappyk-runtime-v22"));
+assert.ok(serviceWorker.includes("flappyk-app-v20"));
+assert.ok(serviceWorker.includes("flappyk-runtime-v20"));
 assert.ok(!serviceWorker.includes("'./hud-compact.css'"));
 assert.ok(serviceWorker.includes("'./account-integration.css'"));
 assert.ok(serviceWorker.includes("'./scripts/account-cloud-sync.js'"));
 assert.ok(serviceWorker.includes("'./membership-config.js'"));
-assert.ok(serviceWorker.includes("'./home-market.css'"));
-assert.ok(serviceWorker.includes("'./scripts/home-market.js'"));
+assert.ok(serviceWorker.includes("'./home-story.css'"));
+assert.ok(serviceWorker.includes("'./scripts/home-story.js'"));
 assert.ok(serviceWorker.includes("'./indicator-cards.css'"));
 assert.ok(serviceWorker.includes("'./scripts/indicator-cards.js'"));
-assert.ok(!serviceWorker.includes('home-story'));
 assert.ok(!serviceWorker.includes("'./scripts/cloud-run-sync-core.js'"));
 assert.ok(!serviceWorker.includes("'./membership-sync.css'"));
 assert.ok(serviceWorker.includes("'./market-weather.css'"));
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"));
 
-console.log('Interactive market home, unified coin HUD, tactical indicator deck, explicit ownership, coordinated controls, pixel typography, responsive layout, cloud history, and PWA v22 contracts passed');
+console.log('Full-viewport two-page web home, unified HUD instrument language, tactical indicator deck, account toolbar, coordinated input dock, pixel typography, semantic counters, responsive controls, personal cloud history, and PWA v20 cache contracts passed');

@@ -94,8 +94,8 @@ for (const contract of [
   assert.ok(pwaSource.includes(contract), `Missing indicator runtime load contract: ${contract}`);
 }
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v22'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v22'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v20'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v20'"));
 for (const asset of [
   "'./indicator-cards.css'",
   "'./scripts/indicator-core.js'",
@@ -103,7 +103,7 @@ for (const asset of [
   "'./scripts/indicator-card-store.js'",
   "'./scripts/indicator-cards.js'",
 ]) {
-  assert.ok(serviceWorkerSource.includes(asset), `PWA v22 is missing ${asset}`);
+  assert.ok(serviceWorkerSource.includes(asset), `PWA v20 is missing ${asset}`);
 }
 
-console.log('BOLL, MACD, pre-window history, tactical card inventory, account entitlement, mobile controls, and PWA v22 contracts validated');
+console.log('BOLL, MACD, pre-window history, tactical card inventory, account entitlement, mobile controls, and PWA v20 contracts validated');

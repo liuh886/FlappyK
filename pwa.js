@@ -22,7 +22,9 @@
     let deferredInstallPrompt = null;
     const isIos = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
 
-    if (isStandalone) document.documentElement.classList.add('pwa-standalone');
+    if (isStandalone) {
+        document.documentElement.classList.add('pwa-standalone');
+    }
 
     function ensureInstallButton() {
         const actions = document.querySelector('#start-screen .start-actions');
@@ -42,9 +44,12 @@
                 button.dataset.ready = 'false';
                 await prompt.prompt();
                 const choice = await prompt.userChoice;
-                if (choice?.outcome !== 'accepted') button.dataset.ready = 'true';
+                if (choice?.outcome !== 'accepted') {
+                    button.dataset.ready = 'true';
+                }
                 return;
             }
+
             window.alert(isIos ? copy.iosHelp : copy.unavailable);
         });
         actions.appendChild(button);
@@ -141,7 +146,6 @@
     });
 
     ensureStylesheet('flappyk-market-weather-styles', './market-weather.css');
-    ensureStylesheet('flappyk-home-market-styles', './home-market.css');
     void loadScript('flappyk-market-weather-client', './scripts/market-weather.js').catch((error) => {
         console.warn('FlappyK market weather could not be loaded. Gameplay is unaffected.', error);
     });
