@@ -58,24 +58,30 @@ assert.ok(indexSource.includes('https://liuh886.github.io/admin/shared/account-s
 assert.ok(indexSource.includes('async src="https://liuh886.github.io/admin/shared/account-shell.js?v=2"'));
 assert.ok(indexSource.includes('scripts/account-cloud-sync.js'));
 
+// Curated shell and hierarchy.
 assert.ok(pixelStyles.includes("family=Pixelify+Sans"));
 assert.ok(pixelStyles.includes('--pixel-shadow-step'));
 assert.ok(pixelStyles.includes('--pixel-cut'));
 assert.ok(pixelStyles.includes('--space-1: 4px'));
-assert.ok(pixelStyles.includes("#game-hud-rail"));
-assert.ok(pixelStyles.includes("grid-template-columns: minmax(96px, 0.42fr) minmax(270px, 1.28fr) minmax(142px, 0.68fr) auto"));
-assert.ok(pixelStyles.includes(".stats-box[data-composition='returns-only']"));
-assert.ok(pixelStyles.includes('.run-progress-panel .hud-details'));
-assert.ok(pixelStyles.includes('clip-path: none'));
+assert.ok(pixelStyles.includes('#ui-layer[data-hud-composition='));
+assert.ok(pixelStyles.includes('#game-hud-rail'));
+assert.ok(pixelStyles.includes('.hud-metric-label'));
 assert.ok(pixelStyles.includes("html[data-ui-state='home'] #game-container.arcade-weather-ready"));
 assert.ok(pixelStyles.includes('.home-primary-actions #start-btn'));
-assert.ok(accountStyles.includes('.home-utility-bar'));
-assert.ok(accountStyles.includes('.home-account-slot .hao-account-trigger'));
-assert.ok(accountStyles.includes("html:not([data-ui-state='home']) .home-utility-bar"));
+assert.ok(pixelStyles.includes('font-size: 22px'));
+assert.ok(pixelStyles.includes('min-height: 64px'));
+
+// Gameplay instrument visuals remain centralized in style.css.
 assert.ok(baseStyles.includes('HUD instrument system: one shell, one divider, one label/value hierarchy.'));
 assert.ok(baseStyles.includes('--hud-shell:'));
 assert.ok(baseStyles.includes('--hud-divider:'));
 assert.ok(baseStyles.includes('.weather-status::before'));
+assert.ok(baseStyles.includes("grid-template-columns: repeat(3, minmax(0, 1fr))"));
+assert.ok(baseStyles.includes("#mobile-controls:not([hidden])"));
+
+assert.ok(accountStyles.includes('.home-utility-bar'));
+assert.ok(accountStyles.includes('.home-account-slot .hao-account-trigger'));
+assert.ok(accountStyles.includes("html:not([data-ui-state='home']) .home-utility-bar"));
 assert.ok(homeStoryStyles.includes('.home-story-slide'));
 assert.ok(homeStoryStyles.includes('.home-story-chart'));
 assert.ok(homeStorySource.includes("event.key === 'ArrowRight'"));
@@ -150,4 +156,4 @@ assert.ok(analyticsSource.includes("track('level_complete'"));
 assert.ok(analyticsSource.includes("track('run_complete'"));
 assert.ok(analyticsSource.includes("track('pwa_install'"));
 
-console.log('PWA manifest, icons, install UI, analytics, curated two-page home, unified HUD, tactical indicator cards, account cloud history, and v23 rollback cache checks passed');
+console.log('PWA manifest, icons, install UI, analytics, curated two-page home, modular gameplay HUD, indicator cards, account cloud history, and v23 cache checks passed');
