@@ -54,8 +54,8 @@ assert.ok(indexSource.includes('scripts/ui-state.js'));
 assert.ok(indexSource.includes('scripts/premium-ui.js'));
 assert.ok(indexSource.includes('scripts/home-story.js'));
 assert.ok(indexSource.includes('pwa.js'));
-assert.ok(indexSource.includes('https://liuh886.github.io/admin/shared/account-shell.css?v=3'));
-assert.ok(indexSource.includes('async src="https://liuh886.github.io/admin/shared/account-shell.js?v=3"'));
+assert.ok(indexSource.includes('https://liuh886.github.io/admin/shared/account-shell.css?v=4'));
+assert.ok(indexSource.includes('async src="https://liuh886.github.io/admin/shared/account-shell.js?v=4"'));
 assert.ok(indexSource.includes('scripts/account-cloud-sync.js'));
 assert.ok(indexSource.includes('https://static.cloudflareinsights.com/beacon.min.js'));
 
@@ -166,4 +166,4 @@ assert.ok(analyticsSource.includes("track('level_complete'"));
 assert.ok(analyticsSource.includes("track('run_complete'"));
 assert.ok(analyticsSource.includes("track('pwa_install'"));
 
-console.log('PWA manifest, icons, install UI, GA4 product events, Cloudflare RUM, curated home, modular HUD, Account Shell v3, account-only tactical indicator cards, account cloud history, and stable cache lifecycle checks passed');
+console.log('PWA manifest, icons, install UI, GA4 product events, Cloudflare RUM, curated home, modular HUD, Account Shell v4, account-only tactical indicator cards, account cloud history, and stable cache lifecycle checks passed');
