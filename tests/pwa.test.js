@@ -98,8 +98,11 @@ assert.ok(indicatorSource.includes('function drawProfitLane'));
 assert.ok(indicatorSource.includes('const REVEAL_MS = 440'));
 assert.ok(indicatorSource.includes('deck.hidden = !visible || !cardAccess'));
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v26'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v26'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime'"));
+assert.ok(serviceWorkerSource.includes('isCriticalSameOriginAsset'));
+assert.ok(serviceWorkerSource.includes('? networkFirst(request)'));
+assert.ok(!/flappyk-(?:app|runtime)-v\d+/.test(serviceWorkerSource));
 assert.ok(serviceWorkerSource.includes("'./data.js'"));
 assert.ok(serviceWorkerSource.includes("'./analytics.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership-config.js'"));
@@ -163,4 +166,4 @@ assert.ok(analyticsSource.includes("track('level_complete'"));
 assert.ok(analyticsSource.includes("track('run_complete'"));
 assert.ok(analyticsSource.includes("track('pwa_install'"));
 
-console.log('PWA manifest, icons, install UI, GA4 product events, Cloudflare RUM, curated home, modular HUD, Account Shell v3, account-only tactical indicator cards, account cloud history, and v26 cache checks passed');
+console.log('PWA manifest, icons, install UI, GA4 product events, Cloudflare RUM, curated home, modular HUD, Account Shell v3, account-only tactical indicator cards, account cloud history, and stable cache lifecycle checks passed');
