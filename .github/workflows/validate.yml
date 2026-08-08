@@ -78,6 +78,14 @@ jobs:
           print("HTML, social preview, and leaderboard data validated")
           PY
 
+      - name: Verify Cloudflare RUM token pin
+        env:
+          CLOUDFLARE_WEB_ANALYTICS_TOKEN: ${{ vars.CLOUDFLARE_WEB_ANALYTICS_TOKEN || '' }}
+        run: |
+          test -n "$CLOUDFLARE_WEB_ANALYTICS_TOKEN"
+          grep -q 'static.cloudflareinsights.com/beacon.min.js' index.html
+          grep -q "$CLOUDFLARE_WEB_ANALYTICS_TOKEN" index.html
+
       - name: Audit bundled equity split continuity
         run: python3 scripts/audit_bundled_data.py
 

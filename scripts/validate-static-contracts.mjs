@@ -91,6 +91,12 @@ const analytics = readFileSync(join(root, 'analytics.js'), 'utf8');
 for (const eventName of ['play_start', 'run_complete']) {
   if (!analytics.includes(eventName)) throw new Error(`Missing required analytics event: ${eventName}`);
 }
+for (const rumContract of [
+  'https://static.cloudflareinsights.com/beacon.min.js',
+  '8ddfa35f08814f51af0a4ee625810bea',
+]) {
+  if (!index.includes(rumContract)) throw new Error(`FlappyK Cloudflare RUM contract is missing ${rumContract}`);
+}
 
 const membershipConfig = readFileSync(join(root, 'membership-config.js'), 'utf8');
 const cloudSync = readFileSync(join(root, 'scripts/account-cloud-sync.js'), 'utf8');
@@ -104,8 +110,8 @@ for (const contract of [
   if (!membershipConfig.includes(contract)) throw new Error(`FlappyK account config is missing ${contract}`);
 }
 for (const reference of [
-  'https://liuh886.github.io/admin/shared/account-shell.css?v=2',
-  'https://liuh886.github.io/admin/shared/account-shell.js?v=2',
+  'https://liuh886.github.io/admin/shared/account-shell.css?v=3',
+  'https://liuh886.github.io/admin/shared/account-shell.js?v=3',
   'scripts/account-cloud-sync.js',
 ]) {
   if (!index.includes(reference)) throw new Error(`FlappyK index is missing ${reference}`);
@@ -126,4 +132,4 @@ for (const forbidden of [/sk_(live|test)_/, /whsec_/, /sb_secret_/, /service_rol
 
 requireFile('data/leaderboard.json');
 requireFile('.github/workflows/leaderboard.yml');
-console.log('Structured gameplay, PWA, analytics, Account Shell v2, cloud-history, and asset contracts passed.');
+console.log('Structured gameplay, PWA, GA4 product events, Cloudflare RUM, Account Shell v3, cloud-history, and asset contracts passed.');

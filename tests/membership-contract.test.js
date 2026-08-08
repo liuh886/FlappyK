@@ -30,9 +30,9 @@ for (const forbidden of [/sk_(live|test)_/, /sb_secret_/, /whsec_/, /service_rol
 }
 
 for (const reference of [
-  'https://liuh886.github.io/admin/shared/account-shell.css?v=2',
+  'https://liuh886.github.io/admin/shared/account-shell.css?v=3',
   '<script src="membership-config.js"></script>',
-  'async src="https://liuh886.github.io/admin/shared/account-shell.js?v=2"',
+  'async src="https://liuh886.github.io/admin/shared/account-shell.js?v=3"',
   '<script src="scripts/account-cloud-sync.js"></script>',
 ]) {
   assert.ok(indexSource.includes(reference), `FlappyK page is missing ${reference}`);
@@ -96,8 +96,8 @@ for (const retiredRuntime of [
   assert.ok(!pwaSource.includes(retiredRuntime), `PWA runtime still loads retired account code: ${retiredRuntime}`);
 }
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v25'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v25'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v26'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v26'"));
 for (const retainedAsset of [
   "'./membership-config.js'",
   "'./account-integration.css'",
@@ -156,4 +156,4 @@ for (const privacyContract of [
   assert.ok(privacySource.includes(privacyContract), `Cloud-history documentation is missing ${privacyContract}`);
 }
 
-console.log('Shared account, account-backed card inventory, personal cloud history, PWA v25, trusted entitlement boundary, privacy, rankings, and RLS checks validated');
+console.log('Shared Account Shell v3, account-backed card inventory, personal cloud history, PWA v26, trusted entitlement boundary, privacy, rankings, and RLS checks validated');

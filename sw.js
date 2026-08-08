@@ -1,5 +1,5 @@
-const APP_CACHE = 'flappyk-app-v25';
-const RUNTIME_CACHE = 'flappyk-runtime-v25';
+const APP_CACHE = 'flappyk-app-v26';
+const RUNTIME_CACHE = 'flappyk-runtime-v26';
 
 const APP_SHELL = [
     './',
