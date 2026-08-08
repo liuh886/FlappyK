@@ -1,78 +1,120 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
-const vm = require('node:vm');
 
-const coreSource = fs.readFileSync('scripts/indicator-core.js', 'utf8');
+const previousWindow = global.window;
+global.window = {};
+const core = require('../scripts/indicator-core.js');
+global.window = previousWindow;
+
+const flat = Array.from({ length: 40 }, (_, index) => ({ date: `D${index}`, close: 10 }));
+const flatBands = core.bollingerBands(flat);
+assert.equal(flatBands[18], null);
+assert.deepEqual(flatBands[19], { middle: 10, upper: 10, lower: 10 });
+
+const rising = Array.from({ length: 60 }, (_, index) => ({ close: index + 1 }));
+const risingBands = core.bollingerBands(rising);
+assert.equal(risingBands.length, rising.length);
+assert.ok(Math.abs(risingBands[19].middle - 10.5) < 1e-10);
+assert.ok(risingBands[19].upper > risingBands[19].middle);
+assert.ok(risingBands[19].lower < risingBands[19].middle);
+
+const risingMacd = core.macd(rising);
+assert.equal(risingMacd.length, rising.length);
+assert.equal(risingMacd[24], null);
+assert.ok(Number.isFinite(risingMacd[25].line));
+assert.equal(risingMacd[32].signal, null);
+assert.ok(Number.isFinite(risingMacd[33].signal));
+assert.ok(Number.isFinite(risingMacd[33].histogram));
+
 const historySource = fs.readFileSync('scripts/indicator-history.js', 'utf8');
 const storeSource = fs.readFileSync('scripts/indicator-card-store.js', 'utf8');
 const cardsSource = fs.readFileSync('scripts/indicator-cards.js', 'utf8');
-const cardCssSource = fs.readFileSync('indicator-cards.css', 'utf8');
+const cardsStyles = fs.readFileSync('indicator-cards.css', 'utf8');
+const auditSource = fs.readFileSync('scripts/audit_bundled_data.py', 'utf8');
+const refreshSource = fs.readFileSync('fetch_all_data.py', 'utf8');
+const weatherStyles = fs.readFileSync('market-weather.css', 'utf8');
 const pwaSource = fs.readFileSync('pwa.js', 'utf8');
 const serviceWorkerSource = fs.readFileSync('sw.js', 'utf8');
-const dataAuditSource = fs.readFileSync('scripts/audit_bundled_data.py', 'utf8');
-const refreshSource = fs.readFileSync('fetch_all_data.py', 'utf8');
-const membershipConfigSource = fs.readFileSync('membership-config.js', 'utf8');
-const indexSource = fs.readFileSync('index.html', 'utf8');
-
-const context = { window: {}, console };
-vm.createContext(context);
-vm.runInContext(coreSource, context);
-const IndicatorCore = context.window.FlappyKIndicatorCore;
-
-const closes = Array.from({ length: 80 }, (_, index) => 100 + index * 0.35 + Math.sin(index / 4));
-const highs = closes.map((value, index) => value + 1.2 + (index % 3) * 0.1);
-const lows = closes.map((value, index) => value - 1.1 - (index % 2) * 0.1);
-
-const boll = IndicatorCore.calculateBollinger(closes);
-assert.equal(boll.length, closes.length);
-assert.ok(Number.isFinite(boll.at(-1).middle));
-assert.ok(boll.at(-1).upper > boll.at(-1).middle);
-assert.ok(boll.at(-1).middle > boll.at(-1).lower);
-
-const macd = IndicatorCore.calculateMacd(closes);
-assert.equal(macd.length, closes.length);
-assert.ok(Number.isFinite(macd.at(-1).macd));
-assert.ok(Number.isFinite(macd.at(-1).signal));
-assert.ok(Number.isFinite(macd.at(-1).histogram));
 
 for (const contract of [
-  'window.FlappyKIndicatorCore',
-  'calculateBollinger',
-  'calculateMacd',
+  'const WARMUP_DAYS = 35',
+  'stockData?.[market]?.[asset]',
+  'fullSeries.findIndex',
+  'startIndex - WARMUP_DAYS',
 ]) {
-  assert.ok(coreSource.includes(contract), `Missing indicator core contract: ${contract}`);
+  assert.ok(historySource.includes(contract), `Missing non-forward-looking indicator history contract: ${contract}`);
 }
+
 for (const contract of [
-  'window.FlappyKIndicatorHistory',
-  'normalizeRows',
-  'getAssetSeries',
+  "const STATE_KEY = 'indicator_cards'",
+  'const STARTER_COUNT = 3',
+  'const DAILY_DRAW_LIMIT = 3',
+  'accountState?.isPro === true',
+  'window.HaoAccount.saveProductData',
+  '[STATE_KEY]: payload',
+  "window.addEventListener('hao:account-changed'",
+  "emit('starter-granted'",
+  "emit('drawn'",
 ]) {
-  assert.ok(historySource.includes(contract), `Missing indicator history contract: ${contract}`);
+  assert.ok(storeSource.includes(contract), `Missing account-backed card inventory contract: ${contract}`);
 }
+assert.ok(!storeSource.includes('localStorage'), 'Card inventory must use the account product state, not a local entitlement fallback.');
+
 for (const contract of [
-  'window.FlappyKIndicatorCardStore',
-  'getInventory',
-  'consume',
-  'starter',
+  "event.key === '1'",
+  "activate('boll')",
+  "event.key === '2'",
+  "activate('macd')",
+  "core.bollingerBands(data, 20, 2)",
+  "core.macd(data, 12, 26, 9)",
+  "overlay.id = 'indicator-overlay'",
+  "deck.id = 'indicator-card-deck'",
+  "if (active[type])",
+  "if (!store.consume(type))",
+  'const REVEAL_MS = 440',
+  'function revealProgress',
+  'function drawScanEdge',
+  'function drawProfitLane',
+  "context.fillText('P/L'",
+  "drawButton.hidden = true",
+  "text('TACTICAL HAND', '战术手牌')",
+  'function hasCardAccess()',
+  'deck.hidden = !visible || !cardAccess',
+  'visible && cardAccess && snapshot.data.length',
+  'if (event.detail?.signedIn === false) clearActiveCards()',
 ]) {
-  assert.ok(storeSource.includes(contract), `Missing indicator card-store contract: ${contract}`);
+  assert.ok(cardsSource.includes(contract), `Missing tactical indicator card contract: ${contract}`);
 }
+assert.ok(!cardsSource.includes('is-locked'), 'Guests must not receive a visible locked-card presentation.');
+assert.ok(!cardsSource.includes('window.HaoAccount?.open?.()'), 'Hidden guest cards must not open account UI through secret keyboard shortcuts.');
+
 for (const contract of [
-  'window.FlappyKIndicatorCards',
-  'BOLL',
-  'MACD',
-  'indicator-card',
-  'indicator-scan',
+  '#indicator-overlay',
+  'z-index: 10',
+  '.indicator-card-deck',
+  '.indicator-hand-label',
+  '.indicator-card.is-active',
+  '.indicator-card.is-revealing',
+  '@keyframes indicator-card-decode',
+  "@media (max-width: 720px), (pointer: coarse)",
+  'touch-action: manipulation',
+  'var(--hud-shell',
 ]) {
-  assert.ok(cardsSource.includes(contract), `Missing indicator card UI contract: ${contract}`);
+  assert.ok(cardsStyles.includes(contract), `Missing tactical card visual contract: ${contract}`);
 }
+assert.ok(weatherStyles.includes('#game-canvas'));
+assert.ok(weatherStyles.includes('z-index: 8'));
+assert.ok(!cardsStyles.includes('.indicator-card.is-locked'), 'Retired guest-card styling must be deleted, not retained as a compatibility state.');
+
 for (const contract of [
-  '.indicator-card-hand',
-  '.indicator-scan-layer',
-  '.indicator-macd-panel',
+  'CHALLENGE_DAYS = 250',
+  'INDICATOR_WARMUP_DAYS = 35',
+  'MIN_INDICATOR_ROWS = CHALLENGE_DAYS + INDICATOR_WARMUP_DAYS',
+  'audit_indicator_history(data)',
 ]) {
-  assert.ok(cardCssSource.includes(contract), `Missing indicator card CSS contract: ${contract}`);
+  assert.ok(auditSource.includes(contract), `Missing bundled indicator-data readiness contract: ${contract}`);
 }
+assert.ok(refreshSource.includes('DAYS_REQUIRED = 300'), 'Data refresh must retain more than the 285 rows required for a 250-day challenge plus indicator warm-up.');
 
 for (const contract of [
   "ensureStylesheet('flappyk-indicator-card-styles', './indicator-cards.css')",
@@ -83,23 +125,6 @@ for (const contract of [
 ]) {
   assert.ok(pwaSource.includes(contract), `Missing indicator runtime load contract: ${contract}`);
 }
-
-for (const contract of [
-  "entitlementCode: 'flappyk.pro'",
-  "productCode: 'flappyk'",
-]) {
-  assert.ok(membershipConfigSource.includes(contract), `Missing membership contract: ${contract}`);
-}
-assert.ok(indexSource.includes('membership-config.js'));
-
-for (const contract of [
-  'MIN_ROWS_REQUIRED = 285',
-  'indicator_ready',
-  'stockDataMeta',
-]) {
-  assert.ok(dataAuditSource.includes(contract), `Missing bundled indicator-data readiness contract: ${contract}`);
-}
-assert.ok(refreshSource.includes('DAYS_REQUIRED = 300'), 'Data refresh must retain more than the 285 rows required for a 250-day challenge plus indicator warm-up.');
 
 assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app'"));
 assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime'"));
