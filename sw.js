@@ -1,5 +1,5 @@
-const APP_CACHE = 'flappyk-app-v26';
-const RUNTIME_CACHE = 'flappyk-runtime-v26';
+const APP_CACHE = 'flappyk-app';
+const RUNTIME_CACHE = 'flappyk-runtime';
 
 const APP_SHELL = [
     './',
@@ -98,7 +98,7 @@ async function networkFirst(request) {
         const response = await fetch(request);
         if (response && (response.ok || response.type === 'opaque')) {
             const cache = await caches.open(RUNTIME_CACHE);
-            cache.put(request, response.clone());
+            await cache.put(request, response.clone());
         }
         return response;
     } catch (error) {
@@ -123,6 +123,13 @@ async function staleWhileRevalidate(request) {
     return cached || update || Response.error();
 }
 
+function isCriticalSameOriginAsset(request, url) {
+    if (request.destination === 'script' || request.destination === 'style' || request.destination === 'worker') {
+        return true;
+    }
+    return /\.(?:html|js|css|json|webmanifest)$/.test(url.pathname);
+}
+
 self.addEventListener('fetch', (event) => {
     const request = event.request;
     if (request.method !== 'GET') return;
@@ -137,7 +144,11 @@ self.addEventListener('fetch', (event) => {
     }
 
     if (url.origin === self.location.origin) {
-        event.respondWith(staleWhileRevalidate(request));
+        event.respondWith(
+            isCriticalSameOriginAsset(request, url)
+                ? networkFirst(request)
+                : staleWhileRevalidate(request)
+        );
         return;
     }
 

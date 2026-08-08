@@ -126,8 +126,11 @@ for (const contract of [
   assert.ok(pwaSource.includes(contract), `Missing indicator runtime load contract: ${contract}`);
 }
 
-assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app-v26'"));
-assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime-v26'"));
+assert.ok(serviceWorkerSource.includes("const APP_CACHE = 'flappyk-app'"));
+assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime'"));
+assert.ok(serviceWorkerSource.includes('isCriticalSameOriginAsset'));
+assert.ok(serviceWorkerSource.includes('? networkFirst(request)'));
+assert.ok(!/flappyk-(?:app|runtime)-v\d+/.test(serviceWorkerSource));
 for (const asset of [
   "'./indicator-cards.css'",
   "'./scripts/indicator-core.js'",
@@ -135,7 +138,7 @@ for (const asset of [
   "'./scripts/indicator-card-store.js'",
   "'./scripts/indicator-cards.js'",
 ]) {
-  assert.ok(serviceWorkerSource.includes(asset), `PWA v26 is missing ${asset}`);
+  assert.ok(serviceWorkerSource.includes(asset), `Stable PWA shell is missing ${asset}`);
 }
 
-console.log('BOLL, MACD, 285-row data readiness, guest gating, visible overlay stacking, tactical scan reveal, preserved P/L lane, account inventory, mobile controls, and PWA v26 contracts validated');
+console.log('BOLL, MACD, 285-row data readiness, guest gating, visible overlay stacking, tactical scan reveal, preserved P/L lane, account inventory, mobile controls, and stable PWA cache contracts validated');
