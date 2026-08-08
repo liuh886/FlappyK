@@ -46,10 +46,13 @@ for (const contract of [
 assert.equal((storyJs.match(/home-story-marker home-story-marker--/g) || []).length, 3);
 assert.ok(!storyJs.includes('new Swiper'));
 assert.ok(!storyJs.includes('setInterval('));
-assert.ok(serviceWorker.includes("flappyk-app-v26"));
-assert.ok(serviceWorker.includes("flappyk-runtime-v26"));
+assert.ok(serviceWorker.includes("const APP_CACHE = 'flappyk-app'"));
+assert.ok(serviceWorker.includes("const RUNTIME_CACHE = 'flappyk-runtime'"));
+assert.ok(serviceWorker.includes('isCriticalSameOriginAsset'));
+assert.ok(serviceWorker.includes('? networkFirst(request)'));
 assert.ok(serviceWorker.includes("'./home-story.css'"));
 assert.ok(serviceWorker.includes("'./scripts/home-story.js'"));
 assert.ok(!serviceWorker.includes('home-market'));
+assert.ok(!/flappyk-(?:app|runtime)-v\d+/.test(serviceWorker));
 
-console.log('Two-page pixel home story, decisive-trades message, bilingual copy, keyboard navigation, mobile layout, and PWA v26 contracts passed');
+console.log('Two-page pixel home story, decisive-trades message, bilingual copy, keyboard navigation, mobile layout, and stable PWA cache contracts passed');
