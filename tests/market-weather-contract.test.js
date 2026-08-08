@@ -110,10 +110,13 @@ assert.ok(pwa.includes("'./market-weather.css'"), 'PWA loader must attach market
 assert.ok(pwa.includes("'./scripts/market-weather.js'"), 'PWA loader must attach market-weather.js.');
 assert.ok(serviceWorker.includes("'./market-weather.css'"), 'Offline shell must cache market-weather.css.');
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"), 'Offline shell must cache scripts/market-weather.js.');
-assert.ok(serviceWorker.includes("flappyk-app-v26"), 'The auth/RUM rollout must advance the PWA cache to v26.');
+assert.ok(serviceWorker.includes("const APP_CACHE = 'flappyk-app'"), 'PWA must use the stable app cache lifecycle.');
+assert.ok(serviceWorker.includes("const RUNTIME_CACHE = 'flappyk-runtime'"), 'PWA must use the stable runtime cache lifecycle.');
+assert.ok(serviceWorker.includes('isCriticalSameOriginAsset'), 'Critical same-origin assets must be refreshed network-first.');
+assert.ok(!/flappyk-(?:app|runtime)-v\d+/.test(serviceWorker), 'Feature-numbered cache names must not return.');
 assert.ok(serviceWorker.includes("'./home-story.css'"), 'Offline shell must cache the second home panel styles.');
 assert.ok(serviceWorker.includes("'./scripts/home-story.js'"), 'Offline shell must cache the second home panel behavior.');
 assert.ok(serviceWorker.includes("'./account-integration.css'"), 'Offline shell must cache the account toolbar styles.');
 assert.ok(serviceWorker.includes("'./scripts/account-cloud-sync.js'"), 'Offline shell must cache the account cloud bridge.');
 
-console.log('Isolated market weather, staged transitions, explicit event ownership, curated home shell, account toolbar, cloud history, and PWA v26 contracts passed.');
+console.log('Isolated market weather, staged transitions, explicit event ownership, curated home shell, account toolbar, cloud history, and stable PWA cache contracts passed.');
