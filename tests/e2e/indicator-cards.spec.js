@@ -96,7 +96,7 @@ async function startDailyRun(page) {
   await warmCurrentGame(page, { expectDeck: true });
 }
 
-test('normal free gameplay has no power-up hand and cannot reveal indicators', async ({ page }) => {
+test('normal free gameplay has no power-up access even when signed in', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await preparePage(page, { signedIn: true, pro: false });
   await startNormalGame(page, { expectDeck: false });
@@ -119,9 +119,9 @@ test('normal free gameplay has no power-up hand and cannot reveal indicators', a
     };
   });
 
-  expect(state.inventory.accountSignedIn).toBe(true);
-  expect(state.inventory.signedIn).toBe(false);
+  expect(state.inventory.signedIn).toBe(true);
   expect(state.inventory.isPro).toBe(false);
+  expect(state.inventory.isDailyTrial).toBe(false);
   expect(state.active).toEqual({ boll: false, macd: false });
   expect(state.visiblePixels).toBe(0);
 });
@@ -203,12 +203,13 @@ test('Daily Run grants one free BOLL and MACD trial outside Pro', async ({ page 
   await preparePage(page, { signedIn: false, pro: false });
   await startDailyRun(page);
 
+  await expect(page.locator('[data-hand-label]')).toContainText('DAILY TRIAL');
   await expect(page.locator('[data-card-count="boll"]')).toHaveText('×1');
   await expect(page.locator('[data-card-count="macd"]')).toHaveText('×1');
   const inventory = await page.evaluate(() => window.FlappyKIndicatorCardStore.getSnapshot());
+  expect(inventory.signedIn).toBe(false);
   expect(inventory.isPro).toBe(false);
   expect(inventory.isDailyTrial).toBe(true);
-  expect(inventory.signedIn).toBe(true);
 
   await page.locator('[data-indicator-card="boll"]').click();
   await expect(page.locator('[data-card-count="boll"]')).toHaveText('×0');
