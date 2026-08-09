@@ -104,7 +104,7 @@ for (const contract of [
   'window.HaoAccountConfig',
   "productCode: 'flappyk'",
   "entitlementCode: 'flappyk.pro'",
-  'billingEnabled: false',
+  'billingEnabled: true',
   '公共排行榜不会直接信任浏览器提交的成绩',
 ]) {
   if (!membershipConfig.includes(contract)) throw new Error(`FlappyK account config is missing ${contract}`);
