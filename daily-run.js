@@ -114,9 +114,11 @@
     }
 
     function resetDailyMode() {
+        const wasActive = state.active;
         state.active = false;
         state.lastRecordedSignature = '';
         hideDailyResult();
+        if (wasActive) window.dispatchEvent(new CustomEvent('flappyk:daily-run-ended'));
     }
 
     function exitDailyMode() {
@@ -138,6 +140,7 @@
         collectedCards = [];
         startScreenElement?.classList.remove('active');
         document.title = `Daily Run ${dateKey} · FlappyK`;
+        window.dispatchEvent(new CustomEvent('flappyk:daily-run-started', { detail: { date: dateKey } }));
         initAudio();
         startLevel();
     }
