@@ -5,6 +5,7 @@ const configSource = fs.readFileSync('membership-config.js', 'utf8');
 const indexSource = fs.readFileSync('index.html', 'utf8');
 const cloudSyncSource = fs.readFileSync('scripts/account-cloud-sync.js', 'utf8');
 const cardStoreSource = fs.readFileSync('scripts/indicator-card-store.js', 'utf8');
+const dailyRunSource = fs.readFileSync('daily-run.js', 'utf8');
 const pwaSource = fs.readFileSync('pwa.js', 'utf8');
 const serviceWorkerSource = fs.readFileSync('sw.js', 'utf8');
 const migrationSource = fs.readFileSync('supabase/migrations/0001_membership_foundation.sql', 'utf8');
@@ -62,16 +63,29 @@ for (const contract of [
 
 for (const contract of [
   "const STATE_KEY = 'indicator_cards'",
-  'const STARTER_COUNT = 3',
-  'const DAILY_DRAW_LIMIT = 3',
+  'const VERSION = 2',
+  'const DAILY_PRO_GRANT = 3',
+  'const DAILY_TRIAL_GRANT = 1',
   'accountState?.isPro === true',
+  'dailyGrantDate',
+  "window.addEventListener('flappyk:daily-run-started'",
+  "window.addEventListener('flappyk:daily-run-ended'",
   'window.HaoAccount.saveProductData',
   '[STATE_KEY]: payload',
   "window.addEventListener('hao:account-changed'",
 ]) {
-  assert.ok(cardStoreSource.includes(contract), `Missing account-backed indicator card contract: ${contract}`);
+  assert.ok(cardStoreSource.includes(contract), `Missing Pro/Daily Run indicator card contract: ${contract}`);
+}
+for (const retired of ['STARTER_COUNT', 'DAILY_DRAW_LIMIT', 'starterGranted', 'drawsUsed', 'drawDate']) {
+  assert.ok(!cardStoreSource.includes(retired), `Retired indicator card economy still exists: ${retired}`);
 }
 assert.ok(!cardStoreSource.includes('localStorage'), 'Indicator card entitlement must not use a browser-local membership fallback.');
+for (const contract of [
+  "new CustomEvent('flappyk:daily-run-started'",
+  "new CustomEvent('flappyk:daily-run-ended'",
+]) {
+  assert.ok(dailyRunSource.includes(contract), `Daily Run must expose card-trial lifecycle: ${contract}`);
+}
 
 for (const retainedRuntime of [
   "loadScript('flappyk-analytics-loader'",
@@ -158,4 +172,4 @@ for (const privacyContract of [
   assert.ok(privacySource.includes(privacyContract), `Cloud-history documentation is missing ${privacyContract}`);
 }
 
-console.log('Shared Google/GitHub/X Account Shell v4, account-backed card inventory, personal cloud history, stable PWA cache lifecycle, trusted entitlement boundary, privacy, rankings, and RLS checks validated');
+console.log('Shared Account Shell, Pro daily card grants, Daily Run free trials, cloud history, stable PWA cache, entitlement boundary, privacy, rankings, and RLS checks validated');
