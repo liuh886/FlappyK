@@ -2,21 +2,20 @@
     'use strict';
 
     const STATE_KEY = 'indicator_cards';
-    const VERSION = 1;
-    const STARTER_COUNT = 3;
-    const DAILY_DRAW_LIMIT = 3;
+    const VERSION = 2;
+    const DAILY_PRO_GRANT = 3;
+    const DAILY_TRIAL_GRANT = 1;
     const TYPES = Object.freeze(['boll', 'macd']);
     const EMPTY = Object.freeze({
         version: VERSION,
         boll: 0,
         macd: 0,
-        starterGranted: false,
-        drawDate: '',
-        drawsUsed: 0,
+        dailyGrantDate: '',
     });
 
     let accountState = null;
     let cards = { ...EMPTY };
+    let dailyTrial = null;
     let saveQueue = Promise.resolve();
 
     function integer(value, minimum = 0, maximum = 999) {
@@ -25,14 +24,12 @@
     }
 
     function normalize(value) {
-        const source = value && typeof value === 'object' ? value : EMPTY;
+        if (!value || typeof value !== 'object' || Number(value.version) !== VERSION) return { ...EMPTY };
         return {
             version: VERSION,
-            boll: integer(source.boll),
-            macd: integer(source.macd),
-            starterGranted: source.starterGranted === true,
-            drawDate: /^\d{4}-\d{2}-\d{2}$/.test(String(source.drawDate || '')) ? String(source.drawDate) : '',
-            drawsUsed: integer(source.drawsUsed, 0, DAILY_DRAW_LIMIT),
+            boll: integer(value.boll),
+            macd: integer(value.macd),
+            dailyGrantDate: /^\d{4}-\d{2}-\d{2}$/.test(String(value.dailyGrantDate || '')) ? String(value.dailyGrantDate) : '',
         };
     }
 
@@ -51,22 +48,20 @@
         return signedIn() && accountState?.isPro === true;
     }
 
-    function drawsRemaining(date = new Date()) {
-        if (!isPro()) return 0;
-        return cards.drawDate === localDateKey(date)
-            ? Math.max(0, DAILY_DRAW_LIMIT - cards.drawsUsed)
-            : DAILY_DRAW_LIMIT;
+    function isDailyTrial() {
+        return !isPro() && dailyTrial !== null;
     }
 
     function snapshot() {
+        const visibleCards = isDailyTrial() ? dailyTrial : cards;
         return Object.freeze({
             accountId: signedIn() ? String(accountState.user.id) : null,
             signedIn: signedIn(),
             isPro: isPro(),
-            boll: cards.boll,
-            macd: cards.macd,
-            starterGranted: cards.starterGranted,
-            dailyDrawsRemaining: drawsRemaining(),
+            isDailyTrial: isDailyTrial(),
+            boll: integer(visibleCards?.boll),
+            macd: integer(visibleCards?.macd),
+            dailyGrantDate: cards.dailyGrantDate,
         });
     }
 
@@ -102,15 +97,17 @@
         return saveQueue;
     }
 
-    function grantStarterPack() {
-        if (!signedIn() || cards.starterGranted) return false;
+    function grantDailyProCards(date = new Date()) {
+        if (!isPro()) return false;
+        const today = localDateKey(date);
+        if (cards.dailyGrantDate === today) return false;
         cards = {
             ...cards,
-            boll: cards.boll + STARTER_COUNT,
-            macd: cards.macd + STARTER_COUNT,
-            starterGranted: true,
+            boll: integer(cards.boll + DAILY_PRO_GRANT),
+            macd: integer(cards.macd + DAILY_PRO_GRANT),
+            dailyGrantDate: today,
         };
-        emit('starter-granted', { awarded: { boll: STARTER_COUNT, macd: STARTER_COUNT } });
+        emit('pro-daily-granted', { awarded: { boll: DAILY_PRO_GRANT, macd: DAILY_PRO_GRANT } });
         void save();
         return true;
     }
@@ -119,6 +116,7 @@
         const previousId = accountState?.user?.id ? String(accountState.user.id) : null;
         const nextId = nextState?.user?.id ? String(nextState.user.id) : null;
         accountState = nextState || null;
+        dailyTrial = null;
         if (!nextId) {
             cards = { ...EMPTY };
             emit(previousId ? 'signed-out' : 'guest');
@@ -126,40 +124,43 @@
         }
         cards = remoteState();
         emit(previousId === nextId ? 'account-refreshed' : 'signed-in');
-        grantStarterPack();
+        grantDailyProCards();
+    }
+
+    function startDailyTrial() {
+        if (isPro()) {
+            dailyTrial = null;
+            emit('daily-run-pro');
+            return;
+        }
+        dailyTrial = { boll: DAILY_TRIAL_GRANT, macd: DAILY_TRIAL_GRANT };
+        emit('daily-trial-started', { awarded: { boll: DAILY_TRIAL_GRANT, macd: DAILY_TRIAL_GRANT } });
+    }
+
+    function endDailyTrial() {
+        if (dailyTrial === null) return;
+        dailyTrial = null;
+        emit('daily-trial-ended');
     }
 
     function consume(type) {
-        if (!TYPES.includes(type) || !signedIn() || cards[type] < 1) return false;
-        cards = { ...cards, [type]: cards[type] - 1 };
-        emit('consumed', { type });
-        void save();
+        if (!TYPES.includes(type)) return false;
+        if (isPro()) {
+            if (cards[type] < 1) return false;
+            cards = { ...cards, [type]: cards[type] - 1 };
+            emit('consumed', { type });
+            void save();
+            return true;
+        }
+        if (!isDailyTrial() || dailyTrial[type] < 1) return false;
+        dailyTrial = { ...dailyTrial, [type]: dailyTrial[type] - 1 };
+        emit('trial-consumed', { type });
         return true;
     }
 
-    function randomType(randomValue) {
-        const value = Number.isFinite(randomValue) ? randomValue : Math.random();
-        return TYPES[Math.max(0, Math.min(TYPES.length - 1, Math.floor(value * TYPES.length)))];
-    }
-
-    function draw(randomValue) {
-        const remaining = drawsRemaining();
-        if (remaining < 1) return null;
-        const today = localDateKey();
-        const type = randomType(randomValue);
-        const used = cards.drawDate === today ? cards.drawsUsed : 0;
-        cards = {
-            ...cards,
-            [type]: cards[type] + 1,
-            drawDate: today,
-            drawsUsed: used + 1,
-        };
-        emit('drawn', { type });
-        void save();
-        return type;
-    }
-
     window.addEventListener('hao:account-changed', (event) => setAccountState(event.detail));
+    window.addEventListener('flappyk:daily-run-started', startDailyTrial);
+    window.addEventListener('flappyk:daily-run-ended', endDailyTrial);
 
     const current = window.HaoAccount?.getState?.();
     if (current) setAccountState(current);
@@ -167,15 +168,16 @@
 
     window.FlappyKIndicatorCardStore = Object.freeze({
         TYPES,
-        STARTER_COUNT,
-        DAILY_DRAW_LIMIT,
+        DAILY_PRO_GRANT,
+        DAILY_TRIAL_GRANT,
         STATE_KEY,
         normalize,
         localDateKey,
         getSnapshot: snapshot,
         setAccountState,
-        grantStarterPack,
+        grantDailyProCards,
+        startDailyTrial,
+        endDailyTrial,
         consume,
-        draw,
     });
 })();
