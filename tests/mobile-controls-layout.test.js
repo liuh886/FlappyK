@@ -22,12 +22,18 @@ assert.ok(uiState.includes('get virtualControls()'));
 assert.ok(uiState.includes('root.dataset.virtualControls'));
 
 assert.ok(css.includes('#mobile-controls:not([hidden])'));
-assert.ok(css.includes('position: fixed !important'));
-assert.ok(css.includes('bottom: 0 !important'));
-assert.ok(css.includes('width: 100vw !important'));
+assert.ok(css.includes('position: fixed'));
+assert.ok(css.includes('bottom: 0'));
+assert.ok(css.includes('width: 100vw'));
 assert.ok(css.includes('env(safe-area-inset-bottom)'));
+assert.ok(css.includes('grid-template-columns: minmax(72px, 1fr) auto minmax(72px, 1fr)'));
+assert.ok(css.includes('#mobile-controls .mobile-speed-control'));
+assert.ok(css.includes('opacity: 0.68'));
+assert.ok(css.includes("data-ui-state='playing'"));
+
+// Premium UI still creates the three controls, while mobile-controls.css owns
+// their phone spatial hierarchy. Do not require the retired oversized layout.
 assert.ok(premiumCss.includes('#mobile-controls:not([hidden])'));
-assert.ok(premiumCss.includes('grid-template-columns'));
 assert.ok(premiumCss.includes('.mobile-speed-control'));
 
-console.log('Shared responsive state and fixed virtual-control overlay checks passed');
+console.log('Shared responsive state, fixed virtual-control dock, and mobile thumb hierarchy checks passed');
