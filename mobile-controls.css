@@ -64,23 +64,19 @@ body {
 }
 
 /*
- * The virtual controls are a viewport overlay rather than part of the canvas
- * flex layout. This prevents mobile browsers with tall canvases or desktop-site
- * viewport widths from pushing the controls below the visible screen.
+ * Mobile spatial ownership: the chart remains the playfield, BUY/SELL are the
+ * two primary thumb actions, and playback speed is a quiet utility between
+ * them. The fixed dock avoids browser-toolbar jumps without turning utility
+ * controls into the visual focal point.
  */
 #mobile-controls:not([hidden]) {
-    position: fixed !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
     z-index: 80;
-    display: flex !important;
-    width: 100vw !important;
-    margin: 0 !important;
-    padding: 8px 10px calc(10px + env(safe-area-inset-bottom)) !important;
-    align-items: flex-end;
-    justify-content: space-between;
-    background: linear-gradient(to top, rgba(13, 17, 23, 0.88), rgba(13, 17, 23, 0));
+    width: 100vw;
+    margin: 0;
     pointer-events: none;
     touch-action: manipulation;
 }
@@ -152,20 +148,151 @@ body {
     }
 }
 
+@media (max-width: 720px), (pointer: coarse) {
+    html body #game-container #mobile-controls:not([hidden]) {
+        display: grid !important;
+        grid-template-columns: minmax(72px, 1fr) auto minmax(72px, 1fr) !important;
+        align-items: end;
+        gap: 10px !important;
+        padding:
+            9px
+            max(12px, env(safe-area-inset-right))
+            calc(11px + env(safe-area-inset-bottom))
+            max(12px, env(safe-area-inset-left)) !important;
+        border-top: 2px solid var(--hud-frame, #9fb0c4) !important;
+        background: var(--hud-shell, rgba(6, 12, 20, 0.94)) !important;
+        box-shadow: 0 -4px 0 rgba(0, 0, 0, 0.42) !important;
+    }
+
+    html body #game-container #mobile-controls #btn-buy,
+    html body #game-container #mobile-controls #btn-sell {
+        width: 78px !important;
+        height: 78px !important;
+        min-width: 78px;
+        min-height: 78px;
+        margin: 0 !important;
+    }
+
+    html body #game-container #mobile-controls #btn-buy {
+        justify-self: start;
+    }
+
+    html body #game-container #mobile-controls #btn-sell {
+        justify-self: end;
+    }
+
+    html body #game-container #mobile-controls .mobile-speed-control {
+        display: grid;
+        grid-template-columns: 28px 38px 28px;
+        align-self: end;
+        justify-self: center;
+        gap: 2px;
+        margin: 0 0 5px;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        opacity: 0.68;
+        backdrop-filter: none;
+    }
+
+    html body #game-container #mobile-controls .mobile-speed-control .small-btn {
+        width: 28px;
+        min-width: 28px;
+        height: 28px;
+        min-height: 28px;
+        margin: 0;
+        padding: 0;
+        border: 1px solid #52647c;
+        border-radius: 0;
+        background: rgba(18, 29, 43, 0.62);
+        box-shadow: none;
+        color: var(--hud-label, #91a0b3);
+        font-size: 13px;
+    }
+
+    html body #game-container #mobile-controls .mobile-speed-control .speed-readout {
+        min-width: 38px;
+        color: var(--hud-label, #91a0b3);
+        font-size: 14px;
+        line-height: 28px;
+        text-align: center;
+    }
+
+    /* Keep the live chart above the fixed thumb dock instead of painting under it. */
+    html[data-virtual-controls='true'][data-ui-state='playing'] body #game-container #game-canvas,
+    html[data-virtual-controls='true'][data-ui-state='paused'] body #game-container #game-canvas {
+        margin-bottom: 102px;
+    }
+
+    /* A signed-in tactical hand gets its own compact tray between chart and dock. */
+    html[data-virtual-controls='true'][data-ui-state='playing'] body #game-container:has(#indicator-card-deck:not([hidden])) #game-canvas,
+    html[data-virtual-controls='true'][data-ui-state='paused'] body #game-container:has(#indicator-card-deck:not([hidden])) #game-canvas {
+        margin-bottom: 184px;
+    }
+}
+
 @media (max-width: 430px) {
-    #mobile-controls:not([hidden]) {
-        padding-left: 6px !important;
-        padding-right: 6px !important;
+    html body #game-container #mobile-controls:not([hidden]) {
+        gap: 6px !important;
+        padding-left: max(8px, env(safe-area-inset-left)) !important;
+        padding-right: max(8px, env(safe-area-inset-right)) !important;
     }
 
-    #mobile-controls .action-btn {
-        width: 72px;
-        height: 72px;
-        margin: 0 5px;
+    html body #game-container #mobile-controls #btn-buy,
+    html body #game-container #mobile-controls #btn-sell {
+        width: 72px !important;
+        height: 72px !important;
+        min-width: 72px;
+        min-height: 72px;
     }
 
-    #mobile-controls .small-btn {
-        width: 44px;
-        height: 44px;
+    html body #game-container #mobile-controls .mobile-speed-control {
+        grid-template-columns: 26px 34px 26px;
+        margin-bottom: 4px;
+    }
+
+    html body #game-container #mobile-controls .mobile-speed-control .small-btn {
+        width: 26px;
+        min-width: 26px;
+        height: 26px;
+        min-height: 26px;
+    }
+
+    html body #game-container #mobile-controls .mobile-speed-control .speed-readout {
+        min-width: 34px;
+        font-size: 14px;
+        line-height: 26px;
+    }
+
+    html[data-virtual-controls='true'][data-ui-state='playing'] body #game-container #game-canvas,
+    html[data-virtual-controls='true'][data-ui-state='paused'] body #game-container #game-canvas {
+        margin-bottom: 94px;
+    }
+
+    html[data-virtual-controls='true'][data-ui-state='playing'] body #game-container:has(#indicator-card-deck:not([hidden])) #game-canvas,
+    html[data-virtual-controls='true'][data-ui-state='paused'] body #game-container:has(#indicator-card-deck:not([hidden])) #game-canvas {
+        margin-bottom: 174px;
+    }
+}
+
+@media (max-height: 650px) and (max-width: 720px) {
+    html body #game-container #mobile-controls #btn-buy,
+    html body #game-container #mobile-controls #btn-sell {
+        width: 66px !important;
+        height: 66px !important;
+        min-width: 66px;
+        min-height: 66px;
+    }
+
+    html[data-virtual-controls='true'][data-ui-state='playing'] body #game-container #game-canvas,
+    html[data-virtual-controls='true'][data-ui-state='paused'] body #game-container #game-canvas {
+        margin-bottom: 86px;
+    }
+
+    html[data-virtual-controls='true'][data-ui-state='playing'] body #game-container:has(#indicator-card-deck:not([hidden])) #game-canvas,
+    html[data-virtual-controls='true'][data-ui-state='paused'] body #game-container:has(#indicator-card-deck:not([hidden])) #game-canvas {
+        margin-bottom: 158px;
     }
 }
