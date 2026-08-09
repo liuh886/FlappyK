@@ -115,8 +115,10 @@ html:not([data-ui-state='home']) .home-utility-bar {
         gap: 3px;
     }
 
-    .home-console-topline > .home-utility-bar[data-arcade-placement='console'] #language-toggle-btn {
+    .home-console-topline > .home-utility-bar[data-arcade-placement='console'] #language-toggle-btn,
+    .home-console-topline > .home-utility-bar[data-arcade-placement='console'] .hao-account-trigger {
         height: 40px !important;
+        min-width: 40px !important;
         min-height: 40px !important;
     }
 
