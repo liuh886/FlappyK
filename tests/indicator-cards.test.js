@@ -53,7 +53,8 @@ for (const contract of [
   'const DAILY_TRIAL_GRANT = 1',
   'accountState?.isPro === true',
   'dailyGrantDate',
-  'function hasCardAccess()',
+  'function isPro()',
+  'function isDailyTrial()',
   "window.addEventListener('flappyk:daily-run-started'",
   "window.addEventListener('flappyk:daily-run-ended'",
   'window.HaoAccount.saveProductData',
@@ -98,6 +99,7 @@ for (const contract of [
   'BOLL power-up deployed',
   'MACD power-up deployed',
   'function hasCardAccess()',
+  'inventory.isPro === true || inventory.isDailyTrial === true',
   'deck.hidden = !visible || !cardAccess',
   'visible && cardAccess && snapshot.data.length',
   'if (event.detail?.isPro !== true && event.detail?.isDailyTrial !== true) clearActiveCards()',
@@ -170,4 +172,4 @@ for (const asset of [
   assert.ok(serviceWorkerSource.includes(asset), `Stable PWA shell is missing ${asset}`);
 }
 
-console.log('BOLL/MACD math, Pro daily grants, Daily Run trials, scarce power-up visuals, overlay stacking, mobile controls, retired draw deletion, and stable PWA contracts validated');
+console.log('BOLL/MACD math, Pro daily grants, Daily Run trials, account/access separation, scarce power-up visuals, overlay stacking, mobile controls, retired draw deletion, and stable PWA contracts validated');
