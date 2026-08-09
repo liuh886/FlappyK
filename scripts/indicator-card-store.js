@@ -118,21 +118,6 @@
         return true;
     }
 
-    function setAccountState(nextState) {
-        const previousId = accountState?.user?.id ? String(accountState.user.id) : null;
-        const nextId = nextState?.user?.id ? String(nextState.user.id) : null;
-        accountState = nextState || null;
-        dailyTrial = null;
-        if (!nextId) {
-            cards = { ...EMPTY };
-            emit(previousId ? 'signed-out' : 'guest');
-            return;
-        }
-        cards = remoteState();
-        emit(previousId === nextId ? 'account-refreshed' : 'signed-in');
-        grantDailyProCards();
-    }
-
     function startDailyTrial() {
         if (isPro()) {
             dailyTrial = null;
@@ -147,6 +132,23 @@
         if (dailyTrial === null) return;
         dailyTrial = null;
         emit('daily-trial-ended');
+    }
+
+    function setAccountState(nextState) {
+        const previousId = accountState?.user?.id ? String(accountState.user.id) : null;
+        const nextId = nextState?.user?.id ? String(nextState.user.id) : null;
+        accountState = nextState || null;
+        dailyTrial = null;
+        if (!nextId) {
+            cards = { ...EMPTY };
+            emit(previousId ? 'signed-out' : 'guest');
+            if (window.FlappyKDailyRun?.isActive?.()) startDailyTrial();
+            return;
+        }
+        cards = remoteState();
+        emit(previousId === nextId ? 'account-refreshed' : 'signed-in');
+        grantDailyProCards();
+        if (window.FlappyKDailyRun?.isActive?.()) startDailyTrial();
     }
 
     function consume(type) {
@@ -164,18 +166,16 @@
         return true;
     }
 
-    function removeRetiredDrawControl() {
-        document.querySelector('[data-indicator-draw]')?.remove();
-    }
-
     window.addEventListener('hao:account-changed', (event) => setAccountState(event.detail));
     window.addEventListener('flappyk:daily-run-started', startDailyTrial);
     window.addEventListener('flappyk:daily-run-ended', endDailyTrial);
 
     const current = window.HaoAccount?.getState?.();
     if (current) setAccountState(current);
-    else emit('initial');
-    window.requestAnimationFrame(removeRetiredDrawControl);
+    else {
+        emit('initial');
+        if (window.FlappyKDailyRun?.isActive?.()) startDailyTrial();
+    }
 
     window.FlappyKIndicatorCardStore = Object.freeze({
         TYPES,
