@@ -10,7 +10,7 @@ for (const contract of [
   'Mobile home quality pass',
   'grid-template-rows: 48px minmax(0, 1fr) 28px',
   'justify-content: flex-start',
-  'width: min(320px, 100%)',
+  'width: min(320px, calc(100vw - 20px))',
   'grid-template-columns: repeat(2, minmax(0, 1fr))',
   'grid-template-columns: minmax(0, 1fr) 106px',
   '.daily-mode-copy span {\n        display: none',
