@@ -18,7 +18,12 @@ for (const contract of [
   "grid-template-columns: minmax(72px, 1fr) auto minmax(72px, 1fr)",
   '#mobile-controls #btn-buy',
   '#mobile-controls #btn-sell',
+  'grid-column: 1',
+  'grid-column: 3',
   '#mobile-controls .mobile-speed-control',
+  'position: fixed',
+  'top: calc(max(6px, env(safe-area-inset-top)) + 88px)',
+  'right: max(10px, env(safe-area-inset-right))',
   'grid-template-columns: 28px 38px 28px',
   'opacity: 0.68',
   'background: transparent',
@@ -32,17 +37,20 @@ for (const contract of [
 for (const contract of [
   'left: 50%',
   'transform: translateX(-50%)',
-  'width: min(248px',
+  'width: min(190px',
+  'width: min(180px',
   '.indicator-card-copy small',
   'display: none',
   'grid-template-columns: minmax(0, 1fr) auto',
   'min-height: 44px',
+  'border-width: 1px',
   'justify-self: center',
   'background: transparent',
 ]) {
-  assert.ok(cards.includes(contract), `Missing compact mobile tactical-hand contract: ${contract}`);
+  assert.ok(cards.includes(contract), `Missing mini mobile tactical-hand contract: ${contract}`);
 }
 
 assert.ok(!mobile.includes('grid-template-columns: 88px minmax(106px, 1fr) 88px'), 'The oversized centered speed-control layout must not return to the mobile spatial owner.');
+assert.ok(!cards.includes('width: min(248px, calc(100% - 28px))'), 'The previous oversized mobile tactical tray must not return.');
 
-console.log('Mobile thumb hierarchy, quiet speed utility, dedicated tactical tray, and always-visible settlement identity contracts passed.');
+console.log('Top speed utility, bottom thumb hierarchy, mini tactical cards, and always-visible settlement identity contracts passed.');
