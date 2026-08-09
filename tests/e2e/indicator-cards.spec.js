@@ -116,10 +116,11 @@ test('guest gameplay has no tactical hand and cannot reveal indicators', async (
   expect(guestState.visiblePixels).toBe(0);
 });
 
-test('signed-in starter cards render BOLL and MACD above the K-line without double consumption', async ({ page }) => {
+test('signed-in starter power-ups render BOLL and MACD above the K-line without double consumption', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await preparePage(page);
 
+  await expect(page.locator('[data-hand-label]')).toHaveText('POWER-UP HAND');
   await expect(page.locator('[data-card-count="boll"]')).toHaveText('×3');
   await expect(page.locator('[data-card-count="macd"]')).toHaveText('×3');
   await startAtWarmIndicatorDay(page);
@@ -136,7 +137,7 @@ test('signed-in starter cards render BOLL and MACD above the K-line without doub
   await expect(page.locator('[data-indicator-card="boll"]')).toHaveClass(/is-active/);
   await expect(page.locator('[data-indicator-card="boll"]')).toHaveClass(/is-revealing/);
   await expect(page.locator('[data-card-count="boll"]')).toHaveText('×2');
-  await expect(page.locator('.indicator-card-feedback')).toContainText('BOLL scan decoded');
+  await expect(page.locator('.indicator-card-feedback')).toContainText('BOLL power-up deployed');
   await page.waitForTimeout(520);
   await expect(page.locator('[data-indicator-card="boll"]')).not.toHaveClass(/is-revealing/);
 
@@ -214,6 +215,7 @@ test('pro entitlement permits exactly three daily random draws', async ({ page }
   await startAtWarmIndicatorDay(page);
 
   const drawButton = page.locator('[data-indicator-draw]');
+  await expect(drawButton).toContainText('POWER-UP PACK');
   await expect(drawButton).toContainText('3 LEFT');
   await drawButton.click();
   await expect(drawButton).toContainText('2 LEFT');
