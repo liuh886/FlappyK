@@ -64,7 +64,7 @@ for (const contract of [
 
 // The established gameplay instrument system remains the sole owner of HUD/control visual details.
 for (const hudLanguageContract of [
-  'HUD instrument system: one shell, one divider, one label/value hierarchy.',
+  'HUD instrument system: one shell, one divider, one score-first hierarchy.',
   '--hud-shell:',
   '--hud-divider:',
   '--hud-label:',
@@ -73,7 +73,8 @@ for (const hudLanguageContract of [
   '--hud-negative:',
   '#game-hud-rail .weather-status::before',
   "html[data-market-weather='cloudy']",
-  "grid-template-columns: repeat(3, minmax(0, 1fr))",
+  "grid-template-columns: minmax(142px, 1.7fr) minmax(82px, 0.72fr) minmax(82px, 0.72fr)",
+  ".stats-box[data-composition='returns-only'] .excess-meter",
   '.run-progress-panel .hud-header',
   '#game-top-controls .speed-step:hover',
   '.trade-key-hint + .trade-key-hint',
@@ -145,4 +146,4 @@ assert.ok(!serviceWorker.includes("'./membership-sync.css'"));
 assert.ok(serviceWorker.includes("'./market-weather.css'"));
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"));
 
-console.log('Curated full-viewport home, static HUD geometry ownership, unified gameplay instrument system, account-only tactical cards, responsive controls, isolated weather, and stable PWA cache contracts passed.');
+console.log('Curated full-viewport home, static score-first HUD ownership, unified gameplay instrument system, Pro/Daily Run tactical power-ups, responsive controls, isolated weather, and stable PWA cache contracts passed.');
