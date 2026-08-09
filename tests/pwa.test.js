@@ -73,11 +73,12 @@ assert.ok(pixelStyles.includes('font-size: 22px'));
 assert.ok(pixelStyles.includes('min-height: 64px'));
 
 // Gameplay instrument visuals remain centralized in style.css.
-assert.ok(baseStyles.includes('HUD instrument system: one shell, one divider, one label/value hierarchy.'));
+assert.ok(baseStyles.includes('HUD instrument system: one shell, one divider, one score-first hierarchy.'));
 assert.ok(baseStyles.includes('--hud-shell:'));
 assert.ok(baseStyles.includes('--hud-divider:'));
 assert.ok(baseStyles.includes('.weather-status::before'));
-assert.ok(baseStyles.includes("grid-template-columns: repeat(3, minmax(0, 1fr))"));
+assert.ok(baseStyles.includes("grid-template-columns: minmax(142px, 1.7fr) minmax(82px, 0.72fr) minmax(82px, 0.72fr)"));
+assert.ok(baseStyles.includes(".stats-box[data-composition='returns-only'] .excess-meter"));
 assert.ok(baseStyles.includes("#mobile-controls:not([hidden])"));
 
 assert.ok(accountStyles.includes('.home-utility-bar'));
@@ -166,4 +167,4 @@ assert.ok(analyticsSource.includes("track('level_complete'"));
 assert.ok(analyticsSource.includes("track('run_complete'"));
 assert.ok(analyticsSource.includes("track('pwa_install'"));
 
-console.log('PWA manifest, icons, install UI, GA4 product events, Cloudflare RUM, curated home, modular HUD, Google/GitHub/X Account Shell v4, account-only tactical indicator cards, account cloud history, and stable cache lifecycle checks passed');
+console.log('PWA manifest, icons, install UI, GA4 product events, Cloudflare RUM, curated home, score-first HUD, Pro/Daily Run tactical power-ups, account cloud history, and stable cache lifecycle checks passed');

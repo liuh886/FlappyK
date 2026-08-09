@@ -49,7 +49,7 @@ async function preparePage(page) {
   });
 }
 
-test('desktop game uses one compact pixel HUD rail around the dominant chart', async ({ page }) => {
+test('desktop game uses one compact score-first pixel HUD rail around the dominant chart', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await preparePage(page);
   await page.goto('/');
@@ -175,8 +175,8 @@ test('desktop game uses one compact pixel HUD rail around the dominant chart', a
   expect(layout.run.right).toBeLessThanOrEqual(layout.top.x + 1);
   expect(layout.top.right).toBeLessThanOrEqual(layout.rail.right + 1);
 
-  expect(layout.stats.width).toBeGreaterThanOrEqual(330);
-  expect(layout.stats.width).toBeLessThanOrEqual(380);
+  expect(layout.stats.width).toBeGreaterThanOrEqual(360);
+  expect(layout.stats.width).toBeLessThanOrEqual(400);
   expect(layout.run.width).toBeLessThanOrEqual(180);
   expect(layout.statsColumns).toBe(3);
   expect(layout.hudMainDisplay).toBe('contents');
@@ -194,12 +194,13 @@ test('desktop game uses one compact pixel HUD rail around the dominant chart', a
 
   expect(layout.totalFont).toContain('Pixelify Sans');
   expect(layout.returnFont).toContain('Pixelify Sans');
-  expect(layout.totalSize).toBe('13px');
-  expect(layout.returnSize).toBe('13px');
-  expect(layout.excessSize).toBe('13px');
+  expect(layout.totalSize).toBe('11px');
+  expect(layout.returnSize).toBe('11px');
+  expect(layout.excessSize).toBe('17px');
+  expect(parseFloat(layout.excessSize)).toBeGreaterThan(parseFloat(layout.totalSize));
   expect(layout.speedSize).toBe('14px');
   expect(layout.tradeSize).toBe('13px');
-  expect(layout.runSize).toBe('13px');
+  expect(layout.runSize).toBe('11px');
 
   expect(layout.railRadius).toBe('0px');
   expect(layout.railBorder).toBe('2px');
@@ -210,7 +211,7 @@ test('desktop game uses one compact pixel HUD rail around the dominant chart', a
   expect(layout.statsShadow).toBe('none');
 });
 
-test('mobile uses a readable two-row HUD rail above virtual controls', async ({ page }) => {
+test('mobile uses a readable two-row score-first HUD rail above virtual controls', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await preparePage(page);
   await page.goto('/');
@@ -231,6 +232,7 @@ test('mobile uses a readable two-row HUD rail above virtual controls', async ({ 
     const buy = getComputedStyle(document.querySelector('#btn-buy'));
     const speed = getComputedStyle(document.querySelector('#mobile-speed-readout'));
     const hud = getComputedStyle(document.querySelector('#total-display'));
+    const excess = getComputedStyle(document.querySelector('#live-excess-display'));
     const runValue = getComputedStyle(document.querySelector('#level-display'));
     const statsStyle = getComputedStyle(document.querySelector('.stats-box'));
     const metricNodes = Array.from(document.querySelectorAll('.hud-total, .hud-return, #excess-meter'));
@@ -259,6 +261,7 @@ test('mobile uses a readable two-row HUD rail above virtual controls', async ({ 
       buyShadow: buy.boxShadow,
       speedSize: speed.fontSize,
       hudSize: hud.fontSize,
+      excessSize: excess.fontSize,
       runSize: runValue.fontSize,
     };
   });
@@ -284,6 +287,8 @@ test('mobile uses a readable two-row HUD rail above virtual controls', async ({ 
   expect(positions.buyRadius).toBe('0px');
   expect(positions.buyShadow).not.toBe('none');
   expect(positions.speedSize).toBe('14px');
-  expect(positions.hudSize).toBe('11px');
-  expect(positions.runSize).toBe('11px');
+  expect(positions.hudSize).toBe('9px');
+  expect(positions.excessSize).toBe('14px');
+  expect(parseFloat(positions.excessSize)).toBeGreaterThan(parseFloat(positions.hudSize));
+  expect(positions.runSize).toBe('10px');
 });

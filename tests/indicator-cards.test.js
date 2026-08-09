@@ -30,6 +30,7 @@ const historySource = fs.readFileSync('scripts/indicator-history.js', 'utf8');
 const storeSource = fs.readFileSync('scripts/indicator-card-store.js', 'utf8');
 const cardsSource = fs.readFileSync('scripts/indicator-cards.js', 'utf8');
 const cardsStyles = fs.readFileSync('indicator-cards.css', 'utf8');
+const dailyRunSource = fs.readFileSync('daily-run.js', 'utf8');
 const auditSource = fs.readFileSync('scripts/audit_bundled_data.py', 'utf8');
 const refreshSource = fs.readFileSync('fetch_all_data.py', 'utf8');
 const weatherStyles = fs.readFileSync('market-weather.css', 'utf8');
@@ -47,18 +48,33 @@ for (const contract of [
 
 for (const contract of [
   "const STATE_KEY = 'indicator_cards'",
-  'const STARTER_COUNT = 3',
-  'const DAILY_DRAW_LIMIT = 3',
+  'const VERSION = 2',
+  'const DAILY_PRO_GRANT = 3',
+  'const DAILY_TRIAL_GRANT = 1',
   'accountState?.isPro === true',
+  'dailyGrantDate',
+  'function isPro()',
+  'function isDailyTrial()',
+  "window.addEventListener('flappyk:daily-run-started'",
+  "window.addEventListener('flappyk:daily-run-ended'",
   'window.HaoAccount.saveProductData',
   '[STATE_KEY]: payload',
   "window.addEventListener('hao:account-changed'",
-  "emit('starter-granted'",
-  "emit('drawn'",
+  "emit('pro-daily-granted'",
+  "emit('daily-trial-started'",
 ]) {
-  assert.ok(storeSource.includes(contract), `Missing account-backed card inventory contract: ${contract}`);
+  assert.ok(storeSource.includes(contract), `Missing Pro/Daily Run power-up inventory contract: ${contract}`);
 }
-assert.ok(!storeSource.includes('localStorage'), 'Card inventory must use the account product state, not a local entitlement fallback.');
+for (const retired of ['STARTER_COUNT', 'DAILY_DRAW_LIMIT', 'starterGranted', 'drawsUsed', 'drawDate']) {
+  assert.ok(!storeSource.includes(retired), `Retired power-up economy still exists: ${retired}`);
+}
+assert.ok(!storeSource.includes('localStorage'), 'Power-up inventory must use account product state, not a browser-local entitlement fallback.');
+for (const contract of [
+  "new CustomEvent('flappyk:daily-run-started'",
+  "new CustomEvent('flappyk:daily-run-ended'",
+]) {
+  assert.ok(dailyRunSource.includes(contract), `Daily Run must expose power-up trial lifecycle: ${contract}`);
+}
 
 for (const contract of [
   "event.key === '1'",
@@ -76,21 +92,24 @@ for (const contract of [
   'function drawScanEdge',
   'function drawProfitLane',
   "context.fillText('P/L'",
-  "drawButton.hidden = true",
   "text('POWER-UP HAND', '战术道具')",
+  "text('DAILY TRIAL · 1 EACH', '每日挑战体验 · 各 1 张')",
   "text('VOLATILITY SCAN', '波动扫描')",
   "text('MOMENTUM SCAN', '动量扫描')",
   'BOLL power-up deployed',
   'MACD power-up deployed',
   'function hasCardAccess()',
+  'inventory.isPro === true || inventory.isDailyTrial === true',
   'deck.hidden = !visible || !cardAccess',
   'visible && cardAccess && snapshot.data.length',
-  'if (event.detail?.signedIn === false) clearActiveCards()',
+  'if (event.detail?.isPro !== true && event.detail?.isDailyTrial !== true) clearActiveCards()',
 ]) {
-  assert.ok(cardsSource.includes(contract), `Missing tactical indicator card contract: ${contract}`);
+  assert.ok(cardsSource.includes(contract), `Missing tactical power-up contract: ${contract}`);
 }
-assert.ok(!cardsSource.includes('is-locked'), 'Guests must not receive a visible locked-card presentation.');
-assert.ok(!cardsSource.includes('window.HaoAccount?.open?.()'), 'Hidden guest cards must not open account UI through secret keyboard shortcuts.');
+assert.ok(!cardsSource.includes('is-locked'), 'Unavailable cards must stay hidden rather than render a locked compatibility state.');
+assert.ok(!cardsSource.includes('window.HaoAccount?.open?.()'), 'Hidden cards must not open account UI through secret keyboard shortcuts.');
+assert.ok(!cardsSource.includes('indicator-card-draw'), 'Retired random-draw controls must be deleted rather than hidden or shimmed.');
+assert.ok(!cardsSource.includes('function drawCard'), 'Retired random-draw runtime must stay deleted.');
 
 for (const contract of [
   '#indicator-overlay',
@@ -115,7 +134,7 @@ for (const contract of [
 }
 assert.ok(weatherStyles.includes('#game-canvas'));
 assert.ok(weatherStyles.includes('z-index: 8'));
-assert.ok(!cardsStyles.includes('.indicator-card.is-locked'), 'Retired guest-card styling must be deleted, not retained as a compatibility state.');
+assert.ok(!cardsStyles.includes('.indicator-card.is-locked'), 'Retired guest-card styling must stay deleted.');
 assert.ok(!cardsStyles.includes('width: min(248px, calc(100% - 28px))'), 'The oversized mobile tactical tray must not return.');
 
 for (const contract of [
@@ -153,4 +172,4 @@ for (const asset of [
   assert.ok(serviceWorkerSource.includes(asset), `Stable PWA shell is missing ${asset}`);
 }
 
-console.log('BOLL, MACD, 285-row data readiness, guest gating, visible overlay stacking, scarce power-up styling, tactical scan reveal, preserved P/L lane, account inventory, mobile controls, and stable PWA cache contracts validated');
+console.log('BOLL/MACD math, Pro daily grants, Daily Run trials, account/access separation, scarce power-up visuals, overlay stacking, mobile controls, retired draw deletion, and stable PWA contracts validated');
