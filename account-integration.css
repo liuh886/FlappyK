@@ -12,6 +12,15 @@
     backdrop-filter: none;
 }
 
+.home-console-topline > .home-utility-bar[data-arcade-placement='console'] {
+    position: static;
+    inset: auto;
+    flex: 0 0 auto;
+    max-width: none;
+    margin: 0 0 0 auto;
+    transform: none;
+}
+
 .home-language-slot,
 .home-account-slot {
     display: inline-flex;
@@ -70,12 +79,46 @@ html:not([data-ui-state='home']) .home-utility-bar {
     display: none !important;
 }
 
+@media (max-width: 720px), (pointer: coarse) {
+    .home-console-topline:has(> .home-utility-bar[data-arcade-placement='console']) {
+        box-sizing: border-box;
+        height: 48px;
+        min-height: 48px;
+    }
+
+    .home-console-topline > .home-utility-bar[data-arcade-placement='console'] {
+        top: auto;
+        right: auto;
+        height: 40px;
+        max-height: 40px;
+        align-self: center;
+        gap: 3px;
+    }
+
+    .home-console-topline > .home-utility-bar[data-arcade-placement='console'] #language-toggle-btn {
+        height: 40px !important;
+        min-height: 40px !important;
+    }
+
+    #language-toggle-btn,
+    .home-account-slot .hao-account-trigger {
+        height: 40px;
+        min-height: 40px;
+    }
+}
+
 @media (max-width: 640px) {
     .home-utility-bar {
         top: 10px;
         right: 10px;
         gap: 6px;
         max-width: calc(100% - 20px);
+    }
+
+    .home-console-topline > .home-utility-bar[data-arcade-placement='console'] {
+        top: auto;
+        right: auto;
+        max-width: none;
     }
 
     #language-toggle-btn,
@@ -96,5 +139,10 @@ html:not([data-ui-state='home']) .home-utility-bar {
     .home-utility-bar {
         top: 8px;
         right: 10px;
+    }
+
+    .home-console-topline > .home-utility-bar[data-arcade-placement='console'] {
+        top: auto;
+        right: auto;
     }
 }

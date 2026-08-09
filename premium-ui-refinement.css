@@ -1026,3 +1026,228 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
         transition: none;
     }
 }
+
+/* Mobile home quality pass: treat the start screen as a compact arcade cartridge, not a stack of web cards. */
+@media (max-width: 720px), (pointer: coarse) {
+    .home-console-bezel {
+        grid-template-rows: 48px minmax(0, 1fr) 28px;
+    }
+
+    .home-console-topline {
+        min-height: 48px;
+        padding:
+            max(6px, env(safe-area-inset-top))
+            max(10px, env(safe-area-inset-right))
+            5px
+            max(10px, env(safe-area-inset-left));
+        border-bottom: 1px solid rgba(124, 151, 178, 0.24);
+        background: #08111d;
+    }
+
+    .home-console-brand {
+        max-width: 150px;
+        color: #9fb0c4;
+        font-size: 6px;
+        opacity: 0.8;
+    }
+
+    .home-console-topline > .home-utility-bar[data-arcade-placement='console'] {
+        gap: 3px !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        clip-path: none;
+    }
+
+    .home-utility-bar #language-toggle-btn,
+    .home-utility-bar .membership-launcher {
+        min-height: 38px !important;
+        height: 38px !important;
+        padding-inline: 8px !important;
+        border: 1px solid #46566d !important;
+        background: #0d1725 !important;
+        font-size: 11px !important;
+    }
+
+    .home-utility-bar #language-toggle-btn {
+        min-width: 48px !important;
+    }
+
+    .home-utility-bar .membership-launcher {
+        width: 40px !important;
+        min-width: 40px !important;
+        max-width: 40px !important;
+        padding-inline: 0 !important;
+        overflow: hidden;
+    }
+
+    .home-console-screen {
+        justify-content: flex-start;
+        padding:
+            clamp(28px, 5vh, 44px)
+            max(14px, env(safe-area-inset-right))
+            8px
+            max(14px, env(safe-area-inset-left));
+        background:
+            radial-gradient(circle at 50% 8%, rgba(224, 248, 255, 0.18), transparent 28%),
+            linear-gradient(rgba(5, 13, 23, 0.08), rgba(5, 13, 23, 0.58)),
+            linear-gradient(180deg, #73b7d8 0%, #4e829f 42%, #183447 100%);
+    }
+
+    .home-console-screen::before {
+        height: 32%;
+        opacity: 0.48;
+    }
+
+    .home-console-kicker {
+        margin-bottom: 9px;
+        padding: 4px 6px 3px;
+        border-color: rgba(216, 226, 239, 0.45);
+        background: rgba(5, 14, 24, 0.54);
+        font-size: 6px;
+    }
+
+    #start-screen.arcade-home #game-title {
+        margin-bottom: 8px;
+        font-size: clamp(38px, 12vw, 48px);
+        line-height: 1.04;
+        text-shadow: 3px 3px 0 #163a55;
+    }
+
+    .home-console-screen > p,
+    #start-screen.arcade-home > .home-console-bezel p {
+        max-width: 320px;
+        font-size: 13px;
+        line-height: 1.18;
+    }
+
+    .home-primary-actions {
+        width: min(320px, calc(100vw - 20px));
+        margin-top: 16px;
+    }
+
+    .home-primary-actions #start-btn {
+        min-height: 52px;
+        padding: 9px 14px;
+        border-width: 2px;
+        box-shadow: 3px 3px 0 var(--pixel-shadow);
+        font-size: 18px;
+    }
+
+    .home-play-icon {
+        margin-right: 8px;
+    }
+
+    .local-records-summary {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: min(320px, calc(100vw - 20px));
+        min-height: 38px;
+        margin-top: 9px;
+        padding: 0;
+        overflow: hidden;
+        border-color: rgba(216, 226, 239, 0.24);
+        background: rgba(7, 18, 31, 0.72);
+        font-size: 10px;
+    }
+
+    .local-records-summary > span {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        justify-content: center;
+        padding: 7px 6px;
+        white-space: nowrap;
+    }
+
+    .local-records-summary > span + span {
+        border-left: 1px solid rgba(216, 226, 239, 0.16);
+    }
+
+    .home-mode-stack {
+        width: min(320px, calc(100vw - 20px));
+        gap: 6px;
+        margin-top: 7px;
+    }
+
+    .daily-mode-card {
+        grid-template-columns: minmax(0, 1fr) 106px;
+        min-height: 58px;
+        gap: 6px;
+        padding: 7px 8px;
+        border-color: rgba(201, 186, 255, 0.48);
+        background: rgba(10, 19, 31, 0.78);
+        box-shadow: 2px 2px 0 var(--pixel-shadow);
+    }
+
+    .daily-mode-copy {
+        gap: 3px;
+    }
+
+    .daily-mode-copy strong {
+        font-size: 7px;
+    }
+
+    .daily-mode-copy span {
+        display: none;
+    }
+
+    .daily-mode-card .daily-run-summary small {
+        font-size: 9px;
+    }
+
+    .daily-mode-card #daily-run-btn {
+        min-width: 106px;
+        min-height: 40px;
+        padding: 7px 8px;
+        box-shadow: 2px 2px 0 #31245d;
+        font-size: 11px;
+    }
+
+    .home-secondary-actions {
+        display: grid;
+        width: 100%;
+    }
+
+    .home-secondary-actions button,
+    #pwa-install-btn {
+        width: 100%;
+        min-height: 38px;
+        padding: 6px 9px;
+        box-shadow: none;
+        font-size: 11px;
+    }
+
+    #start-screen.arcade-home .start-data-ticker {
+        display: none;
+    }
+
+    .home-console-footer {
+        min-height: 28px;
+        padding:
+            4px
+            max(10px, env(safe-area-inset-right))
+            max(5px, env(safe-area-inset-bottom))
+            max(10px, env(safe-area-inset-left));
+        border-top: 1px solid rgba(124, 151, 178, 0.18);
+        background: #06101c;
+        font-size: 7px;
+    }
+
+    .home-console-legend {
+        opacity: 0.74;
+    }
+}
+
+@media (max-width: 390px) {
+    .home-console-brand {
+        max-width: 138px;
+    }
+
+    .home-utility-bar .membership-launcher {
+        width: 38px !important;
+        min-width: 38px !important;
+        max-width: 38px !important;
+    }
+}
