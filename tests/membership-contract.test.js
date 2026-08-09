@@ -5,6 +5,7 @@ const configSource = fs.readFileSync('membership-config.js', 'utf8');
 const indexSource = fs.readFileSync('index.html', 'utf8');
 const cloudSyncSource = fs.readFileSync('scripts/account-cloud-sync.js', 'utf8');
 const cardStoreSource = fs.readFileSync('scripts/indicator-card-store.js', 'utf8');
+const cardUiSource = fs.readFileSync('scripts/indicator-cards.js', 'utf8');
 const dailyRunSource = fs.readFileSync('daily-run.js', 'utf8');
 const pwaSource = fs.readFileSync('pwa.js', 'utf8');
 const serviceWorkerSource = fs.readFileSync('sw.js', 'utf8');
@@ -80,6 +81,19 @@ for (const retired of ['STARTER_COUNT', 'DAILY_DRAW_LIMIT', 'starterGranted', 'd
   assert.ok(!cardStoreSource.includes(retired), `Retired indicator card economy still exists: ${retired}`);
 }
 assert.ok(!cardStoreSource.includes('localStorage'), 'Indicator card entitlement must not use a browser-local membership fallback.');
+
+for (const contract of [
+  'inventory.isPro === true || inventory.isDailyTrial === true',
+  "text('DAILY TRIAL · 1 EACH', '每日挑战体验 · 各 1 张')",
+  'store.consume(type)',
+]) {
+  assert.ok(cardUiSource.includes(contract), `Indicator card UI is missing Pro/Daily Run access behavior: ${contract}`);
+}
+for (const retired of ['data-indicator-draw', 'drawCard', 'dailyDrawsRemaining', 'POWER-UP PACK', 'DAILY PACK EMPTY']) {
+  assert.ok(!cardUiSource.includes(retired), `Retired random-draw card UI still exists: ${retired}`);
+  assert.ok(!pwaSource.includes(retired), `PWA bootstrap still references retired card UI: ${retired}`);
+}
+
 for (const contract of [
   "new CustomEvent('flappyk:daily-run-started'",
   "new CustomEvent('flappyk:daily-run-ended'",
