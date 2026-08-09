@@ -1123,7 +1123,7 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
     }
 
     .home-primary-actions {
-        width: min(320px, 100%);
+        width: min(320px, calc(100vw - 20px));
         margin-top: 16px;
     }
 
@@ -1142,7 +1142,7 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
     .local-records-summary {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        width: min(320px, 100%);
+        width: min(320px, calc(100vw - 20px));
         min-height: 38px;
         margin-top: 9px;
         padding: 0;
@@ -1166,7 +1166,7 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
     }
 
     .home-mode-stack {
-        width: min(320px, 100%);
+        width: min(320px, calc(100vw - 20px));
         gap: 6px;
         margin-top: 7px;
     }
