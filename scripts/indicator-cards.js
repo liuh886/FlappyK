@@ -20,19 +20,19 @@
     const deck = document.createElement('aside');
     deck.id = 'indicator-card-deck';
     deck.className = 'indicator-card-deck';
-    deck.setAttribute('aria-label', 'Tactical indicator cards');
+    deck.setAttribute('aria-label', 'Power-up indicator cards');
     deck.hidden = true;
     deck.innerHTML = `
-        <div class="indicator-hand-label" data-hand-label>TACTICAL HAND</div>
+        <div class="indicator-hand-label" data-hand-label>POWER-UP HAND</div>
         <div class="indicator-card-row">
             <button class="indicator-card indicator-card--boll" type="button" data-indicator-card="boll" aria-keyshortcuts="1">
                 <span class="indicator-card-key">1</span>
-                <span class="indicator-card-copy"><strong>BOLL</strong><small data-card-subtitle="boll">K-LINE SCAN</small></span>
+                <span class="indicator-card-copy"><strong>BOLL</strong><small data-card-subtitle="boll">VOLATILITY SCAN</small></span>
                 <span class="indicator-card-count" data-card-count="boll">×0</span>
             </button>
             <button class="indicator-card indicator-card--macd" type="button" data-indicator-card="macd" aria-keyshortcuts="2">
                 <span class="indicator-card-key">2</span>
-                <span class="indicator-card-copy"><strong>MACD</strong><small data-card-subtitle="macd">MOMENTUM</small></span>
+                <span class="indicator-card-copy"><strong>MACD</strong><small data-card-subtitle="macd">MOMENTUM SCAN</small></span>
                 <span class="indicator-card-count" data-card-count="macd">×0</span>
             </button>
         </div>
@@ -423,11 +423,11 @@
         const inventory = store.getSnapshot();
         if (!inventory.signedIn) return;
         if (active[type]) {
-            showFeedback(text(`${type.toUpperCase()} already revealed`, `${type.toUpperCase()} 已显示`));
+            showFeedback(text(`${type.toUpperCase()} already deployed`, `${type.toUpperCase()} 已部署`));
             return;
         }
         if (!store.consume(type)) {
-            showFeedback(text(`No ${type.toUpperCase()} cards left`, `${type.toUpperCase()} 卡牌已用完`), 'empty');
+            showFeedback(text(`No ${type.toUpperCase()} power-ups left`, `${type.toUpperCase()} 道具已用完`), 'empty');
             return;
         }
 
@@ -437,8 +437,8 @@
         navigator.vibrate?.([16, 20, 16]);
         showFeedback(
             type === 'boll'
-                ? text('BOLL scan decoded', 'BOLL 扫描已解码')
-                : text('MACD scan decoded', 'MACD 扫描已解码'),
+                ? text('BOLL power-up deployed', 'BOLL 道具已部署')
+                : text('MACD power-up deployed', 'MACD 道具已部署'),
             'success'
         );
         renderDeck();
@@ -459,7 +459,7 @@
         if (!type) return;
         navigator.vibrate?.(24);
         showFeedback(
-            text(`Drew 1 ${type.toUpperCase()} card`, `抽到 1 张 ${type.toUpperCase()} 卡`),
+            text(`Drew 1 ${type.toUpperCase()} power-up`, `抽到 1 个 ${type.toUpperCase()} 道具`),
             'success'
         );
         renderDeck();
@@ -467,9 +467,9 @@
 
     function renderDeck() {
         const inventory = store.getSnapshot();
-        if (handLabel) handLabel.textContent = text('TACTICAL HAND', '战术手牌');
-        if (subtitles.boll) subtitles.boll.textContent = text('K-LINE SCAN', 'K线扫描');
-        if (subtitles.macd) subtitles.macd.textContent = text('MOMENTUM', '动量扫描');
+        if (handLabel) handLabel.textContent = text('POWER-UP HAND', '战术道具');
+        if (subtitles.boll) subtitles.boll.textContent = text('VOLATILITY SCAN', '波动扫描');
+        if (subtitles.macd) subtitles.macd.textContent = text('MOMENTUM SCAN', '动量扫描');
 
         TYPES.forEach((type) => {
             const button = buttons[type];
@@ -480,8 +480,8 @@
             button.classList.toggle('is-empty', inventory.signedIn && inventory[type] < 1 && !active[type]);
             button.setAttribute('aria-pressed', String(inventory.signedIn && active[type]));
             button.setAttribute('aria-label', text(
-                `Use ${type.toUpperCase()} card. ${inventory[type]} remaining.`,
-                `使用 ${type.toUpperCase()} 卡牌，剩余 ${inventory[type]} 张。`
+                `Deploy ${type.toUpperCase()} power-up. ${inventory[type]} remaining.`,
+                `部署 ${type.toUpperCase()} 道具，剩余 ${inventory[type]} 个。`
             ));
         });
 
@@ -496,8 +496,8 @@
             drawButton.disabled = remaining < 1;
             drawButton.dataset.mode = remaining ? 'draw' : 'complete';
             drawButton.textContent = remaining
-                ? text(`DRAW PACK · ${remaining} LEFT`, `抽卡包 · 剩余 ${remaining} 次`)
-                : text('DAILY PACK EMPTY', '今日卡包已抽完');
+                ? text(`POWER-UP PACK · ${remaining} LEFT`, `道具包 · 剩余 ${remaining} 次`)
+                : text('DAILY PACK EMPTY', '今日道具包已抽完');
         }
     }
 
