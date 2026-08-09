@@ -155,7 +155,6 @@
         .then(() => loadScript('flappyk-indicator-history', './scripts/indicator-history.js'))
         .then(() => loadScript('flappyk-indicator-card-store', './scripts/indicator-card-store.js'))
         .then(() => loadScript('flappyk-indicator-cards', './scripts/indicator-cards.js'))
-        .then(() => document.querySelector('[data-indicator-draw]')?.remove())
         .catch((error) => {
             console.warn('FlappyK indicator cards could not be loaded. Gameplay is unaffected.', error);
         });
