@@ -75,6 +75,26 @@
     white-space: nowrap;
 }
 
+.home-account-slot .hao-account-trigger.is-pro {
+    gap: 7px;
+    border-color: var(--pixel-yellow, #f1c40f);
+}
+
+.home-account-slot .hao-account-trigger.is-pro::after {
+    content: 'PRO';
+    display: inline-flex;
+    align-items: center;
+    min-height: 17px;
+    padding: 1px 5px 0;
+    border: 1px solid var(--pixel-yellow, #f1c40f);
+    background: rgba(241, 196, 15, 0.1);
+    color: var(--pixel-yellow, #f1c40f);
+    font-size: 8px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0.08em;
+}
+
 html:not([data-ui-state='home']) .home-utility-bar {
     display: none !important;
 }
@@ -128,6 +148,10 @@ html:not([data-ui-state='home']) .home-utility-bar {
 
     .home-account-slot .hao-account-trigger {
         padding: 5px;
+    }
+
+    .home-account-slot .hao-account-trigger.is-pro {
+        padding-inline: 6px;
     }
 
     .home-account-slot .hao-account-trigger-label {
