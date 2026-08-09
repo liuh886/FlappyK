@@ -46,7 +46,7 @@
         if (!document.getElementById('hao-account-upgrade-script')) {
             const script = document.createElement('script');
             script.id = 'hao-account-upgrade-script';
-            script.src = 'https://liuh886.github.io/admin/shared/account-upgrade.js?v=1';
+            script.src = 'https://liuh886.github.io/admin/shared/account-upgrade.js?v=2';
             script.defer = true;
             document.head.appendChild(script);
         }
