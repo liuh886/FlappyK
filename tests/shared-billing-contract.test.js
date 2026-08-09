@@ -54,7 +54,7 @@ assert.ok(functionConfig.includes('[functions.create-portal-session]'));
 assert.ok(functionConfig.includes('[functions.stripe-webhook]'));
 assert.ok(functionConfig.includes('verify_jwt = false'));
 
-assert.ok(browserConfig.includes('billingEnabled: false'));
+assert.ok(browserConfig.includes('billingEnabled: true'));
 assert.ok(browserConfig.includes("productCode: 'flappyk'"));
 assert.ok(!/sk_(live|test)_/.test(browserConfig));
 assert.ok(!/whsec_/.test(browserConfig));

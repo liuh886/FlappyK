@@ -4,21 +4,21 @@
     --pixel-grid: 4px;
     --pixel-font-display: 'Press Start 2P', monospace;
     --pixel-font-ui: 'Pixelify Sans', 'Press Start 2P', monospace;
-    --pixel-bg: #070a0f;
-    --pixel-panel: #101722;
-    --pixel-panel-raised: #162132;
-    --pixel-line: #344056;
-    --pixel-line-soft: rgba(216, 226, 239, 0.22);
-    --pixel-line-strong: #d8e2ef;
-    --pixel-text: #f7fbff;
-    --pixel-muted: #a9b5c7;
-    --pixel-dim: #718096;
-    --pixel-yellow: #ffd84a;
-    --pixel-cyan: #5ce7f2;
-    --pixel-green: #46e08a;
-    --pixel-red: #ff6b6b;
-    --pixel-purple: #ad91ff;
-    --pixel-shadow: #020408;
+    --pixel-bg: #050912;
+    --pixel-panel: #0a1320;
+    --pixel-panel-raised: #0f1d2d;
+    --pixel-line: #30445a;
+    --pixel-line-soft: rgba(202, 221, 239, 0.18);
+    --pixel-line-strong: #d8e7f4;
+    --pixel-text: #f5fbff;
+    --pixel-muted: #9db0c2;
+    --pixel-dim: #667b90;
+    --pixel-yellow: #f6c84a;
+    --pixel-cyan: #55e6ff;
+    --pixel-green: #4de39a;
+    --pixel-red: #ff6d77;
+    --pixel-purple: #a98bff;
+    --pixel-shadow: #01040a;
     --pixel-shadow-step: 4px 4px 0 var(--pixel-shadow);
     --pixel-shadow-small: 2px 2px 0 var(--pixel-shadow);
     --pixel-cut: polygon(
@@ -41,6 +41,9 @@
     --space-4: 16px;
     --space-5: 20px;
     --space-6: 24px;
+    --arcade-sky: #0b3553;
+    --arcade-horizon: #071927;
+    --arcade-deep: #040912;
 }
 
 #ui-layer[hidden] {
@@ -70,10 +73,11 @@ html[data-ui-state='paused'] #btn-sell {
 
 body {
     background:
+        radial-gradient(circle at 50% 20%, rgba(85, 230, 255, 0.08), transparent 34%),
         linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px),
-        #090d14;
-    background-size: 16px 16px;
+        #050912;
+    background-size: auto, 16px 16px, 16px 16px, auto;
     font-family: var(--pixel-font-ui);
     text-rendering: geometricPrecision;
 }
@@ -84,13 +88,13 @@ body::before {
     z-index: 9999;
     background: repeating-linear-gradient(
         180deg,
-        rgba(255, 255, 255, 0.01) 0,
-        rgba(255, 255, 255, 0.01) 1px,
+        rgba(255, 255, 255, 0.012) 0,
+        rgba(255, 255, 255, 0.012) 1px,
         transparent 1px,
         transparent 4px
     );
     content: '';
-    opacity: 0.18;
+    opacity: 0.14;
     pointer-events: none;
 }
 
@@ -147,7 +151,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     height: 100dvh;
     min-height: 100vh;
     border: 0;
-    background: #07111e;
+    background: var(--arcade-deep);
     box-shadow: none;
 }
 
@@ -171,7 +175,7 @@ html[data-ui-state='home'] #game-container::after {
     height: 100%;
     min-height: 0;
     overflow: hidden;
-    background: transparent;
+    background: var(--arcade-deep);
 }
 
 .home-console-topline {
@@ -181,23 +185,35 @@ html[data-ui-state='home'] #game-container::after {
     min-height: 58px;
     min-width: 0;
     align-items: center;
-    gap: var(--space-3);
+    gap: 10px;
     padding:
-        max(14px, env(safe-area-inset-top))
+        max(13px, env(safe-area-inset-top))
         clamp(18px, 3.5vw, 44px)
-        var(--space-2);
-    background: linear-gradient(180deg, rgba(5, 12, 21, 0.9), rgba(5, 12, 21, 0));
+        9px;
+    border-bottom: 1px solid rgba(124, 164, 196, 0.22);
+    background: rgba(4, 10, 18, 0.96);
     color: var(--pixel-muted);
 }
 
 .home-console-brand {
+    flex: 0 0 auto;
+    color: var(--pixel-yellow);
+    font-family: var(--pixel-font-display);
+    font-size: 9px;
+    line-height: 1;
+    letter-spacing: 0.05em;
+    text-shadow: 2px 2px 0 var(--pixel-shadow);
+    white-space: nowrap;
+}
+
+.home-console-series {
     min-width: 0;
     overflow: hidden;
-    color: #c4d2df;
-    font-family: var(--pixel-font-display);
-    font-size: 8px;
-    line-height: 1;
-    letter-spacing: 0.06em;
+    color: #7f98ad;
+    font-family: var(--pixel-font-ui);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.11em;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -205,19 +221,20 @@ html[data-ui-state='home'] #game-container::after {
 .home-console-lamps {
     display: flex;
     flex: 0 0 auto;
-    gap: 6px;
+    gap: 5px;
+    margin-left: 3px;
 }
 
 .home-console-lamps span {
     width: 6px;
     height: 6px;
-    border: 1px solid #07101b;
-    background: #64758a;
+    border: 1px solid #02070d;
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.58);
 }
 
-.home-console-lamps span:first-child { background: var(--pixel-green); }
+.home-console-lamps span:first-child { background: var(--pixel-cyan); }
 .home-console-lamps span:nth-child(2) { background: var(--pixel-yellow); }
-.home-console-lamps span:last-child { background: var(--pixel-cyan); }
+.home-console-lamps span:last-child { background: var(--pixel-green); }
 
 .home-console-topline > .home-utility-bar[data-arcade-placement='console'] {
     position: static !important;
@@ -228,11 +245,11 @@ html[data-ui-state='home'] #game-container::after {
     gap: var(--space-1) !important;
     max-width: none !important;
     margin-left: auto;
-    padding: 4px !important;
+    padding: 3px !important;
     overflow: visible !important;
-    border: 2px solid #4c5b70 !important;
+    border: 1px solid #31475d !important;
     border-radius: 0 !important;
-    background: #0b111c !important;
+    background: #08111d !important;
     box-shadow: var(--pixel-shadow-small) !important;
     clip-path: var(--pixel-cut);
     backdrop-filter: none !important;
@@ -244,17 +261,17 @@ html[data-ui-state='home'] #game-container::after {
     height: 34px !important;
     margin: 0 !important;
     padding-inline: 10px !important;
-    border: 1px solid #526078 !important;
+    border: 1px solid #40576d !important;
     border-radius: 0 !important;
-    background: #121b2a !important;
+    background: #0d1926 !important;
     box-shadow: none !important;
-    color: #dbe5ef !important;
+    color: #d9e7f1 !important;
 }
 
 .home-utility-bar #language-toggle-btn:hover,
 .home-utility-bar .membership-launcher:hover {
-    border-color: #8292a8 !important;
-    background: #1a2739 !important;
+    border-color: #6a8ca8 !important;
+    background: #122337 !important;
 }
 
 .membership-launcher-tier {
@@ -268,12 +285,11 @@ html[data-ui-state='home'] #game-container::after {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: clamp(20px, 4vh, 44px) clamp(18px, 5.5vw, 74px) clamp(18px, 3vh, 34px);
+    padding: clamp(18px, 3.2vh, 36px) clamp(18px, 5vw, 70px) clamp(16px, 2.8vh, 30px);
     overflow: hidden;
     background:
-        radial-gradient(circle at 50% 14%, rgba(222, 246, 255, 0.2), transparent 34%),
-        linear-gradient(rgba(5, 13, 23, 0.1), rgba(5, 13, 23, 0.55)),
-        linear-gradient(180deg, #7fc6e8 0%, #5b93b1 44%, #234259 100%);
+        radial-gradient(circle at 50% 20%, rgba(85, 230, 255, 0.16), transparent 28%),
+        linear-gradient(180deg, rgba(11, 53, 83, 0.78) 0%, rgba(7, 25, 39, 0.94) 58%, #050b13 100%);
 }
 
 .home-console-screen::before,
@@ -284,18 +300,22 @@ html[data-ui-state='home'] #game-container::after {
 }
 
 .home-console-screen::before {
-    inset: auto 0 0;
-    height: 39%;
+    inset: auto -8% -12%;
+    height: 53%;
     background:
-        linear-gradient(135deg, transparent 27%, rgba(26, 65, 81, 0.7) 27% 49%, transparent 49%) 0 0 / 260px 100%,
-        linear-gradient(45deg, transparent 31%, rgba(14, 39, 55, 0.86) 31% 59%, transparent 59%) 96px 0 / 330px 100%;
-    opacity: 0.68;
+        linear-gradient(90deg, transparent 49.5%, rgba(85, 230, 255, 0.14) 50%, transparent 50.5%) 0 0 / 74px 100%,
+        linear-gradient(180deg, rgba(85, 230, 255, 0.14) 1px, transparent 1px) 0 0 / 100% 34px;
+    opacity: 0.55;
+    transform: perspective(420px) rotateX(63deg) scale(1.18);
+    transform-origin: 50% 100%;
 }
 
 .home-console-screen::after {
     inset: 0;
-    background: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px) 0 0 / 4px 4px;
-    opacity: 0.28;
+    background:
+        linear-gradient(90deg, rgba(4, 14, 24, 0.94), transparent 9%, transparent 91%, rgba(4, 14, 24, 0.94)),
+        repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.014) 0 1px, transparent 1px 4px);
+    opacity: 0.72;
 }
 
 .home-console-screen > * {
@@ -304,42 +324,87 @@ html[data-ui-state='home'] #game-container::after {
 }
 
 .home-console-kicker {
-    margin-bottom: var(--space-3);
-    padding: 5px 8px 4px;
-    border: 1px solid rgba(226, 239, 247, 0.58);
-    background: rgba(6, 16, 28, 0.6);
-    color: #d8e6f0;
+    margin-bottom: 10px;
+    color: #b9d3e5;
     font-family: var(--pixel-font-display);
-    font-size: 8px;
-    line-height: 1.2;
-    letter-spacing: 0.07em;
+    font-size: 7px;
+    line-height: 1.3;
+    letter-spacing: 0.08em;
+    text-align: center;
+    text-shadow: 2px 2px 0 var(--pixel-shadow);
 }
 
 #start-screen.arcade-home #game-title {
-    margin: 0 0 var(--space-4);
-    color: #fff1a8;
-    font-size: clamp(46px, 6vw, 72px);
-    line-height: 1.14;
-    letter-spacing: 0.025em;
-    text-shadow: 4px 4px 0 #163a55;
+    margin: 0 0 10px;
+    color: var(--pixel-yellow);
+    font-size: clamp(54px, 7vw, 84px);
+    line-height: 1.08;
+    letter-spacing: 0.02em;
+    text-shadow:
+        0 4px 0 #9a6713,
+        4px 8px 0 rgba(1, 4, 10, 0.82);
 }
 
 .home-console-screen > p,
 #start-screen.arcade-home > .home-console-bezel p {
-    max-width: 650px;
-    margin: 0 0 3px;
-    color: #eef6fb;
+    max-width: 620px;
+    margin: 0 0 2px;
+    color: #dcebf5;
     font-family: var(--pixel-font-ui);
-    font-size: clamp(15px, 1.45vw, 18px);
+    font-size: clamp(14px, 1.35vw, 17px);
     font-weight: 500;
-    line-height: 1.32;
+    line-height: 1.26;
     text-align: center;
-    text-shadow: 1px 1px 0 rgba(5, 12, 21, 0.65);
+    text-shadow: 1px 1px 0 rgba(2, 7, 13, 0.72);
 }
 
+.home-world-strip {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: min(620px, 94%);
+    margin-top: 14px;
+    border-block: 1px solid rgba(174, 206, 229, 0.28);
+    background: rgba(3, 10, 18, 0.36);
+}
+
+.home-world {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    min-width: 0;
+    min-height: 42px;
+    padding: 8px 12px;
+    align-items: center;
+    gap: 9px;
+    color: var(--pixel-muted);
+}
+
+.home-world + .home-world {
+    border-left: 1px solid rgba(174, 206, 229, 0.18);
+}
+
+.home-world-index {
+    color: var(--pixel-cyan);
+    font-family: var(--pixel-font-display);
+    font-size: 7px;
+    font-weight: 400;
+}
+
+.home-world-name {
+    overflow: hidden;
+    font-family: var(--pixel-font-ui);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.home-world--ashare .home-world-index { color: var(--pixel-yellow); }
+.home-world--us .home-world-index { color: var(--pixel-green); }
+
 .home-primary-actions {
-    width: min(340px, 92%);
-    margin-top: clamp(18px, 2.8vh, 26px);
+    width: min(360px, 92%);
+    margin-top: clamp(16px, 2.2vh, 22px);
 }
 
 .home-primary-actions #start-btn,
@@ -356,68 +421,93 @@ html[data-ui-state='home'] #game-container::after {
     min-height: 64px;
     margin: 0;
     padding: 12px 18px;
-    border: 2px solid #e8fff0;
-    background: var(--pixel-green);
-    box-shadow: var(--pixel-shadow-step);
-    color: #062313;
+    border: 2px solid #fff0ac;
+    background: var(--pixel-yellow);
+    box-shadow: 5px 5px 0 #6e4b0c;
+    color: #171006;
     font-size: 22px;
     font-weight: 700;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.065em;
 }
 
 .home-primary-actions #start-btn:hover {
-    background: #66eca0;
+    background: #ffdc63;
     transform: translate(-1px, -1px);
-    box-shadow: 5px 5px 0 var(--pixel-shadow);
+    box-shadow: 6px 6px 0 #6e4b0c;
 }
 
 .home-primary-actions #start-btn:active {
-    transform: translate(4px, 4px);
+    transform: translate(5px, 5px);
     box-shadow: none;
 }
 
 .home-play-icon {
     margin-right: 10px;
-    color: #d8ff9f;
-    font-size: 0.7em;
+    color: #1b1608;
+    font-size: 0.68em;
 }
 
 .local-records-summary {
-    width: min(560px, 92%);
-    margin: 12px 0 0;
-    padding: 8px 12px;
-    border: 1px solid rgba(226, 239, 247, 0.28);
-    background: rgba(7, 18, 31, 0.58);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: min(540px, 92%);
+    min-height: 36px;
+    margin: 10px 0 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid rgba(174, 206, 229, 0.2);
+    background: rgba(4, 12, 20, 0.68);
     box-shadow: none;
-    color: #c5d3df;
-    font-size: 13px;
+    color: #b9cadd;
+    font-size: 12px;
+}
+
+.local-records-summary > span {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 10px;
+    white-space: nowrap;
+}
+
+.local-records-summary > span + span {
+    border-left: 1px solid rgba(174, 206, 229, 0.16);
+}
+
+.local-records-summary strong {
+    color: var(--pixel-green);
 }
 
 .home-mode-stack {
-    width: min(560px, 92%);
+    width: min(540px, 92%);
     gap: var(--space-2);
     margin-top: var(--space-2);
 }
 
 .daily-mode-card {
     gap: var(--space-3) var(--space-4);
-    padding: 13px 14px;
-    border: 1px solid rgba(216, 207, 255, 0.55);
-    background: rgba(11, 21, 34, 0.76);
+    padding: 11px 12px;
+    border: 1px solid rgba(85, 230, 255, 0.48);
+    background: rgba(5, 20, 31, 0.8);
     box-shadow: var(--pixel-shadow-small);
 }
 
 .daily-mode-copy strong {
-    color: #c8baff;
+    color: var(--pixel-cyan);
     font-family: var(--pixel-font-display);
-    font-size: 8px;
+    font-size: 7px;
     line-height: 1.4;
 }
 
 .daily-mode-copy span {
     color: var(--pixel-text);
     font-size: 16px;
-    line-height: 1.22;
+    line-height: 1.18;
+}
+
+.daily-mode-card .daily-run-summary {
+    color: #a8bed0;
 }
 
 .daily-mode-card #daily-run-btn {
@@ -425,11 +515,15 @@ html[data-ui-state='home'] #game-container::after {
     min-height: 44px;
     margin: 0;
     padding: 9px 12px;
-    border: 1px solid #dcd4ff;
-    background: #6d57bf;
-    box-shadow: 2px 2px 0 #31245d;
-    color: #fff;
+    border: 1px solid #b7eff8;
+    background: #11677a;
+    box-shadow: 2px 2px 0 #052f39;
+    color: #effcff;
     font-size: 13px;
+}
+
+.daily-mode-card #daily-run-btn:hover {
+    background: #158096;
 }
 
 .home-secondary-actions {
@@ -441,24 +535,24 @@ html[data-ui-state='home'] #game-container::after {
     min-height: 38px;
     margin-top: 0;
     padding: 7px 11px;
-    border: 1px solid #526078;
-    background: rgba(11, 19, 31, 0.82);
+    border: 1px solid #40566d;
+    background: rgba(7, 15, 25, 0.84);
     box-shadow: var(--pixel-shadow-small);
-    color: #c3d0dc;
+    color: #aebdca;
     font-size: 12px;
 }
 
 .home-secondary-actions button:hover,
 #pwa-install-btn:hover {
-    border-color: #7c8da5;
-    background: #172235;
+    border-color: #6f8ba4;
+    background: #102033;
     color: var(--pixel-text);
 }
 
 #start-screen.arcade-home .start-data-ticker {
-    max-width: min(560px, 92%);
+    max-width: min(540px, 92%);
     margin-top: var(--space-3);
-    opacity: 0.64;
+    opacity: 0.48;
 }
 
 .home-console-footer {
@@ -473,23 +567,29 @@ html[data-ui-state='home'] #game-container::after {
         8px
         clamp(18px, 3.5vw, 44px)
         max(10px, env(safe-area-inset-bottom));
-    background: linear-gradient(0deg, rgba(5, 12, 21, 0.92), rgba(5, 12, 21, 0));
-    color: #8294a7;
+    border-top: 1px solid rgba(124, 164, 196, 0.18);
+    background: #040a12;
+    color: #70879a;
     font-size: 9px;
-    letter-spacing: 0.045em;
+    letter-spacing: 0.055em;
 }
 
 .home-console-speaker {
     display: grid;
-    grid-template-columns: repeat(6, 4px);
-    gap: 4px;
+    grid-template-columns: repeat(7, 4px);
+    gap: 3px;
 }
 
 .home-console-speaker span {
     width: 4px;
     height: 4px;
-    background: #050a11;
-    box-shadow: inset 1px 1px 0 #33445b;
+    background: #01050a;
+    box-shadow: inset 1px 1px 0 #294158;
+}
+
+.home-console-legend {
+    color: #7993a9;
+    font-weight: 700;
 }
 
 /* Structural rules previously injected from JavaScript. Visual HUD language stays in style.css. */
@@ -577,7 +677,6 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
     display: none !important;
 }
 
-/* Secondary screens reuse the same restrained pixel grammar. */
 .game-coachmark {
     right: 16px;
     bottom: 16px;
@@ -586,7 +685,7 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
     padding: 12px 14px;
     border: 2px solid var(--pixel-cyan);
     border-radius: 0;
-    background: #0c1420;
+    background: #08131f;
     box-shadow: var(--pixel-shadow-step);
     clip-path: var(--pixel-cut);
     backdrop-filter: none;
@@ -614,7 +713,7 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
     padding: 7px 10px;
     border: 2px solid var(--pixel-line);
     border-radius: 0;
-    background: #111b2a;
+    background: #0e1d2b;
     box-shadow: var(--pixel-shadow-small);
     color: var(--pixel-muted);
     font-size: 12px;
@@ -766,7 +865,7 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
 
 @media (max-width: 720px), (pointer: coarse) {
     body::before {
-        opacity: 0.12;
+        opacity: 0.1;
     }
 
     #game-hud-rail {
@@ -801,122 +900,6 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
         min-height: 0;
     }
 
-    .home-console-topline {
-        min-height: 50px;
-        gap: 6px;
-        padding:
-            max(8px, env(safe-area-inset-top))
-            max(9px, env(safe-area-inset-right))
-            5px
-            max(9px, env(safe-area-inset-left));
-    }
-
-    .home-console-brand {
-        max-width: 132px;
-        font-size: 7px;
-    }
-
-    .home-console-lamps {
-        display: none;
-    }
-
-    .home-console-topline > .home-utility-bar[data-arcade-placement='console'] {
-        padding: 3px !important;
-    }
-
-    .home-utility-bar #language-toggle-btn,
-    .home-utility-bar .membership-launcher {
-        min-height: 40px !important;
-        height: 40px !important;
-        padding-inline: 8px !important;
-    }
-
-    .home-console-screen {
-        padding: 12px 12px 10px;
-    }
-
-    .home-console-kicker {
-        margin-bottom: 8px;
-        padding: 4px 6px 3px;
-        font-size: 7px;
-    }
-
-    #start-screen.arcade-home #game-title {
-        margin-bottom: 10px;
-        font-size: clamp(31px, 10.8vw, 43px);
-    }
-
-    .home-console-screen > p,
-    #start-screen.arcade-home > .home-console-bezel p {
-        font-size: 12px;
-        line-height: 1.24;
-    }
-
-    .home-primary-actions {
-        width: min(292px, 94%);
-        margin-top: 14px;
-    }
-
-    .home-primary-actions #start-btn {
-        min-height: 50px;
-        font-size: 17px;
-    }
-
-    .local-records-summary,
-    .home-mode-stack {
-        width: min(420px, 94%);
-    }
-
-    .local-records-summary {
-        margin-top: 8px;
-        padding: 6px 9px;
-        font-size: 12px;
-    }
-
-    .home-mode-stack {
-        gap: 6px;
-        margin-top: 6px;
-    }
-
-    .daily-mode-card {
-        gap: 7px 10px;
-        padding: 9px 10px;
-    }
-
-    .daily-mode-copy strong { font-size: 7px; }
-    .daily-mode-copy span { font-size: 12px; }
-
-    .daily-mode-card #daily-run-btn {
-        min-width: 118px;
-        min-height: 44px;
-        padding-inline: 9px;
-        font-size: 12px;
-    }
-
-    .home-secondary-actions button,
-    #pwa-install-btn {
-        min-height: 40px;
-        font-size: 12px;
-    }
-
-    #start-screen.arcade-home .start-data-ticker {
-        margin-top: 8px;
-    }
-
-    .home-console-footer {
-        min-height: 34px;
-        padding:
-            5px
-            max(10px, env(safe-area-inset-right))
-            max(7px, env(safe-area-inset-bottom))
-            max(10px, env(safe-area-inset-left));
-        font-size: 8px;
-    }
-
-    .home-console-speaker {
-        display: none;
-    }
-
     #mobile-controls .mobile-trade-primary {
         font-size: 14px;
     }
@@ -947,87 +930,7 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
     }
 }
 
-@media (max-width: 390px) {
-    .home-console-brand {
-        max-width: 104px;
-    }
-
-    .home-utility-bar #language-toggle-btn {
-        min-width: 42px !important;
-        padding-inline: 6px !important;
-    }
-
-    .home-utility-bar .membership-launcher {
-        max-width: 92px;
-        padding-inline: 7px !important;
-    }
-}
-
-@media (max-width: 430px) and (max-height: 700px),
-       (orientation: landscape) and (max-height: 500px) {
-    .home-console-topline {
-        min-height: 44px;
-        padding-top: max(5px, env(safe-area-inset-top));
-    }
-
-    .home-console-screen {
-        padding: 7px 10px;
-    }
-
-    .home-console-kicker,
-    .home-console-footer,
-    #start-screen.arcade-home .start-data-ticker {
-        display: none;
-    }
-
-    #start-screen.arcade-home #game-title {
-        margin-bottom: 5px;
-        font-size: clamp(25px, 8.5vw, 32px);
-    }
-
-    .home-console-screen > p,
-    #start-screen.arcade-home > .home-console-bezel p {
-        font-size: 10px;
-        line-height: 1.18;
-    }
-
-    .home-primary-actions {
-        margin-top: 8px;
-    }
-
-    .home-primary-actions #start-btn {
-        min-height: 48px;
-        font-size: 15px;
-    }
-
-    .local-records-summary {
-        margin-top: 4px;
-        padding-block: 5px;
-    }
-
-    .home-mode-stack {
-        margin-top: 4px;
-    }
-
-    .daily-mode-card {
-        padding: 7px 8px;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .guide-target {
-        animation: none;
-    }
-
-    .day-progress-fill,
-    .excess-meter-indicator,
-    .settlement-comparison-track i,
-    .game-feedback-toast {
-        transition: none;
-    }
-}
-
-/* Mobile home quality pass: treat the start screen as a compact arcade cartridge, not a stack of web cards. */
+/* Mobile home quality pass: compact market cartridge, not a stack of website cards. */
 @media (max-width: 720px), (pointer: coarse) {
     .home-console-bezel {
         grid-template-rows: 48px minmax(0, 1fr) 28px;
@@ -1041,14 +944,25 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
             5px
             max(10px, env(safe-area-inset-left));
         border-bottom: 1px solid rgba(124, 151, 178, 0.24);
-        background: #08111d;
+        background: #040a12;
     }
 
     .home-console-brand {
-        max-width: 150px;
-        color: #9fb0c4;
+        flex: 0 0 auto;
+        max-width: 78px;
+        overflow: hidden;
         font-size: 6px;
-        opacity: 0.8;
+        text-overflow: ellipsis;
+    }
+
+    .home-console-series {
+        max-width: 118px;
+        font-size: 8px;
+        letter-spacing: 0.07em;
+    }
+
+    .home-console-lamps {
+        display: none;
     }
 
     .home-console-topline > .home-utility-bar[data-arcade-placement='console'] {
@@ -1062,11 +976,11 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
 
     .home-utility-bar #language-toggle-btn,
     .home-utility-bar .membership-launcher {
-        min-height: 38px !important;
-        height: 38px !important;
+        min-height: 40px !important;
+        height: 40px !important;
         padding-inline: 8px !important;
-        border: 1px solid #46566d !important;
-        background: #0d1725 !important;
+        border: 1px solid #40556a !important;
+        background: #0a1522 !important;
         font-size: 11px !important;
     }
 
@@ -1085,53 +999,73 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
     .home-console-screen {
         justify-content: flex-start;
         padding:
-            clamp(28px, 5vh, 44px)
+            clamp(22px, 4vh, 34px)
             max(14px, env(safe-area-inset-right))
             8px
             max(14px, env(safe-area-inset-left));
         background:
-            radial-gradient(circle at 50% 8%, rgba(224, 248, 255, 0.18), transparent 28%),
-            linear-gradient(rgba(5, 13, 23, 0.08), rgba(5, 13, 23, 0.58)),
-            linear-gradient(180deg, #73b7d8 0%, #4e829f 42%, #183447 100%);
+            radial-gradient(circle at 50% 7%, rgba(85, 230, 255, 0.14), transparent 28%),
+            linear-gradient(180deg, #0a304b 0%, #071927 50%, #040a12 100%);
     }
 
     .home-console-screen::before {
-        height: 32%;
-        opacity: 0.48;
+        height: 38%;
+        opacity: 0.44;
     }
 
     .home-console-kicker {
-        margin-bottom: 9px;
-        padding: 4px 6px 3px;
-        border-color: rgba(216, 226, 239, 0.45);
-        background: rgba(5, 14, 24, 0.54);
+        margin-bottom: 7px;
         font-size: 6px;
     }
 
     #start-screen.arcade-home #game-title {
-        margin-bottom: 8px;
+        margin-bottom: 7px;
         font-size: clamp(38px, 12vw, 48px);
         line-height: 1.04;
-        text-shadow: 3px 3px 0 #163a55;
+        text-shadow:
+            0 3px 0 #8b5f12,
+            3px 6px 0 rgba(1, 4, 10, 0.78);
     }
 
     .home-console-screen > p,
     #start-screen.arcade-home > .home-console-bezel p {
         max-width: 320px;
-        font-size: 13px;
+        font-size: 12px;
         line-height: 1.18;
+    }
+
+    .home-world-strip {
+        width: min(320px, calc(100vw - 20px));
+        margin-top: 10px;
+    }
+
+    .home-world {
+        grid-template-columns: 1fr;
+        min-height: 38px;
+        padding: 6px 4px;
+        gap: 2px;
+        text-align: center;
+    }
+
+    .home-world-index {
+        font-size: 6px;
+    }
+
+    .home-world-name {
+        font-size: 9px;
+        letter-spacing: 0.01em;
     }
 
     .home-primary-actions {
         width: min(320px, calc(100vw - 20px));
-        margin-top: 16px;
+        margin-top: 12px;
     }
 
     .home-primary-actions #start-btn {
         min-height: 52px;
         padding: 9px 14px;
         border-width: 2px;
-        box-shadow: 3px 3px 0 var(--pixel-shadow);
+        box-shadow: 3px 3px 0 #6e4b0c;
         font-size: 18px;
     }
 
@@ -1139,45 +1073,34 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
         margin-right: 8px;
     }
 
-    .local-records-summary {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    .local-records-summary,
+    .home-mode-stack {
         width: min(320px, calc(100vw - 20px));
-        min-height: 38px;
-        margin-top: 9px;
-        padding: 0;
-        overflow: hidden;
-        border-color: rgba(216, 226, 239, 0.24);
-        background: rgba(7, 18, 31, 0.72);
+    }
+
+    .local-records-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        min-height: 36px;
+        margin-top: 7px;
         font-size: 10px;
     }
 
     .local-records-summary > span {
-        display: flex;
-        min-width: 0;
-        align-items: center;
-        justify-content: center;
-        padding: 7px 6px;
-        white-space: nowrap;
-    }
-
-    .local-records-summary > span + span {
-        border-left: 1px solid rgba(216, 226, 239, 0.16);
+        padding: 6px;
     }
 
     .home-mode-stack {
-        width: min(320px, calc(100vw - 20px));
-        gap: 6px;
-        margin-top: 7px;
+        gap: 5px;
+        margin-top: 5px;
     }
 
     .daily-mode-card {
         grid-template-columns: minmax(0, 1fr) 106px;
-        min-height: 58px;
+        min-height: 56px;
         gap: 6px;
-        padding: 7px 8px;
-        border-color: rgba(201, 186, 255, 0.48);
-        background: rgba(10, 19, 31, 0.78);
+        padding: 6px 7px;
+        border-color: rgba(85, 230, 255, 0.42);
+        background: rgba(5, 18, 29, 0.82);
         box-shadow: 2px 2px 0 var(--pixel-shadow);
     }
 
@@ -1199,9 +1122,9 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
 
     .daily-mode-card #daily-run-btn {
         min-width: 106px;
-        min-height: 40px;
+        min-height: 44px;
         padding: 7px 8px;
-        box-shadow: 2px 2px 0 #31245d;
+        box-shadow: 2px 2px 0 #052f39;
         font-size: 11px;
     }
 
@@ -1231,23 +1154,90 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
             max(5px, env(safe-area-inset-bottom))
             max(10px, env(safe-area-inset-left));
         border-top: 1px solid rgba(124, 151, 178, 0.18);
-        background: #06101c;
+        background: #030810;
         font-size: 7px;
     }
 
+    .home-console-speaker {
+        display: none;
+    }
+
     .home-console-legend {
-        opacity: 0.74;
+        width: 100%;
+        overflow: hidden;
+        text-align: center;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 }
 
 @media (max-width: 390px) {
-    .home-console-brand {
-        max-width: 138px;
+    .home-console-series {
+        display: none;
     }
 
     .home-utility-bar .membership-launcher {
         width: 38px !important;
         min-width: 38px !important;
         max-width: 38px !important;
+    }
+}
+
+@media (max-width: 430px) and (max-height: 700px),
+       (orientation: landscape) and (max-height: 500px) {
+    .home-console-screen {
+        padding: 7px 10px;
+    }
+
+    .home-console-kicker,
+    .home-console-footer,
+    #start-screen.arcade-home .start-data-ticker,
+    .home-world-strip {
+        display: none;
+    }
+
+    #start-screen.arcade-home #game-title {
+        margin-bottom: 5px;
+        font-size: clamp(25px, 8.5vw, 32px);
+    }
+
+    .home-console-screen > p,
+    #start-screen.arcade-home > .home-console-bezel p {
+        font-size: 10px;
+        line-height: 1.18;
+    }
+
+    .home-primary-actions {
+        margin-top: 8px;
+    }
+
+    .home-primary-actions #start-btn {
+        min-height: 48px;
+        font-size: 15px;
+    }
+
+    .local-records-summary {
+        margin-top: 4px;
+    }
+
+    .home-mode-stack {
+        margin-top: 4px;
+    }
+
+    .daily-mode-card {
+        padding: 6px 7px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .guide-target {
+        animation: none;
+    }
+
+    .day-progress-fill,
+    .excess-meter-indicator,
+    .settlement-comparison-track i,
+    .game-feedback-toast {
+        transition: none;
     }
 }

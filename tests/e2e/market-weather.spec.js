@@ -79,7 +79,10 @@ test('home opens as a full-viewport market scene with immediate play', async ({ 
   await expect(page.locator('html')).toHaveAttribute('data-ui-state', 'home');
   await expect(page.locator('.home-console-bezel')).toBeVisible();
   await expect(page.locator('.home-console-screen')).toBeVisible();
-  await expect(page.locator('.home-console-kicker')).toHaveText('HIDDEN MARKET · PRESS PLAY');
+  await expect(page.locator('.home-console-series')).toHaveText('HIDDEN MARKET ARCADE');
+  await expect(page.locator('.home-console-kicker')).toHaveText('3 WORLDS · 250 DAYS · BEAT THE MARKET');
+  await expect(page.locator('.home-world')).toHaveCount(3);
+  await expect(page.locator('.home-world-name')).toHaveText(['CRYPTO', 'A-SHARES', 'US STOCKS']);
   await expect(page.getByRole('button', { name: 'PLAY', exact: true })).toBeVisible();
   await expect(page.locator('#market-weather-layer')).toHaveAttribute('data-weather', 'clear');
 

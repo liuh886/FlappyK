@@ -162,20 +162,60 @@
         root.dataset.marketWeatherVisual = 'clear';
     }
 
+    function buildHomeWorldStrip() {
+        const strip = createElement('section', 'home-world-strip');
+        strip.setAttribute('aria-label', text('Three hidden market worlds', '三个隐藏市场世界'));
+
+        const worlds = [
+            ['crypto', '01', text('CRYPTO', '加密市场')],
+            ['ashare', '02', text('A-SHARES', 'A股市场')],
+            ['us', '03', text('US STOCKS', '美股市场')],
+        ];
+        worlds.forEach(([key, number, label]) => {
+            const world = createElement('div', `home-world home-world--${key}`);
+            world.dataset.homeWorld = key;
+            const index = createElement('strong', 'home-world-index', number);
+            const name = createElement('span', 'home-world-name', label);
+            world.append(index, name);
+            strip.appendChild(world);
+        });
+        return strip;
+    }
+
+    function syncHomeWorldStrip() {
+        const strip = document.querySelector('.home-world-strip');
+        if (!strip) return;
+        strip.setAttribute('aria-label', text('Three hidden market worlds', '三个隐藏市场世界'));
+        const labels = {
+            crypto: text('CRYPTO', '加密市场'),
+            ashare: text('A-SHARES', 'A股市场'),
+            us: text('US STOCKS', '美股市场'),
+        };
+        Object.entries(labels).forEach(([key, label]) => {
+            setText(strip.querySelector(`[data-home-world='${key}'] .home-world-name`), label);
+        });
+    }
+
     function installHomeConsole() {
         if (!startScreen || startScreen.querySelector('.home-console-bezel')) return;
 
         const legacyIntroParagraphs = Array.from(startScreen.querySelectorAll(':scope > p'));
         const bezel = createElement('div', 'home-console-bezel');
         const topLine = createElement('div', 'home-console-topline');
-        const brand = createElement('span', 'home-console-brand', 'FLAPPYK · POCKET MARKET ARCADE');
+        const brand = createElement('span', 'home-console-brand', 'FLAPPY K');
+        const series = createElement('span', 'home-console-series', text('HIDDEN MARKET ARCADE', '隐藏市场街机'));
         const lamps = createElement('span', 'home-console-lamps');
         lamps.setAttribute('aria-hidden', 'true');
         lamps.append(document.createElement('span'), document.createElement('span'), document.createElement('span'));
-        topLine.append(brand, lamps);
+        topLine.append(brand, series, lamps);
 
         const screen = createElement('div', 'home-console-screen');
-        const kicker = createElement('div', 'home-console-kicker', text('HIDDEN MARKET · PRESS PLAY', '隐藏市场 · 按下开始'));
+        const kicker = createElement(
+            'div',
+            'home-console-kicker',
+            text('3 WORLDS · 250 DAYS · BEAT THE MARKET', '三大市场 · 250 天 · 跑赢市场'),
+        );
+        const worldStrip = buildHomeWorldStrip();
         screen.appendChild(kicker);
         [...startScreen.children].forEach((child) => {
             if (legacyIntroParagraphs.includes(child)) {
@@ -184,6 +224,9 @@
                 screen.appendChild(visibleCopy);
                 return;
             }
+            if (child.classList?.contains('start-actions')) {
+                screen.appendChild(worldStrip);
+            }
             screen.appendChild(child);
         });
 
@@ -191,7 +234,11 @@
         const speaker = createElement('span', 'home-console-speaker');
         speaker.setAttribute('aria-hidden', 'true');
         for (let index = 0; index < 14; index += 1) speaker.appendChild(document.createElement('span'));
-        const legend = createElement('span', 'home-console-legend', text('BUY · SELL · BEAT THE MARKET', '买入 · 卖出 · 跑赢市场'));
+        const legend = createElement(
+            'span',
+            'home-console-legend',
+            text('↑ BUY · ↓ SELL · EXCESS > 0 WINS', '↑ 买入 · ↓ 卖出 · 超额 > 0 即通关'),
+        );
         footer.append(speaker, legend);
 
         bezel.append(topLine, screen, footer);
@@ -485,11 +532,14 @@
 
     function updateLanguage() {
         const brand = document.querySelector('.home-console-brand');
+        const series = document.querySelector('.home-console-series');
         const kicker = document.querySelector('.home-console-kicker');
         const legend = document.querySelector('.home-console-legend');
-        setText(brand, 'FLAPPYK · POCKET MARKET ARCADE');
-        setText(kicker, text('HIDDEN MARKET · PRESS PLAY', '隐藏市场 · 按下开始'));
-        setText(legend, text('BUY · SELL · BEAT THE MARKET', '买入 · 卖出 · 跑赢市场'));
+        setText(brand, 'FLAPPY K');
+        setText(series, text('HIDDEN MARKET ARCADE', '隐藏市场街机'));
+        setText(kicker, text('3 WORLDS · 250 DAYS · BEAT THE MARKET', '三大市场 · 250 天 · 跑赢市场'));
+        setText(legend, text('↑ BUY · ↓ SELL · EXCESS > 0 WINS', '↑ 买入 · ↓ 卖出 · 超额 > 0 即通关'));
+        syncHomeWorldStrip();
         installPrimaryActionIcon();
         installPixelTradeGlyphs();
         syncPrimaryActionLabel();
@@ -550,6 +600,8 @@
         syncWeatherStatusPlacement,
         installPrimaryActionIcon,
         installPixelTradeGlyphs,
+        buildHomeWorldStrip,
+        syncHomeWorldStrip,
         get requestedWeather() { return requestedWeather; },
         get visualWeather() { return visualWeather; },
     };

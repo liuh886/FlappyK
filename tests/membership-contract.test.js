@@ -14,7 +14,7 @@ const accountStyles = fs.readFileSync('account-integration.css', 'utf8');
 for (const contract of [
   'window.HaoAccountConfig',
   'enabled: true',
-  'billingEnabled: false',
+  'billingEnabled: true',
   "supabaseUrl: 'https://blgwlycfcwvsupmqyqwn.supabase.co'",
   "supabasePublishableKey: 'sb_publishable_",
   "productCode: 'flappyk'",
