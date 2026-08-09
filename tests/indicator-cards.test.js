@@ -92,6 +92,7 @@ for (const contract of [
   'function drawProfitLane',
   "context.fillText('P/L'",
   "text('POWER-UP HAND', '战术道具')",
+  "text('DAILY TRIAL · 1 EACH', '每日挑战体验 · 各 1 张')",
   "text('VOLATILITY SCAN', '波动扫描')",
   "text('MOMENTUM SCAN', '动量扫描')",
   'BOLL power-up deployed',
@@ -99,12 +100,14 @@ for (const contract of [
   'function hasCardAccess()',
   'deck.hidden = !visible || !cardAccess',
   'visible && cardAccess && snapshot.data.length',
-  'if (event.detail?.signedIn === false) clearActiveCards()',
+  'if (event.detail?.isPro !== true && event.detail?.isDailyTrial !== true) clearActiveCards()',
 ]) {
   assert.ok(cardsSource.includes(contract), `Missing tactical power-up contract: ${contract}`);
 }
 assert.ok(!cardsSource.includes('is-locked'), 'Unavailable cards must stay hidden rather than render a locked compatibility state.');
 assert.ok(!cardsSource.includes('window.HaoAccount?.open?.()'), 'Hidden cards must not open account UI through secret keyboard shortcuts.');
+assert.ok(!cardsSource.includes('indicator-card-draw'), 'Retired random-draw controls must be deleted rather than hidden or shimmed.');
+assert.ok(!cardsSource.includes('function drawCard'), 'Retired random-draw runtime must stay deleted.');
 
 for (const contract of [
   '#indicator-overlay',
@@ -167,4 +170,4 @@ for (const asset of [
   assert.ok(serviceWorkerSource.includes(asset), `Stable PWA shell is missing ${asset}`);
 }
 
-console.log('BOLL/MACD math, Pro daily grants, Daily Run trials, scarce power-up visuals, overlay stacking, mobile controls, and stable PWA contracts validated');
+console.log('BOLL/MACD math, Pro daily grants, Daily Run trials, scarce power-up visuals, overlay stacking, mobile controls, retired draw deletion, and stable PWA contracts validated');
