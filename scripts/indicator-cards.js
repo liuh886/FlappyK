@@ -36,7 +36,6 @@
                 <span class="indicator-card-count" data-card-count="macd">×0</span>
             </button>
         </div>
-        <button class="indicator-card-draw" type="button" data-indicator-draw hidden></button>
         <div class="indicator-card-feedback" role="status" aria-live="polite"></div>`;
     container.appendChild(deck);
 
@@ -49,7 +48,6 @@
             .map((node) => [node.dataset.cardSubtitle, node])
     );
     const handLabel = deck.querySelector('[data-hand-label]');
-    const drawButton = deck.querySelector('[data-indicator-draw]');
     const feedback = deck.querySelector('.indicator-card-feedback');
 
     let active = { boll: false, macd: false };
@@ -85,7 +83,8 @@
     }
 
     function hasCardAccess() {
-        return store.getSnapshot().signedIn === true;
+        const inventory = store.getSnapshot();
+        return inventory.isPro === true || inventory.isDailyTrial === true;
     }
 
     function syncOverlaySize() {
@@ -419,9 +418,7 @@
 
     function activate(type) {
         const snapshot = gameSnapshot();
-        if (!TYPES.includes(type) || !isGameVisible(snapshot) || !snapshot.data.length) return;
-        const inventory = store.getSnapshot();
-        if (!inventory.signedIn) return;
+        if (!TYPES.includes(type) || !isGameVisible(snapshot) || !snapshot.data.length || !hasCardAccess()) return;
         if (active[type]) {
             showFeedback(text(`${type.toUpperCase()} already deployed`, `${type.toUpperCase()} 已部署`));
             return;
@@ -444,30 +441,12 @@
         renderDeck();
     }
 
-    function randomUnit() {
-        if (window.crypto?.getRandomValues) {
-            const values = new Uint32Array(1);
-            window.crypto.getRandomValues(values);
-            return values[0] / 4294967296;
-        }
-        return Math.random();
-    }
-
-    function drawCard() {
-        if (!store.getSnapshot().isPro) return;
-        const type = store.draw(randomUnit());
-        if (!type) return;
-        navigator.vibrate?.(24);
-        showFeedback(
-            text(`Drew 1 ${type.toUpperCase()} power-up`, `抽到 1 个 ${type.toUpperCase()} 道具`),
-            'success'
-        );
-        renderDeck();
-    }
-
     function renderDeck() {
         const inventory = store.getSnapshot();
-        if (handLabel) handLabel.textContent = text('POWER-UP HAND', '战术道具');
+        const access = inventory.isPro === true || inventory.isDailyTrial === true;
+        if (handLabel) handLabel.textContent = inventory.isDailyTrial
+            ? text('DAILY TRIAL · 1 EACH', '每日挑战体验 · 各 1 张')
+            : text('POWER-UP HAND', '战术道具');
         if (subtitles.boll) subtitles.boll.textContent = text('VOLATILITY SCAN', '波动扫描');
         if (subtitles.macd) subtitles.macd.textContent = text('MOMENTUM SCAN', '动量扫描');
 
@@ -476,29 +455,14 @@
             const count = deck.querySelector(`[data-card-count="${type}"]`);
             if (count) count.textContent = `×${inventory[type]}`;
             if (!button) return;
-            button.classList.toggle('is-active', inventory.signedIn && active[type]);
-            button.classList.toggle('is-empty', inventory.signedIn && inventory[type] < 1 && !active[type]);
-            button.setAttribute('aria-pressed', String(inventory.signedIn && active[type]));
+            button.classList.toggle('is-active', access && active[type]);
+            button.classList.toggle('is-empty', access && inventory[type] < 1 && !active[type]);
+            button.setAttribute('aria-pressed', String(access && active[type]));
             button.setAttribute('aria-label', text(
                 `Deploy ${type.toUpperCase()} power-up. ${inventory[type]} remaining.`,
                 `部署 ${type.toUpperCase()} 道具，剩余 ${inventory[type]} 个。`
             ));
         });
-
-        if (!inventory.isPro) {
-            drawButton.hidden = true;
-            drawButton.disabled = true;
-            drawButton.removeAttribute('data-mode');
-            drawButton.textContent = '';
-        } else {
-            const remaining = inventory.dailyDrawsRemaining;
-            drawButton.hidden = false;
-            drawButton.disabled = remaining < 1;
-            drawButton.dataset.mode = remaining ? 'draw' : 'complete';
-            drawButton.textContent = remaining
-                ? text(`POWER-UP PACK · ${remaining} LEFT`, `道具包 · 剩余 ${remaining} 次`)
-                : text('DAILY PACK EMPTY', '今日道具包已抽完');
-        }
     }
 
     Object.entries(buttons).forEach(([type, button]) => {
@@ -508,13 +472,6 @@
             event.stopPropagation();
             activate(type);
         });
-    });
-
-    drawButton.addEventListener('pointerdown', (event) => event.stopPropagation());
-    drawButton.addEventListener('click', (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        drawCard();
     });
 
     window.addEventListener('keydown', (event) => {
@@ -529,7 +486,7 @@
     }, true);
 
     window.addEventListener('flappyk:indicator-cards', (event) => {
-        if (event.detail?.signedIn === false) clearActiveCards();
+        if (event.detail?.isPro !== true && event.detail?.isDailyTrial !== true) clearActiveCards();
         renderDeck();
     });
     window.addEventListener('flappyk:ui-state', renderDeck);
@@ -559,7 +516,6 @@
 
     window.FlappyKIndicatorCards = Object.freeze({
         activate,
-        drawCard,
         get active() { return Object.freeze({ ...active }); },
         get overlay() { return overlay; },
         get deck() { return deck; },
