@@ -271,7 +271,7 @@
 @media (max-width: 720px), (pointer: coarse) {
     .indicator-card-deck {
         left: 50%;
-        bottom: calc(96px + env(safe-area-inset-bottom));
+        bottom: calc(108px + env(safe-area-inset-bottom));
         width: min(248px, calc(100% - 28px));
         gap: 3px;
         transform: translateX(-50%);
@@ -349,7 +349,7 @@
 
 @media (max-width: 430px) {
     .indicator-card-deck {
-        bottom: calc(90px + env(safe-area-inset-bottom));
+        bottom: calc(100px + env(safe-area-inset-bottom));
         width: min(236px, calc(100% - 24px));
     }
 
@@ -361,12 +361,12 @@
 
 @media (max-height: 650px) and (max-width: 720px) {
     .indicator-card-deck {
-        bottom: calc(82px + env(safe-area-inset-bottom));
+        bottom: calc(92px + env(safe-area-inset-bottom));
         width: min(224px, calc(100% - 20px));
     }
 
     #game-container .indicator-card {
-        min-height: 42px;
+        min-height: 44px;
         padding-block: 5px;
     }
 }
