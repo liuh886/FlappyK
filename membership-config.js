@@ -54,17 +54,17 @@
             en: 'FlappyK player account',
         },
         description: {
-            zh: '登录后可保存个人最佳成绩、完成局数与云端历史，并为未来跨设备记录和可信排行榜建立玩家身份。',
-            en: 'Sign in to keep personal bests, completed runs, and cloud history, and establish a player identity for future cross-device records and trusted rankings.',
+            zh: '登录后保存个人最佳成绩、完成局数与云端历史。FlappyK Pro 每天额外获得 BOLL 与 MACD 道具各 3 张；Free 玩家可在每日挑战中体验各 1 张。',
+            en: 'Sign in to keep personal bests, completed runs, and cloud history. FlappyK Pro adds three BOLL and three MACD power-ups every day; Free players can try one of each in Daily Run.',
         },
         privacyNote: {
             zh: '云端记录仅作为个人历史。公共排行榜不会直接信任浏览器提交的成绩，未来仍需服务端校验。',
             en: 'Cloud records are personal history only. Public rankings never directly trust browser-submitted scores and will require server-side verification.',
         },
         features: [
-            { zh: '同步个人最佳成绩与完成记录', en: 'Sync personal bests and completed runs' },
-            { zh: '未来支持跨设备历史与可信排名', en: 'Prepare for cross-device history and trusted rankings' },
-            { zh: '与其他 Hao Apps 共用同一登录身份', en: 'Use the same identity across Hao Apps' },
+            { zh: 'Free：每日挑战体验 BOLL ×1、MACD ×1', en: 'Free: try BOLL ×1 and MACD ×1 in Daily Run' },
+            { zh: 'Pro：每天获得 BOLL ×3、MACD ×3', en: 'Pro: receive BOLL ×3 and MACD ×3 every day' },
+            { zh: '登录同步个人最佳成绩与完成记录', en: 'Sign in to sync personal bests and completed runs' },
         ],
         feedbackEnabled: false,
     });
