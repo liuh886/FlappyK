@@ -10,5 +10,7 @@ assert.match(source, /navigator\.languages/, 'Language detection must respect th
 assert.match(source, /storedLanguage/, 'A saved manual language choice must remain supported.');
 assert.ok(source.includes('meta[property="og:title"]'), 'Open Graph title must be localized.');
 assert.ok(source.includes('meta[name="twitter:description"]'), 'Twitter description must be localized.');
+assert.ok(source.includes(".settlement-market-identity .settlement-verdict"), 'Visible settlement identity must receive contextual Chinese labels.');
+assert.ok(!source.includes(".card-details p:first-child"), 'Collapsed settlement details must not be treated as the asset row.');
 
-console.log('FlappyK i18n language contract passed.');
+console.log('FlappyK i18n language and settlement identity contracts passed.');
