@@ -50,7 +50,7 @@ async function startGame(page) {
   await expect.poll(() => page.locator('#game-canvas').getAttribute('width')).toBeTruthy();
 }
 
-test('desktop HUD uses one embedded pixel instrument language', async ({ page }) => {
+test('desktop HUD uses one pixel instrument language with Excess as the primary score', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await startGame(page);
 
@@ -65,17 +65,10 @@ test('desktop HUD uses one embedded pixel instrument language', async ({ page })
     const controlButton = css('#pause-btn');
     const dock = css('.controls-hint');
     const dockKey = css('.trade-key-hint .key');
-    const labels = Array.from(document.querySelectorAll(
-      '#game-hud-rail .hud-metric-label, #game-hud-rail .excess-meter-label',
-    )).map((node) => {
-      const style = getComputedStyle(node);
-      return { family: style.fontFamily, size: style.fontSize, color: style.color };
-    });
-    const values = ['#total-display', '#return-display', '#live-excess-display', '#level-display', '#day-display']
-      .map((selector) => {
-        const style = css(selector);
-        return { family: style.fontFamily, size: style.fontSize, weight: style.fontWeight };
-      });
+    const metric = (selector) => {
+      const style = css(selector);
+      return { family: style.fontFamily, size: style.fontSize, color: style.color, weight: style.fontWeight };
+    };
     return {
       rail: {
         background: rail.backgroundColor,
@@ -92,8 +85,20 @@ test('desktop HUD uses one embedded pixel instrument language', async ({ page })
         display: weatherLamp.display,
         background: weatherLamp.backgroundColor,
       },
-      labels,
-      values,
+      labels: {
+        total: metric('.hud-total .hud-metric-label'),
+        returns: metric('.hud-return .hud-metric-label'),
+        excess: metric('.excess-meter-label > span'),
+        run: metric('.hud-game .hud-metric-label'),
+        day: metric('.hud-day .hud-metric-label'),
+      },
+      values: {
+        total: metric('#total-display'),
+        returns: metric('#return-display'),
+        excess: metric('#live-excess-display'),
+        run: metric('#level-display'),
+        day: metric('#day-display'),
+      },
       control: {
         radius: controlButton.borderRadius,
         background: controlButton.backgroundColor,
@@ -118,16 +123,28 @@ test('desktop HUD uses one embedded pixel instrument language', async ({ page })
   expect(visual.dividerWidths.every((width) => width === '1px')).toBe(true);
 
   expect(visual.lamp.display).not.toBe('none');
-  expect(visual.lamp.width).toBe('8px');
-  expect(visual.lamp.height).toBe('8px');
+  expect(visual.lamp.width).toBe('7px');
+  expect(visual.lamp.height).toBe('7px');
   expect(visual.lamp.background).not.toBe('rgba(0, 0, 0, 0)');
 
-  expect(new Set(visual.labels.map((item) => item.family)).size).toBe(1);
-  expect(new Set(visual.labels.map((item) => item.size)).size).toBe(1);
-  expect(new Set(visual.labels.map((item) => item.color)).size).toBe(1);
-  expect(new Set(visual.values.map((item) => item.family)).size).toBe(1);
-  expect(new Set(visual.values.map((item) => item.size)).size).toBe(1);
-  expect(new Set(visual.values.map((item) => item.weight)).size).toBe(1);
+  for (const label of Object.values(visual.labels)) {
+    expect(label.family).toContain('Press Start 2P');
+  }
+  expect(visual.labels.total.size).toBe('6px');
+  expect(visual.labels.returns.size).toBe('6px');
+  expect(visual.labels.run.size).toBe('6px');
+  expect(visual.labels.day.size).toBe('6px');
+  expect(visual.labels.excess.size).toBe('7px');
+
+  for (const value of Object.values(visual.values)) {
+    expect(value.family).toContain('Pixelify Sans');
+  }
+  expect(visual.values.total.size).toBe('11px');
+  expect(visual.values.returns.size).toBe('11px');
+  expect(visual.values.run.size).toBe('11px');
+  expect(visual.values.day.size).toBe('11px');
+  expect(visual.values.excess.size).toBe('17px');
+  expect(parseFloat(visual.values.excess.size)).toBeGreaterThan(parseFloat(visual.values.total.size));
 
   expect(visual.control.radius).toBe('0px');
   expect(visual.control.background).not.toBe('rgba(0, 0, 0, 0)');
@@ -140,7 +157,7 @@ test('desktop HUD uses one embedded pixel instrument language', async ({ page })
   expect(visual.dock.keyRadius).toBe('0px');
 });
 
-test('mobile HUD keeps the same language without clipping or control collisions', async ({ page }) => {
+test('mobile HUD keeps the score-first language without clipping or control collisions', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await startGame(page);
 
@@ -152,6 +169,8 @@ test('mobile HUD keeps the same language without clipping or control collisions'
     const action = getComputedStyle(document.querySelector('#btn-buy'));
     const small = getComputedStyle(document.querySelector('#btn-speed-down'));
     const metricNodes = Array.from(document.querySelectorAll('.hud-total, .hud-return, #excess-meter'));
+    const secondary = getComputedStyle(document.querySelector('#total-display'));
+    const excess = getComputedStyle(document.querySelector('#live-excess-display'));
     return {
       rail: { left: rail.left, right: rail.right, bottom: rail.bottom, height: rail.height },
       controlsTop: controls.top,
@@ -161,6 +180,8 @@ test('mobile HUD keeps the same language without clipping or control collisions'
       actionRadius: action.borderRadius,
       actionShadow: action.boxShadow,
       smallRadius: small.borderRadius,
+      secondarySize: secondary.fontSize,
+      excessSize: excess.fontSize,
     };
   });
 
@@ -173,4 +194,7 @@ test('mobile HUD keeps the same language without clipping or control collisions'
   expect(mobile.actionRadius).toBe('0px');
   expect(mobile.smallRadius).toBe('0px');
   expect(mobile.actionShadow).not.toBe('none');
+  expect(mobile.secondarySize).toBe('9px');
+  expect(mobile.excessSize).toBe('14px');
+  expect(parseFloat(mobile.excessSize)).toBeGreaterThan(parseFloat(mobile.secondarySize));
 });
