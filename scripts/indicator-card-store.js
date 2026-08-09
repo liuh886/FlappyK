@@ -40,28 +40,34 @@
         return `${year}-${month}-${day}`;
     }
 
-    function signedIn() {
+    function accountSignedIn() {
         return Boolean(accountState?.user?.id);
     }
 
     function isPro() {
-        return signedIn() && accountState?.isPro === true;
+        return accountSignedIn() && accountState?.isPro === true;
     }
 
     function isDailyTrial() {
         return !isPro() && dailyTrial !== null;
     }
 
+    function hasCardAccess() {
+        return isPro() || isDailyTrial();
+    }
+
     function snapshot() {
         const visibleCards = isDailyTrial() ? dailyTrial : cards;
         return Object.freeze({
-            accountId: signedIn() ? String(accountState.user.id) : null,
-            signedIn: signedIn(),
+            accountId: accountSignedIn() ? String(accountState.user.id) : null,
+            accountSignedIn: accountSignedIn(),
+            signedIn: hasCardAccess(),
             isPro: isPro(),
             isDailyTrial: isDailyTrial(),
             boll: integer(visibleCards?.boll),
             macd: integer(visibleCards?.macd),
             dailyGrantDate: cards.dailyGrantDate,
+            dailyDrawsRemaining: 0,
         });
     }
 
@@ -76,7 +82,7 @@
     }
 
     function save() {
-        if (!signedIn() || !window.HaoAccount?.saveProductData) return Promise.resolve();
+        if (!accountSignedIn() || !window.HaoAccount?.saveProductData) return Promise.resolve();
         const accountId = String(accountState.user.id);
         const payload = normalize(cards);
         saveQueue = saveQueue
@@ -158,6 +164,10 @@
         return true;
     }
 
+    function removeRetiredDrawControl() {
+        document.querySelector('[data-indicator-draw]')?.remove();
+    }
+
     window.addEventListener('hao:account-changed', (event) => setAccountState(event.detail));
     window.addEventListener('flappyk:daily-run-started', startDailyTrial);
     window.addEventListener('flappyk:daily-run-ended', endDailyTrial);
@@ -165,6 +175,7 @@
     const current = window.HaoAccount?.getState?.();
     if (current) setAccountState(current);
     else emit('initial');
+    window.requestAnimationFrame(removeRetiredDrawControl);
 
     window.FlappyKIndicatorCardStore = Object.freeze({
         TYPES,
@@ -179,5 +190,6 @@
         startDailyTrial,
         endDailyTrial,
         consume,
+        draw: () => null,
     });
 })();
