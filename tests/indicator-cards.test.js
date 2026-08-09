@@ -93,18 +93,26 @@ for (const contract of [
   'z-index: 10',
   '.indicator-card-deck',
   '.indicator-hand-label',
+  '.indicator-hand-label::before',
+  '--card-glow:',
+  '.indicator-card-count',
   '.indicator-card.is-active',
+  '.indicator-card.is-empty',
   '.indicator-card.is-revealing',
   '@keyframes indicator-card-decode',
+  '@keyframes indicator-power-active',
   "@media (max-width: 720px), (pointer: coarse)",
   'touch-action: manipulation',
+  'min-height: 44px',
   'var(--hud-shell',
+  'var(--pixel-yellow',
 ]) {
-  assert.ok(cardsStyles.includes(contract), `Missing tactical card visual contract: ${contract}`);
+  assert.ok(cardsStyles.includes(contract), `Missing tactical power-up visual contract: ${contract}`);
 }
 assert.ok(weatherStyles.includes('#game-canvas'));
 assert.ok(weatherStyles.includes('z-index: 8'));
 assert.ok(!cardsStyles.includes('.indicator-card.is-locked'), 'Retired guest-card styling must be deleted, not retained as a compatibility state.');
+assert.ok(!cardsStyles.includes('width: min(248px, calc(100% - 28px))'), 'The oversized mobile tactical tray must not return.');
 
 for (const contract of [
   'CHALLENGE_DAYS = 250',
@@ -141,4 +149,4 @@ for (const asset of [
   assert.ok(serviceWorkerSource.includes(asset), `Stable PWA shell is missing ${asset}`);
 }
 
-console.log('BOLL, MACD, 285-row data readiness, guest gating, visible overlay stacking, tactical scan reveal, preserved P/L lane, account inventory, mobile controls, and stable PWA cache contracts validated');
+console.log('BOLL, MACD, 285-row data readiness, guest gating, visible overlay stacking, scarce power-up styling, tactical scan reveal, preserved P/L lane, account inventory, mobile controls, and stable PWA cache contracts validated');
