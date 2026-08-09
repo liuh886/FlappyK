@@ -75,9 +75,7 @@ async function preparePage(page, { signedIn = true, pro = false, cardState = nul
   await page.waitForFunction(() => Boolean(window.FlappyKIndicatorCards && window.FlappyKIndicatorCardStore));
 }
 
-async function startAtWarmIndicatorDay(page, { expectDeck = true } = {}) {
-  await page.locator('#start-btn').click();
-  await expect(page.locator('#start-screen')).not.toHaveClass(/active/);
+async function warmCurrentGame(page, { expectDeck = true } = {}) {
   await page.evaluate(() => {
     dayIndex = Math.min(40, currentData.length - 1);
     currentPrice = currentData[dayIndex].close;
@@ -86,16 +84,28 @@ async function startAtWarmIndicatorDay(page, { expectDeck = true } = {}) {
   if (expectDeck) await expect(page.locator('#indicator-card-deck')).toBeVisible();
 }
 
-test('guest gameplay has no tactical hand and cannot reveal indicators', async ({ page }) => {
+async function startNormalGame(page, { expectDeck = true } = {}) {
+  await page.locator('#start-btn').click();
+  await expect(page.locator('#start-screen')).not.toHaveClass(/active/);
+  await warmCurrentGame(page, { expectDeck });
+}
+
+async function startDailyRun(page) {
+  await page.locator('#daily-run-btn').click();
+  await expect(page.locator('#start-screen')).not.toHaveClass(/active/);
+  await warmCurrentGame(page, { expectDeck: true });
+}
+
+test('normal free gameplay has no power-up hand and cannot reveal indicators', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await preparePage(page, { signedIn: false });
-  await startAtWarmIndicatorDay(page, { expectDeck: false });
+  await preparePage(page, { signedIn: true, pro: false });
+  await startNormalGame(page, { expectDeck: false });
 
   await expect(page.locator('#indicator-card-deck')).toBeHidden();
   await page.keyboard.press('1');
   await page.waitForTimeout(80);
 
-  const guestState = await page.evaluate(() => {
+  const state = await page.evaluate(() => {
     const overlay = document.getElementById('indicator-overlay');
     const pixels = overlay.getContext('2d').getImageData(0, 0, overlay.width, overlay.height).data;
     let visiblePixels = 0;
@@ -109,21 +119,24 @@ test('guest gameplay has no tactical hand and cannot reveal indicators', async (
     };
   });
 
-  expect(guestState.inventory.signedIn).toBe(false);
-  expect(guestState.inventory.boll).toBe(0);
-  expect(guestState.inventory.macd).toBe(0);
-  expect(guestState.active).toEqual({ boll: false, macd: false });
-  expect(guestState.visiblePixels).toBe(0);
+  expect(state.inventory.accountSignedIn).toBe(true);
+  expect(state.inventory.signedIn).toBe(false);
+  expect(state.inventory.isPro).toBe(false);
+  expect(state.active).toEqual({ boll: false, macd: false });
+  expect(state.visiblePixels).toBe(0);
 });
 
-test('signed-in starter power-ups render BOLL and MACD above the K-line without double consumption', async ({ page }) => {
+test('Pro daily grant powers BOLL and MACD without double consumption', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await preparePage(page);
+  await preparePage(page, {
+    pro: true,
+    cardState: { version: 2, boll: 0, macd: 0, dailyGrantDate: '' },
+  });
 
   await expect(page.locator('[data-hand-label]')).toHaveText('POWER-UP HAND');
-  await expect(page.locator('[data-card-count="boll"]')).toHaveText('×3');
-  await expect(page.locator('[data-card-count="macd"]')).toHaveText('×3');
-  await startAtWarmIndicatorDay(page);
+  await expect.poll(() => page.locator('[data-card-count="boll"]').textContent()).toBe('×3');
+  await expect.poll(() => page.locator('[data-card-count="macd"]').textContent()).toBe('×3');
+  await startNormalGame(page);
 
   const layers = await page.evaluate(() => ({
     base: Number(getComputedStyle(document.getElementById('game-canvas')).zIndex),
@@ -182,58 +195,36 @@ test('signed-in starter power-ups render BOLL and MACD above the K-line without 
   expect(lowerLanes.active).toEqual({ boll: true, macd: true });
   expect(lowerLanes.latestState.boll).toBe(2);
   expect(lowerLanes.latestState.macd).toBe(2);
-  expect(lowerLanes.latestState.starterGranted).toBe(true);
-
-  await page.evaluate(() => {
-    window.__setIndicatorAccountState({
-      user: null,
-      profile: null,
-      productAccount: { state: {} },
-      entitlements: [],
-      isPro: false,
-      loading: false,
-    });
-  });
-  await expect(page.locator('#indicator-card-deck')).toBeHidden();
-  await expect.poll(() => page.evaluate(() => window.FlappyKIndicatorCards.active))
-    .toEqual({ boll: false, macd: false });
+  expect(lowerLanes.latestState.version).toBe(2);
 });
 
-test('pro entitlement permits exactly three daily random draws', async ({ page }) => {
+test('Daily Run grants one free BOLL and MACD trial outside Pro', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
+  await preparePage(page, { signedIn: false, pro: false });
+  await startDailyRun(page);
+
+  await expect(page.locator('[data-card-count="boll"]')).toHaveText('×1');
+  await expect(page.locator('[data-card-count="macd"]')).toHaveText('×1');
+  const inventory = await page.evaluate(() => window.FlappyKIndicatorCardStore.getSnapshot());
+  expect(inventory.isPro).toBe(false);
+  expect(inventory.isDailyTrial).toBe(true);
+  expect(inventory.signedIn).toBe(true);
+
+  await page.locator('[data-indicator-card="boll"]').click();
+  await expect(page.locator('[data-card-count="boll"]')).toHaveText('×0');
+  await page.locator('[data-indicator-card="macd"]').click();
+  await expect(page.locator('[data-card-count="macd"]')).toHaveText('×0');
+  await expect(page.locator('[data-indicator-draw]')).toHaveCount(0);
+});
+
+test('mobile Pro power-ups are tappable, contained, and stay clear of trade controls', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
   await preparePage(page, {
     pro: true,
-    cardState: {
-      version: 1,
-      boll: 0,
-      macd: 0,
-      starterGranted: true,
-      drawDate: '',
-      drawsUsed: 0,
-    },
+    cardState: { version: 2, boll: 0, macd: 0, dailyGrantDate: '' },
   });
-  await startAtWarmIndicatorDay(page);
-
-  const drawButton = page.locator('[data-indicator-draw]');
-  await expect(drawButton).toContainText('POWER-UP PACK');
-  await expect(drawButton).toContainText('3 LEFT');
-  await drawButton.click();
-  await expect(drawButton).toContainText('2 LEFT');
-  await drawButton.click();
-  await expect(drawButton).toContainText('1 LEFT');
-  await drawButton.click();
-  await expect(drawButton).toContainText('DAILY PACK EMPTY');
-  await expect(drawButton).toBeDisabled();
-
-  const inventory = await page.evaluate(() => window.FlappyKIndicatorCardStore.getSnapshot());
-  expect(inventory.boll + inventory.macd).toBe(3);
-  expect(inventory.dailyDrawsRemaining).toBe(0);
-});
-
-test('mobile cards are tappable, contained, and stay clear of trade controls', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await preparePage(page);
-  await startAtWarmIndicatorDay(page);
+  await expect.poll(() => page.locator('[data-card-count="boll"]').textContent()).toBe('×3');
+  await startNormalGame(page);
 
   const before = await page.evaluate(() => actions.length);
   await page.locator('[data-indicator-card="boll"]').click();
