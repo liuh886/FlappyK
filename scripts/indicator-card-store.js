@@ -40,34 +40,28 @@
         return `${year}-${month}-${day}`;
     }
 
-    function accountSignedIn() {
+    function signedIn() {
         return Boolean(accountState?.user?.id);
     }
 
     function isPro() {
-        return accountSignedIn() && accountState?.isPro === true;
+        return signedIn() && accountState?.isPro === true;
     }
 
     function isDailyTrial() {
         return !isPro() && dailyTrial !== null;
     }
 
-    function hasCardAccess() {
-        return isPro() || isDailyTrial();
-    }
-
     function snapshot() {
         const visibleCards = isDailyTrial() ? dailyTrial : cards;
         return Object.freeze({
-            accountId: accountSignedIn() ? String(accountState.user.id) : null,
-            accountSignedIn: accountSignedIn(),
-            signedIn: hasCardAccess(),
+            accountId: signedIn() ? String(accountState.user.id) : null,
+            signedIn: signedIn(),
             isPro: isPro(),
             isDailyTrial: isDailyTrial(),
             boll: integer(visibleCards?.boll),
             macd: integer(visibleCards?.macd),
             dailyGrantDate: cards.dailyGrantDate,
-            dailyDrawsRemaining: 0,
         });
     }
 
@@ -82,7 +76,7 @@
     }
 
     function save() {
-        if (!accountSignedIn() || !window.HaoAccount?.saveProductData) return Promise.resolve();
+        if (!signedIn() || !window.HaoAccount?.saveProductData) return Promise.resolve();
         const accountId = String(accountState.user.id);
         const payload = normalize(cards);
         saveQueue = saveQueue
@@ -190,6 +184,5 @@
         startDailyTrial,
         endDailyTrial,
         consume,
-        draw: () => null,
     });
 })();
