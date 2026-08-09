@@ -64,8 +64,9 @@
 
     function applyContextualTranslations() {
         if (language !== 'zh') return;
-        document.querySelectorAll('.card-details p:first-child')
-            .forEach((row) => replaceLeadingLabel(row, '标的： '));
+        const identityRows = document.querySelectorAll('.settlement-market-identity .settlement-verdict');
+        if (identityRows[0]) replaceLeadingLabel(identityRows[0], '标的 · ');
+        if (identityRows[1]) replaceLeadingLabel(identityRows[1], '区间 · ');
     }
 
     function applyTranslations(root = document.documentElement) {
