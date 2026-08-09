@@ -160,8 +160,7 @@ body {
             calc(11px + env(safe-area-inset-bottom))
             max(12px, env(safe-area-inset-left)) !important;
         border-top: 2px solid var(--hud-frame, #9fb0c4) !important;
-        background:
-            linear-gradient(to top, rgba(6, 12, 20, 0.99), rgba(6, 12, 20, 0.94)) !important;
+        background: var(--hud-shell, rgba(6, 12, 20, 0.94)) !important;
         box-shadow: 0 -4px 0 rgba(0, 0, 0, 0.42) !important;
     }
 
