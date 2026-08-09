@@ -64,10 +64,9 @@ body {
 }
 
 /*
- * Mobile spatial ownership: the chart remains the playfield, BUY/SELL are the
- * two primary thumb actions, and playback speed is a quiet utility between
- * them. The fixed dock avoids browser-toolbar jumps without turning utility
- * controls into the visual focal point.
+ * Mobile spatial ownership: BUY/SELL stay in the bottom thumb dock while
+ * playback speed is a compact top utility. This keeps the chart and tactical
+ * hand visually dominant without removing immediate speed access.
  */
 #mobile-controls:not([hidden]) {
     position: fixed;
@@ -174,20 +173,25 @@ body {
     }
 
     html body #game-container #mobile-controls #btn-buy {
+        grid-column: 1;
         justify-self: start;
     }
 
     html body #game-container #mobile-controls #btn-sell {
+        grid-column: 3;
         justify-self: end;
     }
 
     html body #game-container #mobile-controls .mobile-speed-control {
+        position: fixed;
+        top: calc(max(6px, env(safe-area-inset-top)) + 88px);
+        right: max(10px, env(safe-area-inset-right));
+        z-index: 91;
         display: grid;
         grid-template-columns: 28px 38px 28px;
-        align-self: end;
-        justify-self: center;
+        align-items: center;
         gap: 2px;
-        margin: 0 0 5px;
+        margin: 0;
         padding: 0;
         border: 0;
         border-radius: 0;
@@ -249,8 +253,8 @@ body {
     }
 
     html body #game-container #mobile-controls .mobile-speed-control {
+        top: calc(max(6px, env(safe-area-inset-top)) + 84px);
         grid-template-columns: 26px 34px 26px;
-        margin-bottom: 4px;
     }
 
     html body #game-container #mobile-controls .mobile-speed-control .small-btn {
@@ -284,6 +288,10 @@ body {
         height: 66px !important;
         min-width: 66px;
         min-height: 66px;
+    }
+
+    html body #game-container #mobile-controls .mobile-speed-control {
+        top: calc(max(6px, env(safe-area-inset-top)) + 80px);
     }
 
     html[data-virtual-controls='true'][data-ui-state='playing'] body #game-container #game-canvas,
