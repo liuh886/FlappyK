@@ -976,8 +976,8 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
 
     .home-utility-bar #language-toggle-btn,
     .home-utility-bar .membership-launcher {
-        min-height: 38px !important;
-        height: 38px !important;
+        min-height: 40px !important;
+        height: 40px !important;
         padding-inline: 8px !important;
         border: 1px solid #40556a !important;
         background: #0a1522 !important;
