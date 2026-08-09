@@ -41,9 +41,9 @@
 
 .home-story-slide::before {
     position: absolute;
-    right: -8%;
+    right: 0;
     bottom: -18%;
-    width: 62%;
+    width: 54%;
     height: 58%;
     background:
         linear-gradient(90deg, transparent 49.5%, rgba(85, 230, 255, 0.09) 50%, transparent 50.5%) 0 0 / 74px 100%,
