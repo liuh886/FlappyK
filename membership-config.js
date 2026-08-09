@@ -38,7 +38,7 @@
 
     window.HaoAccountConfig = Object.freeze({
         enabled: true,
-        billingEnabled: false,
+        billingEnabled: true,
         appName: 'FlappyK',
         productCode: 'flappyk',
         entitlementCode: 'flappyk.pro',
