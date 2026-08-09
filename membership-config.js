@@ -46,7 +46,7 @@
         if (!document.getElementById('hao-account-upgrade-script')) {
             const script = document.createElement('script');
             script.id = 'hao-account-upgrade-script';
-            script.src = 'https://liuh886.github.io/admin/shared/account-upgrade.js?v=2';
+            script.src = 'https://liuh886.github.io/admin/shared/account-upgrade.js?v=3';
             script.defer = true;
             document.head.appendChild(script);
         }
@@ -76,8 +76,8 @@
             en: 'Sign in to sync personal bests and completed runs. FlappyK Pro adds more technical-indicator power-ups.',
         },
         privacyNote: {
-            zh: '云端记录仅作为个人历史。公共排行榜不会直接信任浏览器提交的成绩，未来仍需服务端校验。',
-            en: 'Cloud records are personal history only. Public rankings never directly trust browser-submitted scores and will require server-side verification.',
+            zh: '云端记录用于同步你的个人游戏历史；排行榜按正式游戏规则统计。',
+            en: 'Cloud records sync your personal game history; leaderboard results follow the published game rules.',
         },
         proUpgrade: {
             title: { zh: 'Free 与 FlappyK Pro', en: 'Free and FlappyK Pro' },
