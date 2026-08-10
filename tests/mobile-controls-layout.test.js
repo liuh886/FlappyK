@@ -26,14 +26,20 @@ assert.ok(css.includes('position: fixed'));
 assert.ok(css.includes('bottom: 0'));
 assert.ok(css.includes('width: 100vw'));
 assert.ok(css.includes('env(safe-area-inset-bottom)'));
-assert.ok(css.includes('grid-template-columns: minmax(72px, 1fr) auto minmax(72px, 1fr)'));
+assert.ok(css.includes('grid-template-columns: minmax(64px, 1fr) 78px 10px 78px minmax(64px, 1fr)'));
+assert.ok(css.includes('#mobile-controls #btn-buy'));
+assert.ok(css.includes('grid-column: 2'));
+assert.ok(css.includes('#mobile-controls #btn-sell'));
+assert.ok(css.includes('grid-column: 4'));
 assert.ok(css.includes('#mobile-controls .mobile-speed-control'));
 assert.ok(css.includes('opacity: 0.68'));
 assert.ok(css.includes("data-ui-state='playing'"));
+assert.ok(!css.includes(":has(#indicator-card-deck:not([hidden])) #game-canvas"));
 
 // Premium UI still creates the three controls, while mobile-controls.css owns
-// their phone spatial hierarchy. Do not require the retired oversized layout.
+// their phone spatial hierarchy. The mobile dock now centers BUY/SELL and leaves
+// the outer thumb zones to BOLL/MACD rather than preserving the retired edge layout.
 assert.ok(premiumCss.includes('#mobile-controls:not([hidden])'));
 assert.ok(premiumCss.includes('.mobile-speed-control'));
 
-console.log('Shared responsive state, fixed virtual-control dock, and mobile thumb hierarchy checks passed');
+console.log('Shared responsive state, centered virtual-control dock, and mobile thumb hierarchy checks passed');
