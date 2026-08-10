@@ -171,12 +171,16 @@ test('mobile HUD keeps the score-first language without clipping or control coll
     const metricNodes = Array.from(document.querySelectorAll('.hud-total, .hud-return, #excess-meter'));
     const secondary = getComputedStyle(document.querySelector('#total-display'));
     const excess = getComputedStyle(document.querySelector('#live-excess-display'));
+    const alpha = (value) => {
+      const match = String(value).match(/rgba?\([^,]+,[^,]+,[^,]+(?:,\s*([\d.]+))?\)/);
+      return match?.[1] === undefined ? 1 : Number(match[1]);
+    };
     return {
       rail: { left: rail.left, right: rail.right, bottom: rail.bottom, height: rail.height },
       controlsTop: controls.top,
       metricsFit: metricNodes.every((node) => node.scrollWidth <= node.clientWidth + 1),
-      railBackground: railStyle.backgroundColor,
-      mobileBackground: mobileStyle.backgroundColor,
+      railAlpha: alpha(railStyle.backgroundColor),
+      mobileAlpha: alpha(mobileStyle.backgroundColor),
       actionRadius: action.borderRadius,
       actionShadow: action.boxShadow,
       smallRadius: small.borderRadius,
@@ -190,7 +194,8 @@ test('mobile HUD keeps the score-first language without clipping or control coll
   expect(mobile.rail.height).toBeLessThanOrEqual(90);
   expect(mobile.rail.bottom).toBeLessThan(mobile.controlsTop);
   expect(mobile.metricsFit).toBe(true);
-  expect(mobile.mobileBackground).toBe(mobile.railBackground);
+  expect(mobile.railAlpha).toBeLessThan(0.5);
+  expect(mobile.mobileAlpha).toBeGreaterThan(mobile.railAlpha);
   expect(mobile.actionRadius).toBe('0px');
   expect(mobile.smallRadius).toBe('0px');
   expect(mobile.actionShadow).not.toBe('none');
