@@ -213,7 +213,7 @@ test('Daily Run grants one free BOLL and MACD trial outside Pro', async ({ page 
 
   await page.locator('[data-indicator-card="boll"]').click();
   await expect(page.locator('[data-card-count="boll"]')).toHaveText('×0');
-  await page.locator('[data-indicator-card="macd"]')).click();
+  await page.locator('[data-indicator-card="macd"]').click();
   await expect(page.locator('[data-card-count="macd"]')).toHaveText('×0');
   await expect(page.locator('[data-indicator-draw]')).toHaveCount(0);
 });
