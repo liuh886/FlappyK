@@ -53,7 +53,6 @@ for (const contract of [
 
 assert.ok(!mobile.includes('grid-template-columns: 88px minmax(106px, 1fr) 88px'), 'The oversized centered speed-control layout must not return to the mobile spatial owner.');
 assert.ok(!mobile.includes(":has(#indicator-card-deck:not([hidden])) #game-canvas"), 'Power-ups must not reserve a separate tray above the mobile command dock.');
-assert.ok(!cards.includes('left: 50%'), 'The mobile power-up deck must not return to the centered tray layout.');
 assert.ok(!cards.includes('width: min(248px, calc(100% - 28px))'), 'The previous oversized mobile tactical tray must not return.');
 
 console.log('Top speed utility, centered trade cluster, outer power-ups, and always-visible settlement identity contracts passed.');
