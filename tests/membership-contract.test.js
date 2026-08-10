@@ -23,7 +23,7 @@ for (const contract of [
   "entitlementCode: 'flappyk.pro'",
   "mountSelectors: ['[data-account-slot]'",
   'ensureHomeAccountToolbar',
-  '公共排行榜不会直接信任浏览器提交的成绩',
+  '排行榜按正式游戏规则统计',
 ]) {
   assert.ok(configSource.includes(contract), `Missing shared FlappyK account contract: ${contract}`);
 }
@@ -32,9 +32,9 @@ for (const forbidden of [/sk_(live|test)_/, /sb_secret_/, /whsec_/, /service_rol
 }
 
 for (const reference of [
-  'https://liuh886.github.io/admin/shared/account-shell.css?v=4',
+  'https://liuh886.github.io/admin/shared/account-shell.css?v=5',
   '<script src="membership-config.js"></script>',
-  'async src="https://liuh886.github.io/admin/shared/account-shell.js?v=4"',
+  'async src="https://liuh886.github.io/admin/shared/account-shell.js?v=5"',
   '<script src="scripts/account-cloud-sync.js"></script>',
 ]) {
   assert.ok(indexSource.includes(reference), `FlappyK page is missing ${reference}`);
@@ -186,4 +186,4 @@ for (const privacyContract of [
   assert.ok(privacySource.includes(privacyContract), `Cloud-history documentation is missing ${privacyContract}`);
 }
 
-console.log('Shared Account Shell, Pro daily card grants, Daily Run free trials, cloud history, stable PWA cache, entitlement boundary, privacy, rankings, and RLS checks validated');
+console.log('Shared Account Shell v5, Pro daily card grants, Daily Run free trials, cloud history, stable PWA cache, entitlement boundary, privacy, rankings, and RLS checks validated');

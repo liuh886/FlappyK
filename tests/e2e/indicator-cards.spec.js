@@ -218,7 +218,7 @@ test('Daily Run grants one free BOLL and MACD trial outside Pro', async ({ page 
   await expect(page.locator('[data-indicator-draw]')).toHaveCount(0);
 });
 
-test('mobile Pro power-ups are tappable, contained, and stay clear of trade controls', async ({ page }) => {
+test('mobile Pro power-ups are tappable, contained, and flank trade controls', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await preparePage(page, {
     pro: true,
@@ -234,14 +234,19 @@ test('mobile Pro power-ups are tappable, contained, and stay clear of trade cont
 
   const mobile = await page.evaluate(() => {
     const deck = document.getElementById('indicator-card-deck').getBoundingClientRect();
-    const controls = document.getElementById('mobile-controls').getBoundingClientRect();
-    const buttons = Array.from(document.querySelectorAll('.indicator-card')).map((node) => {
-      const rect = node.getBoundingClientRect();
-      return { width: rect.width, height: rect.height };
-    });
+    const boll = document.querySelector('[data-indicator-card="boll"]').getBoundingClientRect();
+    const macd = document.querySelector('[data-indicator-card="macd"]').getBoundingClientRect();
+    const buy = document.getElementById('btn-buy').getBoundingClientRect();
+    const sell = document.getElementById('btn-sell').getBoundingClientRect();
+    const buttons = [boll, macd].map((rect) => ({ width: rect.width, height: rect.height }));
+    const centerY = (rect) => (rect.top + rect.bottom) / 2;
     return {
       deck: { left: deck.left, right: deck.right, bottom: deck.bottom },
-      controlsTop: controls.top,
+      bollRight: boll.right,
+      buyLeft: buy.left,
+      sellRight: sell.right,
+      macdLeft: macd.left,
+      verticalDelta: Math.max(Math.abs(centerY(boll) - centerY(buy)), Math.abs(centerY(macd) - centerY(sell))),
       buttons,
       actions: actions.length,
       viewportWidth: window.innerWidth,
@@ -253,9 +258,11 @@ test('mobile Pro power-ups are tappable, contained, and stay clear of trade cont
   expect(mobile.deck.left).toBeGreaterThanOrEqual(0);
   expect(mobile.deck.right).toBeLessThanOrEqual(mobile.viewportWidth);
   expect(mobile.deck.bottom).toBeLessThanOrEqual(mobile.viewportHeight);
-  expect(mobile.deck.bottom).toBeLessThanOrEqual(mobile.controlsTop - 4);
+  expect(mobile.bollRight).toBeLessThanOrEqual(mobile.buyLeft);
+  expect(mobile.macdLeft).toBeGreaterThanOrEqual(mobile.sellRight);
+  expect(mobile.verticalDelta).toBeLessThan(20);
   mobile.buttons.forEach((button) => {
-    expect(button.width).toBeGreaterThanOrEqual(80);
+    expect(button.width).toBeGreaterThanOrEqual(64);
     expect(button.height).toBeGreaterThanOrEqual(44);
   });
   expect(mobile.actions).toBe(before);

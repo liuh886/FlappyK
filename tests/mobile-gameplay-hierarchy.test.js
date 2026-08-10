@@ -15,11 +15,11 @@ assert.equal((index.match(/id="card-asset"/g) || []).length, 1, 'Asset ID must s
 assert.equal((index.match(/id="card-period"/g) || []).length, 1, 'Period ID must stay unique.');
 
 for (const contract of [
-  "grid-template-columns: minmax(72px, 1fr) auto minmax(72px, 1fr)",
+  'grid-template-columns: minmax(64px, 1fr) 78px 10px 78px minmax(64px, 1fr)',
   '#mobile-controls #btn-buy',
   '#mobile-controls #btn-sell',
-  'grid-column: 1',
-  'grid-column: 3',
+  'grid-column: 2',
+  'grid-column: 4',
   '#mobile-controls .mobile-speed-control',
   'position: fixed',
   'top: calc(max(6px, env(safe-area-inset-top)) + 88px)',
@@ -28,29 +28,31 @@ for (const contract of [
   'opacity: 0.68',
   'background: transparent',
   "data-ui-state='playing'",
-  ':has(#indicator-card-deck:not([hidden])) #game-canvas',
-  'margin-bottom: 184px',
+  'margin-bottom: 102px',
+  'Power-ups now share the dock.',
 ]) {
   assert.ok(mobile.includes(contract), `Missing mobile gameplay hierarchy contract: ${contract}`);
 }
 
 for (const contract of [
-  'left: 50%',
-  'transform: translateX(-50%)',
-  'width: min(190px',
-  'width: min(180px',
+  'right: max(8px, env(safe-area-inset-right))',
+  'left: max(8px, env(safe-area-inset-left))',
+  'z-index: 82',
+  'grid-template-columns: 64px 64px',
+  'justify-content: space-between',
+  'width: 64px',
   '.indicator-card-copy small',
   'display: none',
   'grid-template-columns: minmax(0, 1fr) auto',
   'min-height: 44px',
   'border-width: 1px',
-  'justify-self: center',
   'background: transparent',
 ]) {
-  assert.ok(cards.includes(contract), `Missing mini mobile tactical-hand contract: ${contract}`);
+  assert.ok(cards.includes(contract), `Missing outer mobile power-up contract: ${contract}`);
 }
 
 assert.ok(!mobile.includes('grid-template-columns: 88px minmax(106px, 1fr) 88px'), 'The oversized centered speed-control layout must not return to the mobile spatial owner.');
+assert.ok(!mobile.includes(":has(#indicator-card-deck:not([hidden])) #game-canvas"), 'Power-ups must not reserve a separate tray above the mobile command dock.');
 assert.ok(!cards.includes('width: min(248px, calc(100% - 28px))'), 'The previous oversized mobile tactical tray must not return.');
 
-console.log('Top speed utility, bottom thumb hierarchy, mini tactical cards, and always-visible settlement identity contracts passed.');
+console.log('Top speed utility, centered trade cluster, outer power-ups, and always-visible settlement identity contracts passed.');

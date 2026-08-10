@@ -105,13 +105,13 @@ for (const contract of [
   "productCode: 'flappyk'",
   "entitlementCode: 'flappyk.pro'",
   'billingEnabled: true',
-  '公共排行榜不会直接信任浏览器提交的成绩',
+  '排行榜按正式游戏规则统计',
 ]) {
   if (!membershipConfig.includes(contract)) throw new Error(`FlappyK account config is missing ${contract}`);
 }
 for (const reference of [
-  'https://liuh886.github.io/admin/shared/account-shell.css?v=4',
-  'https://liuh886.github.io/admin/shared/account-shell.js?v=4',
+  'https://liuh886.github.io/admin/shared/account-shell.css?v=5',
+  'https://liuh886.github.io/admin/shared/account-shell.js?v=5',
   'scripts/account-cloud-sync.js',
 ]) {
   if (!index.includes(reference)) throw new Error(`FlappyK index is missing ${reference}`);
@@ -132,4 +132,4 @@ for (const forbidden of [/sk_(live|test)_/, /whsec_/, /sb_secret_/, /service_rol
 
 requireFile('data/leaderboard.json');
 requireFile('.github/workflows/leaderboard.yml');
-console.log('Structured gameplay, PWA, GA4 product events, Cloudflare RUM, Google/GitHub/X Account Shell v4, cloud-history, and asset contracts passed.');
+console.log('Structured gameplay, PWA, GA4 product events, Cloudflare RUM, Google/GitHub/X Account Shell v5, cloud-history, and asset contracts passed.');
