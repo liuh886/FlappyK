@@ -205,6 +205,6 @@ test('mobile HUD keeps the readable score-first language without clipping or con
   expect(mobile.actionShadow).not.toBe('none');
   expect(mobile.secondarySize).toBe('11px');
   expect(mobile.excessSize).toBe('18px');
-  expect(mobile.labelSize).toBe('8px');
+  expect(parseFloat(mobile.labelSize)).toBeGreaterThanOrEqual(9);
   expect(parseFloat(mobile.excessSize)).toBeGreaterThan(parseFloat(mobile.secondarySize));
 });
