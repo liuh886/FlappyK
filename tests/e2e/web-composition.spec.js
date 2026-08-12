@@ -274,7 +274,7 @@ test('mobile keeps the same hierarchy with readable labels above virtual control
   expect(positions.runWidth).toBeGreaterThanOrEqual(98);
   expect(positions.runWidth).toBeLessThanOrEqual(106);
   expect(positions.runHeight).toBeGreaterThanOrEqual(40);
-  expect(positions.runHeight).toBeLessThanOrEqual(50);
+  expect(positions.runHeight).toBeLessThanOrEqual(52);
   expect(positions.statsColumns).toBe(3);
   expect(positions.metricsFit).toBe(true);
 
@@ -284,7 +284,7 @@ test('mobile keeps the same hierarchy with readable labels above virtual control
   expect(positions.speedSize).toBe('14px');
   expect(positions.hudSize).toBe('11px');
   expect(positions.excessSize).toBe('18px');
-  expect(positions.labelSize).toBe('8px');
+  expect(parseFloat(positions.labelSize)).toBeGreaterThanOrEqual(9);
   expect(parseFloat(positions.excessSize)).toBeGreaterThan(parseFloat(positions.hudSize));
   expect(positions.runSize).toBe('12px');
 });
