@@ -65,9 +65,11 @@ for (const contract of [
   assert.ok(refinementCss.includes(contract), `Missing curated presentation contract: ${contract}`);
 }
 
-// The established gameplay instrument system remains the sole owner of HUD/control visual details.
+// The gameplay instrument system owns a readable score-first hierarchy at fullscreen scale.
+assert.ok(!baseStyles.includes('font-size: 5px !important'), 'Gameplay UI must not regress to 5px labels.');
+assert.ok(!baseStyles.includes('height: 52px !important'), 'Fullscreen HUD must not regress to the old 52px strip.');
 for (const hudLanguageContract of [
-  'HUD instrument system: one shell, one divider, one score-first hierarchy.',
+  'Fullscreen gameplay HUD: readable hierarchy over a dominant chart.',
   '--hud-shell:',
   '--hud-divider:',
   '--hud-label:',
@@ -76,18 +78,19 @@ for (const hudLanguageContract of [
   '--hud-negative:',
   '#game-hud-rail .weather-status::before',
   "html[data-market-weather='cloudy']",
-  "grid-template-columns: minmax(142px, 1.7fr) minmax(82px, 0.72fr) minmax(82px, 0.72fr)",
+  "grid-template-columns: minmax(210px, 1.55fr) minmax(110px, 0.8fr) minmax(110px, 0.8fr)",
   ".stats-box[data-composition='returns-only'] .excess-meter",
   '.run-progress-panel .hud-header',
   '#game-top-controls .speed-step:hover',
   '.trade-key-hint + .trade-key-hint',
   "#mobile-controls:not([hidden])",
   '#mobile-controls .mobile-btn',
-  'height: 52px !important',
-  'border-radius: 0 !important',
+  'min-height: 84px !important',
+  'font-size: 26px !important',
+  'font-size: 9px !important',
   'height: auto !important',
 ]) {
-  assert.ok(baseStyles.includes(hudLanguageContract), `Missing unified HUD language contract: ${hudLanguageContract}`);
+  assert.ok(baseStyles.includes(hudLanguageContract), `Missing readable HUD language contract: ${hudLanguageContract}`);
 }
 
 for (const homeShellContract of [
@@ -149,4 +152,4 @@ assert.ok(!serviceWorker.includes("'./membership-sync.css'"));
 assert.ok(serviceWorker.includes("'./market-weather.css'"));
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"));
 
-console.log('Curated full-viewport home and gameplay, static score-first HUD ownership, unified gameplay instrument system, Pro/Daily Run tactical power-ups, responsive controls, isolated weather, and stable PWA cache contracts passed.');
+console.log('Curated full-viewport home and gameplay, readable score-first HUD hierarchy, unified gameplay instruments, responsive controls, isolated weather, and stable PWA cache contracts passed.');
