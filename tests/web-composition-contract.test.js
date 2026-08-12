@@ -36,6 +36,8 @@ assert.ok(!refinementJs.includes('style.textContent = `'));
 assert.ok(!refinementJs.includes('installPixelCompatibilityStyles'));
 
 // Curated presentation layer owns typography, home, structural composition, and secondary screens.
+assert.ok(!refinementCss.includes('width: min(896px'), 'Fixed desktop viewport width must not return.');
+assert.ok(!refinementCss.includes('aspect-ratio: 4 / 3'), 'Fixed desktop viewport aspect ratio must not return.');
 for (const contract of [
   "family=Pixelify+Sans",
   "--pixel-font-display: 'Press Start 2P'",
