@@ -84,8 +84,8 @@ test('desktop game uses one compact score-first pixel HUD rail around the domina
   await expect(page.locator('#run-progress-panel')).toBeVisible();
   await expect(page.locator('.controls-hint')).toBeVisible();
 
-  await expect.poll(() => page.locator('#game-canvas').getAttribute('width')).toBe('896');
-  await expect.poll(() => page.locator('#game-canvas').getAttribute('height')).toBe('672');
+  await expect.poll(() => page.locator('#game-canvas').getAttribute('width')).toBe('1440');
+  await expect.poll(() => page.locator('#game-canvas').getAttribute('height')).toBe('900');
 
   await expect(page.locator('.stats-box > .hud-main')).toHaveCount(1);
   await expect(page.locator('.stats-box > #excess-meter')).toHaveCount(1);
@@ -122,6 +122,7 @@ test('desktop game uses one compact score-first pixel HUD rail around the domina
     const excessValue = style('#live-excess-display');
     const metricNodes = Array.from(document.querySelectorAll('.hud-total, .hud-return, #excess-meter'));
     return {
+      viewport: { width: window.innerWidth, height: window.innerHeight },
       container: { x: container.x, y: container.y, width: container.width, height: container.height, bottom: container.bottom },
       rail: { x: rail.x, y: rail.y, width: rail.width, height: rail.height, right: rail.right, bottom: rail.bottom },
       weather: { x: weather.x, y: weather.y, width: weather.width, height: weather.height, right: weather.right, bottom: weather.bottom },
@@ -156,8 +157,10 @@ test('desktop game uses one compact score-first pixel HUD rail around the domina
     };
   });
 
-  expect(layout.container.width).toBeGreaterThanOrEqual(894);
-  expect(layout.container.width).toBeLessThanOrEqual(898);
+  expect(Math.abs(layout.container.x)).toBeLessThanOrEqual(1);
+  expect(Math.abs(layout.container.y)).toBeLessThanOrEqual(1);
+  expect(Math.abs(layout.container.width - layout.viewport.width)).toBeLessThanOrEqual(1);
+  expect(Math.abs(layout.container.height - layout.viewport.height)).toBeLessThanOrEqual(1);
   expect(layout.rail.x - layout.container.x).toBeGreaterThanOrEqual(10);
   expect(layout.rail.x - layout.container.x).toBeLessThan(22);
   expect(layout.rail.y - layout.container.y).toBeGreaterThanOrEqual(10);
@@ -176,8 +179,8 @@ test('desktop game uses one compact score-first pixel HUD rail around the domina
   expect(layout.top.right).toBeLessThanOrEqual(layout.rail.right + 1);
 
   expect(layout.stats.width).toBeGreaterThanOrEqual(360);
-  expect(layout.stats.width).toBeLessThanOrEqual(400);
-  expect(layout.run.width).toBeLessThanOrEqual(180);
+  expect(layout.stats.width / layout.rail.width).toBeLessThanOrEqual(0.55);
+  expect(layout.run.width / layout.rail.width).toBeLessThanOrEqual(0.25);
   expect(layout.statsColumns).toBe(3);
   expect(layout.hudMainDisplay).toBe('contents');
   expect(layout.metricsFit).toBe(true);

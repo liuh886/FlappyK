@@ -7,8 +7,6 @@
     const uiLayer = document.getElementById('ui-layer');
     const topControls = document.getElementById('game-top-controls');
     const controlsHint = document.querySelector('.controls-hint');
-    const DESKTOP_CANVAS_WIDTH = 896;
-    const DESKTOP_CANVAS_HEIGHT = 672;
     const HUD_RAIL_ID = 'game-hud-rail';
     let compositionFrame = 0;
 
@@ -242,12 +240,8 @@
     function syncCanvasLayout() {
         if (!canvasElement || typeof draw !== 'function') return;
 
-        const targetWidth = usesVirtualControls()
-            ? (canvasElement.clientWidth || window.innerWidth)
-            : DESKTOP_CANVAS_WIDTH;
-        const targetHeight = usesVirtualControls()
-            ? (canvasElement.clientHeight || Math.round(window.innerHeight * 0.68))
-            : DESKTOP_CANVAS_HEIGHT;
+        const targetWidth = Math.max(1, Math.round(canvasElement.clientWidth || window.innerWidth));
+        const targetHeight = Math.max(1, Math.round(canvasElement.clientHeight || window.innerHeight));
         let changed = false;
 
         if (canvasElement.width !== targetWidth) {
@@ -352,8 +346,6 @@
     window.addEventListener('orientationchange', scheduleComposition);
 
     window.FlappyKPremiumUIRefinement = {
-        DESKTOP_CANVAS_WIDTH,
-        DESKTOP_CANVAS_HEIGHT,
         HUD_RAIL_ID,
         restoreLegacyGoalNode,
         normalizeMetricRows,

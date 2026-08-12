@@ -1,14 +1,20 @@
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
+const gameContainer = document.getElementById('game-container');
 
 function resizeCanvas() {
-    if (window.matchMedia("(max-width: 768px)").matches) {
-        canvas.width = canvas.clientWidth || window.innerWidth;
-        canvas.height = canvas.clientHeight || (window.innerHeight * 0.6);
-    } else {
-        canvas.width = 800;
-        canvas.height = 600;
-    }
+    gameContainer.style.width = '100vw';
+    gameContainer.style.height = '100dvh';
+    gameContainer.style.border = 'none';
+    gameContainer.style.boxShadow = 'none';
+
+    const fallbackHeight = window.matchMedia("(max-width: 768px)").matches
+        ? window.innerHeight * 0.6
+        : window.innerHeight;
+
+    canvas.width = canvas.clientWidth || window.innerWidth;
+    canvas.height = canvas.clientHeight || fallbackHeight;
+
     if (typeof isPlaying !== 'undefined' && isPlaying) draw();
 }
 
