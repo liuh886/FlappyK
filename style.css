@@ -465,17 +465,17 @@ button:active {
     }
 }
 
-/* HUD instrument system: one shell, one divider, one score-first hierarchy. */
+/* Fullscreen gameplay HUD: readable hierarchy over a dominant chart. */
 :root {
     --hud-shell: rgba(6, 12, 20, 0.94);
-    --hud-cell: rgba(18, 29, 43, 0.72);
-    --hud-cell-hover: rgba(30, 45, 64, 0.9);
+    --hud-cell: rgba(18, 29, 43, 0.78);
+    --hud-cell-hover: rgba(30, 45, 64, 0.94);
     --hud-frame: #9fb0c4;
-    --hud-divider: rgba(159, 176, 196, 0.28);
-    --hud-label: #91a0b3;
+    --hud-divider: rgba(159, 176, 196, 0.24);
+    --hud-label: #9aabba;
     --hud-value: #f4f8fc;
     --hud-track: #07101a;
-    --hud-track-line: #314158;
+    --hud-track-line: #3a4b61;
     --hud-neutral: #70d8e4;
     --hud-positive: #54df91;
     --hud-negative: #ff7774;
@@ -484,31 +484,37 @@ button:active {
 }
 
 html body #game-container #game-hud-rail {
-    grid-template-columns: minmax(112px, 0.44fr) minmax(350px, 1.5fr) minmax(148px, 0.64fr) auto !important;
-    min-height: 52px !important;
-    height: 52px !important;
-    overflow: hidden !important;
-    border: 2px solid var(--hud-frame) !important;
-    background: var(--hud-shell) !important;
-    box-shadow: 4px 4px 0 var(--hud-shadow) !important;
-    clip-path: var(--pixel-cut) !important;
+    grid-template-columns: minmax(170px, 220px) minmax(460px, 620px) minmax(210px, 280px) auto !important;
+    justify-content: center !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    min-height: 84px !important;
+    height: 84px !important;
+    overflow: visible !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    clip-path: none !important;
 }
 
 html body #game-container #game-hud-rail > * {
     min-width: 0 !important;
+    overflow: hidden !important;
+    border: 2px solid var(--hud-frame) !important;
     border-radius: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
+    background: var(--hud-shell) !important;
+    box-shadow: 4px 4px 0 var(--hud-shadow) !important;
+    clip-path: var(--pixel-cut) !important;
 }
 
 html body #game-container #game-hud-rail .hud-metric-label,
 html body #game-container #game-hud-rail .excess-meter-label,
 html body #game-container #game-hud-rail .weather-status {
     color: var(--hud-label) !important;
-    font-family: var(--pixel-font-display) !important;
-    font-size: 7px !important;
-    font-weight: 400 !important;
-    line-height: 1 !important;
+    font-family: var(--pixel-font-ui) !important;
+    font-size: 9px !important;
+    font-weight: 700 !important;
+    line-height: 1.05 !important;
     letter-spacing: 0.055em !important;
     opacity: 1 !important;
 }
@@ -521,8 +527,8 @@ html body #game-container #game-hud-rail #day-display,
 html body #game-container #game-hud-rail .speed-readout {
     color: var(--hud-value) !important;
     font-family: var(--pixel-font-ui) !important;
-    font-size: 13px !important;
-    font-weight: 600 !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
     font-variant-numeric: tabular-nums !important;
     line-height: 1 !important;
 }
@@ -545,16 +551,17 @@ html body #game-container #game-hud-rail .weather-status {
     width: auto !important;
     min-width: 0 !important;
     margin: 0 !important;
-    padding: 0 9px !important;
+    padding: 0 16px !important;
     align-items: center !important;
-    gap: 7px !important;
+    justify-content: flex-start !important;
+    gap: 10px !important;
     overflow: hidden !important;
-    border: 0 !important;
-    border-right: 1px solid var(--hud-divider) !important;
+    border: 2px solid var(--hud-frame) !important;
     color: var(--hud-label) !important;
     font-family: var(--pixel-font-ui) !important;
-    font-size: 9px !important;
-    letter-spacing: 0.02em !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.025em !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
     transform: none !important;
@@ -562,9 +569,9 @@ html body #game-container #game-hud-rail .weather-status {
 
 html body #game-container #game-hud-rail .weather-status::before {
     flex: 0 0 auto;
-    width: 7px;
-    height: 7px;
-    border: 1px solid rgba(255, 255, 255, 0.72);
+    width: 10px;
+    height: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.78);
     background: var(--hud-neutral);
     box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.48);
     content: '';
@@ -583,7 +590,6 @@ html[data-market-weather='rain'] body #game-container #game-hud-rail .weather-st
 }
 
 html body #game-container #game-hud-rail .weather-status.is-event {
-    background: transparent !important;
     color: var(--hud-value) !important;
 }
 
@@ -597,13 +603,12 @@ html body #game-container #game-hud-rail .weather-status[data-tone='negative']::
 
 html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] {
     display: grid !important;
-    grid-template-columns: minmax(142px, 1.7fr) minmax(82px, 0.72fr) minmax(82px, 0.72fr) !important;
+    grid-template-columns: minmax(210px, 1.55fr) minmax(110px, 0.8fr) minmax(110px, 0.8fr) !important;
     width: auto !important;
     min-width: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
-    border: 0 !important;
-    border-right: 1px solid var(--hud-divider) !important;
+    border: 2px solid var(--hud-frame) !important;
     backdrop-filter: none !important;
 }
 
@@ -616,9 +621,9 @@ html body #game-container #game-hud-rail .stats-box[data-composition='returns-on
     display: grid !important;
     min-width: 0 !important;
     margin: 0 !important;
-    padding: 6px 8px !important;
+    padding: 11px 13px !important;
     align-content: center !important;
-    gap: 3px !important;
+    gap: 7px !important;
     border: 0 !important;
     background: transparent !important;
 }
@@ -627,8 +632,7 @@ html body #game-container #game-hud-rail .stats-box[data-composition='returns-on
     grid-column: 1 !important;
     grid-row: 1 !important;
     border-right: 1px solid var(--hud-divider) !important;
-    background:
-        linear-gradient(90deg, rgba(112, 216, 228, 0.075), transparent 72%) !important;
+    background: linear-gradient(90deg, rgba(112, 216, 228, 0.09), transparent 78%) !important;
 }
 
 html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] .hud-total {
@@ -645,52 +649,53 @@ html body #game-container #game-hud-rail .stats-box[data-composition='returns-on
 html body #game-container #game-hud-rail #total-display,
 html body #game-container #game-hud-rail #return-display {
     overflow: visible !important;
-    color: #c7d2de !important;
-    font-size: 11px !important;
+    color: #d2dbe5 !important;
+    font-size: 15px !important;
     text-overflow: clip !important;
     white-space: nowrap !important;
 }
 
 html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] .hud-metric-label {
-    color: #718398 !important;
-    font-size: 6px !important;
+    color: #8fa0b2 !important;
+    font-size: 9px !important;
 }
 
 html body #game-container #game-hud-rail .excess-meter-label {
     display: grid !important;
     grid-template-columns: 1fr !important;
-    gap: 3px !important;
+    gap: 5px !important;
 }
 
 html body #game-container #game-hud-rail .excess-meter-label > span {
     color: var(--hud-neutral) !important;
-    font-size: 7px !important;
+    font-size: 9px !important;
 }
 
 html body #game-container #game-hud-rail .excess-meter-label strong,
 html body #game-container #game-hud-rail #live-excess-display {
     overflow: visible !important;
-    font-size: 17px !important;
+    font-size: 26px !important;
     font-weight: 700 !important;
+    line-height: 0.95 !important;
     text-overflow: clip !important;
     white-space: nowrap !important;
 }
 
 html body #game-container #game-hud-rail .excess-meter-track,
 html body #game-container #game-hud-rail .run-progress-panel .day-progress {
-    height: 4px !important;
+    height: 6px !important;
     border: 1px solid var(--hud-track-line) !important;
     background: var(--hud-track) !important;
 }
 
 html body #game-container #game-hud-rail .excess-meter-track {
     width: 100% !important;
-    margin-top: 0 !important;
+    margin-top: 1px !important;
 }
 
 html body #game-container #game-hud-rail .excess-meter-indicator {
-    width: 7px !important;
-    height: 7px !important;
+    width: 10px !important;
+    height: 10px !important;
     border: 1px solid var(--hud-value) !important;
     background: var(--hud-negative) !important;
 }
@@ -707,8 +712,7 @@ html body #game-container #game-hud-rail .run-progress-panel {
     min-width: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
-    border: 0 !important;
-    border-right: 1px solid var(--hud-divider) !important;
+    border: 2px solid var(--hud-frame) !important;
 }
 
 html body #game-container #game-hud-rail .run-progress-panel .hud-header {
@@ -719,20 +723,20 @@ html body #game-container #game-hud-rail .run-progress-panel .hud-game,
 html body #game-container #game-hud-rail .run-progress-panel .hud-day {
     display: grid !important;
     min-width: 0 !important;
-    padding: 7px 7px 4px !important;
+    padding: 13px 12px 8px !important;
     align-content: center !important;
-    gap: 3px !important;
+    gap: 6px !important;
 }
 
 html body #game-container #game-hud-rail .run-progress-panel .hud-metric-label {
-    color: #718398 !important;
-    font-size: 6px !important;
+    color: #8fa0b2 !important;
+    font-size: 9px !important;
 }
 
 html body #game-container #game-hud-rail #level-display,
 html body #game-container #game-hud-rail #day-display {
-    color: #c7d2de !important;
-    font-size: 11px !important;
+    color: #d2dbe5 !important;
+    font-size: 15px !important;
 }
 
 html body #game-container #game-hud-rail .run-progress-panel .hud-day {
@@ -742,7 +746,7 @@ html body #game-container #game-hud-rail .run-progress-panel .hud-day {
 html body #game-container #game-hud-rail .run-progress-panel .day-progress {
     grid-column: 1 / -1 !important;
     width: auto !important;
-    margin: 0 7px 6px !important;
+    margin: 0 12px 10px !important;
 }
 
 html body #game-container #game-hud-rail .run-progress-panel .day-progress-fill {
@@ -753,30 +757,30 @@ html body #game-container #game-hud-rail #game-top-controls {
     position: static !important;
     inset: auto !important;
     align-self: stretch !important;
-    gap: 4px !important;
+    gap: 6px !important;
     margin: 0 !important;
-    padding: 7px 8px !important;
-    border: 0 !important;
-    background: transparent !important;
+    padding: 14px 12px !important;
+    border: 2px solid var(--hud-frame) !important;
+    background: var(--hud-shell) !important;
 }
 
 html body #game-container #game-hud-rail #game-top-controls .desktop-speed-control {
-    grid-template-columns: 28px 44px 28px !important;
-    gap: 3px !important;
-    margin: 0 5px 0 0 !important;
-    padding-right: 7px !important;
+    grid-template-columns: 34px 54px 34px !important;
+    gap: 4px !important;
+    margin: 0 7px 0 0 !important;
+    padding-right: 9px !important;
     border-right: 1px solid var(--hud-divider) !important;
 }
 
 html body #game-container #game-hud-rail #game-top-controls .speed-step,
 html body #game-container #game-hud-rail #game-top-controls > button {
-    width: 30px !important;
-    min-width: 30px !important;
-    height: 30px !important;
-    min-height: 30px !important;
+    width: 38px !important;
+    min-width: 38px !important;
+    height: 38px !important;
+    min-height: 38px !important;
     margin: 0 !important;
     padding: 0 !important;
-    border: 1px solid #52647c !important;
+    border: 1px solid #667991 !important;
     border-radius: 0 !important;
     background: var(--hud-cell) !important;
     box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.42) !important;
@@ -796,15 +800,15 @@ html body #game-container #game-hud-rail #game-top-controls .is-arcade-pressed {
 }
 
 html body #game-container #game-hud-rail #game-top-controls .speed-readout {
-    min-width: 44px !important;
+    min-width: 54px !important;
     color: var(--hud-warning) !important;
-    font-size: 14px !important;
+    font-size: 16px !important;
 }
 
 @media (min-width: 1025px) and (pointer: fine) {
     html body #game-container .controls-hint {
         position: absolute !important;
-        bottom: 14px !important;
+        bottom: 18px !important;
         left: 50% !important;
         z-index: 62 !important;
         display: block !important;
@@ -827,26 +831,27 @@ html body #game-container #game-hud-rail #game-top-controls .speed-readout {
     }
 
     html body #game-container .trade-key-hint {
-        min-height: 34px !important;
+        min-height: 42px !important;
         margin: 0 !important;
-        padding: 5px 10px 5px 5px !important;
+        padding: 7px 14px 7px 8px !important;
         border: 0 !important;
         background: transparent !important;
         box-shadow: none !important;
         color: var(--hud-value) !important;
-        font-size: 13px !important;
+        font-size: 15px !important;
+        font-weight: 600 !important;
         opacity: 1 !important;
     }
 
     html body #game-container .trade-key-hint + .trade-key-hint {
-        padding-left: 10px !important;
+        padding-left: 14px !important;
         border-left: 1px solid var(--hud-divider) !important;
     }
 
     html body #game-container .trade-key-hint .key {
-        min-width: 28px !important;
-        padding: 4px !important;
-        border: 1px solid #52647c !important;
+        min-width: 32px !important;
+        padding: 5px !important;
+        border: 1px solid #667991 !important;
         border-radius: 0 !important;
         background: var(--hud-cell) !important;
         color: var(--hud-warning) !important;
@@ -854,87 +859,113 @@ html body #game-container #game-hud-rail #game-top-controls .speed-readout {
     }
 }
 
-@media (max-width: 720px), (pointer: coarse) {
+@media (max-width: 1100px) and (min-width: 721px) {
     html body #game-container #game-hud-rail {
-        grid-template-columns: minmax(0, 1fr) auto !important;
-        grid-template-rows: auto auto !important;
-        min-height: 78px !important;
-        height: auto !important;
+        grid-template-columns: minmax(150px, 0.72fr) minmax(390px, 1.6fr) minmax(190px, 0.8fr) auto !important;
+        gap: 6px !important;
     }
 
     html body #game-container #game-hud-rail .weather-status {
-        min-height: 30px !important;
-        padding: 5px 7px !important;
-        border-top: 1px solid var(--hud-divider) !important;
-        border-right: 0 !important;
-        font-size: 8px !important;
-    }
-
-    html body #game-container #game-hud-rail .weather-status::before {
-        width: 7px;
-        height: 7px;
+        padding-inline: 12px !important;
+        font-size: 11px !important;
     }
 
     html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] {
-        grid-template-columns: minmax(124px, 1.55fr) minmax(68px, 0.72fr) minmax(68px, 0.72fr) !important;
-        border-right: 0 !important;
-        border-bottom: 1px solid var(--hud-divider) !important;
+        grid-template-columns: minmax(180px, 1.45fr) minmax(92px, 0.78fr) minmax(92px, 0.78fr) !important;
+    }
+}
+
+@media (max-width: 720px), (pointer: coarse) {
+    html body #game-container #game-hud-rail {
+        grid-template-columns: minmax(0, 1fr) 78px !important;
+        grid-template-rows: auto auto !important;
+        gap: 6px !important;
+        min-height: 0 !important;
+        height: auto !important;
+        overflow: visible !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    html body #game-container #game-hud-rail > * {
+        box-shadow: 3px 3px 0 var(--hud-shadow) !important;
+    }
+
+    html body #game-container #game-hud-rail .weather-status {
+        min-height: 42px !important;
+        padding: 7px 10px !important;
+        border: 2px solid var(--hud-frame) !important;
+        font-size: 11px !important;
+    }
+
+    html body #game-container #game-hud-rail .weather-status::before {
+        width: 9px;
+        height: 9px;
+    }
+
+    html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] {
+        grid-template-columns: minmax(118px, 1.5fr) minmax(64px, 0.72fr) minmax(64px, 0.72fr) !important;
+        min-height: 58px !important;
+        border: 2px solid var(--hud-frame) !important;
     }
 
     html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] .hud-main .hud-stat-row,
     html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] .excess-meter {
-        padding: 4px 5px !important;
-        gap: 2px !important;
+        padding: 7px 7px !important;
+        gap: 4px !important;
     }
 
     html body #game-container #game-hud-rail #total-display,
     html body #game-container #game-hud-rail #return-display {
-        font-size: 9px !important;
+        font-size: 11px !important;
     }
 
     html body #game-container #game-hud-rail #live-excess-display,
     html body #game-container #game-hud-rail .excess-meter-label strong {
-        font-size: 14px !important;
+        font-size: 18px !important;
     }
 
     html body #game-container #game-hud-rail #level-display,
     html body #game-container #game-hud-rail #day-display {
-        font-size: 10px !important;
+        font-size: 12px !important;
     }
 
     html body #game-container #game-hud-rail .hud-metric-label,
-    html body #game-container #game-hud-rail .excess-meter-label {
-        font-size: 5px !important;
+    html body #game-container #game-hud-rail .excess-meter-label,
+    html body #game-container #game-hud-rail .excess-meter-label > span,
+    html body #game-container #game-hud-rail .run-progress-panel .hud-metric-label {
+        font-size: 8px !important;
     }
 
     html body #game-container #game-hud-rail .run-progress-panel {
-        min-width: 122px !important;
-        border-top: 1px solid var(--hud-divider) !important;
-        border-right: 0 !important;
-        border-left: 1px solid var(--hud-divider) !important;
+        min-width: 132px !important;
+        min-height: 42px !important;
+        border: 2px solid var(--hud-frame) !important;
     }
 
     html body #game-container #game-hud-rail .run-progress-panel .hud-game,
     html body #game-container #game-hud-rail .run-progress-panel .hud-day {
-        padding: 5px 5px 3px !important;
+        padding: 7px 7px 4px !important;
+        gap: 4px !important;
     }
 
     html body #game-container #game-hud-rail .run-progress-panel .day-progress {
-        margin: 0 5px 4px !important;
+        height: 5px !important;
+        margin: 0 7px 6px !important;
     }
 
     html body #game-container #game-hud-rail #game-top-controls {
-        min-width: 68px !important;
-        padding: 5px !important;
-        border-bottom: 1px solid var(--hud-divider) !important;
-        border-left: 1px solid var(--hud-divider) !important;
+        min-width: 78px !important;
+        padding: 9px 7px !important;
+        border: 2px solid var(--hud-frame) !important;
     }
 
     html body #game-container #game-hud-rail #game-top-controls > button {
-        width: 28px !important;
-        min-width: 28px !important;
-        height: 28px !important;
-        min-height: 28px !important;
+        width: 32px !important;
+        min-width: 32px !important;
+        height: 32px !important;
+        min-height: 32px !important;
     }
 
     html body #game-container #mobile-controls:not([hidden]) {
@@ -951,7 +982,7 @@ html body #game-container #game-hud-rail #game-top-controls .speed-readout {
     }
 
     html body #game-container #mobile-controls .small-btn {
-        border-color: #52647c !important;
+        border-color: #667991 !important;
         color: var(--hud-value) !important;
     }
 }
