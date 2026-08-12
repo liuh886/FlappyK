@@ -14,8 +14,10 @@ assert.ok(hardeningJs.includes('levelDisp.textContent = String(visibleGame)'));
 assert.ok(!hardeningJs.includes('levelDisp.textContent = `${visibleGame}/3`'));
 
 // JavaScript owns composition/state only; presentation must stay static and reviewable.
-assert.ok(refinementJs.includes('const DESKTOP_CANVAS_WIDTH = 896'));
-assert.ok(refinementJs.includes('const DESKTOP_CANVAS_HEIGHT = 672'));
+assert.ok(refinementJs.includes('canvasElement.clientWidth || window.innerWidth'));
+assert.ok(refinementJs.includes('canvasElement.clientHeight || window.innerHeight'));
+assert.ok(!refinementJs.includes('DESKTOP_CANVAS_WIDTH'));
+assert.ok(!refinementJs.includes('DESKTOP_CANVAS_HEIGHT'));
 assert.ok(refinementJs.includes("const HUD_RAIL_ID = 'game-hud-rail'"));
 assert.ok(refinementJs.includes('function ensureHudRail()'));
 assert.ok(refinementJs.includes("rail.id = HUD_RAIL_ID"));
@@ -46,7 +48,6 @@ for (const contract of [
   '#ui-layer[data-hud-composition=',
   '#game-hud-rail',
   '.hud-metric-label',
-  'width: min(896px',
   "html[data-virtual-controls='true'] #game-top-controls .desktop-speed-control",
   "html[data-ui-state='home'] .controls-hint",
   "#game-hud-rail .stats-box[data-composition='returns-only']",
@@ -146,4 +147,4 @@ assert.ok(!serviceWorker.includes("'./membership-sync.css'"));
 assert.ok(serviceWorker.includes("'./market-weather.css'"));
 assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"));
 
-console.log('Curated full-viewport home, static score-first HUD ownership, unified gameplay instrument system, Pro/Daily Run tactical power-ups, responsive controls, isolated weather, and stable PWA cache contracts passed.');
+console.log('Curated full-viewport home and gameplay, static score-first HUD ownership, unified gameplay instrument system, Pro/Daily Run tactical power-ups, responsive controls, isolated weather, and stable PWA cache contracts passed.');
