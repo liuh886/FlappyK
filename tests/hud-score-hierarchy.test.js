@@ -17,7 +17,7 @@ for (const contract of [
   '#live-excess-display',
   'font-size: 26px !important',
   'color: #d2dbe5 !important',
-  'grid-template-columns: minmax(118px, 1.5fr) minmax(64px, 0.72fr) minmax(64px, 0.72fr)',
+  'grid-template-columns: minmax(96px, 1.5fr) minmax(48px, 0.72fr) minmax(48px, 0.72fr)',
   'font-size: 18px !important',
 ]) {
   assert.ok(base.includes(contract), `Missing readable score-first HUD visual contract: ${contract}`);
