@@ -856,13 +856,6 @@ html:not([data-ui-state='onboarding']):not([data-ui-state='playing']):not([data-
     white-space: nowrap;
 }
 
-@media (min-width: 1025px) and (pointer: fine) {
-    #game-container {
-        width: min(896px, calc(100vw - 32px), calc(133.333vh - 40px));
-        aspect-ratio: 4 / 3;
-    }
-}
-
 @media (max-width: 720px), (pointer: coarse) {
     body::before {
         opacity: 0.1;
