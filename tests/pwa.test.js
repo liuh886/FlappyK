@@ -72,13 +72,15 @@ assert.ok(pixelStyles.includes('.home-primary-actions #start-btn'));
 assert.ok(pixelStyles.includes('font-size: 22px'));
 assert.ok(pixelStyles.includes('min-height: 64px'));
 
-// Gameplay instrument visuals remain centralized in style.css.
-assert.ok(baseStyles.includes('HUD instrument system: one shell, one divider, one score-first hierarchy.'));
+// Gameplay instrument visuals remain centralized in style.css and readable at fullscreen scale.
+assert.ok(baseStyles.includes('Fullscreen gameplay HUD: readable hierarchy over a dominant chart.'));
 assert.ok(baseStyles.includes('--hud-shell:'));
 assert.ok(baseStyles.includes('--hud-divider:'));
 assert.ok(baseStyles.includes('.weather-status::before'));
-assert.ok(baseStyles.includes("grid-template-columns: minmax(142px, 1.7fr) minmax(82px, 0.72fr) minmax(82px, 0.72fr)"));
+assert.ok(baseStyles.includes("grid-template-columns: minmax(210px, 1.55fr) minmax(110px, 0.8fr) minmax(110px, 0.8fr)"));
 assert.ok(baseStyles.includes(".stats-box[data-composition='returns-only'] .excess-meter"));
+assert.ok(baseStyles.includes('font-size: 26px !important'));
+assert.ok(!baseStyles.includes('font-size: 5px !important'));
 assert.ok(baseStyles.includes("#mobile-controls:not([hidden])"));
 
 assert.ok(accountStyles.includes('.home-utility-bar'));
@@ -167,4 +169,4 @@ assert.ok(analyticsSource.includes("track('level_complete'"));
 assert.ok(analyticsSource.includes("track('run_complete'"));
 assert.ok(analyticsSource.includes("track('pwa_install'"));
 
-console.log('PWA manifest, icons, install UI, GA4 product events, Cloudflare RUM, curated home, score-first HUD, Pro/Daily Run tactical power-ups, Account Shell v6 cloud history, and stable cache lifecycle checks passed');
+console.log('PWA manifest, icons, install UI, GA4 product events, Cloudflare RUM, curated home, readable score-first HUD, Pro/Daily Run tactical power-ups, Account Shell v6 cloud history, and stable cache lifecycle checks passed');

@@ -50,7 +50,7 @@ async function startGame(page) {
   await expect.poll(() => page.locator('#game-canvas').getAttribute('width')).toBeTruthy();
 }
 
-test('desktop HUD uses one pixel instrument language with Excess as the primary score', async ({ page }) => {
+test('desktop HUD uses modular pixel instruments with Excess as the primary score', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await startGame(page);
 
@@ -69,16 +69,19 @@ test('desktop HUD uses one pixel instrument language with Excess as the primary 
       const style = css(selector);
       return { family: style.fontFamily, size: style.fontSize, color: style.color, weight: style.fontWeight };
     };
+    const segments = [weather, stats, run, controls];
     return {
       rail: {
         background: rail.backgroundColor,
-        border: rail.borderTopColor,
         borderWidth: rail.borderTopWidth,
         shadow: rail.boxShadow,
       },
-      segmentBackgrounds: [weather.backgroundColor, stats.backgroundColor, run.backgroundColor, controls.backgroundColor],
-      dividers: [weather.borderRightColor, stats.borderRightColor, run.borderRightColor],
-      dividerWidths: [weather.borderRightWidth, stats.borderRightWidth, run.borderRightWidth],
+      segments: segments.map((style) => ({
+        background: style.backgroundColor,
+        border: style.borderTopColor,
+        borderWidth: style.borderTopWidth,
+        shadow: style.boxShadow,
+      })),
       lamp: {
         width: weatherLamp.width,
         height: weatherLamp.height,
@@ -115,49 +118,47 @@ test('desktop HUD uses one pixel instrument language with Excess as the primary 
     };
   });
 
-  expect(visual.rail.background).not.toBe('rgba(0, 0, 0, 0)');
-  expect(visual.rail.borderWidth).toBe('2px');
-  expect(visual.rail.shadow).not.toBe('none');
-  expect(new Set(visual.segmentBackgrounds).size).toBe(1);
-  expect(new Set(visual.dividers).size).toBe(1);
-  expect(visual.dividerWidths.every((width) => width === '1px')).toBe(true);
+  expect(visual.rail.background).toBe('rgba(0, 0, 0, 0)');
+  expect(visual.rail.borderWidth).toBe('0px');
+  expect(visual.rail.shadow).toBe('none');
+  expect(new Set(visual.segments.map((segment) => segment.background)).size).toBe(1);
+  expect(visual.segments[0].background).not.toBe('rgba(0, 0, 0, 0)');
+  expect(new Set(visual.segments.map((segment) => segment.border)).size).toBe(1);
+  expect(visual.segments.every((segment) => segment.borderWidth === '2px')).toBe(true);
+  expect(visual.segments.every((segment) => segment.shadow !== 'none')).toBe(true);
 
   expect(visual.lamp.display).not.toBe('none');
-  expect(visual.lamp.width).toBe('7px');
-  expect(visual.lamp.height).toBe('7px');
+  expect(visual.lamp.width).toBe('10px');
+  expect(visual.lamp.height).toBe('10px');
   expect(visual.lamp.background).not.toBe('rgba(0, 0, 0, 0)');
 
   for (const label of Object.values(visual.labels)) {
-    expect(label.family).toContain('Press Start 2P');
+    expect(label.family).toContain('Pixelify Sans');
+    expect(parseFloat(label.size)).toBeGreaterThanOrEqual(9);
   }
-  expect(visual.labels.total.size).toBe('6px');
-  expect(visual.labels.returns.size).toBe('6px');
-  expect(visual.labels.run.size).toBe('6px');
-  expect(visual.labels.day.size).toBe('6px');
-  expect(visual.labels.excess.size).toBe('7px');
 
   for (const value of Object.values(visual.values)) {
     expect(value.family).toContain('Pixelify Sans');
   }
-  expect(visual.values.total.size).toBe('11px');
-  expect(visual.values.returns.size).toBe('11px');
-  expect(visual.values.run.size).toBe('11px');
-  expect(visual.values.day.size).toBe('11px');
-  expect(visual.values.excess.size).toBe('17px');
+  expect(visual.values.total.size).toBe('15px');
+  expect(visual.values.returns.size).toBe('15px');
+  expect(visual.values.run.size).toBe('15px');
+  expect(visual.values.day.size).toBe('15px');
+  expect(visual.values.excess.size).toBe('26px');
   expect(parseFloat(visual.values.excess.size)).toBeGreaterThan(parseFloat(visual.values.total.size));
 
   expect(visual.control.radius).toBe('0px');
   expect(visual.control.background).not.toBe('rgba(0, 0, 0, 0)');
   expect(visual.control.shadow).not.toBe('none');
-  expect(visual.dock.background).toBe(visual.rail.background);
-  expect(visual.dock.border).toBe(visual.rail.border);
-  expect(visual.dock.borderWidth).toBe(visual.rail.borderWidth);
+  expect(visual.dock.background).toBe(visual.segments[0].background);
+  expect(visual.dock.border).toBe(visual.segments[0].border);
+  expect(visual.dock.borderWidth).toBe(visual.segments[0].borderWidth);
   expect(visual.dock.shadow).not.toBe('none');
   expect(visual.dock.keyBackground).toBe(visual.control.background);
   expect(visual.dock.keyRadius).toBe('0px');
 });
 
-test('mobile HUD keeps the score-first language without clipping or control collisions', async ({ page }) => {
+test('mobile HUD keeps the readable score-first language without clipping or control collisions', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await startGame(page);
 
@@ -171,6 +172,7 @@ test('mobile HUD keeps the score-first language without clipping or control coll
     const metricNodes = Array.from(document.querySelectorAll('.hud-total, .hud-return, #excess-meter'));
     const secondary = getComputedStyle(document.querySelector('#total-display'));
     const excess = getComputedStyle(document.querySelector('#live-excess-display'));
+    const label = getComputedStyle(document.querySelector('.stats-box .hud-metric-label'));
     const alpha = (value) => {
       const match = String(value).match(/rgba?\([^,]+,[^,]+,[^,]+(?:,\s*([\d.]+))?\)/);
       return match?.[1] === undefined ? 1 : Number(match[1]);
@@ -186,12 +188,14 @@ test('mobile HUD keeps the score-first language without clipping or control coll
       smallRadius: small.borderRadius,
       secondarySize: secondary.fontSize,
       excessSize: excess.fontSize,
+      labelSize: label.fontSize,
     };
   });
 
   expect(mobile.rail.left).toBeGreaterThanOrEqual(5);
   expect(mobile.rail.right).toBeLessThanOrEqual(385);
-  expect(mobile.rail.height).toBeLessThanOrEqual(90);
+  expect(mobile.rail.height).toBeGreaterThanOrEqual(96);
+  expect(mobile.rail.height).toBeLessThanOrEqual(120);
   expect(mobile.rail.bottom).toBeLessThan(mobile.controlsTop);
   expect(mobile.metricsFit).toBe(true);
   expect(mobile.railAlpha).toBeLessThan(0.5);
@@ -199,7 +203,8 @@ test('mobile HUD keeps the score-first language without clipping or control coll
   expect(mobile.actionRadius).toBe('0px');
   expect(mobile.smallRadius).toBe('0px');
   expect(mobile.actionShadow).not.toBe('none');
-  expect(mobile.secondarySize).toBe('9px');
-  expect(mobile.excessSize).toBe('14px');
+  expect(mobile.secondarySize).toBe('11px');
+  expect(mobile.excessSize).toBe('18px');
+  expect(parseFloat(mobile.labelSize)).toBeGreaterThanOrEqual(9);
   expect(parseFloat(mobile.excessSize)).toBeGreaterThan(parseFloat(mobile.secondarySize));
 });

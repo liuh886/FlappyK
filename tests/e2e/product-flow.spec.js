@@ -219,8 +219,10 @@ test('mobile gameplay keeps virtual keys and rail-integrated navigation visible'
 
   const pauseBox = await page.locator('#pause-btn').boundingBox();
   expect(pauseBox).not.toBeNull();
-  expect(pauseBox.width).toBeLessThanOrEqual(30);
-  expect(pauseBox.height).toBeLessThanOrEqual(30);
+  expect(pauseBox.width).toBeGreaterThanOrEqual(30);
+  expect(pauseBox.width).toBeLessThanOrEqual(34);
+  expect(pauseBox.height).toBeGreaterThanOrEqual(30);
+  expect(pauseBox.height).toBeLessThanOrEqual(34);
 
   await page.mouse.wheel(0, 800);
   await page.waitForTimeout(100);
