@@ -180,7 +180,7 @@ test('desktop game uses one compact score-first pixel HUD rail around the domina
 
   expect(layout.stats.width).toBeGreaterThanOrEqual(360);
   expect(layout.stats.width / layout.rail.width).toBeLessThanOrEqual(0.55);
-  expect(layout.run.width).toBeLessThanOrEqual(180);
+  expect(layout.run.width / layout.rail.width).toBeLessThanOrEqual(0.25);
   expect(layout.statsColumns).toBe(3);
   expect(layout.hudMainDisplay).toBe('contents');
   expect(layout.metricsFit).toBe(true);
