@@ -877,7 +877,7 @@ html body #game-container #game-hud-rail #game-top-controls .speed-readout {
 
 @media (max-width: 720px), (pointer: coarse) {
     html body #game-container #game-hud-rail {
-        grid-template-columns: minmax(0, 1fr) 78px !important;
+        grid-template-columns: minmax(0, 1fr) 102px !important;
         grid-template-rows: auto auto !important;
         gap: 6px !important;
         min-height: 0 !important;
@@ -905,7 +905,7 @@ html body #game-container #game-hud-rail #game-top-controls .speed-readout {
     }
 
     html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'] {
-        grid-template-columns: minmax(118px, 1.5fr) minmax(64px, 0.72fr) minmax(64px, 0.72fr) !important;
+        grid-template-columns: minmax(96px, 1.5fr) minmax(48px, 0.72fr) minmax(48px, 0.72fr) !important;
         min-height: 58px !important;
         border: 2px solid var(--hud-frame) !important;
     }
@@ -939,7 +939,7 @@ html body #game-container #game-hud-rail #game-top-controls .speed-readout {
     }
 
     html body #game-container #game-hud-rail .run-progress-panel {
-        min-width: 132px !important;
+        min-width: 102px !important;
         min-height: 42px !important;
         border: 2px solid var(--hud-frame) !important;
     }
@@ -956,7 +956,7 @@ html body #game-container #game-hud-rail #game-top-controls .speed-readout {
     }
 
     html body #game-container #game-hud-rail #game-top-controls {
-        min-width: 78px !important;
+        min-width: 102px !important;
         padding: 9px 7px !important;
         border: 2px solid var(--hud-frame) !important;
     }
