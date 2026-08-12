@@ -50,7 +50,7 @@ async function preparePage(page) {
   });
 }
 
-test('desktop home owns the viewport and PLAY restores the arcade cabinet', async ({ page }) => {
+test('desktop home owns the viewport and PLAY keeps the game fullscreen', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await preparePage(page);
   await page.goto('/');
@@ -109,15 +109,8 @@ test('desktop home owns the viewport and PLAY restores the arcade cabinet', asyn
 
   await page.getByRole('button', { name: 'PLAY', exact: true }).click();
   await expect(page.locator('html')).toHaveAttribute('data-ui-state', 'playing');
-  await expect.poll(() => page.locator('#game-canvas').getAttribute('width')).toBe('896');
-  await expect.poll(async () => {
-    const box = await page.locator('#game-container').boundingBox();
-    return box?.width || 0;
-  }).toBeLessThanOrEqual(898);
-  await expect.poll(async () => {
-    const box = await page.locator('#game-container').boundingBox();
-    return box?.width || 0;
-  }).toBeGreaterThanOrEqual(894);
+  await expect.poll(() => page.locator('#game-canvas').getAttribute('width')).toBe(String(home.viewport.width));
+  await expect.poll(() => page.locator('#game-canvas').getAttribute('height')).toBe(String(home.viewport.height));
 
   const gameplay = await page.evaluate(() => {
     const container = document.getElementById('game-container').getBoundingClientRect();
@@ -132,13 +125,12 @@ test('desktop home owns the viewport and PLAY restores the arcade cabinet', asyn
     };
   });
 
-  expect(gameplay.width).toBeGreaterThanOrEqual(894);
-  expect(gameplay.width).toBeLessThanOrEqual(898);
-  expect(gameplay.left).toBeGreaterThan(200);
-  expect(gameplay.top).toBeGreaterThan(20);
-  expect(gameplay.height).toBeLessThan(home.viewport.height);
-  expect(gameplay.border).not.toBe('0px');
-  expect(gameplay.shadow).not.toBe('none');
+  expect(Math.abs(gameplay.left)).toBeLessThanOrEqual(1);
+  expect(Math.abs(gameplay.top)).toBeLessThanOrEqual(1);
+  expect(Math.abs(gameplay.width - home.viewport.width)).toBeLessThanOrEqual(1);
+  expect(Math.abs(gameplay.height - home.viewport.height)).toBeLessThanOrEqual(1);
+  expect(gameplay.border).toBe('0px');
+  expect(gameplay.shadow).toBe('none');
 });
 
 test('mobile home remains one full-screen scene without document scrolling', async ({ page }) => {
