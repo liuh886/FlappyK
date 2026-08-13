@@ -65,9 +65,17 @@
             const script = document.createElement('script');
             script.id = 'hao-product-referral-script';
             script.src = 'https://liuh886.github.io/admin/shared/product-referral.js?v=1';
-            script.defer = true;
+            script.async = true;
             document.head.appendChild(script);
         }
+    }
+
+    function scheduleReferralAssets() {
+        if (document.readyState === 'complete') {
+            ensureReferralAssets();
+            return;
+        }
+        window.addEventListener('load', ensureReferralAssets, { once: true });
     }
 
     ensureHomeAccountToolbar();
@@ -124,5 +132,5 @@
     });
 
     ensureUpgradeAssets();
-    ensureReferralAssets();
+    scheduleReferralAssets();
 })();
