@@ -17,16 +17,22 @@ for (const contract of [
   'window.HaoAccountConfig',
   'enabled: true',
   'billingEnabled: true',
+  'referralEnabled: true',
   "supabaseUrl: 'https://blgwlycfcwvsupmqyqwn.supabase.co'",
   "supabasePublishableKey: 'sb_publishable_",
   "productCode: 'flappyk'",
   "entitlementCode: 'flappyk.pro'",
   "mountSelectors: ['[data-account-slot]'",
   'ensureHomeAccountToolbar',
+  'ensureReferralAssets',
+  'scheduleReferralAssets',
+  "window.addEventListener('load', ensureReferralAssets, { once: true })",
+  "script.async = true",
   '排行榜按正式游戏规则统计',
 ]) {
   assert.ok(configSource.includes(contract), `Missing shared FlappyK account contract: ${contract}`);
 }
+assert.ok(!/ensureUpgradeAssets\(\);\s*ensureReferralAssets\(\);/.test(configSource), 'Referral assets must not block the initial window load.');
 for (const forbidden of [/sk_(live|test)_/, /sb_secret_/, /whsec_/, /service_role/]) {
   assert.ok(!forbidden.test(configSource), `FlappyK account config contains forbidden secret material: ${forbidden}`);
 }
@@ -186,4 +192,4 @@ for (const privacyContract of [
   assert.ok(privacySource.includes(privacyContract), `Cloud-history documentation is missing ${privacyContract}`);
 }
 
-console.log('Shared Account Shell v6, Pro daily card grants, Daily Run free trials, cloud history, stable PWA cache, entitlement boundary, privacy, rankings, and RLS checks validated');
+console.log('Shared Account Shell v6, nonblocking product referrals, Pro daily card grants, Daily Run free trials, cloud history, stable PWA cache, entitlement boundary, privacy, rankings, and RLS checks validated');
