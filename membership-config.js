@@ -52,11 +52,30 @@
         }
     }
 
+    function ensureReferralAssets() {
+        if (!document.getElementById('hao-product-referral-styles')) {
+            const stylesheet = document.createElement('link');
+            stylesheet.id = 'hao-product-referral-styles';
+            stylesheet.rel = 'stylesheet';
+            stylesheet.href = 'https://liuh886.github.io/admin/shared/product-referral.css?v=1';
+            document.head.appendChild(stylesheet);
+        }
+
+        if (!document.getElementById('hao-product-referral-script')) {
+            const script = document.createElement('script');
+            script.id = 'hao-product-referral-script';
+            script.src = 'https://liuh886.github.io/admin/shared/product-referral.js?v=1';
+            script.defer = true;
+            document.head.appendChild(script);
+        }
+    }
+
     ensureHomeAccountToolbar();
 
     window.HaoAccountConfig = Object.freeze({
         enabled: true,
         billingEnabled: true,
+        referralEnabled: true,
         appName: 'FlappyK',
         productCode: 'flappyk',
         entitlementCode: 'flappyk.pro',
@@ -105,4 +124,5 @@
     });
 
     ensureUpgradeAssets();
+    ensureReferralAssets();
 })();
