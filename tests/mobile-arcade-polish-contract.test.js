@@ -3,7 +3,7 @@ const fs = require('node:fs');
 
 const weatherSource = fs.readFileSync('scripts/market-weather.js', 'utf8');
 const weatherStyles = fs.readFileSync('market-weather.css', 'utf8');
-const uiStyles = fs.readFileSync('premium-ui-refinement.css', 'utf8');
+const uiStyles = fs.readFileSync('premium-ui.css', 'utf8');
 const baseStyles = fs.readFileSync('style.css', 'utf8');
 
 assert.ok(weatherSource.includes('function syncHomeUtilityPlacement()'));

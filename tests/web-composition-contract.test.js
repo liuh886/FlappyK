@@ -3,7 +3,7 @@ const fs = require('node:fs');
 
 const hardeningJs = fs.readFileSync('core-hardening.js', 'utf8');
 const refinementJs = fs.readFileSync('scripts/premium-ui-refinement.js', 'utf8');
-const refinementCss = fs.readFileSync('premium-ui-refinement.css', 'utf8');
+const refinementCss = fs.readFileSync('premium-ui.css', 'utf8');
 const baseStyles = fs.readFileSync('style.css', 'utf8');
 const weatherCss = fs.readFileSync('market-weather.css', 'utf8');
 const accountCss = fs.readFileSync('account-integration.css', 'utf8');
@@ -143,7 +143,8 @@ assert.ok(!serviceWorker.includes("'./hud-compact.css'"));
 assert.ok(serviceWorker.includes("'./account-integration.css'"));
 assert.ok(serviceWorker.includes("'./scripts/account-cloud-sync.js'"));
 assert.ok(serviceWorker.includes("'./membership-config.js'"));
-assert.ok(serviceWorker.includes("'./home-story.css'"));
+assert.ok(serviceWorker.includes("'./premium-ui.css'"));
+assert.ok(!serviceWorker.includes("'./home-story.css'"));
 assert.ok(serviceWorker.includes("'./scripts/home-story.js'"));
 assert.ok(serviceWorker.includes("'./indicator-cards.css'"));
 assert.ok(serviceWorker.includes("'./scripts/indicator-cards.js'"));

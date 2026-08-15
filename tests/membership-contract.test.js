@@ -141,8 +141,6 @@ for (const retainedAsset of [
   "'./market-weather.css'",
   "'./scripts/market-weather.js'",
   "'./premium-ui.css'",
-  "'./premium-ui-refinement.css'",
-  "'./home-story.css'",
   "'./scripts/home-story.js'",
   "'./indicator-cards.css'",
   "'./scripts/indicator-core.js'",
@@ -152,6 +150,8 @@ for (const retainedAsset of [
 ]) {
   assert.ok(serviceWorkerSource.includes(retainedAsset), `Offline shell is missing ${retainedAsset}`);
 }
+assert.ok(!serviceWorkerSource.includes("'./premium-ui-refinement.css'"));
+assert.ok(!serviceWorkerSource.includes("'./home-story.css'"));
 for (const retiredAsset of [
   "'./membership.js'",
   "'./membership-experience.js'",
