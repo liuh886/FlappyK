@@ -4,13 +4,14 @@ on:
   push:
     branches:
       - refactor/ui-canonical
+    paths:
+      - .github/workflows/ui-consolidate-once.yml
 
 permissions:
   contents: write
 
 jobs:
   consolidate:
-    if: github.event.head_commit.message == 'chore: run ui consolidation'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,7 +35,7 @@ jobs:
           refinement = refinement_path.read_text(encoding='utf-8')
           story = story_path.read_text(encoding='utf-8')
 
-          # CSS @import rules must remain before normal rules. Preserve the
+          # CSS @import rules must stay before normal rules. Preserve the
           # refinement font import while keeping the original rule order.
           refinement_lines = refinement.splitlines()
           leading_imports = []
@@ -76,7 +77,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add premium-ui.css index.html premium-ui-refinement.css home-story.css
-          git commit -m "refactor(ui): consolidate final visual layers [ui-consolidated]"
+          git commit -m "refactor(ui): consolidate final visual layers"
           git push origin HEAD:refactor/ui-canonical
 
       - name: Install test dependencies
