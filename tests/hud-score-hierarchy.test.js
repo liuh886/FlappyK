@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 
 const base = fs.readFileSync('style.css', 'utf8');
-const refinement = fs.readFileSync('premium-ui-refinement.css', 'utf8');
+const canonicalUi = fs.readFileSync('premium-ui.css', 'utf8');
 const refinementJs = fs.readFileSync('scripts/premium-ui-refinement.js', 'utf8');
 
 for (const contract of [
@@ -35,10 +35,10 @@ for (const structuralContract of [
   "'performance controls'",
   "'weather progress'",
 ]) {
-  assert.ok(refinement.includes(structuralContract), `Mobile HUD structure changed unexpectedly: ${structuralContract}`);
+  assert.ok(canonicalUi.includes(structuralContract), `Mobile HUD structure changed unexpectedly: ${structuralContract}`);
 }
 
 assert.ok(refinementJs.includes("rail.appendChild(element)"), 'HUD must keep the existing shared rail composition.');
 assert.ok(!refinementJs.includes('style.textContent = `'), 'HUD presentation must remain in the stylesheet owner, not runtime CSS.');
 
-console.log('Excess remains the primary live score, fullscreen typography is readable, and weather/run/control rail ownership is preserved.');
+console.log('Excess remains the primary live score, fullscreen typography is readable, and weather/run/control rail ownership is preserved by the canonical UI stylesheet.');
