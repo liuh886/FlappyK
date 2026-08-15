@@ -1,0 +1,23 @@
+name: UI retired path scan once
+
+on:
+  push:
+    branches:
+      - refactor/ui-canonical
+    paths:
+      - .github/workflows/ui-retired-path-scan-once.yml
+
+jobs:
+  scan:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: refactor/ui-canonical
+      - name: Find stale UI topology references
+        shell: bash
+        run: |
+          echo '=== premium-ui-refinement.css ==='
+          grep -RIn --exclude-dir=.git --exclude='ui-retired-path-scan-once.yml' 'premium-ui-refinement\.css' . || true
+          echo '=== home-story.css ==='
+          grep -RIn --exclude-dir=.git --exclude='ui-retired-path-scan-once.yml' 'home-story\.css' . || true
