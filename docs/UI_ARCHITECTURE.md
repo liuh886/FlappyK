@@ -6,7 +6,7 @@ FlappyK grew through small feature PRs. Feature isolation is useful, but visual 
 
 1. a base stylesheet defined the original arcade UI;
 2. `visual-polish.css` introduced rounded, blurred web-style surfaces;
-3. `premium-ui.css` and `premium-ui-refinement.css` rebuilt the same selectors as a modern pixel game.
+3. `premium-ui.css` is the canonical modern-pixel visual owner; refinement and home-story rules are consolidated into it.
 
 The JavaScript followed a similar pattern: later files repeatedly wrapped `updateUI`, `startLevel`, and `endLevel`, then repaired DOM produced by earlier files. That made the final result depend on load order and made apparently small UI edits expensive to verify.
 
@@ -30,7 +30,7 @@ PR #48 removes the obsolete `visual-polish.css` layer and stops `premium-ui-refi
 
 - Feature stylesheets such as `daily-run.css`, `leaderboard.css`, and `membership.css` own their feature-specific components.
 - `premium-ui.css` owns shared UI geometry and component layout.
-- `premium-ui-refinement.css` owns the current modern-pixel theme and responsive scale.
+- `premium-ui.css` owns the current modern-pixel theme, responsive scale, and home-story presentation.
 - `visual-polish.css` is retained only as historical source and is not loaded.
 - New visual directions must edit the owning stylesheet. Do not add `*-polish.css`, `*-fix.css`, or another final override sheet.
 

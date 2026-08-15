@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 
-const refinement = fs.readFileSync('premium-ui-refinement.css', 'utf8');
+const refinement = fs.readFileSync('premium-ui.css', 'utf8');
 const base = fs.readFileSync('style.css', 'utf8');
 const refinementJs = fs.readFileSync('scripts/premium-ui-refinement.js', 'utf8');
 

@@ -21,8 +21,6 @@ const APP_SHELL = [
     './i18n.css',
     './pwa.css',
     './premium-ui.css',
-    './premium-ui-refinement.css',
-    './home-story.css',
     './indicator-cards.css',
     './account-integration.css',
     './market-weather.css',

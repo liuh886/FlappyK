@@ -4,8 +4,8 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 
 const weather = fs.readFileSync('scripts/market-weather.js', 'utf8');
-const home = fs.readFileSync('premium-ui-refinement.css', 'utf8');
-const story = fs.readFileSync('home-story.css', 'utf8');
+const home = fs.readFileSync('premium-ui.css', 'utf8');
+const story = fs.readFileSync('premium-ui.css', 'utf8');
 
 for (const contract of [
   "'FLAPPY K'",
@@ -45,6 +45,6 @@ for (const contract of [
 }
 
 assert.ok(!home.includes('visual-redesign-v1.css'), 'Visual Redesign v1 must stay in the owning stylesheet, not an override layer.');
-assert.ok(!story.includes('visual-redesign-v1.css'), 'Story redesign must stay in home-story.css.');
+assert.ok(!story.includes('visual-redesign-v1.css'), 'Story redesign must stay in the canonical premium-ui.css owner.');
 
 console.log('Visual Redesign v1 Hidden Market Arcade contracts passed.');

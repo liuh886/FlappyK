@@ -3,14 +3,15 @@ const fs = require('node:fs');
 
 const index = fs.readFileSync('index.html', 'utf8');
 const storyJs = fs.readFileSync('scripts/home-story.js', 'utf8');
-const storyCss = fs.readFileSync('home-story.css', 'utf8');
+const uiCss = fs.readFileSync('premium-ui.css', 'utf8');
 const serviceWorker = fs.readFileSync('sw.js', 'utf8');
 
-assert.ok(index.includes('<link rel="stylesheet" href="home-story.css">'));
+assert.ok(index.includes('<link rel="stylesheet" href="premium-ui.css">'));
+assert.ok(!index.includes('premium-ui-refinement.css'));
+assert.ok(!index.includes('home-story.css'));
 assert.ok(index.includes('<script src="scripts/home-story.js"></script>'));
 assert.ok(!index.includes('home-market.css'));
 assert.ok(!index.includes('scripts/home-market.js'));
-assert.ok(index.indexOf('home-story.css') > index.indexOf('premium-ui-refinement.css'));
 assert.ok(index.indexOf('scripts/home-story.js') > index.indexOf('scripts/premium-ui-refinement.js'));
 
 for (const contract of [
@@ -40,7 +41,7 @@ for (const contract of [
   '@media (max-width: 720px), (pointer: coarse)',
   '@media (prefers-reduced-motion: reduce)',
 ]) {
-  assert.ok(storyCss.includes(contract), `Missing home story visual contract: ${contract}`);
+  assert.ok(uiCss.includes(contract), `Missing home story visual contract: ${contract}`);
 }
 
 assert.equal((storyJs.match(/home-story-marker home-story-marker--/g) || []).length, 3);
@@ -50,9 +51,11 @@ assert.ok(serviceWorker.includes("const APP_CACHE = 'flappyk-app'"));
 assert.ok(serviceWorker.includes("const RUNTIME_CACHE = 'flappyk-runtime'"));
 assert.ok(serviceWorker.includes('isCriticalSameOriginAsset'));
 assert.ok(serviceWorker.includes('? networkFirst(request)'));
-assert.ok(serviceWorker.includes("'./home-story.css'"));
+assert.ok(serviceWorker.includes("'./premium-ui.css'"));
+assert.ok(!serviceWorker.includes("'./premium-ui-refinement.css'"));
+assert.ok(!serviceWorker.includes("'./home-story.css'"));
 assert.ok(serviceWorker.includes("'./scripts/home-story.js'"));
 assert.ok(!serviceWorker.includes('home-market'));
 assert.ok(!/flappyk-(?:app|runtime)-v\d+/.test(serviceWorker));
 
-console.log('Two-page pixel home story, decisive-trades message, bilingual copy, keyboard navigation, mobile layout, and stable PWA cache contracts passed');
+console.log('Canonical pixel UI retains the two-page home story, decisive-trades message, bilingual copy, keyboard navigation, mobile layout, and stable PWA cache contracts');

@@ -31,9 +31,11 @@ assert.equal(i18n.translateText('Unknown asset name', 'zh'), 'Unknown asset name
 const indexSource = fs.readFileSync('index.html', 'utf8');
 const browserSource = fs.readFileSync('scripts/i18n.js', 'utf8');
 const cssSource = fs.readFileSync('i18n.css', 'utf8');
-const pixelSource = fs.readFileSync('premium-ui-refinement.css', 'utf8');
+const pixelSource = fs.readFileSync('premium-ui.css', 'utf8');
 
 assert.ok(indexSource.includes('i18n.css'));
+assert.ok(indexSource.includes('premium-ui.css'));
+assert.ok(!indexSource.includes('premium-ui-refinement.css'));
 assert.ok(indexSource.includes('scripts/i18n-core.js'));
 assert.ok(indexSource.includes('scripts/i18n.js'));
 assert.ok(indexSource.indexOf('scripts/i18n.js') < indexSource.indexOf('game.js'));
@@ -66,4 +68,4 @@ assert.ok(pixelSource.includes('--pixel-cut'));
 assert.ok(pixelSource.includes('--pixel-shadow-step'));
 assert.ok(pixelSource.includes('backdrop-filter: none'));
 
-console.log('Chinese-English i18n, unified typography, and modern pixel ownership checks passed');
+console.log('Chinese-English i18n, unified typography, and canonical modern pixel ownership checks passed');

@@ -3,8 +3,8 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 
-const home = fs.readFileSync('premium-ui-refinement.css', 'utf8');
-const story = fs.readFileSync('home-story.css', 'utf8');
+const home = fs.readFileSync('premium-ui.css', 'utf8');
+const story = fs.readFileSync('premium-ui.css', 'utf8');
 
 for (const contract of [
   'Mobile home quality pass',
