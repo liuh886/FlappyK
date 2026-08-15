@@ -11,7 +11,8 @@
             toolbar.id = 'home-utility-bar';
             toolbar.className = 'home-utility-bar';
             toolbar.dataset.arcadePlacement = 'console';
-            toolbar.setAttribute('aria-label', 'Language and player account');
+            toolbar.setAttribute('role', 'group');
+            toolbar.setAttribute('aria-label', 'Player tools');
 
             const languageSlot = document.createElement('div');
             languageSlot.id = 'language-toggle-slot';
