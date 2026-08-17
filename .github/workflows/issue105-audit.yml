@@ -1,0 +1,26 @@
+name: Issue 105 ownership audit
+
+on:
+  push:
+    branches:
+      - fix/frontend-performance-105
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Locate data, resize and font owners
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '=== stockData references ==='
+          grep -RIn --exclude=data.js --exclude-dir=.git --exclude-dir=node_modules 'stockData' . || true
+          echo '=== startLevel references ==='
+          grep -RIn --exclude-dir=.git --exclude-dir=node_modules 'startLevel' . || true
+          echo '=== canvas width/height writers ==='
+          grep -RIn --exclude-dir=.git --exclude-dir=node_modules -E 'canvas(Element)?\.(width|height)[[:space:]]*=' . || true
+          echo '=== data.js references ==='
+          grep -RIn --exclude-dir=.git --exclude-dir=node_modules 'data\.js' . || true
+          echo '=== Pixelify/font imports ==='
+          grep -RIn --exclude-dir=.git --exclude-dir=node_modules -E 'Pixelify|@import.*fonts\.googleapis' . || true
