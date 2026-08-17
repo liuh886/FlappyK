@@ -1,0 +1,40 @@
+name: Issue 105 product patch
+
+on:
+  push:
+    branches:
+      - fix/frontend-performance-105
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: fix/frontend-performance-105
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - name: Apply and validate product patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/issue105_patch.py
+          python scripts/audit_bundled_data.py
+          npm ci --no-audit --no-fund
+          node scripts/validate-static-contracts.mjs
+          echo '=== canvas backing-store writers ==='
+          grep -RIn --exclude-dir=.git --exclude-dir=node_modules -E 'canvas(Element)?\.(width|height)[[:space:]]*=' game.js scripts || true
+          echo '=== retired blocking paths ==='
+          ! grep -RIn --exclude-dir=.git --exclude-dir=node_modules -E '<script src="data\.js"|@import.*fonts\.googleapis' index.html premium-ui.css i18n.css
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A ':!.github/workflows/issue105-audit.yml' ':!.github/workflows/fix-issue105-runner.yml' ':!.github/workflows/issue105-product-patch.yml' ':!scripts/issue105_patch.py'
+          git commit -m "fix(frontend): lazy-load market data and sharpen DPR canvas"
+          git push origin HEAD:fix/frontend-performance-105
