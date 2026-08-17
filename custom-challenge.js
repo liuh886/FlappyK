@@ -31,9 +31,7 @@
     let titleHoldTimer = null;
 
     function availableMarkets() {
-        return Object.keys(marketLabels).filter((market) =>
-            stockData[market] && Object.keys(stockData[market]).length > 0
-        );
+        return window.FlappyKData?.markets?.() || Object.keys(marketLabels);
     }
 
     function populateMarkets() {
@@ -51,12 +49,12 @@
             marketSelect.value = previousValue;
         }
 
-        populateAssets();
     }
 
-    function populateAssets() {
+    async function populateAssets() {
         const market = marketSelect.value;
         const previousValue = assetSelect.value;
+        await window.FlappyKData.loadMarket(market);
         const assets = Object.keys(stockData[market] || {}).sort((a, b) => a.localeCompare(b));
 
         assetSelect.innerHTML = '';
@@ -79,7 +77,7 @@
         customScreen.classList.remove('active');
     }
 
-    function openCustomSelector() {
+    async function openCustomSelector() {
         if (isPlaying) return;
 
         customState.unlocked = true;
@@ -88,14 +86,13 @@
 
         if (customState.market && availableMarkets().includes(customState.market)) {
             marketSelect.value = customState.market;
-            populateAssets();
-
-            if (customState.asset && Object.prototype.hasOwnProperty.call(
-                stockData[customState.market] || {},
-                customState.asset
-            )) {
-                assetSelect.value = customState.asset;
-            }
+        }
+        await populateAssets();
+        if (customState.market && customState.asset && Object.prototype.hasOwnProperty.call(
+            stockData[customState.market] || {},
+            customState.asset
+        )) {
+            assetSelect.value = customState.asset;
         }
 
         customScreen.classList.add('active');
@@ -119,9 +116,10 @@
         customResultActions.style.display = 'none';
     }
 
-    function startCustomChallenge({ reuseWindow = false } = {}) {
+    async function startCustomChallenge({ reuseWindow = false } = {}) {
         const market = marketSelect.value || customState.market;
         const asset = assetSelect.value || customState.asset;
+        await window.FlappyKData.loadMarket(market);
         const data = stockData[market]?.[asset];
 
         if (!data || data.length < DAYS_PER_LEVEL) {
@@ -145,7 +143,7 @@
 
     function unlockFromCode(code) {
         if (String(code || '').trim().toUpperCase() !== UNLOCK_CODE) return false;
-        openCustomSelector();
+        void openCustomSelector();
         return true;
     }
 
@@ -161,7 +159,7 @@
 
         if (codeBuffer === UNLOCK_CODE) {
             codeBuffer = '';
-            openCustomSelector();
+            void openCustomSelector();
         }
     }
 
@@ -231,10 +229,10 @@
         collectedCards = [];
     };
 
-    marketSelect.addEventListener('change', populateAssets);
+    marketSelect.addEventListener('change', () => { void populateAssets(); });
 
     customStartButton.addEventListener('click', () => {
-        startCustomChallenge({ reuseWindow: false });
+        void startCustomChallenge({ reuseWindow: false });
     });
 
     customCancelButton.addEventListener('click', () => {
@@ -245,7 +243,7 @@
 
     customRetryButton.addEventListener('click', () => {
         settlementScreen.classList.remove('active');
-        startCustomChallenge({ reuseWindow: true });
+        void startCustomChallenge({ reuseWindow: true });
     });
 
     customChangeButton.addEventListener('click', () => {
@@ -253,7 +251,7 @@
         customState.active = false;
         customState.startIndex = null;
         resetCoreState();
-        openCustomSelector();
+        void openCustomSelector();
     });
 
     document.addEventListener('keydown', handleUnlockKey);

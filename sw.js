@@ -24,7 +24,7 @@ const APP_SHELL = [
     './indicator-cards.css',
     './account-integration.css',
     './market-weather.css',
-    './data.js',
+    './data-loader.js',
     './qqq-loader.js',
     './scripts/friend-challenge-codec.js',
     './scripts/legend-score.js',

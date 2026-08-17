@@ -37,7 +37,7 @@ async function preparePage(page, accountOptions = {}) {
   });
 }
 
-test('PWA registers, controls the page, and reloads offline', async ({ page, context }) => {
+test('PWA runtime-caches a market chunk after first use and replays it offline', async ({ page, context }) => {
   await preparePage(page);
   await page.goto('/');
 
@@ -50,23 +50,17 @@ test('PWA registers, controls the page, and reloads offline', async ({ page, con
   expect(registration.scope).toContain('127.0.0.1:8000/');
 
   await page.reload();
-  await expect.poll(
-    () => page.evaluate(() => Boolean(navigator.serviceWorker.controller)),
-    { timeout: 20_000 }
-  ).toBe(true);
+  await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller)), { timeout: 20_000 }).toBe(true);
+  expect(await page.evaluate(() => Object.keys(stockData.crypto || {}).length)).toBe(0);
+
+  await page.getByRole('button', { name: 'PLAY', exact: true }).click();
+  await expect.poll(() => page.evaluate(() => Object.keys(stockData.crypto || {}).length)).toBeGreaterThan(0);
+  await expect.poll(() => page.evaluate(() => Array.isArray(currentData) ? currentData.length : 0)).toBe(250);
 
   await context.setOffline(true);
   await page.reload({ waitUntil: 'domcontentloaded' });
-  await expect(page.getByRole('button', { name: 'PLAY', exact: true })).toBeVisible();
-  await expect.poll(() => page.evaluate(() => (
-    typeof stockData !== 'undefined' ? Object.keys(stockData.crypto || {}).length : 0
-  ))).toBeGreaterThan(0);
-
   await page.getByRole('button', { name: 'PLAY', exact: true }).click();
-  await expect(page.locator('#start-screen')).not.toHaveClass(/active/);
-  await expect.poll(() => page.evaluate(() => (
-    typeof currentData !== 'undefined' && Array.isArray(currentData) ? currentData.length : 0
-  ))).toBe(250);
+  await expect.poll(() => page.evaluate(() => Array.isArray(currentData) ? currentData.length : 0)).toBe(250);
   await context.setOffline(false);
 });
 
@@ -190,4 +184,29 @@ test('mobile account toolbar and drawer remain inside the viewport', async ({ pa
   expect(dialogBounds.rightGap).toBeGreaterThanOrEqual(0);
   expect(dialogBounds.bottomGap).toBeGreaterThanOrEqual(0);
   expect(dialogBounds.width).toBeLessThanOrEqual(dialogBounds.viewportWidth);
+});
+
+
+test('canvas backing store follows devicePixelRatio while gameplay coordinates stay in CSS pixels', async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 900, height: 700 }, deviceScaleFactor: 2 });
+  const page = await context.newPage();
+  await preparePage(page);
+  await page.goto('/');
+  await page.getByRole('button', { name: 'PLAY', exact: true }).click();
+  await expect.poll(() => page.evaluate(() => Array.isArray(currentData) ? currentData.length : 0)).toBe(250);
+  const size = await page.evaluate(() => {
+    const canvas = document.getElementById('game-canvas');
+    const rect = canvas.getBoundingClientRect();
+    return {
+      dpr: window.devicePixelRatio,
+      cssWidth: Math.round(rect.width),
+      cssHeight: Math.round(rect.height),
+      backingWidth: canvas.width,
+      backingHeight: canvas.height,
+    };
+  });
+  expect(size.dpr).toBe(2);
+  expect(size.backingWidth).toBe(Math.round(size.cssWidth * size.dpr));
+  expect(size.backingHeight).toBe(Math.round(size.cssHeight * size.dpr));
+  await context.close();
 });

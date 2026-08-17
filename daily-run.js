@@ -23,6 +23,8 @@
         descriptors: [],
         record: loadRecord(),
         lastRecordedSignature: '',
+        loading: false,
+        loadFailed: false,
     };
 
     function formatPercent(value) {
@@ -64,7 +66,25 @@
         }
     }
 
-    state.descriptors = createDescriptors();
+    async function ensureDescriptors() {
+        if (state.descriptors.length === 3) return true;
+        state.loading = true;
+        state.loadFailed = false;
+        renderDailySummary();
+        try {
+            await window.FlappyKData.loadMarkets(window.FlappyKData.markets());
+            state.descriptors = createDescriptors();
+            state.loadFailed = state.descriptors.length !== 3;
+        } catch (error) {
+            console.warn('Daily Run market data could not be loaded.', error);
+            state.descriptors = [];
+            state.loadFailed = true;
+        } finally {
+            state.loading = false;
+            renderDailySummary();
+        }
+        return state.descriptors.length === 3;
+    }
 
     function resolveDescriptor(descriptor) {
         const rows = stockData?.[descriptor?.m]?.[descriptor?.a];
@@ -100,10 +120,12 @@
         streakNode.textContent = `DAILY STREAK ${streak}`;
         dailySummary.append(title, detail, streakNode);
 
-        dailyButton.disabled = state.descriptors.length !== 3;
-        dailyButton.textContent = state.descriptors.length === 3
-            ? Number.isFinite(Number(todayBest)) ? 'REPLAY DAILY' : 'DAILY RUN'
-            : 'DAILY UNAVAILABLE';
+        dailyButton.disabled = state.loading;
+        dailyButton.textContent = state.loading
+            ? 'LOADING…'
+            : state.loadFailed
+                ? 'DAILY UNAVAILABLE'
+                : Number.isFinite(Number(todayBest)) ? 'REPLAY DAILY' : 'DAILY RUN';
     }
 
     function hideDailyResult() {
@@ -126,8 +148,8 @@
         document.title = DEFAULT_TITLE;
     }
 
-    function startDailyRun() {
-        if (state.descriptors.length !== 3) {
+    async function startDailyRun() {
+        if (!await ensureDescriptors()) {
             window.alert('Today’s Daily Run is unavailable for the current market snapshot.');
             return;
         }
@@ -229,7 +251,7 @@
     dailyButton?.addEventListener('click', (event) => {
         event.preventDefault();
         event.stopImmediatePropagation();
-        startDailyRun();
+        void startDailyRun();
     }, { capture: true });
     startButton?.addEventListener('click', resetDailyMode, { capture: true });
     customStartButton?.addEventListener('click', resetDailyMode, { capture: true });

@@ -4,6 +4,7 @@ import json
 import time
 import urllib.request
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
 import yfinance as yf
@@ -193,16 +194,17 @@ metadata = {
     "crypto_price_policy": "Raw Binance daily OHLC; corporate-action adjustment is not applicable.",
 }
 
-with open("data.js", "w", encoding="utf-8") as output:
-    output.write(
-        "const stockDataMeta = "
-        + json.dumps(metadata, ensure_ascii=False)
-        + ";\n"
-    )
-    output.write(
-        "const stockData = "
-        + json.dumps(all_data, ensure_ascii=False)
-        + ";\n"
-    )
 
-print("Done! Adjusted data and metadata written to data.js")
+output_dir = Path("data/markets")
+output_dir.mkdir(parents=True, exist_ok=True)
+for market, payload in all_data.items():
+    (output_dir / f"{market}.json").write_text(
+        json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + "\n",
+        encoding="utf-8",
+    )
+(output_dir / "meta.json").write_text(
+    json.dumps(metadata, ensure_ascii=False, indent=2) + "\n",
+    encoding="utf-8",
+)
+
+print("Done! Adjusted data and metadata written to data/markets/")

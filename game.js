@@ -2,6 +2,9 @@ const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
 const gameContainer = document.getElementById('game-container');
 
+let canvasCssWidth = 1;
+let canvasCssHeight = 1;
+
 function resizeCanvas() {
     gameContainer.style.width = '100vw';
     gameContainer.style.height = '100dvh';
@@ -11,9 +14,17 @@ function resizeCanvas() {
     const fallbackHeight = window.matchMedia("(max-width: 768px)").matches
         ? window.innerHeight * 0.6
         : window.innerHeight;
+    const cssWidth = Math.max(1, Math.round(canvas.clientWidth || window.innerWidth));
+    const cssHeight = Math.max(1, Math.round(canvas.clientHeight || fallbackHeight));
+    const dpr = Math.max(1, Number(window.devicePixelRatio) || 1);
 
-    canvas.width = canvas.clientWidth || window.innerWidth;
-    canvas.height = canvas.clientHeight || fallbackHeight;
+    canvasCssWidth = cssWidth;
+    canvasCssHeight = cssHeight;
+    const backingWidth = Math.round(cssWidth * dpr);
+    const backingHeight = Math.round(cssHeight * dpr);
+    if (canvas.width !== backingWidth) canvas.width = backingWidth;
+    if (canvas.height !== backingHeight) canvas.height = backingHeight;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     if (typeof isPlaying !== 'undefined' && isPlaying) draw();
 }
@@ -47,8 +58,9 @@ let collectedCards = [];
 let gameInterval;
 let isPlaying = false;
 
-window.addEventListener('resize', resizeCanvas);
-setTimeout(resizeCanvas, 100);
+window.addEventListener('resize', resizeCanvas, { passive: true });
+window.addEventListener('orientationchange', resizeCanvas, { passive: true });
+new ResizeObserver(resizeCanvas).observe(canvas);
 
 // Set initial size
 resizeCanvas();
@@ -142,6 +154,17 @@ function changeSpeed(delta) {
 // Initial Speed UI Sync
 speedBtn.innerText = `${speedMultiplier}x [←/→]`;
 
+async function ensureLevelMarketData(levelNumber = level) {
+    const dataApi = window.FlappyKData;
+    if (!dataApi) throw new Error('Market data loader is unavailable');
+    await dataApi.loadMarket(dataApi.marketForLevel(levelNumber));
+}
+
+function reportMarketLoadFailure(error) {
+    console.error('FlappyK market data load failed:', error);
+    window.alert('Market data could not be loaded. Check your connection and try again.');
+}
+
 // Speed Button
 speedBtn.addEventListener('click', () => {
     // Left click adds 1x
@@ -149,23 +172,47 @@ speedBtn.addEventListener('click', () => {
 });
 
 // Start Button
-startBtn.addEventListener('click', () => {
-    startScreen.classList.remove('active');
-    initAudio();
-    startLevel();
+startBtn.addEventListener('click', async () => {
+    startBtn.disabled = true;
+    try {
+        await ensureLevelMarketData();
+        startScreen.classList.remove('active');
+        initAudio();
+        startLevel();
+    } catch (error) {
+        reportMarketLoadFailure(error);
+    } finally {
+        startBtn.disabled = false;
+    }
 });
 
 // Next Level / Restart
-nextBtn.addEventListener('click', () => {
-    settlementScreen.classList.remove('active');
-    startLevel();
+nextBtn.addEventListener('click', async () => {
+    nextBtn.disabled = true;
+    try {
+        await ensureLevelMarketData();
+        settlementScreen.classList.remove('active');
+        startLevel();
+    } catch (error) {
+        reportMarketLoadFailure(error);
+    } finally {
+        nextBtn.disabled = false;
+    }
 });
-restartBtn.addEventListener('click', () => {
-    settlementScreen.classList.remove('active');
+restartBtn.addEventListener('click', async () => {
     level = 1;
     targetReturn = 0;
     collectedCards = [];
-    startLevel();
+    restartBtn.disabled = true;
+    try {
+        await ensureLevelMarketData(1);
+        settlementScreen.classList.remove('active');
+        startLevel();
+    } catch (error) {
+        reportMarketLoadFailure(error);
+    } finally {
+        restartBtn.disabled = false;
+    }
 });
 
 saveBtn.addEventListener('click', () => {
@@ -226,12 +273,20 @@ champagneSaveBtn.addEventListener('click', () => {
     });
 });
 
-champagneRestartBtn.addEventListener('click', () => {
-    champagneScreen.classList.remove('active');
+champagneRestartBtn.addEventListener('click', async () => {
     level = 1;
     targetReturn = 0;
     collectedCards = [];
-    startLevel();
+    champagneRestartBtn.disabled = true;
+    try {
+        await ensureLevelMarketData(1);
+        champagneScreen.classList.remove('active');
+        startLevel();
+    } catch (error) {
+        reportMarketLoadFailure(error);
+    } finally {
+        champagneRestartBtn.disabled = false;
+    }
 });
 
 function pickRandomData() {
@@ -239,11 +294,10 @@ function pickRandomData() {
     else if (level === 2) currentMarket = 'ashare';
     else currentMarket = 'usstock';
     
-    // In case data failed to fetch, fallback
     if (!stockData[currentMarket] || Object.keys(stockData[currentMarket]).length === 0) {
-        currentMarket = Object.keys(stockData).find(k => Object.keys(stockData[k]).length > 0);
+        throw new Error(`Market data is not loaded: ${currentMarket}`);
     }
-    
+
     const assets = Object.keys(stockData[currentMarket]);
     currentAsset = assets[Math.floor(Math.random() * assets.length)];
     const data = stockData[currentMarket][currentAsset];
@@ -522,16 +576,16 @@ function playActionSound(type) {
 }
 
 function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvasCssWidth, canvasCssHeight);
     
     // Draw neon grid background
     ctx.strokeStyle = 'rgba(46, 204, 113, 0.05)';
     ctx.lineWidth = 1;
-    for (let x = 0; x < canvas.width; x += 40) {
-        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+    for (let x = 0; x < canvasCssWidth; x += 40) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvasCssHeight); ctx.stroke();
     }
-    for (let y = 0; y < canvas.height; y += 40) {
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+    for (let y = 0; y < canvasCssHeight; y += 40) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvasCssWidth, y); ctx.stroke();
     }
     
     if (!currentData || currentData.length === 0) return;
@@ -552,8 +606,8 @@ function draw() {
     minPrice -= pricePadding;
     maxPrice += pricePadding;
     
-    const candleWidth = canvas.width / VISIBLE_DAYS;
-    const chartHeight = canvas.height * 0.7; // Top 70% for K-line
+    const candleWidth = canvasCssWidth / VISIBLE_DAYS;
+    const chartHeight = canvasCssHeight * 0.7; // Top 70% for K-line
     
     function getY(price) {
         return chartHeight - ((price - minPrice) / (maxPrice - minPrice) * chartHeight);
@@ -620,8 +674,8 @@ function draw() {
     }
     
     // Draw Total Return Curve (Bottom 30%)
-    const curveTop = canvas.height * 0.75;
-    const curveHeight = canvas.height * 0.2;
+    const curveTop = canvasCssHeight * 0.75;
+    const curveHeight = canvasCssHeight * 0.2;
     
     let minTotal = Math.min(levelStartCash, ...totalHistory.slice(startDay));
     let maxTotal = Math.max(levelStartCash, ...totalHistory.slice(startDay));
@@ -637,7 +691,7 @@ function draw() {
     ctx.strokeStyle = '#555';
     ctx.beginPath();
     ctx.moveTo(0, chartHeight + 10);
-    ctx.lineTo(canvas.width, chartHeight + 10);
+    ctx.lineTo(canvasCssWidth, chartHeight + 10);
     ctx.stroke();
     
     // Draw initial cash reference line
@@ -646,7 +700,7 @@ function draw() {
     ctx.setLineDash([5, 5]);
     ctx.beginPath();
     ctx.moveTo(0, refY);
-    ctx.lineTo(canvas.width, refY);
+    ctx.lineTo(canvasCssWidth, refY);
     ctx.stroke();
     ctx.setLineDash([]);
     

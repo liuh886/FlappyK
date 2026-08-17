@@ -63,7 +63,10 @@ assert.ok(indexSource.includes('scripts/account-cloud-sync.js'));
 assert.ok(indexSource.includes('https://static.cloudflareinsights.com/beacon.min.js'));
 
 // Curated shell and hierarchy.
-assert.ok(pixelStyles.includes("family=Pixelify+Sans"));
+assert.ok(indexSource.includes('rel="preconnect" href="https://fonts.googleapis.com"'));
+assert.ok(indexSource.includes('rel="preconnect" href="https://fonts.gstatic.com" crossorigin'));
+assert.ok(indexSource.includes('family=Pixelify+Sans'));
+assert.ok(!pixelStyles.includes('@import url('));
 assert.ok(pixelStyles.includes('--pixel-shadow-step'));
 assert.ok(pixelStyles.includes('--pixel-cut'));
 assert.ok(pixelStyles.includes('--space-1: 4px'));
@@ -109,7 +112,9 @@ assert.ok(serviceWorkerSource.includes("const RUNTIME_CACHE = 'flappyk-runtime'"
 assert.ok(serviceWorkerSource.includes('isCriticalSameOriginAsset'));
 assert.ok(serviceWorkerSource.includes('? networkFirst(request)'));
 assert.ok(!/flappyk-(?:app|runtime)-v\d+/.test(serviceWorkerSource));
-assert.ok(serviceWorkerSource.includes("'./data.js'"));
+assert.ok(serviceWorkerSource.includes("'./data-loader.js'"));
+assert.ok(!serviceWorkerSource.includes("'./data.js'"));
+assert.ok(!serviceWorkerSource.includes("'./data/markets/crypto.json'"));
 assert.ok(serviceWorkerSource.includes("'./analytics.js'"));
 assert.ok(serviceWorkerSource.includes("'./membership-config.js'"));
 assert.ok(serviceWorkerSource.includes("'./account-integration.css'"));

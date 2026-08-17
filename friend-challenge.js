@@ -99,7 +99,7 @@
         if (challengeShareButton) challengeShareButton.textContent = 'CHALLENGE A FRIEND';
     }
 
-    function loadInviteFromLocation() {
+    async function loadInviteFromLocation() {
         const token = getChallengeToken();
         if (!token) {
             state.invite = null;
@@ -108,11 +108,28 @@
         }
 
         const payload = codec.decodeChallenge(token);
-        if (!payload || !validateAgainstDataset(payload)) {
+        if (!payload || !codec.validateChallengeShape(payload)) {
             state.invite = null;
             removeChallengeToken();
             clearInviteVisual();
-            window.alert('This friend challenge is invalid or no longer matches the bundled market snapshot.');
+            window.alert('This friend challenge is invalid.');
+            return;
+        }
+
+        if (startButton) startButton.disabled = true;
+        try {
+            await window.FlappyKData.loadMarkets(payload.g.map((descriptor) => descriptor.m));
+        } catch (error) {
+            console.warn('Friend challenge market data could not be loaded.', error);
+            return;
+        } finally {
+            if (startButton) startButton.disabled = false;
+        }
+        if (!validateAgainstDataset(payload)) {
+            state.invite = null;
+            removeChallengeToken();
+            clearInviteVisual();
+            window.alert('This friend challenge no longer matches the market snapshot.');
             return;
         }
 
@@ -245,12 +262,12 @@
     window.addEventListener('hashchange', () => {
         state.active = false;
         hideChallengeResult();
-        loadInviteFromLocation();
+        void loadInviteFromLocation();
     });
     window.addEventListener('popstate', () => {
         state.active = false;
         hideChallengeResult();
-        loadInviteFromLocation();
+        void loadInviteFromLocation();
     });
 
     window.FlappyKFriendChallenge = {
@@ -259,5 +276,5 @@
         getDescriptors: () => state.descriptors.map((game) => ({ ...game })),
     };
 
-    loadInviteFromLocation();
+    void loadInviteFromLocation();
 })();

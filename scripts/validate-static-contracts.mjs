@@ -87,6 +87,25 @@ if (!migration.includes('enable row level security')) {
   throw new Error('Membership migration must enable row-level security.');
 }
 
+const dataLoader = readFileSync(join(root, 'data-loader.js'), 'utf8');
+if (!index.includes('<script src="data-loader.js"></script>') || index.includes('<script src="data.js"></script>')) {
+  throw new Error('FlappyK must boot through the lazy market data loader, not data.js.');
+}
+for (const market of ['crypto', 'ashare', 'usstock']) requireFile(`data/markets/${market}.json`);
+if (!dataLoader.includes('window.FlappyKData') || !dataLoader.includes('loadMarket')) {
+  throw new Error('Lazy market loader contract is missing.');
+}
+const gameSource = readFileSync(join(root, 'game.js'), 'utf8');
+const refinementSource = readFileSync(join(root, 'scripts/premium-ui-refinement.js'), 'utf8');
+const canvasWrites = [...gameSource.matchAll(/canvas\.(?:width|height)\s*=/g)].length
+  + [...refinementSource.matchAll(/canvasElement\.(?:width|height)\s*=/g)].length;
+if (canvasWrites !== 2 || refinementSource.includes('syncCanvasLayout')) {
+  throw new Error(`Canvas backing store must have one owner in game.js; found ${canvasWrites} writes.`);
+}
+if (!gameSource.includes('window.devicePixelRatio') || !gameSource.includes('ctx.setTransform(dpr, 0, 0, dpr, 0, 0)')) {
+  throw new Error('Canvas owner must scale its backing store for devicePixelRatio.');
+}
+
 const analytics = readFileSync(join(root, 'analytics.js'), 'utf8');
 for (const eventName of ['play_start', 'run_complete']) {
   if (!analytics.includes(eventName)) throw new Error(`Missing required analytics event: ${eventName}`);
