@@ -28,7 +28,7 @@ for (const contract of [
   'scheduleReferralAssets',
   "window.addEventListener('load', ensureReferralAssets, { once: true })",
   "script.async = true",
-  'product-referral.js?v=4',
+  'product-referral.js?v=5',
   '排行榜按正式游戏规则统计',
 ]) {
   assert.ok(configSource.includes(contract), `Missing shared FlappyK account contract: ${contract}`);
@@ -47,7 +47,7 @@ for (const reference of [
 ]) {
   assert.ok(indexSource.includes(reference), `FlappyK page is missing ${reference}`);
 }
-for (const retired of ['account-shell.css?v=5', 'account-shell.js?v=6', 'account-upgrade.css', 'account-upgrade.js', 'product-referral.js?v=3']) {
+for (const retired of ['account-shell.css?v=5', 'account-shell.js?v=6', 'account-upgrade.css', 'account-upgrade.js', 'product-referral.js?v=3', 'product-referral.js?v=4']) {
   assert.ok(!`${indexSource}\n${configSource}`.includes(retired), `FlappyK must not load retired shared asset ${retired}`);
 }
 for (const toolbarContract of [
@@ -197,4 +197,4 @@ for (const privacyContract of [
   assert.ok(privacySource.includes(privacyContract), `Cloud-history documentation is missing ${privacyContract}`);
 }
 
-console.log('Canonical Account Shell v7, bounded nonblocking referrals, Pro daily card grants, Daily Run free trials, cloud history, stable PWA cache, entitlement boundary, privacy, rankings, and RLS checks validated');
+console.log('Canonical Account Shell v7, immutable referral v5, Pro daily card grants, Daily Run free trials, cloud history, stable PWA cache, entitlement boundary, privacy, rankings, and RLS checks validated');
