@@ -1,26 +1,751 @@
-name: Issue 105 ownership audit
+name: Issue 105 closeout patch
 
 on:
   push:
     branches:
       - fix/frontend-performance-105
 
+permissions:
+  contents: write
+
 jobs:
-  audit:
+  patch:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Locate data, resize and font owners
+        with:
+          ref: fix/frontend-performance-105
+          fetch-depth: 0
+      - name: Apply performance and canvas fixes
         shell: bash
         run: |
           set -euo pipefail
-          echo '=== stockData references ==='
-          grep -RIn --exclude=data.js --exclude-dir=.git --exclude-dir=node_modules 'stockData' . || true
-          echo '=== startLevel references ==='
-          grep -RIn --exclude-dir=.git --exclude-dir=node_modules 'startLevel' . || true
-          echo '=== canvas width/height writers ==='
-          grep -RIn --exclude-dir=.git --exclude-dir=node_modules -E 'canvas(Element)?\.(width|height)[[:space:]]*=' . || true
-          echo '=== data.js references ==='
-          grep -RIn --exclude-dir=.git --exclude-dir=node_modules 'data\.js' . || true
-          echo '=== Pixelify/font imports ==='
-          grep -RIn --exclude-dir=.git --exclude-dir=node_modules -E 'Pixelify|@import.*fonts\.googleapis' . || true
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          import re
+
+          def replace_once(path, old, new):
+              p = Path(path)
+              text = p.read_text()
+              if old not in text:
+                  raise SystemExit(f'expected patch anchor missing: {path}')
+              p.write_text(text.replace(old, new, 1))
+
+          def regex_once(path, pattern, replacement):
+              p = Path(path)
+              text = p.read_text()
+              updated, count = re.subn(pattern, replacement, text, count=1, flags=re.S)
+              if count != 1:
+                  raise SystemExit(f'expected regex patch anchor missing: {path}: {pattern}')
+              p.write_text(updated)
+
+          # Split the canonical snapshot into lazy market chunks, then retire data.js.
+          data_path = Path('data.js')
+          source = data_path.read_text()
+          prefix = 'const stockDataMeta = '
+          separator = ';\nconst stockData = '
+          if not source.startswith(prefix) or separator not in source:
+              raise SystemExit('data.js does not match the canonical stockData snapshot format')
+          meta_raw, data_raw = source[len(prefix):].split(separator, 1)
+          data_raw = data_raw.strip()
+          if data_raw.endswith(';'):
+              data_raw = data_raw[:-1]
+          metadata = json.loads(meta_raw)
+          all_data = json.loads(data_raw)
+          market_dir = Path('data/markets')
+          market_dir.mkdir(parents=True, exist_ok=True)
+          for market in ('crypto', 'ashare', 'usstock'):
+              payload = all_data.get(market, {})
+              (market_dir / f'{market}.json').write_text(
+                  json.dumps(payload, ensure_ascii=False, separators=(',', ':')) + '\n'
+              )
+          (market_dir / 'meta.json').write_text(
+              json.dumps(metadata, ensure_ascii=False, indent=2) + '\n'
+          )
+          data_path.unlink()
+
+          Path('data-loader.js').write_text(r'''const stockData = { crypto: {}, ashare: {}, usstock: {} };
+
+          (() => {
+              'use strict';
+
+              const MARKETS = Object.freeze(['crypto', 'ashare', 'usstock']);
+              const pending = new Map();
+              const loaded = new Set();
+
+              function marketForLevel(level) {
+                  if (Number(level) === 1) return 'crypto';
+                  if (Number(level) === 2) return 'ashare';
+                  return 'usstock';
+              }
+
+              async function loadMarket(market) {
+                  if (!MARKETS.includes(market)) throw new Error(`Unknown market: ${market}`);
+                  if (loaded.has(market)) return stockData[market];
+                  if (pending.has(market)) return pending.get(market);
+
+                  const request = fetch(`./data/markets/${market}.json`, { cache: 'force-cache' })
+                      .then(async (response) => {
+                          if (!response.ok) throw new Error(`${market} data request failed with ${response.status}`);
+                          const payload = await response.json();
+                          if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+                              throw new Error(`${market} data payload is invalid`);
+                          }
+                          stockData[market] = payload;
+                          loaded.add(market);
+                          document.dispatchEvent(new CustomEvent('flappyk:data-updated', {
+                              detail: { market, assets: Object.keys(payload).length },
+                          }));
+                          return payload;
+                      })
+                      .finally(() => pending.delete(market));
+
+                  pending.set(market, request);
+                  return request;
+              }
+
+              function loadMarkets(markets) {
+                  return Promise.all([...new Set(markets)].map(loadMarket));
+              }
+
+              window.FlappyKData = Object.freeze({
+                  markets: () => [...MARKETS],
+                  marketForLevel,
+                  isLoaded: (market) => loaded.has(market),
+                  loadMarket,
+                  loadMarkets,
+              });
+          })();
+          ''')
+
+          # Canonical generator now emits the same market chunks; obsolete generators are removed below.
+          replace_once('fetch_all_data.py',
+              'from datetime import datetime, timezone\n',
+              'from datetime import datetime, timezone\nfrom pathlib import Path\n')
+          regex_once('fetch_all_data.py', r'\nwith open\("data\.js", "w", encoding="utf-8"\) as output:.*\Z', r'''
+          output_dir = Path("data/markets")
+          output_dir.mkdir(parents=True, exist_ok=True)
+          for market, payload in all_data.items():
+              (output_dir / f"{market}.json").write_text(
+                  json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + "\n",
+                  encoding="utf-8",
+              )
+          (output_dir / "meta.json").write_text(
+              json.dumps(metadata, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+
+          print("Done! Adjusted data and metadata written to data/markets/")
+          ''')
+
+          # Loader order and font discovery: no blocking data.js and no CSS @import.
+          index = Path('index.html').read_text()
+          index = index.replace(
+              '    <link rel="canonical" href="https://liuh886.github.io/FlappyK/">\n',
+              '    <link rel="canonical" href="https://liuh886.github.io/FlappyK/">\n'
+              '    <link rel="preconnect" href="https://fonts.googleapis.com">\n'
+              '    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
+          )
+          index = index.replace(
+              '    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">',
+              '    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Press+Start+2P&family=ZCOOL+QingKe+HuangYou&display=swap" rel="stylesheet">'
+          )
+          index = index.replace(
+              '    <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js"',
+              '    <script defer src="https://static.cloudflareinsights.com/beacon.min.js"'
+          )
+          index = index.replace('    <script src="data.js"></script>', '    <script src="data-loader.js"></script>')
+          Path('index.html').write_text(index)
+
+          for css_path in ('premium-ui.css', 'i18n.css'):
+              css_file = Path(css_path)
+              css = css_file.read_text()
+              css = re.sub(r"^@import url\('https://fonts\.googleapis\.com/[^\n]+\);\n\n?", '', css, count=1)
+              css_file.write_text(css)
+
+          # Canvas backing store has one owner: game.js. Logical drawing coordinates stay in CSS pixels.
+          old_resize = '''function resizeCanvas() {
+              gameContainer.style.width = '100vw';
+              gameContainer.style.height = '100dvh';
+              gameContainer.style.border = 'none';
+              gameContainer.style.boxShadow = 'none';
+
+              const fallbackHeight = window.matchMedia("(max-width: 768px)").matches
+                  ? window.innerHeight * 0.6
+                  : window.innerHeight;
+
+              canvas.width = canvas.clientWidth || window.innerWidth;
+              canvas.height = canvas.clientHeight || fallbackHeight;
+
+              if (typeof isPlaying !== 'undefined' && isPlaying) draw();
+          }
+          '''
+          new_resize = '''let canvasCssWidth = 1;
+          let canvasCssHeight = 1;
+
+          function resizeCanvas() {
+              gameContainer.style.width = '100vw';
+              gameContainer.style.height = '100dvh';
+              gameContainer.style.border = 'none';
+              gameContainer.style.boxShadow = 'none';
+
+              const fallbackHeight = window.matchMedia("(max-width: 768px)").matches
+                  ? window.innerHeight * 0.6
+                  : window.innerHeight;
+              const cssWidth = Math.max(1, Math.round(canvas.clientWidth || window.innerWidth));
+              const cssHeight = Math.max(1, Math.round(canvas.clientHeight || fallbackHeight));
+              const dpr = Math.max(1, Number(window.devicePixelRatio) || 1);
+
+              canvasCssWidth = cssWidth;
+              canvasCssHeight = cssHeight;
+              const backingWidth = Math.round(cssWidth * dpr);
+              const backingHeight = Math.round(cssHeight * dpr);
+              if (canvas.width !== backingWidth) canvas.width = backingWidth;
+              if (canvas.height !== backingHeight) canvas.height = backingHeight;
+              ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+              if (typeof isPlaying !== 'undefined' && isPlaying) draw();
+          }
+          '''
+          replace_once('game.js', old_resize, new_resize)
+          replace_once('game.js',
+              "window.addEventListener('resize', resizeCanvas);\nsetTimeout(resizeCanvas, 100);\n\n// Set initial size\nresizeCanvas();",
+              "window.addEventListener('resize', resizeCanvas, { passive: true });\nwindow.addEventListener('orientationchange', resizeCanvas, { passive: true });\nnew ResizeObserver(resizeCanvas).observe(canvas);\n\n// Set initial size\nresizeCanvas();")
+          replace_once('game.js',
+              '// Initial Speed UI Sync\nspeedBtn.innerText = `${speedMultiplier}x [←/→]`;\n',
+              '''// Initial Speed UI Sync
+          speedBtn.innerText = `${speedMultiplier}x [←/→]`;
+
+          async function ensureLevelMarketData(levelNumber = level) {
+              const dataApi = window.FlappyKData;
+              if (!dataApi) throw new Error('Market data loader is unavailable');
+              await dataApi.loadMarket(dataApi.marketForLevel(levelNumber));
+          }
+
+          function reportMarketLoadFailure(error) {
+              console.error('FlappyK market data load failed:', error);
+              window.alert('Market data could not be loaded. Check your connection and try again.');
+          }
+          ''')
+          replace_once('game.js',
+              '''startBtn.addEventListener('click', () => {
+              startScreen.classList.remove('active');
+              initAudio();
+              startLevel();
+          });''',
+              '''startBtn.addEventListener('click', async () => {
+              startBtn.disabled = true;
+              try {
+                  await ensureLevelMarketData();
+                  startScreen.classList.remove('active');
+                  initAudio();
+                  startLevel();
+              } catch (error) {
+                  reportMarketLoadFailure(error);
+              } finally {
+                  startBtn.disabled = false;
+              }
+          });''')
+          replace_once('game.js',
+              '''nextBtn.addEventListener('click', () => {
+              settlementScreen.classList.remove('active');
+              startLevel();
+          });
+          restartBtn.addEventListener('click', () => {
+              settlementScreen.classList.remove('active');
+              level = 1;
+              targetReturn = 0;
+              collectedCards = [];
+              startLevel();
+          });''',
+              '''nextBtn.addEventListener('click', async () => {
+              nextBtn.disabled = true;
+              try {
+                  await ensureLevelMarketData();
+                  settlementScreen.classList.remove('active');
+                  startLevel();
+              } catch (error) {
+                  reportMarketLoadFailure(error);
+              } finally {
+                  nextBtn.disabled = false;
+              }
+          });
+          restartBtn.addEventListener('click', async () => {
+              level = 1;
+              targetReturn = 0;
+              collectedCards = [];
+              restartBtn.disabled = true;
+              try {
+                  await ensureLevelMarketData(1);
+                  settlementScreen.classList.remove('active');
+                  startLevel();
+              } catch (error) {
+                  reportMarketLoadFailure(error);
+              } finally {
+                  restartBtn.disabled = false;
+              }
+          });''')
+          replace_once('game.js',
+              '''champagneRestartBtn.addEventListener('click', () => {
+              champagneScreen.classList.remove('active');
+              level = 1;
+              targetReturn = 0;
+              collectedCards = [];
+              startLevel();
+          });''',
+              '''champagneRestartBtn.addEventListener('click', async () => {
+              level = 1;
+              targetReturn = 0;
+              collectedCards = [];
+              champagneRestartBtn.disabled = true;
+              try {
+                  await ensureLevelMarketData(1);
+                  champagneScreen.classList.remove('active');
+                  startLevel();
+              } catch (error) {
+                  reportMarketLoadFailure(error);
+              } finally {
+                  champagneRestartBtn.disabled = false;
+              }
+          });''')
+          replace_once('game.js',
+              '''    // In case data failed to fetch, fallback
+              if (!stockData[currentMarket] || Object.keys(stockData[currentMarket]).length === 0) {
+                  currentMarket = Object.keys(stockData).find(k => Object.keys(stockData[k]).length > 0);
+              }
+              
+              const assets = Object.keys(stockData[currentMarket]);''',
+              '''    if (!stockData[currentMarket] || Object.keys(stockData[currentMarket]).length === 0) {
+                  throw new Error(`Market data is not loaded: ${currentMarket}`);
+              }
+
+              const assets = Object.keys(stockData[currentMarket]);''')
+          game = Path('game.js').read_text()
+          head, marker, draw_tail = game.partition('function draw() {')
+          if not marker:
+              raise SystemExit('game.js draw function missing')
+          draw_tail = draw_tail.replace('canvas.width', 'canvasCssWidth').replace('canvas.height', 'canvasCssHeight')
+          Path('game.js').write_text(head + marker + draw_tail)
+
+          # Premium refinement remains a presentation synchronizer, never a canvas backing-store writer.
+          refinement = Path('scripts/premium-ui-refinement.js').read_text()
+          refinement = refinement.replace("    const canvasElement = document.getElementById('game-canvas');\n", '')
+          refinement = re.sub(r'\n    function syncCanvasLayout\(\) \{.*?\n    \}\n\n    function syncComposition', '\n    function syncComposition', refinement, count=1, flags=re.S)
+          refinement = refinement.replace('        syncCanvasLayout();\n', '')
+          refinement = re.sub(r'\n    if \(canvasElement\) \{\n        new MutationObserver\(scheduleComposition\)\.observe\(canvasElement, \{.*?\n    \}\n', '\n', refinement, count=1, flags=re.S)
+          refinement = refinement.replace('        syncCanvasLayout,\n', '')
+          Path('scripts/premium-ui-refinement.js').write_text(refinement)
+
+          # Supplemental QQQ is now sourced from the canonical US market chunk and hidden from random selection.
+          Path('qqq-loader.js').write_text(r'''(() => {
+              'use strict';
+
+              const QQQ_NAME = 'QQQ';
+
+              function syncOpenSelector() {
+                  const marketSelect = document.getElementById('custom-market-select');
+                  const assetSelect = document.getElementById('custom-asset-select');
+                  if (!marketSelect || !assetSelect || marketSelect.value !== 'usstock') return;
+                  if (!stockData.usstock?.[QQQ_NAME]?.length) return;
+                  if (Array.from(assetSelect.options).some((option) => option.value === QQQ_NAME)) return;
+                  const option = document.createElement('option');
+                  option.value = QQQ_NAME;
+                  option.textContent = QQQ_NAME;
+                  assetSelect.appendChild(option);
+                  const sorted = Array.from(assetSelect.options)
+                      .sort((left, right) => left.textContent.localeCompare(right.textContent));
+                  assetSelect.replaceChildren(...sorted);
+              }
+
+              function installCustomOnlyQQQ() {
+                  const rows = stockData.usstock?.[QQQ_NAME];
+                  if (!Array.isArray(rows) || rows.length < 250) return;
+                  Object.defineProperty(stockData.usstock, QQQ_NAME, {
+                      value: rows,
+                      enumerable: false,
+                      configurable: true,
+                      writable: true,
+                  });
+                  syncOpenSelector();
+              }
+
+              document.addEventListener('flappyk:data-updated', (event) => {
+                  if (event.detail?.market === 'usstock') installCustomOnlyQQQ();
+              });
+              document.getElementById('custom-market-select')?.addEventListener('change', () => window.setTimeout(syncOpenSelector, 0));
+              const assetSelect = document.getElementById('custom-asset-select');
+              if (assetSelect) new MutationObserver(syncOpenSelector).observe(assetSelect, { childList: true });
+          })();
+          ''')
+
+          # Custom Challenge knows the market catalog without preloading market payloads.
+          replace_once('custom-challenge.js',
+              '''    function availableMarkets() {
+                  return Object.keys(marketLabels).filter((market) =>
+                      stockData[market] && Object.keys(stockData[market]).length > 0
+                  );
+              }''',
+              '''    function availableMarkets() {
+                  return window.FlappyKData?.markets?.() || Object.keys(marketLabels);
+              }''')
+          replace_once('custom-challenge.js', '\n        populateAssets();\n    }\n\n    function populateAssets() {', '\n    }\n\n    async function populateAssets() {')
+          replace_once('custom-challenge.js',
+              '''        const market = marketSelect.value;
+                  const previousValue = assetSelect.value;
+                  const assets = Object.keys(stockData[market] || {}).sort((a, b) => a.localeCompare(b));''',
+              '''        const market = marketSelect.value;
+                  const previousValue = assetSelect.value;
+                  await window.FlappyKData.loadMarket(market);
+                  const assets = Object.keys(stockData[market] || {}).sort((a, b) => a.localeCompare(b));''')
+          replace_once('custom-challenge.js', '    function openCustomSelector() {', '    async function openCustomSelector() {')
+          replace_once('custom-challenge.js',
+              '''        populateMarkets();
+
+                  if (customState.market && availableMarkets().includes(customState.market)) {
+                      marketSelect.value = customState.market;
+                      populateAssets();
+
+                      if (customState.asset && Object.prototype.hasOwnProperty.call(
+                          stockData[customState.market] || {},
+                          customState.asset
+                      )) {
+                          assetSelect.value = customState.asset;
+                      }
+                  }
+
+                  customScreen.classList.add('active');''',
+              '''        populateMarkets();
+
+                  if (customState.market && availableMarkets().includes(customState.market)) {
+                      marketSelect.value = customState.market;
+                  }
+                  await populateAssets();
+                  if (customState.market && customState.asset && Object.prototype.hasOwnProperty.call(
+                      stockData[customState.market] || {},
+                      customState.asset
+                  )) {
+                      assetSelect.value = customState.asset;
+                  }
+
+                  customScreen.classList.add('active');''')
+          replace_once('custom-challenge.js', '    function startCustomChallenge({ reuseWindow = false } = {}) {', '    async function startCustomChallenge({ reuseWindow = false } = {}) {')
+          replace_once('custom-challenge.js',
+              '''        const market = marketSelect.value || customState.market;
+                  const asset = assetSelect.value || customState.asset;
+                  const data = stockData[market]?.[asset];''',
+              '''        const market = marketSelect.value || customState.market;
+                  const asset = assetSelect.value || customState.asset;
+                  await window.FlappyKData.loadMarket(market);
+                  const data = stockData[market]?.[asset];''')
+          custom = Path('custom-challenge.js').read_text()
+          custom = custom.replace('        openCustomSelector();\n        return true;', '        void openCustomSelector();\n        return true;')
+          custom = custom.replace('            openCustomSelector();\n', '            void openCustomSelector();\n')
+          custom = custom.replace("    marketSelect.addEventListener('change', populateAssets);", "    marketSelect.addEventListener('change', () => { void populateAssets(); });")
+          custom = custom.replace('        startCustomChallenge({ reuseWindow: false });', '        void startCustomChallenge({ reuseWindow: false });')
+          custom = custom.replace('        startCustomChallenge({ reuseWindow: true });', '        void startCustomChallenge({ reuseWindow: true });')
+          custom = custom.replace('        openCustomSelector();\n    });', '        void openCustomSelector();\n    });')
+          Path('custom-challenge.js').write_text(custom)
+
+          # Daily Run loads all three markets only when the user requests the cross-market daily descriptor set.
+          replace_once('daily-run.js',
+              "        lastRecordedSignature: '',\n    };",
+              "        lastRecordedSignature: '',\n        loading: false,\n        loadFailed: false,\n    };")
+          replace_once('daily-run.js',
+              '    state.descriptors = createDescriptors();\n',
+              '''    async function ensureDescriptors() {
+                  if (state.descriptors.length === 3) return true;
+                  state.loading = true;
+                  state.loadFailed = false;
+                  renderDailySummary();
+                  try {
+                      await window.FlappyKData.loadMarkets(window.FlappyKData.markets());
+                      state.descriptors = createDescriptors();
+                      state.loadFailed = state.descriptors.length !== 3;
+                  } catch (error) {
+                      console.warn('Daily Run market data could not be loaded.', error);
+                      state.descriptors = [];
+                      state.loadFailed = true;
+                  } finally {
+                      state.loading = false;
+                      renderDailySummary();
+                  }
+                  return state.descriptors.length === 3;
+              }
+          ''')
+          replace_once('daily-run.js',
+              '''        dailyButton.disabled = state.descriptors.length !== 3;
+                  dailyButton.textContent = state.descriptors.length === 3
+                      ? Number.isFinite(Number(todayBest)) ? 'REPLAY DAILY' : 'DAILY RUN'
+                      : 'DAILY UNAVAILABLE';''',
+              '''        dailyButton.disabled = state.loading;
+                  dailyButton.textContent = state.loading
+                      ? 'LOADING…'
+                      : state.loadFailed
+                          ? 'DAILY UNAVAILABLE'
+                          : Number.isFinite(Number(todayBest)) ? 'REPLAY DAILY' : 'DAILY RUN';''')
+          replace_once('daily-run.js', '    function startDailyRun() {', '    async function startDailyRun() {')
+          replace_once('daily-run.js',
+              '''        if (state.descriptors.length !== 3) {
+                      window.alert('Today’s Daily Run is unavailable for the current market snapshot.');
+                      return;
+                  }
+
+                  state.active = true;''',
+              '''        if (!await ensureDescriptors()) {
+                      window.alert('Today’s Daily Run is unavailable for the current market snapshot.');
+                      return;
+                  }
+
+                  state.active = true;''')
+          replace_once('daily-run.js', '        startDailyRun();\n    }, { capture: true });', '        void startDailyRun();\n    }, { capture: true });')
+
+          # Friend Challenge validates shape first, then lazy-loads only the markets named by the challenge.
+          replace_once('friend-challenge.js', '    function loadInviteFromLocation() {', '    async function loadInviteFromLocation() {')
+          replace_once('friend-challenge.js',
+              '''        const payload = codec.decodeChallenge(token);
+                  if (!payload || !validateAgainstDataset(payload)) {
+                      state.invite = null;
+                      removeChallengeToken();
+                      clearInviteVisual();
+                      window.alert('This friend challenge is invalid or no longer matches the bundled market snapshot.');
+                      return;
+                  }
+
+                  state.invite = payload;''',
+              '''        const payload = codec.decodeChallenge(token);
+                  if (!payload || !codec.validateChallengeShape(payload)) {
+                      state.invite = null;
+                      removeChallengeToken();
+                      clearInviteVisual();
+                      window.alert('This friend challenge is invalid.');
+                      return;
+                  }
+
+                  if (startButton) startButton.disabled = true;
+                  try {
+                      await window.FlappyKData.loadMarkets(payload.g.map((descriptor) => descriptor.m));
+                  } catch (error) {
+                      console.warn('Friend challenge market data could not be loaded.', error);
+                      return;
+                  } finally {
+                      if (startButton) startButton.disabled = false;
+                  }
+                  if (!validateAgainstDataset(payload)) {
+                      state.invite = null;
+                      removeChallengeToken();
+                      clearInviteVisual();
+                      window.alert('This friend challenge no longer matches the market snapshot.');
+                      return;
+                  }
+
+                  state.invite = payload;''')
+          friend = Path('friend-challenge.js').read_text()
+          friend = friend.replace('        loadInviteFromLocation();\n    });', '        void loadInviteFromLocation();\n    });')
+          friend = friend.replace('    loadInviteFromLocation();\n})();', '    void loadInviteFromLocation();\n})();')
+          Path('friend-challenge.js').write_text(friend)
+
+          # Service worker precaches the loader, not the multi-megabyte market payloads. JSON chunks enter runtime cache on use.
+          replace_once('sw.js', "    './data.js',", "    './data-loader.js',")
+          sw = Path('sw.js').read_text()
+          if not sw.endswith('\n'):
+              Path('sw.js').write_text(sw + '\n')
+
+          # Data audit reads the canonical generated chunks directly.
+          audit = Path('scripts/audit_bundled_data.py').read_text()
+          audit = audit.replace('DATA_FILE = Path(__file__).resolve().parents[1] / "data.js"', 'DATA_DIR = Path(__file__).resolve().parents[1] / "data" / "markets"')
+          audit = re.sub(
+              r'def load_stock_data\(\) -> dict\[str, dict\[str, list\[dict\[str, Any\]\]\]\]:\n.*?\n\n\ndef rows_by_date',
+              '''def load_stock_data() -> dict[str, dict[str, list[dict[str, Any]]]]:
+              data: dict[str, dict[str, list[dict[str, Any]]]] = {}
+              for market in ("crypto", "ashare", "usstock"):
+                  path = DATA_DIR / f"{market}.json"
+                  payload = json.loads(path.read_text(encoding="utf-8"))
+                  if not isinstance(payload, dict):
+                      raise RuntimeError(f"{path} does not contain a market object")
+                  data[market] = payload
+              return data
+
+
+          def rows_by_date''',
+              audit,
+              count=1,
+              flags=re.S,
+          )
+          Path('scripts/audit_bundled_data.py').write_text(audit)
+
+          # Tests protect runtime behavior/ownership rather than retired file names.
+          pwa = Path('tests/pwa.test.js').read_text()
+          pwa = pwa.replace('assert.ok(pixelStyles.includes("family=Pixelify+Sans"));', '''assert.ok(indexSource.includes('rel="preconnect" href="https://fonts.googleapis.com"'));
+          assert.ok(indexSource.includes('rel="preconnect" href="https://fonts.gstatic.com" crossorigin'));
+          assert.ok(indexSource.includes('family=Pixelify+Sans'));
+          assert.ok(!pixelStyles.includes('@import url('));''')
+          pwa = pwa.replace('assert.ok(serviceWorkerSource.includes("\'./data.js\'"));', '''assert.ok(serviceWorkerSource.includes("'./data-loader.js'"));
+          assert.ok(!serviceWorkerSource.includes("'./data.js'"));
+          assert.ok(!serviceWorkerSource.includes("'./data/markets/crypto.json'"));''')
+          Path('tests/pwa.test.js').write_text(pwa)
+
+          i18n_test = Path('tests/i18n.test.js').read_text()
+          i18n_test = i18n_test.replace(
+              'assert.ok(cssSource.startsWith("@import url(\'https://fonts.googleapis.com/css2?family=ZCOOL+QingKe+HuangYou"));',
+              '''assert.ok(indexSource.includes('family=ZCOOL+QingKe+HuangYou'));
+          assert.ok(!cssSource.includes('@import url('));'''
+          )
+          Path('tests/i18n.test.js').write_text(i18n_test)
+
+          web_contract = Path('tests/web-composition-contract.test.js').read_text()
+          web_contract = web_contract.replace("const hardeningJs = fs.readFileSync('core-hardening.js', 'utf8');", "const hardeningJs = fs.readFileSync('core-hardening.js', 'utf8');\nconst gameJs = fs.readFileSync('game.js', 'utf8');")
+          web_contract = web_contract.replace("assert.ok(refinementJs.includes('canvasElement.clientWidth || window.innerWidth'));\nassert.ok(refinementJs.includes('canvasElement.clientHeight || window.innerHeight'));", "assert.ok(!refinementJs.includes('canvasElement.width ='));\nassert.ok(!refinementJs.includes('canvasElement.height ='));\nassert.ok(!refinementJs.includes('syncCanvasLayout'));\nassert.ok(gameJs.includes('window.devicePixelRatio'));\nassert.ok(gameJs.includes('ctx.setTransform(dpr, 0, 0, dpr, 0, 0)'));")
+          web_contract = web_contract.replace('  "family=Pixelify+Sans",\n', '')
+          Path('tests/web-composition-contract.test.js').write_text(web_contract)
+
+          e2e = Path('tests/e2e/pwa.spec.js').read_text()
+          old_offline = r'''test('PWA registers, controls the page, and reloads offline', async ({ page, context }) => {
+            await preparePage(page);
+            await page.goto('/');
+
+            await expect(page.locator('link[rel="manifest"]')).toHaveAttribute('href', 'manifest.webmanifest');
+            const registration = await page.evaluate(async () => {
+              const ready = await navigator.serviceWorker.ready;
+              return { scope: ready.scope, active: Boolean(ready.active) };
+            });
+            expect(registration.active).toBe(true);
+            expect(registration.scope).toContain('127.0.0.1:8000/');
+
+            await page.reload();
+            await expect.poll(
+              () => page.evaluate(() => Boolean(navigator.serviceWorker.controller)),
+              { timeout: 20_000 }
+            ).toBe(true);
+
+            await context.setOffline(true);
+            await page.reload({ waitUntil: 'domcontentloaded' });
+            await expect(page.getByRole('button', { name: 'PLAY', exact: true })).toBeVisible();
+            await expect.poll(() => page.evaluate(() => (
+              typeof stockData !== 'undefined' ? Object.keys(stockData.crypto || {}).length : 0
+            ))).toBeGreaterThan(0);
+
+            await page.getByRole('button', { name: 'PLAY', exact: true }).click();
+            await expect(page.locator('#start-screen')).not.toHaveClass(/active/);
+            await expect.poll(() => page.evaluate(() => (
+              typeof currentData !== 'undefined' && Array.isArray(currentData) ? currentData.length : 0
+            ))).toBe(250);
+            await context.setOffline(false);
+          });'''
+          new_offline = r'''test('PWA runtime-caches a market chunk after first use and replays it offline', async ({ page, context }) => {
+            await preparePage(page);
+            await page.goto('/');
+
+            await expect(page.locator('link[rel="manifest"]')).toHaveAttribute('href', 'manifest.webmanifest');
+            const registration = await page.evaluate(async () => {
+              const ready = await navigator.serviceWorker.ready;
+              return { scope: ready.scope, active: Boolean(ready.active) };
+            });
+            expect(registration.active).toBe(true);
+            expect(registration.scope).toContain('127.0.0.1:8000/');
+
+            await page.reload();
+            await expect.poll(
+              () => page.evaluate(() => Boolean(navigator.serviceWorker.controller)),
+              { timeout: 20_000 }
+            ).toBe(true);
+            expect(await page.evaluate(() => Object.keys(stockData.crypto || {}).length)).toBe(0);
+
+            await page.getByRole('button', { name: 'PLAY', exact: true }).click();
+            await expect.poll(() => page.evaluate(() => Object.keys(stockData.crypto || {}).length)).toBeGreaterThan(0);
+            await expect.poll(() => page.evaluate(() => Array.isArray(currentData) ? currentData.length : 0)).toBe(250);
+
+            await context.setOffline(true);
+            await page.reload({ waitUntil: 'domcontentloaded' });
+            await expect(page.getByRole('button', { name: 'PLAY', exact: true })).toBeVisible();
+            await page.getByRole('button', { name: 'PLAY', exact: true }).click();
+            await expect.poll(() => page.evaluate(() => Array.isArray(currentData) ? currentData.length : 0)).toBe(250);
+            await context.setOffline(false);
+          });'''
+          if old_offline not in e2e:
+              raise SystemExit('PWA offline e2e anchor missing')
+          e2e = e2e.replace(old_offline, new_offline, 1)
+          e2e += r'''
+
+          test('canvas backing store follows devicePixelRatio while gameplay coordinates stay in CSS pixels', async ({ browser }) => {
+            const context = await browser.newContext({ viewport: { width: 900, height: 700 }, deviceScaleFactor: 2 });
+            const page = await context.newPage();
+            await preparePage(page);
+            await page.goto('/');
+            await page.getByRole('button', { name: 'PLAY', exact: true }).click();
+            await expect.poll(() => page.evaluate(() => Array.isArray(currentData) ? currentData.length : 0)).toBe(250);
+
+            const size = await page.evaluate(() => {
+              const canvas = document.getElementById('game-canvas');
+              const rect = canvas.getBoundingClientRect();
+              return {
+                dpr: window.devicePixelRatio,
+                cssWidth: Math.round(rect.width),
+                cssHeight: Math.round(rect.height),
+                backingWidth: canvas.width,
+                backingHeight: canvas.height,
+              };
+            });
+            expect(size.dpr).toBe(2);
+            expect(size.backingWidth).toBe(Math.round(size.cssWidth * size.dpr));
+            expect(size.backingHeight).toBe(Math.round(size.cssHeight * size.dpr));
+            await context.close();
+          });
+          '''
+          Path('tests/e2e/pwa.spec.js').write_text(e2e)
+
+          # Canonical static contract for lazy data and one canvas writer.
+          validator = Path('scripts/validate-static-contracts.mjs').read_text()
+          insert = '''\nconst dataLoader = readFileSync(join(root, 'data-loader.js'), 'utf8');
+          if (!index.includes('<script src="data-loader.js"></script>') || index.includes('<script src="data.js"></script>')) {
+            throw new Error('FlappyK must boot through the lazy market data loader, not data.js.');
+          }
+          for (const market of ['crypto', 'ashare', 'usstock']) requireFile(`data/markets/${market}.json`);
+          if (!dataLoader.includes('window.FlappyKData') || !dataLoader.includes('loadMarket')) {
+            throw new Error('Lazy market loader contract is missing.');
+          }
+          const gameSource = readFileSync(join(root, 'game.js'), 'utf8');
+          const refinementSource = readFileSync(join(root, 'scripts/premium-ui-refinement.js'), 'utf8');
+          const canvasWrites = [...gameSource.matchAll(/canvas\\.(?:width|height)\\s*=/g)].length
+            + [...refinementSource.matchAll(/canvasElement\\.(?:width|height)\\s*=/g)].length;
+          if (canvasWrites !== 2 || refinementSource.includes('syncCanvasLayout')) {
+            throw new Error(`Canvas backing store must have one owner in game.js; found ${canvasWrites} width/height writes.`);
+          }
+          if (!gameSource.includes('window.devicePixelRatio') || !gameSource.includes('ctx.setTransform(dpr, 0, 0, dpr, 0, 0)')) {
+            throw new Error('Canvas owner must scale its backing store for devicePixelRatio.');
+          }
+          '''
+          validator = validator.replace("const analytics = readFileSync(join(root, 'analytics.js'), 'utf8');", insert + "\nconst analytics = readFileSync(join(root, 'analytics.js'), 'utf8');")
+          Path('scripts/validate-static-contracts.mjs').write_text(validator)
+
+          # README now describes the canonical split snapshot; dated review/changelog history remains historical.
+          readme = Path('README.md').read_text()
+          readme = readme.replace('The market snapshot is stored locally in `data.js`.', 'The market snapshot is stored as lazy market chunks under `data/markets/` and loaded through `data-loader.js`.')
+          readme = readme.replace('the `html2canvas` CDN dependency, supplemental QQQ history, and the live leaderboard JSON.', 'the `html2canvas` CDN dependency, Google Fonts, and the live leaderboard JSON.')
+          readme = readme.replace('restores the three windows from the bundled `data.js` snapshot', 'restores the three windows from the canonical market chunks')
+          readme = readme.replace('`fetch_all_data.py` builds `data.js` from:', '`fetch_all_data.py` builds the market chunks under `data/markets/` from:')
+          readme = readme.replace('Each newly generated `data.js` also records the generation time, yfinance version, and adjustment policy in `stockDataMeta`.', 'Each refresh also writes generation time, yfinance version, and adjustment policy to `data/markets/meta.json`.')
+          readme = readme.replace('- `data.js` — embedded historical market snapshot;', '- `data-loader.js` + `data/markets/*.json` — lazy historical market snapshot;')
+          readme = readme.replace('It does not relicense `data.js`, generated market data,', 'It does not relicense generated market data,')
+          Path('README.md').write_text(readme)
+
+          # Obsolete alternative data generators are retired rather than kept as parallel authorities.
+          for old in ('fetch_data.py', 'fetch_binance.py'):
+              Path(old).unlink(missing_ok=True)
+          PY
+
+          python scripts/audit_bundled_data.py
+          npm ci --no-audit --no-fund
+          node scripts/validate-static-contracts.mjs
+
+          echo '=== final single canvas owner ==='
+          grep -RIn --exclude-dir=.git --exclude-dir=node_modules -E 'canvas(Element)?\.(width|height)[[:space:]]*=' game.js scripts || true
+          echo '=== no blocking snapshot/font imports ==='
+          ! grep -RIn --exclude-dir=.git --exclude-dir=node_modules -E '<script src="data\.js"|@import.*fonts\.googleapis' index.html premium-ui.css i18n.css
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix(frontend): lazy-load market data and sharpen DPR canvas"
+          git push origin HEAD:fix/frontend-performance-105
