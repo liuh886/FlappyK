@@ -105,6 +105,7 @@ for (const contract of [
   "productCode: 'flappyk'",
   "entitlementCode: 'flappyk.pro'",
   'billingEnabled: true',
+  'product-referral.js?v=5',
   '排行榜按正式游戏规则统计',
 ]) {
   if (!membershipConfig.includes(contract)) throw new Error(`FlappyK account config is missing ${contract}`);
@@ -117,7 +118,7 @@ for (const reference of [
   if (!index.includes(reference)) throw new Error(`FlappyK index is missing ${reference}`);
 }
 const sharedRuntimeSurface = `${index}\n${membershipConfig}`;
-for (const retired of ['account-shell.css?v=5', 'account-shell.js?v=6', 'account-upgrade.css', 'account-upgrade.js', 'product-referral.js?v=3']) {
+for (const retired of ['account-shell.css?v=5', 'account-shell.js?v=6', 'account-upgrade.css', 'account-upgrade.js', 'product-referral.js?v=3', 'product-referral.js?v=4']) {
   if (sharedRuntimeSurface.includes(retired)) throw new Error(`FlappyK still references retired shared runtime ${retired}`);
 }
 for (const contract of [
@@ -136,4 +137,4 @@ for (const forbidden of [/sk_(live|test)_/, /whsec_/, /sb_secret_/, /service_rol
 
 requireFile('data/leaderboard.json');
 requireFile('.github/workflows/leaderboard.yml');
-console.log('Structured gameplay, PWA, GA4 product events, Cloudflare RUM, canonical Account Shell v7, bounded referrals, cloud-history, and asset contracts passed.');
+console.log('Structured gameplay, PWA, GA4 product events, Cloudflare RUM, canonical Account Shell v7, immutable referral v5, cloud-history, and asset contracts passed.');
