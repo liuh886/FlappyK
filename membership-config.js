@@ -35,24 +35,6 @@
         }
     }
 
-    function ensureUpgradeAssets() {
-        if (!document.getElementById('hao-account-upgrade-styles')) {
-            const stylesheet = document.createElement('link');
-            stylesheet.id = 'hao-account-upgrade-styles';
-            stylesheet.rel = 'stylesheet';
-            stylesheet.href = 'https://liuh886.github.io/admin/shared/account-upgrade.css?v=1';
-            document.head.appendChild(stylesheet);
-        }
-
-        if (!document.getElementById('hao-account-upgrade-script')) {
-            const script = document.createElement('script');
-            script.id = 'hao-account-upgrade-script';
-            script.src = 'https://liuh886.github.io/admin/shared/account-upgrade.js?v=5';
-            script.defer = true;
-            document.head.appendChild(script);
-        }
-    }
-
     function ensureReferralAssets() {
         if (!document.getElementById('hao-product-referral-styles')) {
             const stylesheet = document.createElement('link');
@@ -65,7 +47,7 @@
         if (!document.getElementById('hao-product-referral-script')) {
             const script = document.createElement('script');
             script.id = 'hao-product-referral-script';
-            script.src = 'https://liuh886.github.io/admin/shared/product-referral.js?v=3';
+            script.src = 'https://liuh886.github.io/admin/shared/product-referral.js?v=4';
             script.async = true;
             document.head.appendChild(script);
         }
@@ -132,6 +114,5 @@
         feedbackEnabled: false,
     });
 
-    ensureUpgradeAssets();
     scheduleReferralAssets();
 })();

@@ -54,8 +54,11 @@ assert.ok(indexSource.includes('scripts/ui-state.js'));
 assert.ok(indexSource.includes('scripts/premium-ui.js'));
 assert.ok(indexSource.includes('scripts/home-story.js'));
 assert.ok(indexSource.includes('pwa.js'));
-assert.ok(indexSource.includes('https://liuh886.github.io/admin/shared/account-shell.css?v=5'));
-assert.ok(indexSource.includes('async src="https://liuh886.github.io/admin/shared/account-shell.js?v=6"'));
+assert.ok(indexSource.includes('https://liuh886.github.io/admin/shared/account-shell.css?v=6'));
+assert.ok(indexSource.includes('async src="https://liuh886.github.io/admin/shared/account-shell.js?v=7"'));
+for (const retired of ['account-shell.css?v=5', 'account-shell.js?v=6', 'account-upgrade.css', 'account-upgrade.js']) {
+    assert.ok(!indexSource.includes(retired), `PWA shell must not load retired shared asset ${retired}`);
+}
 assert.ok(indexSource.includes('scripts/account-cloud-sync.js'));
 assert.ok(indexSource.includes('https://static.cloudflareinsights.com/beacon.min.js'));
 
@@ -169,4 +172,4 @@ assert.ok(analyticsSource.includes("track('level_complete'"));
 assert.ok(analyticsSource.includes("track('run_complete'"));
 assert.ok(analyticsSource.includes("track('pwa_install'"));
 
-console.log('PWA manifest, icons, install UI, GA4 product events, Cloudflare RUM, curated home, readable score-first HUD, Pro/Daily Run tactical power-ups, Account Shell v6 cloud history, and stable cache lifecycle checks passed');
+console.log('PWA manifest, icons, install UI, GA4 product events, Cloudflare RUM, curated home, readable score-first HUD, Pro/Daily Run tactical power-ups, canonical Account Shell v7 cloud history, and stable cache lifecycle checks passed');
