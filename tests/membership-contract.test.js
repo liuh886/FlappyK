@@ -28,22 +28,27 @@ for (const contract of [
   'scheduleReferralAssets',
   "window.addEventListener('load', ensureReferralAssets, { once: true })",
   "script.async = true",
+  'product-referral.js?v=4',
   '排行榜按正式游戏规则统计',
 ]) {
   assert.ok(configSource.includes(contract), `Missing shared FlappyK account contract: ${contract}`);
 }
+assert.ok(!configSource.includes('ensureUpgradeAssets'), 'Retired secondary account-upgrade runtime must not return.');
 assert.ok(!/ensureUpgradeAssets\(\);\s*ensureReferralAssets\(\);/.test(configSource), 'Referral assets must not block the initial window load.');
 for (const forbidden of [/sk_(live|test)_/, /sb_secret_/, /whsec_/, /service_role/]) {
   assert.ok(!forbidden.test(configSource), `FlappyK account config contains forbidden secret material: ${forbidden}`);
 }
 
 for (const reference of [
-  'https://liuh886.github.io/admin/shared/account-shell.css?v=5',
+  'https://liuh886.github.io/admin/shared/account-shell.css?v=6',
   '<script src="membership-config.js"></script>',
-  'async src="https://liuh886.github.io/admin/shared/account-shell.js?v=6"',
+  'async src="https://liuh886.github.io/admin/shared/account-shell.js?v=7"',
   '<script src="scripts/account-cloud-sync.js"></script>',
 ]) {
   assert.ok(indexSource.includes(reference), `FlappyK page is missing ${reference}`);
+}
+for (const retired of ['account-shell.css?v=5', 'account-shell.js?v=6', 'account-upgrade.css', 'account-upgrade.js', 'product-referral.js?v=3']) {
+  assert.ok(!`${indexSource}\n${configSource}`.includes(retired), `FlappyK must not load retired shared asset ${retired}`);
 }
 for (const toolbarContract of [
   '.home-utility-bar',
@@ -192,4 +197,4 @@ for (const privacyContract of [
   assert.ok(privacySource.includes(privacyContract), `Cloud-history documentation is missing ${privacyContract}`);
 }
 
-console.log('Shared Account Shell v6, nonblocking product referrals, Pro daily card grants, Daily Run free trials, cloud history, stable PWA cache, entitlement boundary, privacy, rankings, and RLS checks validated');
+console.log('Canonical Account Shell v7, bounded nonblocking referrals, Pro daily card grants, Daily Run free trials, cloud history, stable PWA cache, entitlement boundary, privacy, rankings, and RLS checks validated');
