@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any
 
 
-DATA_FILE = Path(__file__).resolve().parents[1] / "data.js"
+DATA_DIR = Path(__file__).resolve().parents[1] / "data" / "markets"
 CHALLENGE_DAYS = 250
 INDICATOR_WARMUP_DAYS = 35
 MIN_INDICATOR_ROWS = CHALLENGE_DAYS + INDICATOR_WARMUP_DAYS
@@ -21,17 +21,14 @@ KNOWN_SPLITS = [
 
 
 def load_stock_data() -> dict[str, dict[str, list[dict[str, Any]]]]:
-    text = DATA_FILE.read_text(encoding="utf-8")
-    marker = "const stockData = "
-    if marker not in text:
-        raise RuntimeError("data.js does not define stockData")
-
-    payload = text.split(marker, 1)[1].strip()
-    if payload.endswith(";"):
-        payload = payload[:-1]
-
-    return json.loads(payload)
-
+    data: dict[str, dict[str, list[dict[str, Any]]]] = {}
+    for market in ("crypto", "ashare", "usstock"):
+        market_path = DATA_DIR / f"{market}.json"
+        payload = json.loads(market_path.read_text(encoding="utf-8"))
+        if not isinstance(payload, dict):
+            raise RuntimeError(f"{market_path} does not contain a market object")
+        data[market] = payload
+    return data
 
 def rows_by_date(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
     return {row["date"]: row for row in rows}

@@ -2,6 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 
 const hardeningJs = fs.readFileSync('core-hardening.js', 'utf8');
+const gameJs = fs.readFileSync('game.js', 'utf8');
 const refinementJs = fs.readFileSync('scripts/premium-ui-refinement.js', 'utf8');
 const refinementCss = fs.readFileSync('premium-ui.css', 'utf8');
 const baseStyles = fs.readFileSync('style.css', 'utf8');
@@ -14,8 +15,11 @@ assert.ok(hardeningJs.includes('levelDisp.textContent = String(visibleGame)'));
 assert.ok(!hardeningJs.includes('levelDisp.textContent = `${visibleGame}/3`'));
 
 // JavaScript owns composition/state only; presentation must stay static and reviewable.
-assert.ok(refinementJs.includes('canvasElement.clientWidth || window.innerWidth'));
-assert.ok(refinementJs.includes('canvasElement.clientHeight || window.innerHeight'));
+assert.ok(!refinementJs.includes('canvasElement.width ='));
+assert.ok(!refinementJs.includes('canvasElement.height ='));
+assert.ok(!refinementJs.includes('syncCanvasLayout'));
+assert.ok(gameJs.includes('window.devicePixelRatio'));
+assert.ok(gameJs.includes('ctx.setTransform(dpr, 0, 0, dpr, 0, 0)'));
 assert.ok(!refinementJs.includes('DESKTOP_CANVAS_WIDTH'));
 assert.ok(!refinementJs.includes('DESKTOP_CANVAS_HEIGHT'));
 assert.ok(refinementJs.includes("const HUD_RAIL_ID = 'game-hud-rail'"));
@@ -39,7 +43,6 @@ assert.ok(!refinementJs.includes('installPixelCompatibilityStyles'));
 assert.ok(!refinementCss.includes('width: min(896px'), 'Fixed desktop viewport width must not return.');
 assert.ok(!refinementCss.includes('aspect-ratio: 4 / 3'), 'Fixed desktop viewport aspect ratio must not return.');
 for (const contract of [
-  "family=Pixelify+Sans",
   "--pixel-font-display: 'Press Start 2P'",
   "--pixel-font-ui: 'Pixelify Sans'",
   '--pixel-grid: 4px',

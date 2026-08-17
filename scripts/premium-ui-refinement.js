@@ -2,7 +2,6 @@
     'use strict';
 
     const root = document.documentElement;
-    const canvasElement = document.getElementById('game-canvas');
     const gameContainer = document.getElementById('game-container');
     const uiLayer = document.getElementById('ui-layer');
     const topControls = document.getElementById('game-top-controls');
@@ -237,28 +236,9 @@
         document.querySelector(selector)?.classList.add('guide-target');
     }
 
-    function syncCanvasLayout() {
-        if (!canvasElement || typeof draw !== 'function') return;
-
-        const targetWidth = Math.max(1, Math.round(canvasElement.clientWidth || window.innerWidth));
-        const targetHeight = Math.max(1, Math.round(canvasElement.clientHeight || window.innerHeight));
-        let changed = false;
-
-        if (canvasElement.width !== targetWidth) {
-            canvasElement.width = targetWidth;
-            changed = true;
-        }
-        if (canvasElement.height !== targetHeight) {
-            canvasElement.height = targetHeight;
-            changed = true;
-        }
-        if (changed && typeof isPlaying !== 'undefined' && isPlaying) draw();
-    }
-
     function syncComposition() {
         refineHudComposition();
         refineDesktopControls();
-        syncCanvasLayout();
         syncGuideTarget();
     }
 
@@ -305,12 +285,6 @@
         });
     }
 
-    if (canvasElement) {
-        new MutationObserver(scheduleComposition).observe(canvasElement, {
-            attributes: true,
-            attributeFilter: ['width', 'height'],
-        });
-    }
 
     [
         topControls,
@@ -356,7 +330,6 @@
         syncLiveExcess,
         syncSettlementVerdict,
         syncSettlementComparison,
-        syncCanvasLayout,
         syncGuideTarget,
         scheduleComposition,
     };

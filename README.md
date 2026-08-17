@@ -41,7 +41,7 @@ Open `http://localhost:8000` in a browser.
 
 A local web server is recommended instead of opening `index.html` directly because browser download, URL-query, clipboard, storage, and share APIs behave more consistently in a local HTTP context.
 
-The market snapshot is stored locally in `data.js`. An internet connection is still used for the Google pixel font, the `html2canvas` CDN dependency, supplemental QQQ history, and the live leaderboard JSON.
+The market snapshot is stored as lazy market chunks under `data/markets/` and loaded through `data-loader.js`. An internet connection is still used for the Google pixel font, the `html2canvas` CDN dependency, Google Fonts, supplemental QQQ history, and the live leaderboard JSON.
 
 ## Tests
 
@@ -147,7 +147,7 @@ No account or server is involved. Clearing site storage, using a private window,
 - the completed player's Total Excess target;
 - a challenge and dataset format version.
 
-The URL does **not** contain 750 days of price data. The receiving browser restores the three windows from the bundled `data.js` snapshot. Asset names and periods remain hidden during gameplay and are revealed through the normal settlement flow.
+The URL does **not** contain 750 days of price data. The receiving browser restores the three windows from the canonical market chunks. Asset names and periods remain hidden during gameplay and are revealed through the normal settlement flow.
 
 When a friend opens the link, the start screen displays the target Excess and changes the primary action to `PLAY CHALLENGE`. After all three games, the result screen compares:
 
@@ -210,7 +210,7 @@ The friend-challenge action never attaches a PNG file. This keeps the shared ite
 
 ## Data
 
-`fetch_all_data.py` builds `data.js` from:
+`fetch_all_data.py` builds the market chunks under `data/markets/` from:
 
 - Binance daily K-line endpoints for crypto assets;
 - `yfinance` for A-share and US-stock history.
@@ -226,7 +226,7 @@ actions=True
 repair=True
 ```
 
-This adjusts historical OHLC for stock splits and cash dividends while keeping the latest price on the current-price basis. In Chinese market terminology, this is closer to **前复权**, not strict **后复权**. Each newly generated `data.js` also records the generation time, yfinance version, and adjustment policy in `stockDataMeta`.
+This adjusts historical OHLC for stock splits and cash dividends while keeping the latest price on the current-price basis. In Chinese market terminology, this is closer to **前复权**, not strict **后复权**. Each refresh also writes generation time, yfinance version, and adjustment policy to `data/markets/meta.json`.
 
 For reproducible refreshes:
 
@@ -276,7 +276,7 @@ The bundled data is a historical gameplay snapshot, not a real-time market feed.
 - `scripts/leaderboard-ranking.js` — deterministic ranking and one-best-score-per-player rules;
 - `custom-challenge.js` / `custom-challenge.css` — hidden market and asset selector;
 - `card-export.js` / `card-export.css` — stable single-card desktop/mobile image generation;
-- `data.js` — embedded historical market snapshot;
+- `data-loader.js` + `data/markets/*.json` — lazy historical market snapshot;
 - `fetch_all_data.py` — adjusted market-data refresh script;
 - `requirements-data.txt` — pinned data-refresh dependency.
 
@@ -292,4 +292,4 @@ Before **2030-07-18**:
 
 On **2030-07-18**, or earlier if required by BSL 1.1, the Licensed Work converts to the **Apache License 2.0**.
 
-The license applies to the original FlappyK software and documentation. It does not relicense `data.js`, generated market data, third-party libraries, fonts, or other third-party material; those remain subject to their respective upstream terms. See [`LICENSE`](LICENSE) for the complete terms.
+The license applies to the original FlappyK software and documentation. It does not relicense generated market data, third-party libraries, fonts, or other third-party material; those remain subject to their respective upstream terms. See [`LICENSE`](LICENSE) for the complete terms.
