@@ -30,7 +30,8 @@ for (const contract of [
 }
 
 for (const contract of [
-  '#start-screen.is-story-active .home-console-bezel',
+  '#start-screen.is-story-active .home-console-topline',
+  '.home-console-screen > :not(.home-story-slide):not(.home-story-navigation)',
   '.home-story-slide',
   'Story / field-manual page',
   'grid-template-columns: minmax(240px, 0.72fr) minmax(0, 1.28fr)',
@@ -39,12 +40,13 @@ for (const contract of [
   '.home-story-chart-price',
   '.home-story-arrow',
   '@media (max-width: 720px), (pointer: coarse)',
-  "grid-template-columns: 1fr",
+  'grid-template-columns: 1fr',
   '@media (prefers-reduced-motion: reduce)',
 ]) {
   assert.ok(uiCss.includes(contract), `Missing terminal field-note visual contract: ${contract}`);
 }
 
+assert.ok(!uiCss.includes('#start-screen.is-story-active .home-console-bezel {\n    visibility: hidden;'), 'The field note must not hide its own ancestor.');
 assert.equal((storyJs.match(/home-story-marker home-story-marker--/g) || []).length, 3);
 assert.ok(!storyJs.includes('new Swiper'));
 assert.ok(!storyJs.includes('setInterval('));
