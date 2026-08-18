@@ -23,7 +23,7 @@ function inside(inner, outer, tolerance = 1) {
     && inner.bottom <= outer.bottom + tolerance;
 }
 
-test('mobile home keeps the primary terminal hierarchy above the page navigation and settlement centered', async ({ page }) => {
+test('mobile home keeps PLAY first and settlement remains contained in the same surface', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await preparePage(page);
   await page.goto('/');
@@ -51,39 +51,44 @@ test('mobile home keeps the primary terminal hierarchy above the page navigation
   expect(inside(home.play, home.screen, 1)).toBe(true);
   expect(inside(home.modeStack, home.screen, 1)).toBe(true);
   expect(home.horizontalOverflow).toBe(false);
-  expect(home.play.top).toBeLessThan(home.screen.top + home.screen.height * 0.5);
+  expect(home.play.top).toBeLessThan(home.modeStack.top);
   expect(home.modeStack.bottom).toBeLessThan(home.navigation.top);
 
   await page.evaluate(() => {
-    document.documentElement.dataset.uiState = 'run-complete';
+    document.documentElement.dataset.uiState = 'settlement';
     document.getElementById('start-screen')?.classList.remove('active');
     const settlement = document.getElementById('settlement-screen');
     settlement?.classList.add('active');
     const restart = document.getElementById('restart-btn');
-    if (restart) restart.style.display = 'block';
+    if (restart) restart.hidden = false;
   });
   await page.waitForTimeout(80);
 
   const settlementBalance = await page.evaluate(() => {
     const screen = document.getElementById('settlement-screen');
     const card = document.getElementById('profit-card');
-    const restart = document.getElementById('restart-btn');
+    const actions = document.querySelector('.settlement-actions');
     const screenBox = screen.getBoundingClientRect();
     const cardBox = card.getBoundingClientRect();
-    const restartBox = restart.getBoundingClientRect();
-    const groupTop = Math.min(cardBox.top, restartBox.top);
-    const groupBottom = Math.max(cardBox.bottom, restartBox.bottom);
+    const actionsBox = actions.getBoundingClientRect();
     return {
-      justifyContent: getComputedStyle(screen).justifyContent,
-      delta: Math.abs(((groupTop + groupBottom) / 2) - ((screenBox.top + screenBox.bottom) / 2)),
+      viewport: { left: 0, top: 0, right: innerWidth, bottom: innerHeight },
+      screen: { left: screenBox.left, top: screenBox.top, right: screenBox.right, bottom: screenBox.bottom },
+      card: { left: cardBox.left, top: cardBox.top, right: cardBox.right, bottom: cardBox.bottom },
+      actions: { left: actionsBox.left, top: actionsBox.top, right: actionsBox.right, bottom: actionsBox.bottom },
+      cardShadow: getComputedStyle(card).boxShadow,
+      cardRadius: getComputedStyle(card).borderRadius,
     };
   });
 
-  expect(settlementBalance.justifyContent).toBe('center');
-  expect(settlementBalance.delta).toBeLessThan(64);
+  expect(inside(settlementBalance.screen, settlementBalance.viewport, 1)).toBe(true);
+  expect(inside(settlementBalance.card, settlementBalance.screen, 1)).toBe(true);
+  expect(inside(settlementBalance.actions, settlementBalance.screen, 1)).toBe(true);
+  expect(settlementBalance.cardShadow).toBe('none');
+  expect(settlementBalance.cardRadius).toBe('0px');
 });
 
-test('mobile command dock centers trade actions, moves power-ups outside, and softens HUD layer two', async ({ page }) => {
+test('mobile command dock centers trade actions while the HUD uses one opaque rail and transparent internal regions', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await preparePage(page);
   await page.goto('/');
@@ -122,7 +127,6 @@ test('mobile command dock centers trade actions, moves power-ups outside, and so
     const boll = document.querySelector('.indicator-card--boll').getBoundingClientRect();
     const macd = document.querySelector('.indicator-card--macd').getBoundingClientRect();
     const stats = document.querySelector(".stats-box[data-composition='returns-only']");
-    const weather = document.querySelector('.weather-status');
     const run = document.querySelector('.run-progress-panel');
     const rail = document.getElementById('game-hud-rail');
     return {
@@ -137,9 +141,9 @@ test('mobile command dock centers trade actions, moves power-ups outside, and so
         Math.abs(((macd.top + macd.bottom) / 2) - ((sell.top + sell.bottom) / 2)),
       ),
       railBackground: getComputedStyle(rail).backgroundColor,
-      firstLayerBackground: getComputedStyle(stats).backgroundColor,
-      weatherBackground: getComputedStyle(weather).backgroundColor,
+      statsBackground: getComputedStyle(stats).backgroundColor,
       runBackground: getComputedStyle(run).backgroundColor,
+      railShadow: getComputedStyle(rail).boxShadow,
     };
   });
 
@@ -147,7 +151,8 @@ test('mobile command dock centers trade actions, moves power-ups outside, and so
   expect(layout.bollRight).toBeLessThan(layout.buyLeft);
   expect(layout.macdLeft).toBeGreaterThan(layout.sellRight);
   expect(layout.powerVerticalDelta).toBeLessThan(20);
-  expect(alphaFromCssColor(layout.railBackground)).toBeLessThan(0.5);
-  expect(alphaFromCssColor(layout.weatherBackground)).toBeLessThan(alphaFromCssColor(layout.firstLayerBackground));
-  expect(alphaFromCssColor(layout.runBackground)).toBeLessThan(alphaFromCssColor(layout.firstLayerBackground));
+  expect(alphaFromCssColor(layout.railBackground)).toBeGreaterThan(0.8);
+  expect(alphaFromCssColor(layout.statsBackground)).toBeLessThan(0.1);
+  expect(alphaFromCssColor(layout.runBackground)).toBeLessThan(0.1);
+  expect(layout.railShadow).toBe('none');
 });
