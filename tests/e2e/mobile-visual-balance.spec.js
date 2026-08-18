@@ -16,41 +16,43 @@ function alphaFromCssColor(value) {
   return match?.[1] === undefined ? 1 : Number(match[1]);
 }
 
-test('mobile home and settlement keep their primary content visually centered', async ({ page }) => {
+function inside(inner, outer, tolerance = 1) {
+  return inner.left >= outer.left - tolerance
+    && inner.right <= outer.right + tolerance
+    && inner.top >= outer.top - tolerance
+    && inner.bottom <= outer.bottom + tolerance;
+}
+
+test('mobile home keeps the primary terminal hierarchy above the page navigation and settlement centered', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await preparePage(page);
   await page.goto('/');
   await expect(page.locator('#start-screen.arcade-home')).toBeVisible();
 
-  const homeBalance = await page.evaluate(() => {
-    const screen = document.querySelector('.home-console-screen');
-    const selectors = [
-      '.home-console-kicker',
-      '#game-title',
-      '.home-console-screen > p',
-      '.home-world-strip',
-      '.home-primary-actions',
-      '.local-records-summary',
-      '.home-mode-stack',
-    ];
-    const boxes = selectors.flatMap((selector) => Array.from(document.querySelectorAll(selector)))
-      .filter((element) => {
-        const style = getComputedStyle(element);
-        return style.display !== 'none' && style.visibility !== 'hidden';
-      })
-      .map((element) => element.getBoundingClientRect())
-      .filter((box) => box.height > 0 && box.width > 0);
-    const top = Math.min(...boxes.map((box) => box.top));
-    const bottom = Math.max(...boxes.map((box) => box.bottom));
-    const screenBox = screen.getBoundingClientRect();
+  const home = await page.evaluate(() => {
+    const box = (selector) => {
+      const rect = document.querySelector(selector).getBoundingClientRect();
+      return { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom, width: rect.width, height: rect.height };
+    };
+    const screenNode = document.querySelector('.home-console-screen');
     return {
-      justifyContent: getComputedStyle(screen).justifyContent,
-      delta: Math.abs(((top + bottom) / 2) - ((screenBox.top + screenBox.bottom) / 2)),
+      screen: box('.home-console-screen'),
+      title: box('#game-title'),
+      worlds: box('.home-world-strip'),
+      play: box('#start-btn'),
+      modeStack: box('.home-mode-stack'),
+      navigation: box('.home-story-navigation'),
+      horizontalOverflow: screenNode.scrollWidth > screenNode.clientWidth + 1,
     };
   });
 
-  expect(homeBalance.justifyContent).toBe('center');
-  expect(homeBalance.delta).toBeLessThan(76);
+  expect(inside(home.title, home.screen, 1)).toBe(true);
+  expect(inside(home.worlds, home.screen, 1)).toBe(true);
+  expect(inside(home.play, home.screen, 1)).toBe(true);
+  expect(inside(home.modeStack, home.screen, 1)).toBe(true);
+  expect(home.horizontalOverflow).toBe(false);
+  expect(home.play.top).toBeLessThan(home.screen.top + home.screen.height * 0.5);
+  expect(home.modeStack.bottom).toBeLessThan(home.navigation.top);
 
   await page.evaluate(() => {
     document.documentElement.dataset.uiState = 'run-complete';
