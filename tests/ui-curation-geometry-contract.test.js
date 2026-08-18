@@ -26,9 +26,11 @@ for (const visualContract of [
 
 for (const mobileContract of [
   '#mobile-controls:not([hidden])',
+  'Virtual-control geometry is driven by runtime state, not viewport width.',
   'position: fixed;',
+  'display: grid;',
   'width: 100vw;',
-  'Power-ups now share the dock.',
+  'grid-template-columns: minmax(64px, 1fr) 78px 10px 78px minmax(64px, 1fr);',
 ]) {
   assert.ok(mobile.includes(mobileContract), `Missing feature-owned mobile geometry contract: ${mobileContract}`);
 }
@@ -39,4 +41,4 @@ assert.ok(!base.includes('--hud-shell:'), 'Legacy HUD theme variables must not r
 assert.ok(!refinementJs.includes('style.textContent = `'));
 assert.ok(!refinementJs.includes('installPixelCompatibilityStyles'));
 
-console.log('Static shared HUD geometry and feature-owned mobile command geometry remain separated without legacy specificity overrides.');
+console.log('Static shared HUD geometry and state-driven feature-owned mobile command geometry remain separated without legacy specificity overrides.');
