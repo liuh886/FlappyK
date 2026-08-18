@@ -51,9 +51,11 @@ for (const contract of [
 
 for (const contract of [
   '#mobile-controls:not([hidden])',
+  'Virtual-control geometry is driven by runtime state, not viewport width.',
   'position: fixed;',
+  'display: grid;',
   'width: 100vw;',
-  'grid-template-columns: minmax(64px, 1fr) 78px 10px 78px minmax(64px, 1fr) !important;',
+  'grid-template-columns: minmax(64px, 1fr) 78px 10px 78px minmax(64px, 1fr);',
 ]) {
   assert.ok(mobile.includes(contract), `Missing mobile geometry owner contract: ${contract}`);
 }
@@ -90,4 +92,4 @@ for (const principle of [
   assert.ok(direction.includes(principle), `Missing visual-direction principle: ${principle}`);
 }
 
-console.log('Hidden Market Terminal, bilingual parity, feature-owned mobile geometry, field-note story, score receipt, and single-owner shared visual contracts passed.');
+console.log('Hidden Market Terminal, bilingual parity, state-driven feature-owned mobile geometry, field-note story, score receipt, and single-owner shared visual contracts passed.');
