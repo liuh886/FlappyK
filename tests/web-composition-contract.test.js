@@ -5,6 +5,7 @@ const hardeningJs = fs.readFileSync('core-hardening.js', 'utf8');
 const gameJs = fs.readFileSync('game.js', 'utf8');
 const refinementJs = fs.readFileSync('scripts/premium-ui-refinement.js', 'utf8');
 const canonicalCss = fs.readFileSync('premium-ui.css', 'utf8');
+const mobileCss = fs.readFileSync('mobile-controls.css', 'utf8');
 const baseStyles = fs.readFileSync('style.css', 'utf8');
 const weatherCss = fs.readFileSync('market-weather.css', 'utf8');
 const accountCss = fs.readFileSync('account-integration.css', 'utf8');
@@ -14,7 +15,6 @@ const serviceWorker = fs.readFileSync('sw.js', 'utf8');
 assert.ok(hardeningJs.includes('levelDisp.textContent = String(visibleGame)'));
 assert.ok(!hardeningJs.includes('levelDisp.textContent = `${visibleGame}/3`'));
 
-// JavaScript owns composition/state only; presentation stays static and reviewable.
 assert.ok(!refinementJs.includes('canvasElement.width ='));
 assert.ok(!refinementJs.includes('canvasElement.height ='));
 assert.ok(!refinementJs.includes('syncCanvasLayout'));
@@ -26,7 +26,6 @@ assert.ok(refinementJs.includes("runPanel.id = 'run-progress-panel'"));
 assert.ok(refinementJs.includes('usesVirtualControls()'));
 assert.ok(!refinementJs.includes('style.textContent = `'));
 
-// premium-ui.css is the only shared visual owner.
 for (const contract of [
   'FLAPPY K / HIDDEN MARKET TERMINAL',
   "--pixel-font-display: 'Press Start 2P'",
@@ -35,6 +34,7 @@ for (const contract of [
   '--space-1: 4px',
   '--space-6: 24px',
   "#ui-layer[data-hud-composition='rail']",
+  '#ui-layer[hidden]',
   '#game-hud-rail',
   '.hud-metric-label',
   "'performance controls'",
@@ -55,23 +55,30 @@ for (const contract of [
   '.home-secondary-actions button',
   '.home-story-slide',
   '.settlement-summary',
-  '#mobile-controls:not([hidden])',
   "html[data-flappyk-language='zh']",
 ]) {
   assert.ok(canonicalCss.includes(contract), `Missing canonical presentation contract: ${contract}`);
 }
 
+for (const mobileContract of [
+  '#mobile-controls:not([hidden])',
+  'position: fixed;',
+  'width: 100vw;',
+  'Power-ups now share the dock.',
+]) {
+  assert.ok(mobileCss.includes(mobileContract), `Missing mobile feature geometry contract: ${mobileContract}`);
+}
+
+assert.ok(!canonicalCss.includes('#mobile-controls:not([hidden]) {'), 'Shared visual theme must not position the mobile dock.');
 assert.ok(!baseStyles.includes('html body #game-container #game-hud-rail'), 'Legacy high-specificity HUD owner must not return.');
 assert.ok(!baseStyles.includes('--hud-shell:'), 'Legacy HUD theme variables must not return to style.css.');
 assert.ok(!canonicalCss.includes('width: min(896px'), 'Fixed desktop viewport width must not return.');
 assert.ok(!canonicalCss.includes('aspect-ratio: 4 / 3'), 'Fixed desktop viewport aspect ratio must not return.');
 
-// Account controls stay in the home top line and disappear outside home.
 assert.ok(accountCss.includes('.home-utility-bar'));
 assert.ok(accountCss.includes('.home-account-slot .hao-account-trigger'));
 assert.ok(accountCss.includes("html:not([data-ui-state='home']) .home-utility-bar"));
 
-// Weather owns atmosphere only, never shell geometry.
 assert.ok(!weatherCss.includes('.home-console-bezel'));
 assert.ok(!weatherCss.includes('.home-primary-actions'));
 assert.ok(weatherCss.includes('.market-weather-layer'));
@@ -93,4 +100,4 @@ assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"));
 assert.ok(!serviceWorker.includes("'./home-story.css'"));
 assert.ok(!/flappyk-(?:app|runtime)-v\d+/.test(serviceWorker));
 
-console.log('Hidden Market Terminal has one CSS owner, stable DOM composition, isolated weather, account placement, responsive state, and stable PWA cache contracts.');
+console.log('Hidden Market Terminal has one shared CSS owner, feature-owned mobile geometry, stable DOM composition, isolated weather, account placement, responsive state, and stable PWA cache contracts.');
