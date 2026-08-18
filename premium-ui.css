@@ -560,8 +560,8 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 
 .home-console-topline {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    gap: 14px;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    gap: 10px;
     align-items: center;
     min-height: 42px;
     padding: 7px 10px;
@@ -607,7 +607,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     grid-template-columns: minmax(0, 1.28fr) minmax(250px, 0.72fr);
     grid-template-areas:
         'kicker kicker'
-        'title side'
+        'title profile'
         'copy side'
         'worlds side'
         'play side'
@@ -764,13 +764,15 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     grid-area: side;
     display: grid;
     gap: 8px;
-    align-content: center;
+    align-content: start;
     min-width: 0;
     padding-left: 18px;
     border-left: 1px solid var(--game-border);
 }
 
 .local-records-summary {
+    grid-area: profile;
+    align-self: end;
     display: grid;
     grid-template-columns: 1fr auto;
     gap: 12px;
@@ -1514,8 +1516,8 @@ html[data-flappyk-language='zh'] .home-story-body {
 
     .home-console-topline {
         min-height: 36px;
-        grid-template-columns: auto minmax(0, 1fr) auto;
-        gap: 8px;
+        grid-template-columns: auto minmax(0, 1fr) auto auto;
+        gap: 6px;
         padding: 5px 7px;
     }
 
@@ -1531,6 +1533,7 @@ html[data-flappyk-language='zh'] .home-story-body {
             'copy'
             'worlds'
             'play'
+            'profile'
             'side'
             'ticker';
         align-content: center;
@@ -1680,7 +1683,7 @@ html[data-flappyk-language='zh'] .home-story-body {
 
 @media (max-width: 480px) {
     .home-console-topline {
-        grid-template-columns: auto 1fr;
+        grid-template-columns: auto minmax(0, 1fr) auto;
     }
 
     .home-console-series {
@@ -1688,7 +1691,7 @@ html[data-flappyk-language='zh'] .home-story-body {
     }
 
     .home-console-lamps {
-        justify-self: end;
+        display: none;
     }
 
     .home-mode-stack {
