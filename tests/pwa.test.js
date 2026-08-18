@@ -87,7 +87,7 @@ assert.ok(pixelStyles.includes('--game-yellow:'));
 assert.ok(!pixelStyles.includes('#mobile-controls:not([hidden]) {'));
 assert.ok(mobileStyles.includes('#mobile-controls:not([hidden])'));
 assert.ok(mobileStyles.includes('width: 100vw;'));
-assert.ok(mobileStyles.includes('Power-ups now share the dock.'));
+assert.ok(mobileStyles.includes('Virtual-control geometry is driven by runtime state, not viewport width.'));
 assert.ok(!baseStyles.includes('Fullscreen gameplay HUD: readable hierarchy over a dominant chart.'));
 assert.ok(!baseStyles.includes('--hud-shell:'));
 assert.ok(!baseStyles.includes('html body #game-container #game-hud-rail'));
@@ -180,4 +180,4 @@ assert.ok(analyticsSource.includes("track('level_complete'"));
 assert.ok(analyticsSource.includes("track('run_complete'"));
 assert.ok(analyticsSource.includes("track('pwa_install'"));
 
-console.log('PWA manifest, icons, install UI, GA4 product events, Cloudflare RUM, Hidden Market Terminal, feature-owned mobile geometry, tactical power-ups, canonical Account Shell v7 cloud history, and stable cache lifecycle checks passed');
+console.log('PWA manifest, icons, install UI, GA4 product events, Cloudflare RUM, Hidden Market Terminal, state-driven feature-owned mobile geometry, tactical power-ups, canonical Account Shell v7 cloud history, and stable cache lifecycle checks passed');
