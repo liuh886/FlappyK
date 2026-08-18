@@ -57,7 +57,7 @@ function inside(inner, outer, tolerance = 1) {
     && inner.bottom <= outer.bottom + tolerance;
 }
 
-test('home opens as an inset market terminal with immediate play', async ({ page }) => {
+test('home opens as one inset market surface with immediate play', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await preparePage(page);
   await page.goto('/');
@@ -100,7 +100,7 @@ test('home opens as an inset market terminal with immediate play', async ({ page
   expect(hierarchy.bezel.width).toBeLessThan(hierarchy.viewport.width);
   expect(hierarchy.bezel.height).toBeLessThan(hierarchy.viewport.height);
   expect(hierarchy.bezelBorder).not.toBe('0px');
-  expect(hierarchy.bezelShadow).not.toBe('none');
+  expect(hierarchy.bezelShadow).toBe('none');
   expect(hierarchy.bezelRadius).toBe('0px');
   expect(hierarchy.playArea).toBeGreaterThan(hierarchy.dailyArea);
 });
@@ -184,7 +184,7 @@ test('an interrupted weather transition settles at the latest requested state', 
   await expect.poll(async () => page.evaluate(() => window.FlappyKMarketWeather.visualWeather)).toBe('clear');
 });
 
-test('desktop HUD is one compact two-row terminal rail', async ({ page }) => {
+test('desktop HUD is one compact two-row market command surface', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await preparePage(page);
   await page.goto('/');
@@ -224,13 +224,14 @@ test('desktop HUD is one compact two-row terminal rail', async ({ page }) => {
   expect(geometry.hint.top).toBeGreaterThan(geometry.rail.bottom + 40);
 });
 
-test('mobile HUD uses two coordinated rows without colliding with thumb controls', async ({ page }) => {
+test('mobile HUD hides secondary weather text and stays clear of thumb controls', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await preparePage(page);
   await page.goto('/');
   await page.waitForFunction(() => Boolean(window.FlappyKPremiumUIRefinement && window.FlappyKMarketWeather));
   await exposeGameChrome(page);
 
+  await expect(page.locator('#weather-status')).toBeHidden();
   const geometry = await page.evaluate(() => {
     const box = (selector) => {
       const rect = document.querySelector(selector).getBoundingClientRect();
@@ -239,7 +240,6 @@ test('mobile HUD uses two coordinated rows without colliding with thumb controls
     return {
       viewport: { left: 0, top: 0, right: innerWidth, bottom: innerHeight },
       rail: box('#game-hud-rail'),
-      weather: box('#weather-status'),
       stats: box('.stats-box'),
       progress: box('#run-progress-panel'),
       controls: box('#game-top-controls'),
@@ -250,8 +250,7 @@ test('mobile HUD uses two coordinated rows without colliding with thumb controls
   expect(inside(geometry.rail, geometry.viewport, 2)).toBe(true);
   expect(inside(geometry.mobile, geometry.viewport, 2)).toBe(true);
   expect(Math.abs(geometry.stats.top - geometry.controls.top)).toBeLessThan(3);
-  expect(Math.abs(geometry.weather.top - geometry.progress.top)).toBeLessThan(3);
-  expect(geometry.weather.top).toBeGreaterThanOrEqual(geometry.stats.bottom - 2);
+  expect(geometry.progress.top).toBeGreaterThanOrEqual(geometry.stats.bottom - 2);
   expect(geometry.rail.bottom).toBeLessThan(geometry.mobile.top);
 });
 
