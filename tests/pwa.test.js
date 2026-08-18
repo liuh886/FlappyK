@@ -7,6 +7,7 @@ const serviceWorkerSource = fs.readFileSync('sw.js', 'utf8');
 const pwaSource = fs.readFileSync('pwa.js', 'utf8');
 const analyticsSource = fs.readFileSync('analytics.js', 'utf8');
 const pixelStyles = fs.readFileSync('premium-ui.css', 'utf8');
+const mobileStyles = fs.readFileSync('mobile-controls.css', 'utf8');
 const accountStyles = fs.readFileSync('account-integration.css', 'utf8');
 const baseStyles = fs.readFileSync('style.css', 'utf8');
 const homeStoryStyles = fs.readFileSync('premium-ui.css', 'utf8');
@@ -62,7 +63,6 @@ for (const retired of ['account-shell.css?v=5', 'account-shell.js?v=6', 'account
 assert.ok(indexSource.includes('scripts/account-cloud-sync.js'));
 assert.ok(indexSource.includes('https://static.cloudflareinsights.com/beacon.min.js'));
 
-// Curated shell and hierarchy.
 assert.ok(indexSource.includes('rel="preconnect" href="https://fonts.googleapis.com"'));
 assert.ok(indexSource.includes('rel="preconnect" href="https://fonts.gstatic.com" crossorigin'));
 assert.ok(indexSource.includes('family=Pixelify+Sans'));
@@ -71,6 +71,7 @@ assert.ok(pixelStyles.includes('--pixel-shadow-step'));
 assert.ok(pixelStyles.includes('--pixel-cut'));
 assert.ok(pixelStyles.includes('--space-1: 4px'));
 assert.ok(pixelStyles.includes('#ui-layer[data-hud-composition='));
+assert.ok(pixelStyles.includes('#ui-layer[hidden]'));
 assert.ok(pixelStyles.includes('#game-hud-rail'));
 assert.ok(pixelStyles.includes('.hud-metric-label'));
 assert.ok(pixelStyles.includes("html[data-ui-state='home'] #game-container.arcade-weather-ready"));
@@ -78,13 +79,15 @@ assert.ok(pixelStyles.includes('.home-primary-actions #start-btn'));
 assert.ok(pixelStyles.includes('font-size: 22px'));
 assert.ok(pixelStyles.includes('min-height: 64px'));
 
-// Gameplay instruments share the same canonical visual owner as the home shell.
 assert.ok(pixelStyles.includes('FLAPPY K / HIDDEN MARKET TERMINAL'));
 assert.ok(pixelStyles.includes("#game-hud-rail .weather-status::before"));
 assert.ok(pixelStyles.includes(".stats-box[data-composition='returns-only']"));
 assert.ok(pixelStyles.includes('.excess-meter-track'));
-assert.ok(pixelStyles.includes('#mobile-controls:not([hidden])'));
 assert.ok(pixelStyles.includes('--game-yellow:'));
+assert.ok(!pixelStyles.includes('#mobile-controls:not([hidden]) {'));
+assert.ok(mobileStyles.includes('#mobile-controls:not([hidden])'));
+assert.ok(mobileStyles.includes('width: 100vw;'));
+assert.ok(mobileStyles.includes('Power-ups now share the dock.'));
 assert.ok(!baseStyles.includes('Fullscreen gameplay HUD: readable hierarchy over a dominant chart.'));
 assert.ok(!baseStyles.includes('--hud-shell:'));
 assert.ok(!baseStyles.includes('html body #game-container #game-hud-rail'));
@@ -177,4 +180,4 @@ assert.ok(analyticsSource.includes("track('level_complete'"));
 assert.ok(analyticsSource.includes("track('run_complete'"));
 assert.ok(analyticsSource.includes("track('pwa_install'"));
 
-console.log('PWA manifest, icons, install UI, GA4 product events, Cloudflare RUM, Hidden Market Terminal, score-first HUD, Pro/Daily Run tactical power-ups, canonical Account Shell v7 cloud history, and stable cache lifecycle checks passed');
+console.log('PWA manifest, icons, install UI, GA4 product events, Cloudflare RUM, Hidden Market Terminal, feature-owned mobile geometry, tactical power-ups, canonical Account Shell v7 cloud history, and stable cache lifecycle checks passed');
