@@ -27,10 +27,11 @@ assert.ok(refinementJs.includes('usesVirtualControls()'));
 assert.ok(!refinementJs.includes('style.textContent = `'));
 
 for (const contract of [
-  'FLAPPY K / HIDDEN MARKET TERMINAL',
+  'FLAPPY K / SINGLE-SURFACE MARKET OS',
   "--pixel-font-display: 'Press Start 2P'",
   "--pixel-font-ui: 'Pixelify Sans'",
-  '--pixel-cut: polygon',
+  '--game-accent:',
+  '--game-system:',
   '--space-1: 4px',
   '--space-6: 24px',
   "#ui-layer[data-hud-composition='rail']",
@@ -48,13 +49,13 @@ for (const contract of [
   '.home-console-bezel',
   '.home-console-screen',
   '.home-console-footer',
-  "'title profile'",
   '.home-primary-actions #start-btn',
   '.local-records-summary',
   '.daily-mode-card',
   '.home-secondary-actions button',
   '.home-story-slide',
   '.settlement-summary',
+  '.legend-terminal-head',
   "html[data-flappyk-language='zh']",
 ]) {
   assert.ok(canonicalCss.includes(contract), `Missing canonical presentation contract: ${contract}`);
@@ -72,6 +73,8 @@ for (const mobileContract of [
 }
 
 assert.ok(!canonicalCss.includes('#mobile-controls:not([hidden]) {'), 'Shared visual theme must not position the mobile dock.');
+assert.ok(!canonicalCss.includes('--pixel-cut:'), 'Decorative clipped-corner visual grammar must not return.');
+assert.ok(!canonicalCss.includes('background: #e7e2d4'), 'Paper surfaces must not return.');
 assert.ok(!baseStyles.includes('html body #game-container #game-hud-rail'), 'Legacy high-specificity HUD owner must not return.');
 assert.ok(!baseStyles.includes('--hud-shell:'), 'Legacy HUD theme variables must not return to style.css.');
 assert.ok(!canonicalCss.includes('width: min(896px'), 'Fixed desktop viewport width must not return.');
@@ -102,4 +105,4 @@ assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"));
 assert.ok(!serviceWorker.includes("'./home-story.css'"));
 assert.ok(!/flappyk-(?:app|runtime)-v\d+/.test(serviceWorker));
 
-console.log('Hidden Market Terminal has one shared CSS owner, runtime-state-driven feature-owned mobile geometry, stable DOM composition, isolated weather, account placement, responsive state, and stable PWA cache contracts.');
+console.log('Single-Surface Market OS has one shared CSS owner, runtime-state-driven feature-owned mobile geometry, stable DOM composition, isolated weather, account placement, responsive state, and stable PWA cache contracts.');
