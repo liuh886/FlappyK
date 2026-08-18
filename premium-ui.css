@@ -41,10 +41,7 @@
 
 /*
  * FLAPPY K / HIDDEN MARKET TERMINAL
- *
- * One visual owner. No glass cards, no late polish layer, no ornamental bezel
- * around active gameplay. The chart is the product; UI behaves like an arcade
- * instrument cluster around it.
+ * One shared visual owner. Feature styles keep feature geometry.
  */
 
 html,
@@ -96,6 +93,10 @@ summary {
 
 #ui-layer[data-hud-composition='rail'] {
     display: grid;
+}
+
+#ui-layer[hidden] {
+    display: none !important;
 }
 
 #game-hud-rail {
@@ -200,7 +201,7 @@ summary {
 .excess-meter {
     margin-top: 7px;
     padding-top: 6px;
-    border-top: 1px solid var(--game-line, var(--game-border));
+    border-top: 1px solid var(--game-border);
 }
 
 .excess-meter-label {
@@ -341,6 +342,13 @@ summary {
     color: var(--game-muted);
     font-size: 9px;
     letter-spacing: 0.06em;
+    opacity: 0.82;
+    transform: none;
+}
+
+#game-hud-rail .weather-status.is-event {
+    opacity: 1;
+    transform: none;
 }
 
 #game-hud-rail .weather-status::before {
@@ -393,6 +401,12 @@ html[data-market-weather='rain'] #game-hud-rail .weather-status::before {
     box-shadow: none;
     font-family: var(--pixel-font-display);
     font-size: 10px;
+}
+
+#game-top-controls #game-back-btn,
+#game-top-controls #pause-btn,
+#game-top-controls .speed-step {
+    border-radius: 0;
 }
 
 .speed-step:hover,
@@ -467,16 +481,7 @@ html[data-virtual-controls='true'] #game-top-controls .desktop-speed-control {
     display: none !important;
 }
 
-#mobile-controls:not([hidden]) {
-    position: absolute;
-    inset: auto 12px calc(10px + env(safe-area-inset-bottom)) 12px;
-    z-index: 82;
-    display: grid;
-    grid-template-columns: minmax(88px, 1fr) minmax(92px, 0.86fr) minmax(88px, 1fr);
-    gap: 8px;
-    align-items: stretch;
-    padding: 0;
-}
+/* Mobile geometry belongs to mobile-controls.css. This file only supplies skin. */
 
 #mobile-controls .mobile-btn,
 #mobile-controls .speed-step,
@@ -486,7 +491,6 @@ html[data-virtual-controls='true'] #game-top-controls .desktop-speed-control {
 
 #btn-buy,
 #btn-sell {
-    min-height: 62px;
     border: 1px solid var(--game-border-strong) !important;
     background: rgba(7, 9, 12, 0.96) !important;
     color: var(--game-text) !important;
@@ -508,13 +512,9 @@ html[data-virtual-controls='true'] #game-top-controls .desktop-speed-control {
     font-size: 13px;
 }
 
-.mobile-speed-control {
-    align-self: end;
-    min-height: 62px;
-    padding: 4px;
-    border: 1px solid var(--game-border);
-    background: rgba(7, 9, 12, 0.94);
-    box-shadow: var(--pixel-shadow-small);
+#btn-buy > span:last-child,
+#btn-sell > span:last-child {
+    white-space: nowrap;
 }
 
 .mobile-speed-control .speed-readout {
@@ -538,7 +538,11 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     position: absolute;
     inset: 0;
     display: grid;
-    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-rows: minmax(0, 1fr);
+    align-content: stretch;
+    align-items: stretch;
+    justify-content: stretch;
+    justify-items: stretch;
     min-height: 0;
     padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
     overflow: hidden;
@@ -550,9 +554,13 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     z-index: 4;
     display: grid;
     grid-template-rows: auto minmax(0, 1fr) auto;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
     min-height: 0;
     overflow: hidden;
     border: 1px solid var(--game-border);
+    border-radius: 0;
     background: #090d12;
     box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.58);
     clip-path: var(--pixel-cut);
@@ -614,6 +622,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
         'ticker ticker';
     gap: 8px 22px;
     align-content: center;
+    min-width: 0;
     min-height: 0;
     padding: clamp(18px, 4vw, 48px);
     overflow: hidden;
@@ -934,24 +943,27 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 
 /* ---------- Story / field-manual page ---------- */
 
-#start-screen.is-story-active .home-console-bezel {
+#start-screen.is-story-active .home-console-topline,
+#start-screen.is-story-active .home-console-footer,
+#start-screen.is-story-active .home-console-screen > :not(.home-story-slide):not(.home-story-navigation) {
     visibility: hidden;
 }
 
 .home-story-slide {
     position: absolute;
-    inset: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    inset: 12px;
     z-index: 6;
     display: grid;
     grid-template-columns: minmax(240px, 0.72fr) minmax(0, 1.28fr);
     gap: clamp(20px, 4vw, 52px);
     align-items: center;
     padding: clamp(20px, 4vw, 52px);
-    overflow: hidden;
-    border: 1px solid var(--game-border);
+    overflow: auto;
+    border: 1px solid #6e777d;
+    border-radius: 0;
     background: #e7e2d4;
     color: #11151a;
-    box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.58);
+    box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.38);
     clip-path: var(--pixel-cut);
 }
 
@@ -1298,12 +1310,6 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     color: var(--game-muted);
 }
 
-.leaderboard-table,
-.custom-field,
-.onboarding-rules {
-    border-color: var(--game-border) !important;
-}
-
 .custom-field select {
     min-height: 44px;
     border: 1px solid var(--game-border);
@@ -1485,7 +1491,7 @@ html[data-flappyk-language='zh'] .home-story-body {
     }
 
     #game-top-controls {
-        grid-template-columns: 34px 34px;
+        grid-template-columns: 32px 32px;
         align-self: start;
     }
 
@@ -1536,7 +1542,7 @@ html[data-flappyk-language='zh'] .home-story-body {
             'profile'
             'side'
             'ticker';
-        align-content: center;
+        align-content: start;
         gap: 7px;
         padding: 14px;
         overflow-y: auto;
@@ -1636,10 +1642,10 @@ html[data-flappyk-language='zh'] .home-story-body {
     }
 
     .home-story-slide {
-        inset: max(6px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
+        inset: 6px;
         grid-template-columns: 1fr;
         gap: 12px;
-        align-content: center;
+        align-content: start;
         padding: 16px;
         overflow-y: auto;
     }
@@ -1686,10 +1692,7 @@ html[data-flappyk-language='zh'] .home-story-body {
         grid-template-columns: auto minmax(0, 1fr) auto;
     }
 
-    .home-console-series {
-        display: none;
-    }
-
+    .home-console-series,
     .home-console-lamps {
         display: none;
     }
@@ -1718,7 +1721,56 @@ html[data-flappyk-language='zh'] .home-story-body {
     }
 }
 
-@media (max-height: 620px) and (min-width: 721px) {
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 520px) {
+    .home-console-screen {
+        grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr);
+        grid-template-areas:
+            'kicker profile'
+            'title side'
+            'worlds side'
+            'play side'
+            'ticker ticker';
+        gap: 5px 14px;
+        align-content: center;
+        padding: 10px 18px;
+    }
+
+    .home-console-intro-copy {
+        display: none;
+    }
+
+    #start-screen #game-title {
+        font-size: 30px;
+    }
+
+    .home-world {
+        min-height: 32px;
+    }
+
+    .home-primary-actions #start-btn {
+        min-height: 44px;
+        font-size: 14px;
+    }
+
+    .home-mode-stack {
+        grid-template-columns: 1fr;
+        padding: 0 0 0 10px;
+        border-top: 0;
+        border-left: 1px solid var(--game-border);
+    }
+
+    .local-records-summary,
+    .daily-mode-card {
+        padding: 5px 7px;
+        min-height: 38px;
+    }
+
+    .home-console-footer {
+        min-height: 24px;
+    }
+}
+
+@media (max-height: 620px) and (min-width: 721px) and (pointer: fine) {
     .home-console-screen {
         align-content: center;
         padding: 14px 24px;
