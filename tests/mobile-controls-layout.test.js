@@ -36,10 +36,11 @@ assert.ok(css.includes('opacity: 0.68'));
 assert.ok(css.includes("data-ui-state='playing'"));
 assert.ok(!css.includes(":has(#indicator-card-deck:not([hidden])) #game-canvas"));
 
-// Premium UI still creates the three controls, while mobile-controls.css owns
-// their phone spatial hierarchy. The mobile dock now centers BUY/SELL and leaves
-// the outer thumb zones to BOLL/MACD rather than preserving the retired edge layout.
-assert.ok(premiumCss.includes('#mobile-controls:not([hidden])'));
-assert.ok(premiumCss.includes('.mobile-speed-control'));
+// premium-ui.css supplies the terminal skin only. Mobile command geometry belongs
+// exclusively to mobile-controls.css so the dock cannot acquire a second position owner.
+assert.ok(premiumCss.includes('#btn-buy'));
+assert.ok(premiumCss.includes('#btn-sell'));
+assert.ok(premiumCss.includes('.mobile-speed-control .speed-readout'));
+assert.ok(!premiumCss.includes('#mobile-controls:not([hidden]) {'));
 
-console.log('Shared responsive state, centered virtual-control dock, and mobile thumb hierarchy checks passed');
+console.log('Shared responsive state, centered virtual-control dock, terminal skin, and single mobile geometry ownership checks passed');
