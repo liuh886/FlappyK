@@ -15,6 +15,8 @@ assert.equal((index.match(/id="card-asset"/g) || []).length, 1, 'Asset ID must s
 assert.equal((index.match(/id="card-period"/g) || []).length, 1, 'Period ID must stay unique.');
 
 for (const contract of [
+  '#mobile-controls:not([hidden])',
+  'display: grid',
   'grid-template-columns: minmax(64px, 1fr) 78px 10px 78px minmax(64px, 1fr)',
   '#mobile-controls #btn-buy',
   '#mobile-controls #btn-sell',
@@ -29,7 +31,6 @@ for (const contract of [
   'background: transparent',
   "data-ui-state='playing'",
   'margin-bottom: 102px',
-  'Power-ups now share the dock.',
 ]) {
   assert.ok(mobile.includes(contract), `Missing mobile gameplay hierarchy contract: ${contract}`);
 }
@@ -55,4 +56,4 @@ assert.ok(!mobile.includes('grid-template-columns: 88px minmax(106px, 1fr) 88px'
 assert.ok(!mobile.includes(":has(#indicator-card-deck:not([hidden])) #game-canvas"), 'Power-ups must not reserve a separate tray above the mobile command dock.');
 assert.ok(!cards.includes('width: min(248px, calc(100% - 28px))'), 'The previous oversized mobile tactical tray must not return.');
 
-console.log('Top speed utility, centered trade cluster, outer power-ups, and always-visible settlement identity contracts passed.');
+console.log('State-driven dock, top speed utility, centered trade cluster, outer power-ups, and always-visible settlement identity contracts passed.');
