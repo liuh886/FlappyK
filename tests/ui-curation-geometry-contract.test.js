@@ -19,9 +19,10 @@ for (const structuralContract of [
 for (const visualContract of [
   'border-radius: 0',
   'backdrop-filter: none',
-  'box-shadow: var(--pixel-shadow-small)',
+  'box-shadow: none',
+  'border-right: 1px solid var(--game-border)',
 ]) {
-  assert.ok(canonical.includes(visualContract), `Missing terminal visual normalization: ${visualContract}`);
+  assert.ok(canonical.includes(visualContract), `Missing single-surface visual normalization: ${visualContract}`);
 }
 
 for (const mobileContract of [
@@ -36,9 +37,10 @@ for (const mobileContract of [
 }
 
 assert.ok(!canonical.includes('#mobile-controls:not([hidden]) {'), 'premium-ui.css must not take over command-dock positioning.');
+assert.ok(!canonical.includes('--pixel-cut:'), 'Decorative clipped-corner geometry must not return.');
 assert.ok(!base.includes('html body #game-container #game-hud-rail'), 'style.css must not regain HUD-specific high-specificity rules.');
 assert.ok(!base.includes('--hud-shell:'), 'Legacy HUD theme variables must not return to style.css.');
 assert.ok(!refinementJs.includes('style.textContent = `'));
 assert.ok(!refinementJs.includes('installPixelCompatibilityStyles'));
 
-console.log('Static shared HUD geometry and state-driven feature-owned mobile command geometry remain separated without legacy specificity overrides.');
+console.log('Shared single-surface HUD geometry and state-driven feature-owned mobile command geometry remain separated without legacy specificity or decorative containers.');
