@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 
 const css = fs.readFileSync('premium-ui.css', 'utf8');
+const mobile = fs.readFileSync('mobile-controls.css', 'utf8');
 const weather = fs.readFileSync('scripts/market-weather.js', 'utf8');
 const premiumUi = fs.readFileSync('scripts/premium-ui.js', 'utf8');
 const refinement = fs.readFileSync('scripts/premium-ui-refinement.js', 'utf8');
@@ -19,12 +20,12 @@ for (const contract of [
   '--arcade-sky:',
   '--arcade-horizon:',
   "#ui-layer[data-hud-composition='rail']",
+  '#ui-layer[hidden]',
   '#game-hud-rail',
   "'performance controls'",
   "'weather progress'",
   ".stats-box[data-composition='returns-only']",
   '.excess-meter-track',
-  '#mobile-controls:not([hidden])',
   '#btn-buy',
   '#btn-sell',
   "html[data-ui-state='home'] #game-container.arcade-weather-ready",
@@ -47,6 +48,17 @@ for (const contract of [
 ]) {
   assert.ok(css.includes(contract), `Missing Hidden Market Terminal contract: ${contract}`);
 }
+
+for (const contract of [
+  '#mobile-controls:not([hidden])',
+  'position: fixed;',
+  'width: 100vw;',
+  'grid-template-columns: minmax(64px, 1fr) 78px 10px 78px minmax(64px, 1fr) !important;',
+]) {
+  assert.ok(mobile.includes(contract), `Missing mobile geometry owner contract: ${contract}`);
+}
+
+assert.ok(!css.includes('#mobile-controls:not([hidden]) {'), 'Shared theme must not take ownership of mobile dock geometry.');
 
 for (const forbidden of [
   'visual-redesign-v1.css',
@@ -78,4 +90,4 @@ for (const principle of [
   assert.ok(direction.includes(principle), `Missing visual-direction principle: ${principle}`);
 }
 
-console.log('Hidden Market Terminal, bilingual parity, mobile controls, field-note story, score receipt, and single-owner visual contracts passed.');
+console.log('Hidden Market Terminal, bilingual parity, feature-owned mobile geometry, field-note story, score receipt, and single-owner shared visual contracts passed.');
