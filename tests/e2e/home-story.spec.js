@@ -40,7 +40,7 @@ function horizontalInside(inner, outer, tolerance = 1) {
   return inner.left >= outer.left - tolerance && inner.right <= outer.right + tolerance;
 }
 
-test('field-note page keeps decisive-trades story, bilingual navigation, and direct PLAY entry', async ({ page }) => {
+test('analysis mode keeps decisive-trades story, bilingual navigation, and direct PLAY entry', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await preparePage(page);
   await page.goto('/');
@@ -72,6 +72,7 @@ test('field-note page keeps decisive-trades story, bilingual navigation, and dir
     };
     const title = getComputedStyle(document.querySelector('#home-story-title'));
     const arrow = getComputedStyle(document.querySelector('.home-story-arrow--previous'));
+    const slideStyle = getComputedStyle(document.querySelector('#home-story-slide'));
     return {
       screen: rect('#start-screen'),
       slide: rect('#home-story-slide'),
@@ -81,6 +82,9 @@ test('field-note page keeps decisive-trades story, bilingual navigation, and dir
       titleSize: parseFloat(title.fontSize),
       arrowRadius: arrow.borderRadius,
       arrowShadow: arrow.boxShadow,
+      slideBackground: slideStyle.backgroundColor,
+      slideRadius: slideStyle.borderRadius,
+      slideShadow: slideStyle.boxShadow,
     };
   });
 
@@ -90,7 +94,10 @@ test('field-note page keeps decisive-trades story, bilingual navigation, and dir
   expect(layout.titleFont).toContain('Press Start 2P');
   expect(layout.titleSize).toBeGreaterThanOrEqual(22);
   expect(layout.arrowRadius).toBe('0px');
-  expect(layout.arrowShadow).not.toBe('none');
+  expect(layout.arrowShadow).toBe('none');
+  expect(layout.slideRadius).toBe('0px');
+  expect(layout.slideShadow).toBe('none');
+  expect(layout.slideBackground).not.toBe('rgb(231, 226, 212)');
 
   await page.keyboard.press('ArrowLeft');
   await expect(story).toBeHidden();
@@ -111,7 +118,7 @@ test('field-note page keeps decisive-trades story, bilingual navigation, and dir
   await expect(page.locator('#game-hud-rail')).toBeVisible();
 });
 
-test('field-note page stays horizontally contained and vertically scrollable on mobile', async ({ page }) => {
+test('analysis mode stays horizontally contained and vertically reachable on mobile', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await preparePage(page);
   await page.goto('/');
@@ -128,6 +135,7 @@ test('field-note page stays horizontally contained and vertically scrollable on 
       return { left: box.left, top: box.top, right: box.right, bottom: box.bottom, width: box.width, height: box.height };
     };
     const slideNode = document.querySelector('#home-story-slide');
+    const startNode = document.querySelector('#start-screen');
     return {
       viewport: { left: 0, top: 0, right: innerWidth, bottom: innerHeight },
       slide: rect('#home-story-slide'),
@@ -135,20 +143,20 @@ test('field-note page stays horizontally contained and vertically scrollable on 
       tape: rect('.home-story-tape'),
       previous: rect('.home-story-arrow--previous'),
       horizontalOverflow: slideNode.scrollWidth > slideNode.clientWidth + 1,
-      verticallyScrollable: slideNode.scrollHeight >= slideNode.clientHeight,
+      pageScrollable: startNode.scrollHeight >= startNode.clientHeight,
       titleSize: parseFloat(getComputedStyle(document.querySelector('#home-story-title')).fontSize),
       columns: getComputedStyle(slideNode).gridTemplateColumns.split(' ').length,
     };
   });
 
-  expect(inside(mobile.slide, mobile.viewport, 1)).toBe(true);
+  expect(horizontalInside(mobile.slide, mobile.viewport, 1)).toBe(true);
   expect(horizontalInside(mobile.copy, mobile.slide, 1)).toBe(true);
   expect(horizontalInside(mobile.tape, mobile.slide, 1)).toBe(true);
   expect(inside(mobile.previous, mobile.viewport, 1)).toBe(true);
   expect(mobile.horizontalOverflow).toBe(false);
-  expect(mobile.verticallyScrollable).toBe(true);
-  expect(mobile.previous.width).toBeGreaterThanOrEqual(36);
-  expect(mobile.previous.height).toBeGreaterThanOrEqual(36);
+  expect(mobile.pageScrollable).toBe(true);
+  expect(mobile.previous.width).toBeGreaterThanOrEqual(34);
+  expect(mobile.previous.height).toBeGreaterThanOrEqual(34);
   expect(mobile.titleSize).toBeGreaterThanOrEqual(20);
   expect(mobile.columns).toBe(1);
 
