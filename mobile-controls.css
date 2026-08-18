@@ -129,9 +129,10 @@ body {
     }
 
     #game-top-controls button {
-        width: 28px;
-        height: 28px;
+        width: 32px;
+        height: 32px;
         border-width: 2px;
+        border-radius: 0;
     }
 
     #game-back-btn::before {
@@ -177,6 +178,9 @@ body {
     }
 
     html body #game-container #mobile-controls:not([hidden]) {
+        position: fixed !important;
+        inset: auto 0 0 0 !important;
+        width: 100vw !important;
         display: grid !important;
         grid-template-columns: minmax(64px, 1fr) 78px 10px 78px minmax(64px, 1fr) !important;
         align-items: end;
