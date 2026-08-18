@@ -13,10 +13,10 @@ for (const contract of [
   'background: rgba(6, 12, 20, 0.44) !important;',
   'background: rgba(6, 12, 20, 0.3) !important;',
   'background: rgba(6, 12, 20, 0.08) !important;',
-  'grid-template-columns: minmax(64px, 1fr) 78px 10px 78px minmax(64px, 1fr) !important;',
+  'grid-template-columns: minmax(64px, 1fr) 78px 10px 78px minmax(64px, 1fr);',
   'grid-column: 2;',
   'grid-column: 4;',
-  'Power-ups now share the dock.',
+  'Virtual-control geometry is driven by runtime state, not viewport width.',
 ]) {
   assert.ok(mobile.includes(contract), `Missing mobile visual-balance contract: ${contract}`);
 }
