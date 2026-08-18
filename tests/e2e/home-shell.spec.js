@@ -49,7 +49,7 @@ for (const viewport of [
   { name: 'desktop', width: 1440, height: 900 },
   { name: 'mobile', width: 390, height: 844 },
 ]) {
-  test(`${viewport.name} home is one contained terminal scene and PLAY enters fullscreen gameplay`, async ({ page }) => {
+  test(`${viewport.name} home is one contained market surface and PLAY enters fullscreen gameplay`, async ({ page }) => {
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
     await preparePage(page);
     await page.goto('/');
@@ -86,6 +86,7 @@ for (const viewport of [
         bezelRadius: style('.home-console-bezel').borderRadius,
         playRadius: style('#start-btn').borderRadius,
         playShadow: style('#start-btn').boxShadow,
+        playBackground: style('#start-btn').backgroundColor,
       };
     });
 
@@ -102,10 +103,11 @@ for (const viewport of [
     expect(home.documentHeight).toBeLessThanOrEqual(home.viewport.height + 1);
     expect(home.containerBorder).toBe('0px');
     expect(home.bezelBorder).not.toBe('0px');
-    expect(home.bezelShadow).not.toBe('none');
+    expect(home.bezelShadow).toBe('none');
     expect(home.bezelRadius).toBe('0px');
     expect(home.playRadius).toBe('0px');
-    expect(home.playShadow).not.toBe('none');
+    expect(home.playShadow).toBe('none');
+    expect(home.playBackground).not.toBe('rgba(0, 0, 0, 0)');
 
     await page.getByRole('button', { name: 'PLAY', exact: true }).click();
     await expect(page.locator('html')).toHaveAttribute('data-ui-state', 'playing');
