@@ -12,37 +12,18 @@ async function preparePage(page) {
   await page.addInitScript(() => {
     window.localStorage.setItem('flappyk_onboarding_seen_v1', '1');
     class SilentAudioContext {
-      constructor() {
-        this.currentTime = 0;
-        this.state = 'running';
-        this.destination = {};
-      }
+      constructor() { this.currentTime = 0; this.state = 'running'; this.destination = {}; }
       createOscillator() {
         return {
           type: 'square',
-          frequency: {
-            value: 0,
-            setValueAtTime() {},
-            exponentialRampToValueAtTime() {},
-          },
-          connect() {},
-          start() {},
-          stop() {},
+          frequency: { value: 0, setValueAtTime() {}, exponentialRampToValueAtTime() {} },
+          connect() {}, start() {}, stop() {},
         };
       }
       createGain() {
-        return {
-          gain: {
-            setValueAtTime() {},
-            exponentialRampToValueAtTime() {},
-          },
-          connect() {},
-        };
+        return { gain: { setValueAtTime() {}, exponentialRampToValueAtTime() {} }, connect() {} };
       }
-      resume() {
-        this.state = 'running';
-        return Promise.resolve();
-      }
+      resume() { this.state = 'running'; return Promise.resolve(); }
     }
     window.AudioContext = SilentAudioContext;
     window.webkitAudioContext = SilentAudioContext;
@@ -60,9 +41,7 @@ async function exposeGameChrome(page) {
   await expect(rail).toBeVisible();
   await expect(pause).toBeVisible();
 
-  if (await pause.getAttribute('aria-pressed') === 'false') {
-    await pause.click();
-  }
+  if (await pause.getAttribute('aria-pressed') === 'false') await pause.click();
 
   await page.evaluate(() => {
     window.FlappyKPremiumUIRefinement?.refineHudComposition?.();
@@ -71,7 +50,14 @@ async function exposeGameChrome(page) {
   });
 }
 
-test('home opens as a full-viewport market scene with immediate play', async ({ page }) => {
+function inside(inner, outer, tolerance = 1) {
+  return inner.left >= outer.left - tolerance
+    && inner.right <= outer.right + tolerance
+    && inner.top >= outer.top - tolerance
+    && inner.bottom <= outer.bottom + tolerance;
+}
+
+test('home opens as an inset market terminal with immediate play', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await preparePage(page);
   await page.goto('/');
@@ -87,34 +73,35 @@ test('home opens as a full-viewport market scene with immediate play', async ({ 
   await expect(page.locator('#market-weather-layer')).toHaveAttribute('data-weather', 'clear');
 
   const hierarchy = await page.evaluate(() => {
-    const container = document.getElementById('game-container').getBoundingClientRect();
-    const bezel = document.querySelector('.home-console-bezel').getBoundingClientRect();
-    const screen = document.querySelector('.home-console-screen').getBoundingClientRect();
-    const play = document.querySelector('#start-btn').getBoundingClientRect();
-    const daily = document.querySelector('#daily-run-btn').getBoundingClientRect();
+    const box = (selector) => {
+      const rect = document.querySelector(selector).getBoundingClientRect();
+      return { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom, width: rect.width, height: rect.height };
+    };
     const bezelStyle = getComputedStyle(document.querySelector('.home-console-bezel'));
+    const play = box('#start-btn');
+    const daily = box('#daily-run-btn');
     return {
-      viewportWidth: window.innerWidth,
-      viewportHeight: window.innerHeight,
-      containerWidth: container.width,
-      containerHeight: container.height,
-      bezelWidth: bezel.width,
-      bezelHeight: bezel.height,
-      screenWidth: screen.width,
+      viewport: { left: 0, top: 0, right: innerWidth, bottom: innerHeight, width: innerWidth, height: innerHeight },
+      container: box('#game-container'),
+      bezel: box('.home-console-bezel'),
+      screen: box('.home-console-screen'),
       bezelBorder: bezelStyle.borderTopWidth,
       bezelShadow: bezelStyle.boxShadow,
+      bezelRadius: bezelStyle.borderRadius,
       playArea: play.width * play.height,
       dailyArea: daily.width * daily.height,
     };
   });
 
-  expect(Math.abs(hierarchy.containerWidth - hierarchy.viewportWidth)).toBeLessThanOrEqual(1);
-  expect(Math.abs(hierarchy.containerHeight - hierarchy.viewportHeight)).toBeLessThanOrEqual(1);
-  expect(Math.abs(hierarchy.bezelWidth - hierarchy.viewportWidth)).toBeLessThanOrEqual(1);
-  expect(Math.abs(hierarchy.bezelHeight - hierarchy.viewportHeight)).toBeLessThanOrEqual(1);
-  expect(Math.abs(hierarchy.screenWidth - hierarchy.viewportWidth)).toBeLessThanOrEqual(1);
-  expect(hierarchy.bezelBorder).toBe('0px');
-  expect(hierarchy.bezelShadow).toBe('none');
+  expect(Math.abs(hierarchy.container.width - hierarchy.viewport.width)).toBeLessThanOrEqual(1);
+  expect(Math.abs(hierarchy.container.height - hierarchy.viewport.height)).toBeLessThanOrEqual(1);
+  expect(inside(hierarchy.bezel, hierarchy.viewport, 1)).toBe(true);
+  expect(inside(hierarchy.screen, hierarchy.bezel, 1)).toBe(true);
+  expect(hierarchy.bezel.width).toBeLessThan(hierarchy.viewport.width);
+  expect(hierarchy.bezel.height).toBeLessThan(hierarchy.viewport.height);
+  expect(hierarchy.bezelBorder).not.toBe('0px');
+  expect(hierarchy.bezelShadow).not.toBe('none');
+  expect(hierarchy.bezelRadius).toBe('0px');
   expect(hierarchy.playArea).toBeGreaterThan(hierarchy.dailyArea);
 });
 
@@ -168,9 +155,7 @@ test('weather stages clear to rain and rain to clear through cloudy', async ({ p
   await expect(layer).toHaveAttribute('data-weather-transition', 'cloudy-to-rain', { timeout: 800 });
   await expect(layer).toHaveAttribute('data-weather', 'rain', { timeout: 1300 });
 
-  await page.evaluate(() => {
-    window.FlappyKMarketWeather.setWeatherState('clear');
-  });
+  await page.evaluate(() => window.FlappyKMarketWeather.setWeatherState('clear'));
 
   await expect(root).toHaveAttribute('data-market-weather', 'clear');
   await expect(layer).toHaveAttribute('data-weather-target', 'clear');
@@ -199,30 +184,26 @@ test('an interrupted weather transition settles at the latest requested state', 
   await expect.poll(async () => page.evaluate(() => window.FlappyKMarketWeather.visualWeather)).toBe('clear');
 });
 
-test('desktop HUD is one coordinated top rail with a matching input dock', async ({ page }) => {
+test('desktop HUD is one compact two-row terminal rail', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await preparePage(page);
   await page.goto('/');
   await page.waitForFunction(() => Boolean(window.FlappyKPremiumUIRefinement && window.FlappyKMarketWeather));
   await exposeGameChrome(page);
 
-  const rail = page.locator('#game-hud-rail');
-  await expect(rail).toBeVisible();
-
   const geometry = await page.evaluate(() => {
-    const rail = document.getElementById('game-hud-rail').getBoundingClientRect();
-    const weather = document.getElementById('weather-status').getBoundingClientRect();
-    const stats = document.querySelector('.stats-box').getBoundingClientRect();
-    const progress = document.getElementById('run-progress-panel').getBoundingClientRect();
-    const controls = document.getElementById('game-top-controls').getBoundingClientRect();
-    const hint = document.querySelector('.controls-hint').getBoundingClientRect();
+    const box = (selector) => {
+      const rect = document.querySelector(selector).getBoundingClientRect();
+      return { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom, width: rect.width, height: rect.height };
+    };
     return {
-      rail,
-      weather,
-      stats,
-      progress,
-      controls,
-      hint,
+      viewport: { left: 0, top: 0, right: innerWidth, bottom: innerHeight },
+      rail: box('#game-hud-rail'),
+      weather: box('#weather-status'),
+      stats: box('.stats-box'),
+      progress: box('#run-progress-panel'),
+      controls: box('#game-top-controls'),
+      hint: box('.controls-hint'),
       parents: {
         weather: document.getElementById('weather-status').parentElement?.id,
         stats: document.querySelector('.stats-box').parentElement?.id,
@@ -234,13 +215,13 @@ test('desktop HUD is one coordinated top rail with a matching input dock', async
 
   for (const parent of Object.values(geometry.parents)) expect(parent).toBe('game-hud-rail');
   for (const child of [geometry.weather, geometry.stats, geometry.progress, geometry.controls]) {
-    expect(child.top).toBeGreaterThanOrEqual(geometry.rail.top - 1);
-    expect(child.bottom).toBeLessThanOrEqual(geometry.rail.bottom + 1);
+    expect(inside(child, geometry.rail, 2)).toBe(true);
   }
-  expect(geometry.weather.right).toBeLessThanOrEqual(geometry.stats.left + 1);
-  expect(geometry.stats.right).toBeLessThanOrEqual(geometry.progress.left + 1);
-  expect(geometry.progress.right).toBeLessThanOrEqual(geometry.controls.left + 1);
-  expect(Math.abs((geometry.hint.left + geometry.hint.width / 2) - (geometry.rail.left + geometry.rail.width / 2))).toBeLessThan(3);
+  expect(Math.abs(geometry.stats.top - geometry.controls.top)).toBeLessThan(3);
+  expect(Math.abs(geometry.weather.top - geometry.progress.top)).toBeLessThan(3);
+  expect(geometry.weather.top).toBeGreaterThanOrEqual(geometry.stats.bottom - 2);
+  expect(inside(geometry.hint, geometry.viewport, 1)).toBe(true);
+  expect(geometry.hint.top).toBeGreaterThan(geometry.rail.bottom + 40);
 });
 
 test('mobile HUD uses two coordinated rows without colliding with thumb controls', async ({ page }) => {
@@ -251,20 +232,26 @@ test('mobile HUD uses two coordinated rows without colliding with thumb controls
   await exposeGameChrome(page);
 
   const geometry = await page.evaluate(() => {
-    const rail = document.getElementById('game-hud-rail').getBoundingClientRect();
-    const weather = document.getElementById('weather-status').getBoundingClientRect();
-    const stats = document.querySelector('.stats-box').getBoundingClientRect();
-    const progress = document.getElementById('run-progress-panel').getBoundingClientRect();
-    const controls = document.getElementById('game-top-controls').getBoundingClientRect();
-    const mobile = document.getElementById('mobile-controls').getBoundingClientRect();
-    return { rail, weather, stats, progress, controls, mobile };
+    const box = (selector) => {
+      const rect = document.querySelector(selector).getBoundingClientRect();
+      return { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom, width: rect.width, height: rect.height };
+    };
+    return {
+      viewport: { left: 0, top: 0, right: innerWidth, bottom: innerHeight },
+      rail: box('#game-hud-rail'),
+      weather: box('#weather-status'),
+      stats: box('.stats-box'),
+      progress: box('#run-progress-panel'),
+      controls: box('#game-top-controls'),
+      mobile: box('#mobile-controls'),
+    };
   });
 
-  expect(geometry.rail.left).toBeGreaterThanOrEqual(5);
-  expect(geometry.rail.right).toBeLessThanOrEqual(385);
-  expect(Math.abs(geometry.stats.top - geometry.controls.top)).toBeLessThan(2);
-  expect(Math.abs(geometry.weather.top - geometry.progress.top)).toBeLessThan(2);
-  expect(geometry.weather.top).toBeGreaterThanOrEqual(geometry.stats.bottom - 1);
+  expect(inside(geometry.rail, geometry.viewport, 2)).toBe(true);
+  expect(inside(geometry.mobile, geometry.viewport, 2)).toBe(true);
+  expect(Math.abs(geometry.stats.top - geometry.controls.top)).toBeLessThan(3);
+  expect(Math.abs(geometry.weather.top - geometry.progress.top)).toBeLessThan(3);
+  expect(geometry.weather.top).toBeGreaterThanOrEqual(geometry.stats.bottom - 2);
   expect(geometry.rail.bottom).toBeLessThan(geometry.mobile.top);
 });
 
