@@ -36,6 +36,10 @@ function inside(inner, outer, tolerance = 1) {
     && inner.bottom <= outer.bottom + tolerance;
 }
 
+function horizontalInside(inner, outer, tolerance = 1) {
+  return inner.left >= outer.left - tolerance && inner.right <= outer.right + tolerance;
+}
+
 test('field-note page keeps decisive-trades story, bilingual navigation, and direct PLAY entry', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await preparePage(page);
@@ -107,15 +111,16 @@ test('field-note page keeps decisive-trades story, bilingual navigation, and dir
   await expect(page.locator('#game-hud-rail')).toBeVisible();
 });
 
-test('field-note page remains readable and contained on mobile', async ({ page }) => {
+test('field-note page stays horizontally contained and vertically scrollable on mobile', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await preparePage(page);
   await page.goto('/');
   await page.locator('.home-story-arrow--next').click();
 
-  await expect(page.locator('#home-story-slide')).toBeVisible();
+  const story = page.locator('#home-story-slide');
+  const play = page.locator('#home-story-play');
+  await expect(story).toBeVisible();
   await expect(page.locator('.home-story-arrow--previous')).toBeVisible();
-  await expect(page.locator('#home-story-play')).toBeVisible();
 
   const mobile = await page.evaluate(() => {
     const rect = (selector) => {
@@ -129,21 +134,26 @@ test('field-note page remains readable and contained on mobile', async ({ page }
       copy: rect('.home-story-copy'),
       tape: rect('.home-story-tape'),
       previous: rect('.home-story-arrow--previous'),
-      play: rect('#home-story-play'),
       horizontalOverflow: slideNode.scrollWidth > slideNode.clientWidth + 1,
+      verticallyScrollable: slideNode.scrollHeight >= slideNode.clientHeight,
       titleSize: parseFloat(getComputedStyle(document.querySelector('#home-story-title')).fontSize),
       columns: getComputedStyle(slideNode).gridTemplateColumns.split(' ').length,
     };
   });
 
   expect(inside(mobile.slide, mobile.viewport, 1)).toBe(true);
-  expect(inside(mobile.copy, mobile.slide, 1)).toBe(true);
-  expect(inside(mobile.tape, mobile.slide, 1)).toBe(true);
+  expect(horizontalInside(mobile.copy, mobile.slide, 1)).toBe(true);
+  expect(horizontalInside(mobile.tape, mobile.slide, 1)).toBe(true);
   expect(inside(mobile.previous, mobile.viewport, 1)).toBe(true);
-  expect(inside(mobile.play, mobile.slide, 1)).toBe(true);
   expect(mobile.horizontalOverflow).toBe(false);
+  expect(mobile.verticallyScrollable).toBe(true);
   expect(mobile.previous.width).toBeGreaterThanOrEqual(36);
   expect(mobile.previous.height).toBeGreaterThanOrEqual(36);
   expect(mobile.titleSize).toBeGreaterThanOrEqual(20);
   expect(mobile.columns).toBe(1);
+
+  await play.scrollIntoViewIfNeeded();
+  await expect(play).toBeVisible();
+  await play.click();
+  await expect(page.locator('#game-hud-rail')).toBeVisible();
 });
