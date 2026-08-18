@@ -10,8 +10,6 @@ assert.ok(index.includes('<link rel="stylesheet" href="premium-ui.css">'));
 assert.ok(!index.includes('premium-ui-refinement.css'));
 assert.ok(!index.includes('home-story.css'));
 assert.ok(index.includes('<script src="scripts/home-story.js"></script>'));
-assert.ok(!index.includes('home-market.css'));
-assert.ok(!index.includes('scripts/home-market.js'));
 assert.ok(index.indexOf('scripts/home-story.js') > index.indexOf('scripts/premium-ui-refinement.js'));
 
 for (const contract of [
@@ -20,28 +18,31 @@ for (const contract of [
   "event.key === 'ArrowRight'",
   "event.key === 'ArrowLeft'",
   "startButton.click()",
-  "250 days minus 3 trades equals 247 days waiting",
-  "250 天减去 3 次出手，等于 247 天等待",
-  "THE BEST TRADES ARE OFTEN QUIET.",
-  "最好的交易，往往很安静。",
-  "home-story-marker--buy",
-  "home-story-marker--add",
-  "home-story-marker--sell",
+  '250 days minus 3 trades equals 247 days waiting',
+  '250 天减去 3 次出手，等于 247 天等待',
+  'THE BEST TRADES ARE OFTEN QUIET.',
+  '最好的交易，往往很安静。',
+  'home-story-marker--buy',
+  'home-story-marker--add',
+  'home-story-marker--sell',
 ]) {
   assert.ok(storyJs.includes(contract), `Missing home story behavior: ${contract}`);
 }
 
 for (const contract of [
-  '#start-screen.is-story-active > :not(.home-story-slide):not(.home-story-navigation)',
-  'grid-template-columns: minmax(0, 0.92fr) minmax(360px, 1.08fr)',
-  '.home-story-equation-term--trades',
-  '.home-story-equation-term--waiting',
+  '#start-screen.is-story-active .home-console-bezel',
+  '.home-story-slide',
+  'Story / field-manual page',
+  'grid-template-columns: minmax(240px, 0.72fr) minmax(0, 1.28fr)',
+  '.home-story-equation',
+  '.home-story-tape',
   '.home-story-chart-price',
-  '.home-story-arrow--next',
+  '.home-story-arrow',
   '@media (max-width: 720px), (pointer: coarse)',
+  "grid-template-columns: 1fr",
   '@media (prefers-reduced-motion: reduce)',
 ]) {
-  assert.ok(uiCss.includes(contract), `Missing home story visual contract: ${contract}`);
+  assert.ok(uiCss.includes(contract), `Missing terminal field-note visual contract: ${contract}`);
 }
 
 assert.equal((storyJs.match(/home-story-marker home-story-marker--/g) || []).length, 3);
@@ -55,7 +56,6 @@ assert.ok(serviceWorker.includes("'./premium-ui.css'"));
 assert.ok(!serviceWorker.includes("'./premium-ui-refinement.css'"));
 assert.ok(!serviceWorker.includes("'./home-story.css'"));
 assert.ok(serviceWorker.includes("'./scripts/home-story.js'"));
-assert.ok(!serviceWorker.includes('home-market'));
 assert.ok(!/flappyk-(?:app|runtime)-v\d+/.test(serviceWorker));
 
-console.log('Canonical pixel UI retains the two-page home story, decisive-trades message, bilingual copy, keyboard navigation, mobile layout, and stable PWA cache contracts');
+console.log('Canonical terminal UI retains the bilingual decisive-trades field note, keyboard navigation, mobile containment, and stable PWA cache contracts.');
