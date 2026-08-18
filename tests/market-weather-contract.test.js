@@ -101,9 +101,10 @@ assert.ok(baseStyles.includes('.home-play-icon'));
 assert.ok(baseStyles.includes('.pixel-trade-glyph'));
 assert.ok(baseStyles.includes('.sell-btn .trade-emoji'));
 assert.ok(baseStyles.includes(':where(button, select, summary, a[href]):focus-visible'));
-assert.ok(baseStyles.includes('#game-hud-rail .weather-status::before'));
-assert.ok(baseStyles.includes("html[data-market-weather='rain']"));
-assert.ok(baseStyles.includes('--hud-warning:'));
+assert.ok(!baseStyles.includes('#game-hud-rail .weather-status::before'), 'Base CSS must not regain weather/HUD presentation ownership.');
+assert.ok(uiStyles.includes('#game-hud-rail .weather-status::before'));
+assert.ok(uiStyles.includes("html[data-market-weather='rain']"));
+assert.ok(uiStyles.includes('--game-yellow:'));
 assert.ok(!baseStyles.includes('"Apple Color Emoji"'), 'Native color emoji must not own trade-button styling.');
 
 assert.ok(pwa.includes("'./market-weather.css'"), 'PWA loader must attach market-weather.css.');
@@ -120,4 +121,4 @@ assert.ok(serviceWorker.includes("'./scripts/home-story.js'"), 'Offline shell mu
 assert.ok(serviceWorker.includes("'./account-integration.css'"), 'Offline shell must cache the account toolbar styles.');
 assert.ok(serviceWorker.includes("'./scripts/account-cloud-sync.js'"), 'Offline shell must cache the account cloud bridge.');
 
-console.log('Isolated market weather, staged transitions, explicit event ownership, curated canonical home shell, account toolbar, cloud history, and stable PWA cache contracts passed.');
+console.log('Isolated market weather, staged transitions, explicit event ownership, canonical terminal HUD ownership, account toolbar, cloud history, and stable PWA cache contracts passed.');
