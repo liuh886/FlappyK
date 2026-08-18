@@ -4,38 +4,55 @@
 
 FlappyK is a short market game, not a trading dashboard and not a generic retro website.
 
-The player reads a real hidden historical K-line, trades in fixed increments, tries to finish with positive Excess Return, and clears three markets. The visual system exists to make that loop legible, tense, and memorable without introducing another progression system.
+The player reads a real hidden historical K-line, trades in fixed increments, tries to finish with positive Excess Return, and clears three markets. The visual system exists to keep that loop immediate, legible, and tense. It should feel like one instrument from the first tap to the final result.
 
-## Canonical direction: Hidden Market Terminal
+## Canonical direction: Single-Surface Market OS
 
-The product now uses one visual language: **Hidden Market Terminal**.
+The product uses one visual language: **Single-Surface Market OS**.
 
-It combines the immediacy of an arcade cabinet with the information hierarchy of a professional market terminal:
+The previous Hidden Market Terminal direction established the right product character, but still separated home, story, gameplay, settlement, and run-complete states into different visual metaphors. That split is retired.
 
-- the chart is the dominant surface during play;
-- HUD elements behave like instruments around the chart instead of floating web cards;
-- square borders, hard shadows, restrained pixel typography, and compact status marks replace glassmorphism and rounded dashboard surfaces;
-- the home screen is a full-screen market terminal with one unmistakable primary action;
-- the second home page reads like a printed field note rather than another marketing panel;
-- settlement reads like a score receipt: verdict and Excess Return first, detail second;
-- desktop and mobile share the same hierarchy rather than maintaining separate visual products.
+The canonical system now follows these rules:
 
-There is no alternative legacy skin and no compatibility theme. `premium-ui.css` is the single canonical owner for the shared presentation system.
+- one continuous dark market surface from home through gameplay, settlement, dialogs, and run complete;
+- the chart remains the dominant surface during play;
+- hierarchy comes from spacing, separators, typography, and state — not stacks of cards;
+- floating paper, receipt, notebook, celebration, glass, and dashboard metaphors are removed;
+- square geometry remains, but hard decorative shadows and clipped-corner ornaments are no longer primary styling devices;
+- cyan is reserved for system/state information;
+- yellow is reserved for primary action and focus;
+- green and red are reserved for market/performance semantics;
+- desktop and mobile share the same information hierarchy, with mobile changing control geometry only.
+
+There is no alternative legacy skin, no compatibility theme, and no visual fallback. `premium-ui.css` is the single canonical owner for shared presentation.
+
+## Interaction model
+
+Every state should feel like a mode change inside one market operating surface, not navigation into a new website page.
+
+- Home is the idle state of the same terminal.
+- Story is an analysis mode inside the home surface, not a paper article.
+- Gameplay activates the chart and compresses information into a command rail.
+- Settlement keeps the same surface and changes hierarchy from action to evaluation.
+- Leaderboard, onboarding, and custom challenge use the same system shell.
+- Run complete is the terminal's final state, not a separate celebration theme.
+
+Transitions may use short opacity/position changes, but they must never compete with gameplay or imply a different product.
 
 ## Home hierarchy
 
 The first screen answers four questions in order:
 
-1. What is this? — FlappyK / Hidden Market Arcade.
-2. What do I do? — trade three hidden historical markets and beat the market.
+1. What is this? — FlappyK / hidden historical market game.
+2. What do I do? — trade three hidden markets and beat the benchmark.
 3. Where do I play? — Crypto, A-Shares, and US Stocks.
 4. What is the primary action? — Play.
 
-Personal best, Daily Run, rankings, account, language, and installation remain available but visually subordinate to Play.
+Play is the only filled high-emphasis action. Personal best, Daily Run, rankings, account, language, and installation remain available in one secondary command surface rather than separate visual cards.
 
 ## Gameplay hierarchy
 
-The active chart gets maximum space. The persistent rail contains only information required to act:
+The chart gets maximum space. The persistent command rail contains only information required to act:
 
 - Total;
 - Return;
@@ -47,7 +64,7 @@ The active chart gets maximum space. The persistent rail contains only informati
 - back / pause;
 - BUY / SELL controls.
 
-Desktop keyboard hints stay secondary. Mobile uses large BUY and SELL controls with speed between them. No permanent decorative bezel surrounds the active chart.
+The rail is one continuous surface with separators. Individual metrics are not floating cards. Desktop keyboard hints remain low-priority. Mobile uses large BUY and SELL controls with speed between them and keeps the same visual grammar.
 
 ## Weather semantics
 
@@ -63,7 +80,7 @@ Weather must remain lower contrast than the K-line, player return, trade markers
 
 ## Settlement
 
-Settlement is intentionally different from gameplay: a light paper-like score receipt over the dark terminal.
+Settlement is no longer a paper receipt. It is the evaluation state of the same market surface.
 
 The hierarchy is:
 
@@ -74,23 +91,29 @@ The hierarchy is:
 5. expandable accounting detail;
 6. next action.
 
-This contrast marks the end of a market without adding another screen system.
+The visual transition comes from information hierarchy and semantic color, not a change to a light theme.
+
+## Run complete
+
+The final three-market result uses the same dark surface, typography, separators, and command buttons as the rest of the product.
+
+No gold/orange celebration theme, decorative champagne skin, or isolated result page should return. Celebration comes from the result itself, the final score, and the completion state.
 
 ## Chinese and English
 
 Chinese and English are one product, not two layouts.
 
-- The information hierarchy and available actions are identical.
+- Information hierarchy and available actions are identical.
 - Chinese uses the existing `ZCOOL QingKe HuangYou` family where pixel display text would otherwise become illegible.
-- English keeps `Press Start 2P` for display moments and `Pixelify Sans` for operational UI.
+- English keeps `Press Start 2P` only for sparse display moments and `Pixelify Sans` for operational UI.
 - Chinese copy receives natural line-height and does not lose content to make the layout fit.
-- Responsive breakpoints are based on available space and virtual-control state, not language.
+- Responsive behavior is based on available space and virtual-control state, not language.
 
 ## Architecture boundary
 
-`premium-ui.css` owns shared visual tokens and skin, the home terminal, shared HUD appearance, field-note story, settlement receipt, and shared secondary-screen surfaces. It does not take over geometry already owned by a feature stylesheet.
+`premium-ui.css` owns shared visual tokens, shared surfaces, the home terminal, shared HUD appearance, story analysis mode, settlement, run-complete presentation, and shared secondary-screen presentation. It does not take over geometry already owned by a feature stylesheet.
 
-`mobile-controls.css` is the canonical owner for mobile command-dock geometry, thumb-zone placement, mobile speed placement, safe-area spacing, and the chart clearance reserved for those controls. `premium-ui.css` may skin those controls but must not position the dock.
+`mobile-controls.css` is the canonical owner for mobile command-dock geometry, thumb-zone placement, mobile speed placement, safe-area spacing, and chart clearance. `premium-ui.css` may skin those controls but must not position the dock.
 
 `indicator-cards.css` owns BOLL/MACD power-up geometry and its relationship to the mobile command dock.
 
@@ -98,9 +121,9 @@ Chinese and English are one product, not two layouts.
 
 `scripts/premium-ui.js` owns existing home/HUD/control/settlement composition and interaction feedback.
 
-`scripts/premium-ui-refinement.js` owns the existing HUD rail composition and DOM normalization. It must not inject presentation styles.
+`scripts/premium-ui-refinement.js` owns existing HUD rail composition and DOM normalization. It must not inject presentation styles.
 
-`market-weather.css` and `scripts/market-weather.js` continue to own weather semantics and environmental feedback only. When weather status is composed into the shared HUD rail, the canonical HUD skin normalizes its presentation without changing weather behavior.
+`market-weather.css` and `scripts/market-weather.js` continue to own weather semantics and environmental feedback only.
 
 Core game data, scoring, pass rules, account/cloud history, Daily Run, friend challenge, leaderboard, sharing, PWA behavior, and market loading are unchanged by this visual redesign.
 
@@ -108,10 +131,11 @@ Core game data, scoring, pass rules, account/cloud history, Daily Run, friend ch
 
 1. Do not add a second theme, compatibility skin, `*-polish.css`, or `*-fix.css` layer.
 2. Change the actual owning component or shared visual system directly.
-3. Keep the chart visually dominant during play.
-4. Prefer fewer, stronger UI surfaces over more cards.
-5. Preserve the same information and actions in Chinese and English.
-6. Treat mobile as the same game with a different control geometry, not a reduced product.
-7. Do not move feature geometry into the shared theme merely to restyle it.
-8. Keep weather semantic and subordinate to trading information.
-9. Do not turn atmosphere into a new gameplay mechanic.
+3. Keep one continuous visual world from home to final result.
+4. Keep the chart visually dominant during play.
+5. Prefer separators and hierarchy over cards, shadows, and decorative containers.
+6. Reserve semantic colors: cyan for system state, yellow for primary action/focus, green/red for performance.
+7. Preserve the same information and actions in Chinese and English.
+8. Treat mobile as the same game with different control geometry, not a reduced product.
+9. Do not move feature geometry into the shared theme merely to restyle it.
+10. Keep weather semantic and subordinate to trading information.
