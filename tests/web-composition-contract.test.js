@@ -62,9 +62,11 @@ for (const contract of [
 
 for (const mobileContract of [
   '#mobile-controls:not([hidden])',
+  'Virtual-control geometry is driven by runtime state, not viewport width.',
   'position: fixed;',
+  'display: grid;',
   'width: 100vw;',
-  'Power-ups now share the dock.',
+  'grid-template-columns: minmax(64px, 1fr) 78px 10px 78px minmax(64px, 1fr);',
 ]) {
   assert.ok(mobileCss.includes(mobileContract), `Missing mobile feature geometry contract: ${mobileContract}`);
 }
@@ -100,4 +102,4 @@ assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"));
 assert.ok(!serviceWorker.includes("'./home-story.css'"));
 assert.ok(!/flappyk-(?:app|runtime)-v\d+/.test(serviceWorker));
 
-console.log('Hidden Market Terminal has one shared CSS owner, feature-owned mobile geometry, stable DOM composition, isolated weather, account placement, responsive state, and stable PWA cache contracts.');
+console.log('Hidden Market Terminal has one shared CSS owner, runtime-state-driven feature-owned mobile geometry, stable DOM composition, isolated weather, account placement, responsive state, and stable PWA cache contracts.');
