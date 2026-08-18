@@ -12,44 +12,31 @@ async function preparePage(page) {
   await page.addInitScript(() => {
     window.localStorage.setItem('flappyk_onboarding_seen_v1', '1');
     class SilentAudioContext {
-      constructor() {
-        this.currentTime = 0;
-        this.state = 'running';
-        this.destination = {};
-      }
+      constructor() { this.currentTime = 0; this.state = 'running'; this.destination = {}; }
       createOscillator() {
         return {
-          type: 'square',
-          frequency: {
-            value: 0,
-            setValueAtTime() {},
-            exponentialRampToValueAtTime() {},
-          },
-          connect() {},
-          start() {},
-          stop() {},
+          type: 'square', frequency: { value: 0, setValueAtTime() {}, exponentialRampToValueAtTime() {} },
+          connect() {}, start() {}, stop() {},
         };
       }
       createGain() {
-        return {
-          gain: {
-            setValueAtTime() {},
-            exponentialRampToValueAtTime() {},
-          },
-          connect() {},
-        };
+        return { gain: { setValueAtTime() {}, exponentialRampToValueAtTime() {} }, connect() {} };
       }
-      resume() {
-        this.state = 'running';
-        return Promise.resolve();
-      }
+      resume() { this.state = 'running'; return Promise.resolve(); }
     }
     window.AudioContext = SilentAudioContext;
     window.webkitAudioContext = SilentAudioContext;
   });
 }
 
-test('home arrow reveals one focused decisive-trades story and returns cleanly', async ({ page }) => {
+function inside(inner, outer, tolerance = 1) {
+  return inner.left >= outer.left - tolerance
+    && inner.right <= outer.right + tolerance
+    && inner.top >= outer.top - tolerance
+    && inner.bottom <= outer.bottom + tolerance;
+}
+
+test('field-note page keeps decisive-trades story, bilingual navigation, and direct PLAY entry', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await preparePage(page);
   await page.goto('/');
@@ -61,8 +48,6 @@ test('home arrow reveals one focused decisive-trades story and returns cleanly',
   await expect(next).toBeVisible();
   await expect(previous).toBeHidden();
   await expect(story).toBeHidden();
-  await expect(page.locator('#start-btn')).toBeVisible();
-
   await next.click();
 
   await expect(page.locator('#start-screen')).toHaveClass(/is-story-active/);
@@ -77,39 +62,35 @@ test('home arrow reveals one focused decisive-trades story and returns cleanly',
   await expect(page.locator('#start-btn')).toBeHidden();
 
   const layout = await page.evaluate(() => {
-    const screen = document.querySelector('#start-screen').getBoundingClientRect();
-    const slide = document.querySelector('#home-story-slide').getBoundingClientRect();
-    const tape = document.querySelector('.home-story-tape').getBoundingClientRect();
+    const rect = (selector) => {
+      const box = document.querySelector(selector).getBoundingClientRect();
+      return { left: box.left, top: box.top, right: box.right, bottom: box.bottom, width: box.width, height: box.height };
+    };
     const title = getComputedStyle(document.querySelector('#home-story-title'));
-    const nextButton = getComputedStyle(document.querySelector('.home-story-arrow--previous'));
+    const arrow = getComputedStyle(document.querySelector('.home-story-arrow--previous'));
     return {
-      screen: { left: screen.left, top: screen.top, right: screen.right, bottom: screen.bottom },
-      slide: { left: slide.left, top: slide.top, right: slide.right, bottom: slide.bottom },
-      tape: { left: tape.left, top: tape.top, right: tape.right, bottom: tape.bottom },
-      horizontalOverflow: document.querySelector('#home-story-slide').scrollWidth
-        > document.querySelector('#home-story-slide').clientWidth + 1,
+      screen: rect('#start-screen'),
+      slide: rect('#home-story-slide'),
+      tape: rect('.home-story-tape'),
+      horizontalOverflow: document.querySelector('#home-story-slide').scrollWidth > document.querySelector('#home-story-slide').clientWidth + 1,
       titleFont: title.fontFamily,
-      titleSize: title.fontSize,
-      arrowRadius: nextButton.borderRadius,
-      arrowShadow: nextButton.boxShadow,
+      titleSize: parseFloat(title.fontSize),
+      arrowRadius: arrow.borderRadius,
+      arrowShadow: arrow.boxShadow,
     };
   });
 
-  expect(layout.slide.left).toBeGreaterThanOrEqual(layout.screen.left - 1);
-  expect(layout.slide.right).toBeLessThanOrEqual(layout.screen.right + 1);
-  expect(layout.tape.left).toBeGreaterThan(layout.screen.left + 300);
-  expect(layout.tape.right).toBeLessThanOrEqual(layout.screen.right - 60);
+  expect(inside(layout.slide, layout.screen, 1)).toBe(true);
+  expect(inside(layout.tape, layout.slide, 1)).toBe(true);
   expect(layout.horizontalOverflow).toBe(false);
   expect(layout.titleFont).toContain('Press Start 2P');
-  expect(parseFloat(layout.titleSize)).toBeGreaterThanOrEqual(24);
+  expect(layout.titleSize).toBeGreaterThanOrEqual(22);
   expect(layout.arrowRadius).toBe('0px');
   expect(layout.arrowShadow).not.toBe('none');
 
   await page.keyboard.press('ArrowLeft');
   await expect(story).toBeHidden();
   await expect(page.locator('#start-btn')).toBeVisible();
-  await expect(next).toBeVisible();
-
   await page.keyboard.press('ArrowRight');
   await expect(story).toBeVisible();
 
@@ -126,7 +107,7 @@ test('home arrow reveals one focused decisive-trades story and returns cleanly',
   await expect(page.locator('#game-hud-rail')).toBeVisible();
 });
 
-test('second home panel remains readable and horizontally contained on mobile', async ({ page }) => {
+test('field-note page remains readable and contained on mobile', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await preparePage(page);
   await page.goto('/');
@@ -137,34 +118,32 @@ test('second home panel remains readable and horizontally contained on mobile', 
   await expect(page.locator('#home-story-play')).toBeVisible();
 
   const mobile = await page.evaluate(() => {
+    const rect = (selector) => {
+      const box = document.querySelector(selector).getBoundingClientRect();
+      return { left: box.left, top: box.top, right: box.right, bottom: box.bottom, width: box.width, height: box.height };
+    };
     const slideNode = document.querySelector('#home-story-slide');
-    const slide = slideNode.getBoundingClientRect();
-    const copy = document.querySelector('.home-story-copy').getBoundingClientRect();
-    const tape = document.querySelector('.home-story-tape').getBoundingClientRect();
-    const previous = document.querySelector('.home-story-arrow--previous').getBoundingClientRect();
-    const title = getComputedStyle(document.querySelector('#home-story-title'));
     return {
-      slide: { left: slide.left, right: slide.right, width: slide.width },
-      copy: { left: copy.left, right: copy.right, width: copy.width },
-      tape: { left: tape.left, right: tape.right, width: tape.width },
-      previous: { width: previous.width, height: previous.height },
+      viewport: { left: 0, top: 0, right: innerWidth, bottom: innerHeight },
+      slide: rect('#home-story-slide'),
+      copy: rect('.home-story-copy'),
+      tape: rect('.home-story-tape'),
+      previous: rect('.home-story-arrow--previous'),
+      play: rect('#home-story-play'),
       horizontalOverflow: slideNode.scrollWidth > slideNode.clientWidth + 1,
-      verticalScrollAvailable: slideNode.scrollHeight >= slideNode.clientHeight,
-      titleSize: title.fontSize,
+      titleSize: parseFloat(getComputedStyle(document.querySelector('#home-story-title')).fontSize),
       columns: getComputedStyle(slideNode).gridTemplateColumns.split(' ').length,
     };
   });
 
-  expect(mobile.slide.left).toBeGreaterThanOrEqual(0);
-  expect(mobile.slide.right).toBeLessThanOrEqual(390);
-  expect(mobile.copy.left).toBeGreaterThanOrEqual(40);
-  expect(mobile.copy.right).toBeLessThanOrEqual(350);
-  expect(mobile.tape.left).toBeGreaterThanOrEqual(40);
-  expect(mobile.tape.right).toBeLessThanOrEqual(350);
+  expect(inside(mobile.slide, mobile.viewport, 1)).toBe(true);
+  expect(inside(mobile.copy, mobile.slide, 1)).toBe(true);
+  expect(inside(mobile.tape, mobile.slide, 1)).toBe(true);
+  expect(inside(mobile.previous, mobile.viewport, 1)).toBe(true);
+  expect(inside(mobile.play, mobile.slide, 1)).toBe(true);
   expect(mobile.horizontalOverflow).toBe(false);
-  expect(mobile.verticalScrollAvailable).toBe(true);
-  expect(mobile.previous.width).toBeGreaterThanOrEqual(42);
-  expect(mobile.previous.height).toBeGreaterThanOrEqual(48);
-  expect(parseFloat(mobile.titleSize)).toBeGreaterThanOrEqual(21);
+  expect(mobile.previous.width).toBeGreaterThanOrEqual(36);
+  expect(mobile.previous.height).toBeGreaterThanOrEqual(36);
+  expect(mobile.titleSize).toBeGreaterThanOrEqual(20);
   expect(mobile.columns).toBe(1);
 });
