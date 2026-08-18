@@ -88,23 +88,30 @@ Chinese and English are one product, not two layouts.
 
 ## Architecture boundary
 
-`premium-ui.css` owns the shared visual system, responsive composition, home terminal, HUD presentation, field-note story, settlement receipt, and shared secondary-screen surfaces.
+`premium-ui.css` owns shared visual tokens and skin, the home terminal, shared HUD appearance, field-note story, settlement receipt, and shared secondary-screen surfaces. It does not take over geometry already owned by a feature stylesheet.
+
+`mobile-controls.css` is the canonical owner for mobile command-dock geometry, thumb-zone placement, mobile speed placement, safe-area spacing, and the chart clearance reserved for those controls. `premium-ui.css` may skin those controls but must not position the dock.
+
+`indicator-cards.css` owns BOLL/MACD power-up geometry and its relationship to the mobile command dock.
+
+`account-integration.css` owns account-toolbar placement and account-specific presentation.
 
 `scripts/premium-ui.js` owns existing home/HUD/control/settlement composition and interaction feedback.
 
 `scripts/premium-ui-refinement.js` owns the existing HUD rail composition and DOM normalization. It must not inject presentation styles.
 
-`market-weather.css` and `scripts/market-weather.js` continue to own weather semantics and environmental feedback only.
+`market-weather.css` and `scripts/market-weather.js` continue to own weather semantics and environmental feedback only. When weather status is composed into the shared HUD rail, the canonical HUD skin normalizes its presentation without changing weather behavior.
 
 Core game data, scoring, pass rules, account/cloud history, Daily Run, friend challenge, leaderboard, sharing, PWA behavior, and market loading are unchanged by this visual redesign.
 
 ## Rules for future visual work
 
 1. Do not add a second theme, compatibility skin, `*-polish.css`, or `*-fix.css` layer.
-2. Change the owning component or `premium-ui.css` directly.
+2. Change the actual owning component or shared visual system directly.
 3. Keep the chart visually dominant during play.
 4. Prefer fewer, stronger UI surfaces over more cards.
 5. Preserve the same information and actions in Chinese and English.
 6. Treat mobile as the same game with a different control geometry, not a reduced product.
-7. Keep weather semantic and subordinate to trading information.
-8. Do not turn atmosphere into a new gameplay mechanic.
+7. Do not move feature geometry into the shared theme merely to restyle it.
+8. Keep weather semantic and subordinate to trading information.
+9. Do not turn atmosphere into a new gameplay mechanic.
