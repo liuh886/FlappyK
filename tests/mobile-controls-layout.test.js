@@ -22,8 +22,10 @@ assert.ok(uiState.includes('get virtualControls()'));
 assert.ok(uiState.includes('root.dataset.virtualControls'));
 
 assert.ok(css.includes('#mobile-controls:not([hidden])'));
+assert.ok(css.includes('Virtual-control geometry is driven by runtime state, not viewport width.'));
 assert.ok(css.includes('position: fixed'));
-assert.ok(css.includes('bottom: 0'));
+assert.ok(css.includes('inset: auto 0 0 0'));
+assert.ok(css.includes('display: grid'));
 assert.ok(css.includes('width: 100vw'));
 assert.ok(css.includes('env(safe-area-inset-bottom)'));
 assert.ok(css.includes('grid-template-columns: minmax(64px, 1fr) 78px 10px 78px minmax(64px, 1fr)'));
@@ -43,4 +45,4 @@ assert.ok(premiumCss.includes('#btn-sell'));
 assert.ok(premiumCss.includes('.mobile-speed-control .speed-readout'));
 assert.ok(!premiumCss.includes('#mobile-controls:not([hidden]) {'));
 
-console.log('Shared responsive state, centered virtual-control dock, terminal skin, and single mobile geometry ownership checks passed');
+console.log('Shared responsive state, state-driven centered virtual-control dock, terminal skin, and single mobile geometry ownership checks passed');
