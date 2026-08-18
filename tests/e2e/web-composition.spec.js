@@ -36,7 +36,7 @@ function inside(inner, outer, tolerance = 1) {
     && inner.bottom <= outer.bottom + tolerance;
 }
 
-test('desktop keeps the chart dominant with a compact two-row terminal instrument rail', async ({ page }) => {
+test('desktop keeps the chart dominant with one compact two-row market command surface', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await preparePage(page);
   await page.goto('/');
@@ -49,13 +49,15 @@ test('desktop keeps the chart dominant with a compact two-row terminal instrumen
       titleSize: parseFloat(title.fontSize),
       playRadius: play.borderRadius,
       playShadow: play.boxShadow,
+      playBackground: play.backgroundColor,
     };
   });
 
   expect(homeTypography.titleFont).toContain('Press Start 2P');
   expect(homeTypography.titleSize).toBeGreaterThanOrEqual(32);
   expect(homeTypography.playRadius).toBe('0px');
-  expect(homeTypography.playShadow).not.toBe('none');
+  expect(homeTypography.playShadow).toBe('none');
+  expect(homeTypography.playBackground).not.toBe('rgba(0, 0, 0, 0)');
 
   await page.getByRole('button', { name: 'PLAY', exact: true }).click();
 
@@ -87,6 +89,7 @@ test('desktop keeps the chart dominant with a compact two-row terminal instrumen
       statsRadius: style('.stats-box').borderRadius,
       statsBackdrop: style('.stats-box').backdropFilter,
       statsShadow: style('.stats-box').boxShadow,
+      railShadow: style('#game-hud-rail').boxShadow,
       controlRadius: style('#pause-btn').borderRadius,
       hintRadius: style('.controls-hint').borderRadius,
       labelSize: parseFloat(style('.hud-metric-label').fontSize),
@@ -103,14 +106,15 @@ test('desktop keeps the chart dominant with a compact two-row terminal instrumen
   expect(layout.metricsFit).toBe(true);
   expect(layout.statsRadius).toBe('0px');
   expect(layout.statsBackdrop).toBe('none');
-  expect(layout.statsShadow).not.toBe('none');
+  expect(layout.statsShadow).toBe('none');
+  expect(layout.railShadow).toBe('none');
   expect(layout.controlRadius).toBe('0px');
   expect(layout.hintRadius).toBe('0px');
   expect(layout.labelSize).toBeGreaterThanOrEqual(8);
   expect(layout.totalSize).toBeGreaterThan(layout.labelSize);
 });
 
-test('mobile keeps HUD above the command dock and all actions inside the viewport', async ({ page }) => {
+test('mobile keeps HUD above the feature-owned command dock and all actions inside the viewport', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await preparePage(page);
   await page.goto('/');
@@ -138,6 +142,8 @@ test('mobile keeps HUD above the command dock and all actions inside the viewpor
       metricsFit: metricNodes.every((node) => node.scrollWidth <= node.clientWidth + 1),
       buyRadius: style('#btn-buy').borderRadius,
       sellRadius: style('#btn-sell').borderRadius,
+      buyShadow: style('#btn-buy').boxShadow,
+      sellShadow: style('#btn-sell').boxShadow,
       labelSize: parseFloat(style('.stats-box .hud-metric-label').fontSize),
     };
   });
@@ -152,6 +158,8 @@ test('mobile keeps HUD above the command dock and all actions inside the viewpor
   expect(layout.sell.width).toBeGreaterThanOrEqual(60);
   expect(layout.buyRadius).toBe('0px');
   expect(layout.sellRadius).toBe('0px');
+  expect(layout.buyShadow).toBe('none');
+  expect(layout.sellShadow).toBe('none');
   expect(layout.metricsFit).toBe(true);
   expect(layout.labelSize).toBeGreaterThanOrEqual(8);
 });
