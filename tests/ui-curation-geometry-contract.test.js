@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 
-const refinement = fs.readFileSync('premium-ui.css', 'utf8');
+const canonical = fs.readFileSync('premium-ui.css', 'utf8');
 const base = fs.readFileSync('style.css', 'utf8');
 const refinementJs = fs.readFileSync('scripts/premium-ui-refinement.js', 'utf8');
 
@@ -10,26 +10,23 @@ for (const structuralContract of [
   'min-height: 0 !important',
   "'performance controls'",
   "'weather progress'",
+  '#game-hud-rail',
+  '#mobile-controls:not([hidden])',
 ]) {
-  assert.ok(refinement.includes(structuralContract), `Missing static HUD geometry contract: ${structuralContract}`);
+  assert.ok(canonical.includes(structuralContract), `Missing canonical HUD geometry contract: ${structuralContract}`);
 }
 
 for (const visualContract of [
-  'min-height: 84px !important',
-  'height: auto !important',
-  'backdrop-filter: none !important',
-  'border-radius: 0 !important',
+  'border-radius: 0',
+  'backdrop-filter: none',
+  'box-shadow: var(--pixel-shadow-small)',
 ]) {
-  assert.ok(base.includes(visualContract), `Missing HUD visual normalization: ${visualContract}`);
+  assert.ok(canonical.includes(visualContract), `Missing terminal visual normalization: ${visualContract}`);
 }
-assert.ok(!base.includes('height: 52px !important'), 'Fullscreen HUD must not return to the old 52px geometry.');
-assert.ok(!base.includes('font-size: 5px !important'), 'Fullscreen HUD must not return to unreadable 5px labels.');
 
-assert.ok(
-  /\.trade-key-hint \.key \{[\s\S]*?border-radius: 0 !important;/m.test(base),
-  'Desktop trade keycaps must use the same square pixel language as the HUD controls.',
-);
+assert.ok(!base.includes('html body #game-container #game-hud-rail'), 'style.css must not regain HUD-specific high-specificity rules.');
+assert.ok(!base.includes('--hud-shell:'), 'Legacy HUD theme variables must not return to style.css.');
 assert.ok(!refinementJs.includes('style.textContent = `'));
 assert.ok(!refinementJs.includes('installPixelCompatibilityStyles'));
 
-console.log('Readable fullscreen HUD sizing, mobile grid areas, square keycaps, glass removal, and static presentation ownership passed.');
+console.log('Static HUD geometry remains in the canonical presentation layer without legacy specificity overrides.');
