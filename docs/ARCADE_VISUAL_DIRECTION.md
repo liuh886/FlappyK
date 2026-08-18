@@ -1,80 +1,110 @@
-# FlappyK arcade visual direction
+# FlappyK visual direction
 
 ## Product intent
 
-FlappyK should feel like a small, polished pixel stock arcade game rather than a financial dashboard wearing a pixel theme.
+FlappyK is a short market game, not a trading dashboard and not a generic retro website.
 
-The core interaction remains deliberately small:
+The player reads a real hidden historical K-line, trades in fixed increments, tries to finish with positive Excess Return, and clears three markets. The visual system exists to make that loop legible, tense, and memorable without introducing another progression system.
 
-- read a real hidden historical K-line;
-- buy or sell in fixed increments;
-- finish with positive Excess Return;
-- play three short markets without progression, equipment, maps, or a character system.
+## Canonical direction: Hidden Market Terminal
 
-The visual system must increase atmosphere and feedback without creating another gameplay system.
+The product now uses one visual language: **Hidden Market Terminal**.
 
-## Chosen direction
+It combines the immediacy of an arcade cabinet with the information hierarchy of a professional market terminal:
 
-The approved direction combines:
+- the chart is the dominant surface during play;
+- HUD elements behave like instruments around the chart instead of floating web cards;
+- square borders, hard shadows, restrained pixel typography, and compact status marks replace glassmorphism and rounded dashboard surfaces;
+- the home screen is a full-screen market terminal with one unmistakable primary action;
+- the second home page reads like a printed field note rather than another marketing panel;
+- settlement reads like a score receipt: verdict and Excess Return first, detail second;
+- desktop and mobile share the same hierarchy rather than maintaining separate visual products.
 
-1. **Pixel stock arcade** — the chart remains accurate and dominant; HUD information reads like a compact arcade score display.
-2. **Nintendo-like restraint** — obvious primary action, low learning cost, short feedback, no feature inventory on the opening screen.
-3. **Abstract natural environment** — weather communicates player performance without changing the trading rules.
-4. **Light handheld framing** — the opening screen resembles a compact game console, while the game itself keeps the maximum possible chart area.
-5. **No player character** — the K-line and the player's return relationship are the protagonists.
+There is no alternative legacy skin and no compatibility theme. `premium-ui.css` is the single canonical owner for the shared presentation system.
+
+## Home hierarchy
+
+The first screen answers four questions in order:
+
+1. What is this? — FlappyK / Hidden Market Arcade.
+2. What do I do? — trade three hidden historical markets and beat the market.
+3. Where do I play? — Crypto, A-Shares, and US Stocks.
+4. What is the primary action? — Play.
+
+Personal best, Daily Run, rankings, account, language, and installation remain available but visually subordinate to Play.
+
+## Gameplay hierarchy
+
+The active chart gets maximum space. The persistent rail contains only information required to act:
+
+- Total;
+- Return;
+- live Excess;
+- Run;
+- Day progress;
+- weather state;
+- speed;
+- back / pause;
+- BUY / SELL controls.
+
+Desktop keyboard hints stay secondary. Mobile uses large BUY and SELL controls with speed between them. No permanent decorative bezel surrounds the active chart.
 
 ## Weather semantics
 
-Weather is derived only from live player and market performance:
+Weather remains functional feedback and keeps the existing scoring semantics:
 
 | State | Rule | Meaning |
 | --- | --- | --- |
-| Clear | player return is non-negative and Excess Return is non-negative | the player is ahead of the market |
-| Cloudy | player return is non-negative but Excess Return is negative | the player is profitable, but the market is ahead |
-| Rain | player return is negative | the player is underwater |
+| Clear | player return is non-negative and Excess Return is non-negative | player is ahead of the market |
+| Cloudy | player return is non-negative but Excess Return is negative | player is profitable, but the market is ahead |
+| Rain | player return is negative | player is underwater |
 
-The weather layer is feedback, not decoration. It must remain low contrast enough that candlesticks, the return curve, trade markers, and controls stay readable.
+Weather must remain lower contrast than the K-line, player return, trade markers, and controls. It never changes scoring or market playback.
 
-## Key emotional moments
+## Settlement
 
-Short feedback is allowed when a sign boundary is crossed:
+Settlement is intentionally different from gameplay: a light paper-like score receipt over the dark terminal.
 
-- player return becomes positive;
-- player return becomes negative;
-- Excess Return becomes positive;
-- Excess Return becomes negative.
+The hierarchy is:
 
-These events should use brief text, a small weather shift, and restrained haptic/button feedback. They must not pause the game or obscure the chart.
+1. verdict;
+2. Excess Return;
+3. player-versus-market comparison;
+4. revealed asset and period;
+5. expandable accounting detail;
+6. next action.
 
-## HUD and home rules
+This contrast marks the end of a market without adding another screen system.
 
-- Keep the existing compact persistent HUD.
-- Keep live Total, Return, Excess, Run, Day, speed, BUY, and SELL.
-- Present secondary information only on demand or at settlement.
-- Make PLAY the unmistakable primary home action.
-- Daily Run, rankings, account, language, and installation remain secondary.
-- The handheld shell is a home-screen framing device, not a permanent bezel around the active chart.
+## Chinese and English
+
+Chinese and English are one product, not two layouts.
+
+- The information hierarchy and available actions are identical.
+- Chinese uses the existing `ZCOOL QingKe HuangYou` family where pixel display text would otherwise become illegible.
+- English keeps `Press Start 2P` for display moments and `Pixelify Sans` for operational UI.
+- Chinese copy receives natural line-height and does not lose content to make the layout fit.
+- Responsive breakpoints are based on available space and virtual-control state, not language.
 
 ## Architecture boundary
 
-`market-weather.css` owns the new environmental and home-console surfaces.
+`premium-ui.css` owns the shared visual system, responsive composition, home terminal, HUD presentation, field-note story, settlement receipt, and shared secondary-screen surfaces.
 
-`scripts/market-weather.js` owns:
+`scripts/premium-ui.js` owns existing home/HUD/control/settlement composition and interaction feedback.
 
-- weather classification;
-- environmental DOM composition;
-- sign-crossing feedback;
-- the lightweight home-console composition;
-- language synchronization for its own copy.
+`scripts/premium-ui-refinement.js` owns the existing HUD rail composition and DOM normalization. It must not inject presentation styles.
 
-The feature does not wrap or replace `startLevel`, `updateUI`, `draw`, or `endLevel`. It reads canonical gameplay state and observes presentation changes. Market data, scoring, pass rules, authentication, cloud save, leaderboard evidence, and membership are unchanged.
+`market-weather.css` and `scripts/market-weather.js` continue to own weather semantics and environmental feedback only.
 
-## Follow-up candidates
+Core game data, scoring, pass rules, account/cloud history, Daily Run, friend challenge, leaderboard, sharing, PWA behavior, and market loading are unchanged by this visual redesign.
 
-After this first iteration is visually reviewed:
+## Rules for future visual work
 
-- replace legacy emoji trade markers in the canvas with original pixel markers;
-- tune weather opacity against real mobile screenshots;
-- refine settlement as an arcade score reveal without increasing information density;
-- consider a small sound palette for clear/cloudy/rain boundary changes;
-- remove any remaining web-dashboard language that survives in secondary dialogs.
+1. Do not add a second theme, compatibility skin, `*-polish.css`, or `*-fix.css` layer.
+2. Change the owning component or `premium-ui.css` directly.
+3. Keep the chart visually dominant during play.
+4. Prefer fewer, stronger UI surfaces over more cards.
+5. Preserve the same information and actions in Chinese and English.
+6. Treat mobile as the same game with a different control geometry, not a reduced product.
+7. Keep weather semantic and subordinate to trading information.
+8. Do not turn atmosphere into a new gameplay mechanic.
