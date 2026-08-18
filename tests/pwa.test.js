@@ -67,23 +67,25 @@ assert.ok(indexSource.includes('rel="preconnect" href="https://fonts.googleapis.
 assert.ok(indexSource.includes('rel="preconnect" href="https://fonts.gstatic.com" crossorigin'));
 assert.ok(indexSource.includes('family=Pixelify+Sans'));
 assert.ok(!pixelStyles.includes('@import url('));
-assert.ok(pixelStyles.includes('--pixel-shadow-step'));
-assert.ok(pixelStyles.includes('--pixel-cut'));
 assert.ok(pixelStyles.includes('--space-1: 4px'));
+assert.ok(pixelStyles.includes('--game-accent:'));
+assert.ok(pixelStyles.includes('--game-system:'));
 assert.ok(pixelStyles.includes('#ui-layer[data-hud-composition='));
 assert.ok(pixelStyles.includes('#ui-layer[hidden]'));
 assert.ok(pixelStyles.includes('#game-hud-rail'));
 assert.ok(pixelStyles.includes('.hud-metric-label'));
 assert.ok(pixelStyles.includes("html[data-ui-state='home'] #game-container.arcade-weather-ready"));
 assert.ok(pixelStyles.includes('.home-primary-actions #start-btn'));
-assert.ok(pixelStyles.includes('font-size: 22px'));
-assert.ok(pixelStyles.includes('min-height: 64px'));
+assert.ok(pixelStyles.includes('min-height: 58px'));
 
-assert.ok(pixelStyles.includes('FLAPPY K / HIDDEN MARKET TERMINAL'));
+assert.ok(pixelStyles.includes('FLAPPY K / SINGLE-SURFACE MARKET OS'));
 assert.ok(pixelStyles.includes("#game-hud-rail .weather-status::before"));
 assert.ok(pixelStyles.includes(".stats-box[data-composition='returns-only']"));
 assert.ok(pixelStyles.includes('.excess-meter-track'));
-assert.ok(pixelStyles.includes('--game-yellow:'));
+assert.ok(pixelStyles.includes('.legend-terminal-head'));
+assert.ok(!pixelStyles.includes('--pixel-cut:'));
+assert.ok(!pixelStyles.includes('--game-yellow:'));
+assert.ok(!pixelStyles.includes('background: #e7e2d4'));
 assert.ok(!pixelStyles.includes('#mobile-controls:not([hidden]) {'));
 assert.ok(mobileStyles.includes('#mobile-controls:not([hidden])'));
 assert.ok(mobileStyles.includes('width: 100vw;'));
@@ -180,4 +182,4 @@ assert.ok(analyticsSource.includes("track('level_complete'"));
 assert.ok(analyticsSource.includes("track('run_complete'"));
 assert.ok(analyticsSource.includes("track('pwa_install'"));
 
-console.log('PWA manifest, icons, install UI, GA4 product events, Cloudflare RUM, Hidden Market Terminal, state-driven feature-owned mobile geometry, tactical power-ups, canonical Account Shell v7 cloud history, and stable cache lifecycle checks passed');
+console.log('PWA manifest, icons, install UI, GA4 product events, Cloudflare RUM, Single-Surface Market OS, state-driven feature-owned mobile geometry, tactical power-ups, canonical Account Shell v7 cloud history, and stable cache lifecycle checks passed');
