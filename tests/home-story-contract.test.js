@@ -33,20 +33,24 @@ for (const contract of [
   '#start-screen.is-story-active .home-console-topline',
   '.home-console-screen > :not(.home-story-slide):not(.home-story-navigation)',
   '.home-story-slide',
-  'Story / field-manual page',
-  'grid-template-columns: minmax(240px, 0.72fr) minmax(0, 1.28fr)',
+  'Story: analysis mode, not a second visual world',
+  'grid-template-columns: minmax(230px, 0.7fr) minmax(0, 1.3fr)',
   '.home-story-equation',
   '.home-story-tape',
   '.home-story-chart-price',
   '.home-story-arrow',
-  '@media (max-width: 720px), (pointer: coarse)',
+  '@media (max-width: 719px)',
   'grid-template-columns: 1fr',
   '@media (prefers-reduced-motion: reduce)',
 ]) {
-  assert.ok(uiCss.includes(contract), `Missing terminal field-note visual contract: ${contract}`);
+  assert.ok(uiCss.includes(contract), `Missing single-surface story visual contract: ${contract}`);
 }
 
-assert.ok(!uiCss.includes('#start-screen.is-story-active .home-console-bezel {\n    visibility: hidden;'), 'The field note must not hide its own ancestor.');
+for (const retired of ['background: #e7e2d4', 'FIELD NOTE 001', 'clip-path: var(--pixel-cut)']) {
+  assert.ok(!uiCss.includes(retired), `Retired paper-story metaphor returned: ${retired}`);
+}
+
+assert.ok(!uiCss.includes('#start-screen.is-story-active .home-console-bezel {\n    visibility: hidden;'), 'The analysis mode must not hide its own ancestor.');
 assert.equal((storyJs.match(/home-story-marker home-story-marker--/g) || []).length, 3);
 assert.ok(!storyJs.includes('new Swiper'));
 assert.ok(!storyJs.includes('setInterval('));
@@ -60,4 +64,4 @@ assert.ok(!serviceWorker.includes("'./home-story.css'"));
 assert.ok(serviceWorker.includes("'./scripts/home-story.js'"));
 assert.ok(!/flappyk-(?:app|runtime)-v\d+/.test(serviceWorker));
 
-console.log('Canonical terminal UI retains the bilingual decisive-trades field note, keyboard navigation, mobile containment, and stable PWA cache contracts.');
+console.log('Canonical single-surface UI retains the bilingual decisive-trades analysis mode, keyboard navigation, mobile containment, and stable PWA cache contracts.');
