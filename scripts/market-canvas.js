@@ -13,7 +13,7 @@
             border: cssToken('--game-border', '#26313c'),
             borderStrong: cssToken('--game-border-strong', '#556371'),
             text: cssToken('--game-text', '#eef2f5'),
-            muted: cssToken('--game-muted', '#81909e'),
+            muted: cssToken('--game-muted', '#a8b4c0'),
             accent: cssToken('--game-accent', '#f0c94b'),
             system: cssToken('--game-system', '#6bcbd4'),
             green: cssToken('--game-green', '#5ed48a'),
@@ -28,7 +28,7 @@
     function drawHairlineGrid(ctx, plot, colors) {
         ctx.save();
         ctx.strokeStyle = colors.border;
-        ctx.globalAlpha = 0.34;
+        ctx.globalAlpha = 0.42;
         ctx.lineWidth = 1;
 
         const horizontalBands = 5;
@@ -54,8 +54,8 @@
     function drawSectionLabel(ctx, label, x, y, colors) {
         ctx.save();
         ctx.fillStyle = colors.muted;
-        ctx.globalAlpha = 0.78;
-        ctx.font = '10px ui-monospace, SFMono-Regular, Menlo, monospace';
+        ctx.globalAlpha = 0.92;
+        ctx.font = '600 12px "Pixelify Sans", ui-monospace, SFMono-Regular, Menlo, monospace';
         ctx.textAlign = 'left';
         ctx.textBaseline = 'top';
         ctx.fillText(label, x, y);
@@ -64,14 +64,24 @@
 
     function drawTradeMarker(ctx, type, x, y, colors) {
         const isBuy = type === 'buy';
-        const size = 5;
-        const offsetY = isBuy ? 11 : -11;
+        const size = 7;
+        const offsetY = isBuy ? 14 : -14;
         const centerY = y + offsetY;
+        const color = isBuy ? colors.green : colors.red;
 
         ctx.save();
-        ctx.fillStyle = isBuy ? colors.green : colors.red;
-        ctx.strokeStyle = colors.bg;
+        ctx.strokeStyle = color;
+        ctx.globalAlpha = 0.7;
         ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x, y + (isBuy ? 3 : -3));
+        ctx.lineTo(x, centerY + (isBuy ? -size : size));
+        ctx.stroke();
+
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = color;
+        ctx.strokeStyle = colors.bg;
+        ctx.lineWidth = 2;
         ctx.beginPath();
         if (isBuy) {
             ctx.moveTo(x, centerY - size);
@@ -88,11 +98,50 @@
         ctx.restore();
     }
 
+    function drawLatestFocus(ctx, plot, x, colors) {
+        ctx.save();
+        ctx.fillStyle = colors.system;
+        ctx.globalAlpha = 0.055;
+        ctx.fillRect(Math.max(plot.left, x - 10), plot.top, 20, plot.height);
+        ctx.strokeStyle = colors.system;
+        ctx.globalAlpha = 0.28;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(Math.round(x) + 0.5, plot.top);
+        ctx.lineTo(Math.round(x) + 0.5, plot.bottom);
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    function drawPriceBadge(ctx, plot, y, price, colors) {
+        const label = Number(price).toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
+        ctx.save();
+        ctx.font = '700 12px "Pixelify Sans", ui-monospace, monospace';
+        const width = Math.ceil(ctx.measureText(label).width) + 14;
+        const height = 22;
+        const x = Math.max(plot.left, plot.right - width);
+        const top = clamp(y - height / 2, plot.top, plot.bottom - height);
+        ctx.fillStyle = colors.system;
+        ctx.fillRect(x, top, width, height);
+        ctx.fillStyle = colors.bg;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(label, x + width / 2, top + height / 2 + 0.5);
+        ctx.restore();
+    }
+
     function drawCandles(ctx, state, plot, colors, startDay, minPrice, maxPrice) {
         const candleSlot = plot.width / state.visibleDays;
-        const bodyWidth = clamp(candleSlot * 0.58, 2, 8);
+        const bodyWidth = clamp(candleSlot * 0.62, 2.5, 9);
         const range = Math.max(0.000001, maxPrice - minPrice);
         const getY = (price) => plot.bottom - ((price - minPrice) / range) * plot.height;
+        const latestDisplayIndex = state.dayIndex - startDay;
+        const latestX = plot.left + latestDisplayIndex * candleSlot + candleSlot / 2;
+
+        drawLatestFocus(ctx, plot, latestX, colors);
 
         for (let i = startDay; i <= state.dayIndex; i += 1) {
             const datum = state.currentData[i];
@@ -112,23 +161,23 @@
             ctx.save();
             ctx.strokeStyle = color;
             ctx.fillStyle = color;
-            ctx.globalAlpha = 0.86;
-            ctx.lineWidth = 1;
+            ctx.globalAlpha = i === state.dayIndex ? 1 : 0.88;
+            ctx.lineWidth = i === state.dayIndex ? 1.5 : 1;
             ctx.beginPath();
             ctx.moveTo(Math.round(x) + 0.5, highY);
             ctx.lineTo(Math.round(x) + 0.5, lowY);
             ctx.stroke();
 
             const bodyTop = Math.min(openY, closeY);
-            const bodyHeight = Math.max(1.5, Math.abs(closeY - openY));
+            const bodyHeight = Math.max(2, Math.abs(closeY - openY));
             ctx.fillRect(x - bodyWidth / 2, bodyTop, bodyWidth, bodyHeight);
             ctx.restore();
         }
 
         ctx.save();
         ctx.strokeStyle = colors.system;
-        ctx.globalAlpha = 0.44;
-        ctx.setLineDash([3, 4]);
+        ctx.globalAlpha = 0.56;
+        ctx.setLineDash([4, 4]);
         const latest = state.currentData[state.dayIndex];
         if (latest) {
             const latestY = getY(latest.close);
@@ -136,6 +185,7 @@
             ctx.moveTo(plot.left, latestY);
             ctx.lineTo(plot.right, latestY);
             ctx.stroke();
+            drawPriceBadge(ctx, plot, latestY, latest.close, colors);
         }
         ctx.restore();
 
@@ -174,7 +224,7 @@
 
         ctx.save();
         ctx.strokeStyle = colors.system;
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 3;
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
         ctx.beginPath();
@@ -194,14 +244,22 @@
         if (hasPoint) ctx.stroke();
         ctx.restore();
 
-        const latest = state.totalHistory[Math.min(state.dayIndex, state.totalHistory.length - 1)];
+        const latestIndex = Math.min(state.dayIndex, state.totalHistory.length - 1);
+        const latest = state.totalHistory[latestIndex];
         if (Number.isFinite(latest)) {
-            const displayIndex = Math.min(state.dayIndex, state.totalHistory.length - 1) - startDay;
+            const displayIndex = latestIndex - startDay;
             const x = plot.left + displayIndex * slot + slot / 2;
             const y = getY(latest);
             ctx.save();
+            ctx.strokeStyle = colors.accent;
+            ctx.globalAlpha = 0.5;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(x, y, 7, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.globalAlpha = 1;
             ctx.fillStyle = colors.accent;
-            ctx.fillRect(Math.round(x) - 2, Math.round(y) - 2, 5, 5);
+            ctx.fillRect(Math.round(x) - 3, Math.round(y) - 3, 7, 7);
             ctx.restore();
         }
     }
@@ -227,11 +285,11 @@
 
         if (!Array.isArray(currentData) || currentData.length === 0 || dayIndex < 0) return;
 
-        const topInset = clamp(height * 0.16, 90, 124);
-        const sideInset = clamp(width * 0.024, 8, 18);
-        const returnHeight = clamp(height * 0.16, 72, 126);
+        const topInset = clamp(height * 0.17, 100, 138);
+        const sideInset = clamp(width * 0.028, 10, 22);
+        const returnHeight = clamp(height * 0.18, 82, 136);
         const bottomInset = clamp(height * 0.055, 22, 42);
-        const dividerGap = 24;
+        const dividerGap = 28;
         const priceBottom = Math.max(topInset + 80, height - bottomInset - returnHeight - dividerGap);
 
         const pricePlot = {
@@ -254,8 +312,8 @@
 
         drawHairlineGrid(ctx, pricePlot, colors);
         drawHairlineGrid(ctx, returnPlot, colors);
-        drawSectionLabel(ctx, 'PRICE', pricePlot.left, pricePlot.top - 16, colors);
-        drawSectionLabel(ctx, 'PLAYER', returnPlot.left, returnPlot.top - 16, colors);
+        drawSectionLabel(ctx, 'MARKET PRICE', pricePlot.left, pricePlot.top - 20, colors);
+        drawSectionLabel(ctx, 'PLAYER EQUITY', returnPlot.left, returnPlot.top - 20, colors);
 
         const startDay = Math.max(0, dayIndex - visibleDays + 1);
         let minPrice = Infinity;
