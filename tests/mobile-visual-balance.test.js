@@ -47,12 +47,15 @@ for (const contract of [
   'min-height: 48px;',
   'grid-template-rows: auto auto;',
   'font-size: 9px;',
+  'border-width: 2px;',
+  'box-shadow: 3px 3px 0 var(--game-bg',
+  'transform: translate(2px, 2px)',
 ]) {
-  assert.ok(cards.includes(contract), `Missing readable Market Arcade power-up contract: ${contract}`);
+  assert.ok(cards.includes(contract), `Missing tactile Pixel Market Arcade power-up contract: ${contract}`);
 }
 
-assert.ok(cards.includes('box-shadow: inset 0 3px 0 var(--game-accent'));
+assert.ok(!cards.includes('box-shadow: inset 0'), 'Inset equipped-state styling must not return; mobile power-ups use physical hard depth.');
 assert.ok(!cards.includes('clip-path:'));
 assert.ok(!cards.includes('#a98bff'));
 
-console.log('Mobile visual balance enforces a centered command dock, 44px navigation, readable 64px power-ups, equipped-state depth, and no cross-owner HUD/home/settlement overrides.');
+console.log('Mobile visual balance enforces a centered command dock, 44px navigation, tactile 64px power-ups, physical hard depth, and no cross-owner HUD/home/settlement overrides.');
