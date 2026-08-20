@@ -39,6 +39,9 @@
         const w = Math.max(1, snap(width));
         const h = Math.max(1, snap(height));
 
+        ctx.save();
+        ctx.globalAlpha = 1;
+        ctx.setLineDash([]);
         if (depth > 0) {
             ctx.fillStyle = depthColor;
             ctx.fillRect(left + depth, top + depth, w, h);
@@ -50,6 +53,7 @@
             ctx.lineWidth = 2;
             ctx.strokeRect(left + 1, top + 1, Math.max(1, w - 2), Math.max(1, h - 2));
         }
+        ctx.restore();
     }
 
     function drawStageFrame(ctx, plot, colors) {
@@ -133,6 +137,7 @@
         ctx.lineTo(plot.right - 8, railY);
         ctx.stroke();
 
+        ctx.globalAlpha = 1;
         for (let i = 0; i <= markerCount; i += 1) {
             const day = startDay + Math.floor(((state.visibleDays - 1) * i) / markerCount);
             if (day > state.dayIndex) break;
@@ -205,6 +210,8 @@
         const top = clamp(y - height / 2, plot.top + 4, plot.bottom - height - 20);
         drawHardBox(ctx, x, top, width, height, colors.system, colors.bg, 3, colors.bg);
         ctx.fillStyle = colors.bg;
+        ctx.globalAlpha = 1;
+        ctx.setLineDash([]);
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(label, snap(x + width / 2), snap(top + height / 2) + 1);
