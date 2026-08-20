@@ -3,73 +3,17 @@ body {
     overscroll-behavior: none;
 }
 
-#game-top-controls {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 60;
-    display: flex;
-    gap: 7px;
-    align-items: center;
-}
-
-#game-top-controls[hidden],
 #mobile-controls[hidden] {
     display: none !important;
 }
 
-#game-top-controls button {
-    display: inline-flex;
-    width: 30px;
-    height: 30px;
-    margin: 0;
-    padding: 0;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid #fff;
-    border-radius: 5px;
-    background: rgba(13, 17, 23, 0.92);
-    color: #fff;
-    box-shadow: 2px 2px 0 rgba(255, 255, 255, 0.7);
-    font-size: 0;
-    line-height: 1;
-}
-
-#game-top-controls button:hover {
-    background: #1f2937;
-}
-
-#game-top-controls button:active {
-    transform: translate(2px, 2px);
-    box-shadow: none;
-}
-
-#game-back-btn::before {
-    content: '↩';
-    font-family: Arial, sans-serif;
-    font-size: 17px;
-    font-weight: 700;
-}
-
-#pause-btn::before {
-    content: 'Ⅱ';
-    font-family: Arial, sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-}
-
-#pause-btn[aria-pressed='true']::before {
-    content: '▶';
-    font-size: 11px;
-}
-
 /*
- * Virtual-control geometry is driven by runtime state, not viewport width.
- * Touch laptops/tablets can be wider than a phone and still require the dock.
+ * Touch geometry only. Shared color, typography and button skin live in premium-ui.css.
+ * Runtime state decides whether this dock exists; viewport width does not.
  */
 #mobile-controls:not([hidden]) {
     position: fixed;
-    inset: auto 0 0 0;
+    inset: auto 0 0;
     z-index: 80;
     display: grid;
     grid-template-columns: minmax(64px, 1fr) 78px 10px 78px minmax(64px, 1fr);
@@ -82,9 +26,8 @@ body {
         max(12px, env(safe-area-inset-right))
         calc(11px + env(safe-area-inset-bottom))
         max(12px, env(safe-area-inset-left));
-    border-top: 2px solid var(--hud-frame, #9fb0c4);
-    background: var(--hud-shell, rgba(6, 12, 20, 0.94));
-    box-shadow: 0 -4px 0 rgba(0, 0, 0, 0.42);
+    border-top: 1px solid var(--game-border, #26313c);
+    background: var(--game-bg, #07090c);
     pointer-events: none;
     touch-action: manipulation;
 }
@@ -123,12 +66,7 @@ body {
     gap: 2px;
     margin: 0;
     padding: 0;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-    opacity: 0.68;
-    backdrop-filter: none;
+    pointer-events: auto;
 }
 
 #mobile-controls .mobile-speed-control .small-btn {
@@ -138,118 +76,37 @@ body {
     min-height: 28px;
     margin: 0;
     padding: 0;
-    border: 1px solid #52647c;
-    border-radius: 0;
-    background: rgba(18, 29, 43, 0.62);
-    box-shadow: none;
-    color: var(--hud-label, #91a0b3);
-    font-size: 13px;
 }
 
 #mobile-controls .mobile-speed-control .speed-readout {
     min-width: 38px;
-    color: var(--hud-label, #91a0b3);
-    font-size: 14px;
     line-height: 28px;
     text-align: center;
 }
 
-html[data-virtual-controls='true'][data-ui-state='playing'] body #game-container #game-canvas,
-html[data-virtual-controls='true'][data-ui-state='paused'] body #game-container #game-canvas {
+html[data-virtual-controls='true'][data-ui-state='playing'] #game-canvas,
+html[data-virtual-controls='true'][data-ui-state='paused'] #game-canvas {
     margin-bottom: 102px;
-}
-
-@media (min-width: 1025px) {
-    .controls-hint {
-        padding-top: 40px;
-    }
 }
 
 @media (max-width: 1024px) {
     html,
-    body {
+    body,
+    #game-container {
         width: 100%;
-        height: 100%;
+        height: 100dvh;
         overflow: hidden;
     }
 
-    body {
-        position: fixed;
-        inset: 0;
-        width: 100vw;
-        height: 100dvh;
-    }
-
+    body,
     #game-container {
         position: fixed;
         inset: 0;
-        width: 100vw;
-        height: 100dvh;
-        max-height: 100dvh;
-        overflow: hidden;
-        overscroll-behavior: none;
     }
 
     #game-canvas {
         touch-action: none;
         overscroll-behavior: none;
-    }
-
-    #game-top-controls {
-        position: fixed;
-        top: max(8px, env(safe-area-inset-top));
-        right: max(8px, env(safe-area-inset-right));
-        z-index: 90;
-        gap: 6px;
-    }
-
-    #game-top-controls button {
-        width: 32px;
-        height: 32px;
-        border-width: 2px;
-        border-radius: 0;
-    }
-
-    #game-back-btn::before {
-        font-size: 16px;
-    }
-
-    #pause-btn::before {
-        font-size: 11px;
-    }
-
-    #pause-btn[aria-pressed='true']::before {
-        font-size: 10px;
-    }
-}
-
-@media (max-width: 720px), (pointer: coarse) {
-    html[data-ui-state='home'] body #game-container #start-screen.arcade-home .home-console-screen {
-        justify-content: center !important;
-    }
-
-    #settlement-screen.active {
-        justify-content: center;
-        padding-top: max(16px, env(safe-area-inset-top));
-        padding-bottom: max(16px, env(safe-area-inset-bottom));
-    }
-
-    #settlement-screen.active .profit-card {
-        margin-top: 0;
-    }
-
-    html body #game-container #game-hud-rail {
-        background: rgba(6, 12, 20, 0.44) !important;
-    }
-
-    html body #game-container #game-hud-rail .stats-box[data-composition='returns-only'],
-    html body #game-container #game-hud-rail #game-top-controls {
-        background: rgba(6, 12, 20, 0.3) !important;
-    }
-
-    html body #game-container #game-hud-rail .weather-status,
-    html body #game-container #game-hud-rail .run-progress-panel {
-        background: rgba(6, 12, 20, 0.08) !important;
     }
 }
 
@@ -282,20 +139,12 @@ html[data-virtual-controls='true'][data-ui-state='paused'] body #game-container 
 
     #mobile-controls .mobile-speed-control .speed-readout {
         min-width: 34px;
-        font-size: 14px;
         line-height: 26px;
     }
 
-    html[data-virtual-controls='true'][data-ui-state='playing'] body #game-container #game-canvas,
-    html[data-virtual-controls='true'][data-ui-state='paused'] body #game-container #game-canvas {
+    html[data-virtual-controls='true'][data-ui-state='playing'] #game-canvas,
+    html[data-virtual-controls='true'][data-ui-state='paused'] #game-canvas {
         margin-bottom: 94px;
-    }
-}
-
-@media (max-height: 700px) and (max-width: 720px) {
-    html[data-ui-state='home'] body #game-container #start-screen.arcade-home .home-console-screen,
-    #settlement-screen.active {
-        justify-content: flex-start !important;
     }
 }
 
@@ -316,8 +165,8 @@ html[data-virtual-controls='true'][data-ui-state='paused'] body #game-container 
         top: calc(max(6px, env(safe-area-inset-top)) + 80px);
     }
 
-    html[data-virtual-controls='true'][data-ui-state='playing'] body #game-container #game-canvas,
-    html[data-virtual-controls='true'][data-ui-state='paused'] body #game-container #game-canvas {
+    html[data-virtual-controls='true'][data-ui-state='playing'] #game-canvas,
+    html[data-virtual-controls='true'][data-ui-state='paused'] #game-canvas {
         margin-bottom: 86px;
     }
 }
