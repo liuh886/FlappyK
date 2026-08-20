@@ -22,9 +22,10 @@ assert.ok(uiState.includes('get virtualControls()'));
 assert.ok(uiState.includes('root.dataset.virtualControls'));
 
 assert.ok(css.includes('#mobile-controls:not([hidden])'));
-assert.ok(css.includes('Virtual-control geometry is driven by runtime state, not viewport width.'));
+assert.ok(css.includes('Touch geometry only. Shared color, typography and button skin live in premium-ui.css.'));
+assert.ok(css.includes('Runtime state decides whether this dock exists; viewport width does not.'));
 assert.ok(css.includes('position: fixed'));
-assert.ok(css.includes('inset: auto 0 0 0'));
+assert.ok(css.includes('inset: auto 0 0;'));
 assert.ok(css.includes('display: grid'));
 assert.ok(css.includes('width: 100vw'));
 assert.ok(css.includes('env(safe-area-inset-bottom)'));
@@ -34,15 +35,17 @@ assert.ok(css.includes('grid-column: 2'));
 assert.ok(css.includes('#mobile-controls #btn-sell'));
 assert.ok(css.includes('grid-column: 4'));
 assert.ok(css.includes('#mobile-controls .mobile-speed-control'));
-assert.ok(css.includes('opacity: 0.68'));
 assert.ok(css.includes("data-ui-state='playing'"));
 assert.ok(!css.includes(":has(#indicator-card-deck:not([hidden])) #game-canvas"));
 
-// premium-ui.css supplies the terminal skin only. Mobile command geometry belongs
-// exclusively to mobile-controls.css so the dock cannot acquire a second position owner.
+// Touch geometry has one owner. Shared presentation stays in premium-ui.css.
 assert.ok(premiumCss.includes('#btn-buy'));
 assert.ok(premiumCss.includes('#btn-sell'));
 assert.ok(premiumCss.includes('.mobile-speed-control .speed-readout'));
 assert.ok(!premiumCss.includes('#mobile-controls:not([hidden]) {'));
+assert.ok(!css.includes("html[data-ui-state='home'] body #game-container #start-screen.arcade-home"));
+assert.ok(!css.includes('#settlement-screen.active'));
+assert.ok(!css.includes('#game-hud-rail .weather-status'));
+assert.ok(!css.includes('opacity: 0.68'));
 
-console.log('Shared responsive state, state-driven centered virtual-control dock, terminal skin, and single mobile geometry ownership checks passed');
+console.log('Responsive state, state-driven touch geometry, and single-owner mobile presentation checks passed');
