@@ -84,8 +84,10 @@ for (const pacingContract of [
     'gameInterval = setInterval(gameTick, TICK_RATE)',
     'mobileControls.hidden = !showMobileControls',
     'topControls.hidden = !gameActive',
-    "pauseButton.textContent = paused ? '▶' : 'Ⅱ'",
-    "pauseButton.setAttribute('aria-label', paused ? 'Resume game' : 'Pause game')",
+    "pauseButton.textContent = resume ? '▶' : 'Ⅱ'",
+    "isChinese() ? '继续游戏' : 'Resume game'",
+    "isChinese() ? '暂停游戏' : 'Pause game'",
+    "backButton.textContent = '↩'",
     "window.addEventListener('flappyk:layout-state'",
     "window.addEventListener('orientationchange'",
 ]) {
@@ -102,4 +104,4 @@ assert.ok(onboarding.includes('function consumePending()'));
 assert.equal(onboarding.includes('event.stopImmediatePropagation()'), false);
 assert.equal(onboarding.includes('button?.click()'), false);
 
-console.log('Product shell, canonical presentation owner, semantic pause control, responsive touch dock, UI state, onboarding, and manual navigation contracts passed.');
+console.log('Product shell, canonical presentation owner, semantic bilingual pause control, responsive touch dock, UI state, onboarding, and manual navigation contracts passed.');
