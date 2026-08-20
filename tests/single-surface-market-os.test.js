@@ -141,7 +141,7 @@ for (const canvasContract of [
   "drawSectionLabel(ctx, 'MARKET PRICE'",
   "drawSectionLabel(ctx, 'PLAYER EQUITY'",
 ]) {
-  assert.ok(marketCanvas.includes(contract), `Missing canonical pixel-game market visualization contract: ${contract}`);
+  assert.ok(marketCanvas.includes(canvasContract), `Missing canonical pixel-game market visualization contract: ${canvasContract}`);
 }
 
 for (const retiredCanvasPath of [
@@ -181,6 +181,7 @@ for (const principle of [
   'There is no alternative legacy skin',
   'Chinese and English are one product, not two layouts.',
   '`premium-ui.css` is the single canonical owner',
+  'Pixel Market Arcade is the only expressive visual language',
 ]) {
   assert.ok(direction.includes(principle), `Missing visual-direction principle: ${principle}`);
 }
