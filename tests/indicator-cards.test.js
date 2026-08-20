@@ -122,16 +122,18 @@ for (const contract of [
   '.indicator-card.is-empty',
   "@media (max-width: 720px), (pointer: coarse)",
   'touch-action: manipulation',
-  'min-height: 44px',
+  'min-height: 48px',
   'grid-template-columns: 64px 64px',
+  'grid-template-rows: auto auto',
+  'font-size: 9px',
   'right: max(6px, env(safe-area-inset-right))',
   'left: max(6px, env(safe-area-inset-left))',
   'var(--game-system',
   'var(--game-accent',
   'var(--game-bg',
-  'box-shadow: none',
+  'box-shadow: inset 0 3px 0 var(--game-accent',
 ]) {
-  assert.ok(cardsStyles.includes(contract), `Missing single-surface power-up visual contract: ${contract}`);
+  assert.ok(cardsStyles.includes(contract), `Missing readable Market Arcade power-up visual contract: ${contract}`);
 }
 for (const retired of [
   '.indicator-hand-label::before',
@@ -187,4 +189,4 @@ for (const asset of [
   assert.ok(serviceWorkerSource.includes(asset), `Stable PWA shell is missing ${asset}`);
 }
 
-console.log('BOLL/MACD math, Pro daily grants, Daily Run trials, account/access separation, single-surface power-ups, overlay stacking, mobile controls, retired draw deletion, and stable PWA contracts validated');
+console.log('BOLL/MACD math, Pro daily grants, Daily Run trials, account/access separation, readable Market Arcade power-ups, overlay stacking, mobile controls, retired draw deletion, and stable PWA contracts validated');
