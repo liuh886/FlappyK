@@ -12,8 +12,8 @@ assert.equal(manifest.start_url, './?source=pwa');
 assert.equal(manifest.scope, './');
 assert.equal(manifest.display, 'standalone');
 assert.ok(manifest.display_override.includes('fullscreen'));
-assert.equal(manifest.theme_color, '#0d1117');
-assert.equal(manifest.background_color, '#0d1117');
+assert.equal(manifest.theme_color, '#07090c');
+assert.equal(manifest.background_color, '#07090c');
 assert.equal(manifest.prefer_related_applications, false);
 
 const regular192 = manifest.icons.find((icon) => icon.sizes === '192x192' && icon.purpose === 'any');
@@ -37,7 +37,7 @@ assert.deepEqual(pngSize('icons/icon-maskable-512.png'), [512, 512]);
 
 for (const shellAsset of [
     'rel="manifest" href="manifest.webmanifest"',
-    'name="theme-color" content="#0d1117"',
+    'name="theme-color" content="#07090c"',
     'rel="apple-touch-icon"',
     'style.css',
     'mobile-controls.css',
@@ -120,4 +120,4 @@ for (const eventName of ['play_start', 'level_complete', 'run_complete', 'pwa_in
     assert.ok(analytics.includes(eventName), `Missing analytics event: ${eventName}`);
 }
 
-console.log('PWA manifest, install flow, offline shell, critical runtime assets, account bridge, analytics, and stable cache lifecycle checks passed.');
+console.log('PWA manifest, install flow, canonical shell color, offline shell, critical runtime assets, account bridge, analytics, and stable cache lifecycle checks passed.');
