@@ -16,7 +16,7 @@ body {
     inset: auto 0 0;
     z-index: 80;
     display: grid;
-    grid-template-columns: minmax(64px, 1fr) 78px 10px 78px minmax(64px, 1fr);
+    grid-template-columns: minmax(36px, 1fr) 78px 108px 78px minmax(36px, 1fr);
     align-items: end;
     gap: 0;
     width: 100vw;
@@ -55,14 +55,15 @@ body {
     justify-self: center;
 }
 
+/* Speed is secondary: keep it in the command dock instead of floating over market data. */
 #mobile-controls .mobile-speed-control {
-    position: fixed;
-    top: calc(max(6px, env(safe-area-inset-top)) + 88px);
-    right: max(10px, env(safe-area-inset-right));
-    z-index: 91;
+    position: static;
+    grid-column: 3;
+    align-self: center;
+    justify-self: center;
     display: grid;
-    grid-template-columns: 28px 38px 28px;
-    align-items: center;
+    grid-template-columns: 30px 44px 30px;
+    align-items: stretch;
     gap: 2px;
     margin: 0;
     padding: 0;
@@ -70,18 +71,35 @@ body {
 }
 
 #mobile-controls .mobile-speed-control .small-btn {
-    width: 28px;
-    min-width: 28px;
-    height: 28px;
-    min-height: 28px;
+    width: 30px;
+    min-width: 30px;
+    height: 30px;
+    min-height: 30px;
     margin: 0;
     padding: 0;
 }
 
 #mobile-controls .mobile-speed-control .speed-readout {
-    min-width: 38px;
-    line-height: 28px;
+    min-width: 44px;
+    line-height: 30px;
     text-align: center;
+}
+
+html[data-virtual-controls='true'] #game-top-controls {
+    align-self: start;
+    justify-self: end;
+    grid-template-columns: 44px 44px;
+    width: 88px;
+    height: 44px;
+    min-height: 44px;
+}
+
+html[data-virtual-controls='true'] #game-top-controls #game-back-btn,
+html[data-virtual-controls='true'] #game-top-controls #pause-btn {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    min-height: 44px;
 }
 
 html[data-virtual-controls='true'][data-ui-state='playing'] #game-canvas,
@@ -112,7 +130,7 @@ html[data-virtual-controls='true'][data-ui-state='paused'] #game-canvas {
 
 @media (max-width: 430px) {
     #mobile-controls:not([hidden]) {
-        grid-template-columns: minmax(56px, 1fr) 72px 8px 72px minmax(56px, 1fr);
+        grid-template-columns: minmax(28px, 1fr) 72px 104px 72px minmax(28px, 1fr);
         padding-left: max(8px, env(safe-area-inset-left));
         padding-right: max(8px, env(safe-area-inset-right));
     }
@@ -126,20 +144,19 @@ html[data-virtual-controls='true'][data-ui-state='paused'] #game-canvas {
     }
 
     #mobile-controls .mobile-speed-control {
-        top: calc(max(6px, env(safe-area-inset-top)) + 84px);
-        grid-template-columns: 26px 34px 26px;
+        grid-template-columns: 28px 44px 28px;
     }
 
     #mobile-controls .mobile-speed-control .small-btn {
-        width: 26px;
-        min-width: 26px;
-        height: 26px;
-        min-height: 26px;
+        width: 28px;
+        min-width: 28px;
+        height: 28px;
+        min-height: 28px;
     }
 
     #mobile-controls .mobile-speed-control .speed-readout {
-        min-width: 34px;
-        line-height: 26px;
+        min-width: 44px;
+        line-height: 28px;
     }
 
     html[data-virtual-controls='true'][data-ui-state='playing'] #game-canvas,
@@ -150,7 +167,7 @@ html[data-virtual-controls='true'][data-ui-state='paused'] #game-canvas {
 
 @media (max-height: 650px) and (max-width: 720px) {
     #mobile-controls:not([hidden]) {
-        grid-template-columns: minmax(52px, 1fr) 66px 8px 66px minmax(52px, 1fr);
+        grid-template-columns: minmax(24px, 1fr) 66px 96px 66px minmax(24px, 1fr);
     }
 
     #mobile-controls #btn-buy,
@@ -162,7 +179,19 @@ html[data-virtual-controls='true'][data-ui-state='paused'] #game-canvas {
     }
 
     #mobile-controls .mobile-speed-control {
-        top: calc(max(6px, env(safe-area-inset-top)) + 80px);
+        grid-template-columns: 26px 40px 26px;
+    }
+
+    #mobile-controls .mobile-speed-control .small-btn {
+        width: 26px;
+        min-width: 26px;
+        height: 26px;
+        min-height: 26px;
+    }
+
+    #mobile-controls .mobile-speed-control .speed-readout {
+        min-width: 40px;
+        line-height: 26px;
     }
 
     html[data-virtual-controls='true'][data-ui-state='playing'] #game-canvas,
