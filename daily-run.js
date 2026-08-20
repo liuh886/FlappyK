@@ -106,19 +106,16 @@
         if (hiddenForFriendChallenge) return;
 
         const todayBest = state.record?.bestByDate?.[dateKey];
-        const bestText = Number.isFinite(Number(todayBest))
-            ? `TODAY ${formatPercent(todayBest)}`
-            : 'SAME MARKETS FOR EVERYONE';
         const streak = Math.max(0, Number(state.record?.streak) || 0);
 
         dailySummary.replaceChildren();
         const title = document.createElement('strong');
         title.textContent = `DAILY RUN · ${dateKey}`;
-        const detail = document.createElement('span');
-        detail.textContent = bestText;
-        const streakNode = document.createElement('small');
-        streakNode.textContent = `DAILY STREAK ${streak}`;
-        dailySummary.append(title, detail, streakNode);
+        const status = document.createElement('small');
+        status.textContent = Number.isFinite(Number(todayBest))
+            ? `TODAY ${formatPercent(todayBest)} · DAILY STREAK ${streak}`
+            : `DAILY STREAK ${streak}`;
+        dailySummary.append(title, status);
 
         dailyButton.disabled = state.loading;
         dailyButton.textContent = state.loading
