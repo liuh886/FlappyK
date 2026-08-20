@@ -2,23 +2,24 @@
 
 ## Product intent
 
-FlappyK is a short market game, not a trading dashboard and not a generic retro website.
+FlappyK is a short pixel market game, not a trading dashboard and not a generic retro website.
 
-The player reads a real hidden historical K-line, trades in fixed increments, tries to finish with positive Excess Return, and clears three markets. The visual system exists to keep that loop immediate, legible, tense, and replayable. It should feel like one instrument from the first tap to the final result — but it must also feel like a game, not a dry data program.
+The player reads a real hidden historical K-line, trades in fixed increments, tries to finish with positive Excess Return, and clears three markets. The visual system exists to make that loop immediate, legible, tense, tactile, and replayable.
 
 ## Canonical direction: Single-Surface Market OS
 
-The architecture remains **Single-Surface Market OS**: one continuous product world and one authoritative presentation owner. The expressive layer inside that system is now **Market Arcade**.
+The architecture remains **Single-Surface Market OS**: one continuous product world and one authoritative presentation owner. Its only expressive visual language is **Pixel Market Arcade**.
 
-Single-Surface solved the old fragmentation problem. Market Arcade solves the opposite failure mode: excessive restraint. The product should preserve structural clarity while using scale, motion, tactile controls, live-market focus, and score drama to make play feel active.
+Pixel Market Arcade learns proven pixel-game principles — hard silhouettes, limited color roles, strong score hierarchy, immediate press feedback, discrete motion, and a game world that dominates UI chrome — without copying characters, objects, layouts, or identifiable assets from Nintendo, Super Mario, Flappy Bird, or any other game.
 
 The canonical system follows these rules:
 
 - one continuous dark market surface from home through gameplay, settlement, dialogs, and run complete;
-- the chart remains the dominant surface during play;
-- hierarchy comes first from typography, spacing, separators, scale, and state;
-- floating paper, receipt, notebook, glass-dashboard, and compatibility-skin metaphors remain removed;
-- square geometry stays, but selective physical depth is allowed for primary game controls and major result moments;
+- the K-line is the game world during play, not a chart embedded in a dashboard;
+- hierarchy comes first from scale, spacing, hard separators, hard depth, and state;
+- square geometry is canonical;
+- shadows are short, unblurred pixel depth used to communicate pressability and foreground order;
+- motion is short and discrete, preferably stepped when it represents a game-state change;
 - cyan is reserved for system/reference state;
 - yellow is reserved for primary action and current-player focus;
 - green and red are reserved for market/performance/trade semantics;
@@ -26,21 +27,21 @@ The canonical system follows these rules:
 
 There is no alternative legacy skin, no compatibility theme, and no visual fallback. `premium-ui.css` is the single canonical owner for shared presentation.
 
-## Market Arcade expression
+## Pixel Market Arcade expression
 
-Market Arcade is not a return to neon decoration. Its purpose is to make the existing game loop readable and emotionally legible.
+Pixel Market Arcade is not a Mario skin and not a neon terminal. It uses the visual grammar of mature pixel games to make FlappyK's own market mechanics feel playable.
 
 ### Readability floor
 
 Operational information must be readable without leaning into the screen.
 
-- important gameplay values such as Total and Return should generally render at 16–26 px depending on viewport;
+- important gameplay values such as Total and Return should generally render at 16–28 px depending on viewport;
 - primary labels, run/day state, weather, and Excess labels should generally sit around 10–13 px rather than 7–9 px microtype;
 - home supporting copy and Story body copy should generally sit around 17–21 px on larger surfaces and remain about 17 px on mobile;
-- primary game actions should use visibly larger type than secondary commands;
+- primary game actions use visibly larger type than secondary commands;
 - Chinese may use slightly larger line-height and the existing Chinese display family to preserve legibility.
 
-Tiny text is not considered premium density. It is considered lost information.
+Tiny text is not premium density. It is lost information.
 
 ### Game-feel hierarchy
 
@@ -48,37 +49,37 @@ Game feel comes from a small set of strong signals:
 
 1. a clear opening focal point and dominant PLAY control;
 2. tactile BUY / SELL controls with an unmistakable pressed state;
-3. a live current-market focus on the chart;
-4. obvious run/day progress;
-5. strong positive/negative semantic response;
-6. a score reveal that feels like the end of a round;
-7. short, purposeful transitions that reinforce state changes.
+3. the live market rendered as a level with current-day focus and checkpoints;
+4. BOLL / MACD presented as small tactical power-ups rather than dashboard widgets;
+5. obvious run/day and player-versus-market progress;
+6. strong positive/negative semantic response;
+7. a score reveal that feels like the end of a round.
 
 Do not add extra feature panels simply to make the screen feel richer.
 
-### Depth and atmosphere
+### Hard depth, not atmosphere
 
-Selective depth is allowed where it communicates physical interaction or importance:
+Depth communicates physical interaction or foreground order only:
 
-- PLAY, BUY, SELL, and the primary next/restart action may use a short hard shadow or inset depth to feel pressable;
-- the main shell, Story tape, settlement result, and major dialogs may use restrained depth to establish foreground/background separation;
-- subtle grid, scan-line, radial-light, or low-opacity background fields may establish arena atmosphere;
-- depth must never become a second card system or a stack of floating dashboard tiles.
+- PLAY, BUY, SELL, power-ups, and the primary next/restart action may use short hard shadows;
+- the main shell, Story tape, settlement result, and dialogs may use the same hard-depth language;
+- a pressed control physically consumes most of its depth by translating toward the shadow;
+- focus may move a control one pixel forward, but never turns it into a glowing card.
 
-Glow, bloom, lens effects, glass panels, and decorative neon remain prohibited as default styling.
+The following are prohibited in the canonical presentation: ambient radial lighting, decorative gradients, scan-line sweeps, glow, bloom, `shadowBlur`, glass panels, blurred drop shadows, floating dashboard stacks, emoji chart markers, and ornamental neon fields.
 
 ## Interaction model
 
-Every state should feel like a mode change inside one market game surface, not navigation into a different website.
+Every state is a mode change inside one market game surface, not navigation into a different website.
 
-- Home is the idle/start state of the game arena.
-- Story is an analysis mode inside the same surface, not a paper article.
-- Gameplay activates the market canvas and compresses information into a command rail.
-- Settlement keeps the same surface and changes hierarchy from action to evaluation.
-- Leaderboard, onboarding, and custom challenge use the same system shell.
-- Run complete is the final state of the same game world, not a separate celebration theme.
+- Home is the start screen of the game.
+- Story is an analysis/tutorial state inside the same visual world.
+- Gameplay activates the market stage and compresses information into one command rail.
+- Settlement changes hierarchy from action to score evaluation.
+- Leaderboard, onboarding, and custom challenge use the same game-shell language.
+- Run complete is the final score state of the same game world.
 
-Transitions may use short opacity, position, scale, or progress motion when they reinforce state. They must not compete with the K-line or interrupt input.
+Transitions should be short. Stepped motion is preferred for discrete score and screen-state changes; continuous motion is reserved for genuinely continuous data/progress. All motion respects `prefers-reduced-motion`.
 
 ## Home hierarchy
 
@@ -89,11 +90,11 @@ The first screen answers four questions in order:
 3. Where do I play? — Crypto, A-Shares, and US Stocks.
 4. What is the primary action? — Play.
 
-PLAY is the dominant tactile action. The FLAPPY K title is intentionally large and the home surface may use a restrained oversized K or arena field as background identity. Personal best, Daily Run, rankings, account, language, and installation remain available in one secondary command surface rather than separate visual cards.
+PLAY is the dominant tactile action. The FLAPPY K title is intentionally large. Personal best, Daily Run, rankings, account, language, and installation remain secondary commands rather than competing feature cards.
 
 ## Gameplay hierarchy
 
-The chart gets maximum useful space. The persistent command rail contains only information required to act:
+The market stage gets maximum useful space. The persistent command rail contains only information required to act:
 
 - Total;
 - Return;
@@ -105,27 +106,43 @@ The chart gets maximum useful space. The persistent command rail contains only i
 - back / pause;
 - BUY / SELL controls.
 
-The rail is one continuous surface with separators. Individual metrics are not floating cards. Key values are intentionally larger than their labels. Desktop keyboard hints remain low priority. Mobile uses large BUY and SELL controls with speed between them and keeps the same visual grammar.
+The rail is one continuous scoreboard surface with separators. Individual metrics are not floating cards. Key values are intentionally larger than their labels. Desktop keyboard hints remain low priority. Mobile keeps BUY and SELL in the thumb zone with speed between them; `mobile-controls.css` remains the sole geometry owner.
 
 ## Market visualization grammar
 
-The K-line is part of the game interface, not a decorative background. It follows the same tokens and semantics as the HUD.
+The K-line is the level. It carries real market data while adopting a game-stage reading model.
 
-- the canvas background is the same graphite surface as the application;
-- the plotting grid uses quiet hairlines rather than a neon field;
+- the canvas background is the same dark surface as the application;
+- plotting grids are quiet orientation lines, not decorative neon;
+- a hard stage frame and corner brackets make the playable field explicit;
 - candles keep real market up/down conventions, including A-share red-up / green-down behavior;
 - cyan denotes system/reference information and the player's equity path;
-- green and red trade markers are geometric arrows/triangles, never emoji;
-- yellow marks current-player focus on the equity trace;
-- the latest visible candle may receive a restrained cyan focus band and cursor line so the player knows where the market is now;
-- the current price may use a compact cyan edge badge rather than an unreadably small axis label;
-- trade markers should be large enough to read as game events without covering the candles;
-- PLAYER EQUITY is intentionally stronger than a passive analytical sparkline;
-- no glow, bloom, shadowBlur, decorative emoji, or independent chart theme is allowed;
-- price and player-equity regions are labelled explicitly and share one plot grammar;
-- the visualization adapts to available canvas dimensions without changing market data or scoring.
+- BUY / SELL events render as readable hard-edged B/S blocks using green/red semantics, never emoji;
+- yellow marks current-player focus;
+- the latest visible candle receives a restrained cyan focus band and cursor;
+- the current price uses a compact cyan hard-edged badge;
+- a checkpoint rail turns time progression into a visible level rhythm without changing data or scoring;
+- PLAYER EQUITY uses a discrete step path because portfolio value is sampled at game ticks; it remains truthful to the stored history rather than inventing intermediate values;
+- the current equity point acts as the player cursor and carries a compact value label;
+- current-day progress stays visible as a small game rail;
+- price and player-equity regions are labelled directly;
+- the renderer disables image smoothing and snaps important geometry to pixel boundaries;
+- no glow, bloom, `shadowBlur`, emoji, rounded trace styling, or independent chart theme is allowed.
 
 `scripts/market-canvas.js` is the only market-chart renderer. `game.js` supplies state and must not contain a second drawing implementation or visual fallback.
+
+## Power-ups
+
+BOLL and MACD are tactical power-ups, not analytical cards.
+
+- desktop power-ups use a compact hard-edged body, a clear key, inventory count, and a short physical shadow;
+- active state switches to yellow focus and remains distinguishable without animation;
+- pressing a power-up moves it into its shadow so input has immediate visual confirmation;
+- unavailable inventory stays visually quiet; no lock compatibility state is rendered;
+- mobile keeps the existing 64 px control geometry and safe-area placement rather than growing a separate tray;
+- all indicator math, access rules, Daily Run grants, and historical-data semantics remain unchanged.
+
+`indicator-cards.css` owns this presentation. It does not move the mobile command dock or create a second HUD.
 
 ## Weather semantics
 
@@ -137,7 +154,7 @@ Weather remains functional feedback and keeps the existing scoring semantics:
 | Cloudy | player return is non-negative but Excess Return is negative | player is profitable, but the market is ahead |
 | Rain | player return is negative | player is underwater |
 
-Weather stays subordinate to the K-line, Return, Excess, trade markers, and controls. On compact mobile layouts the textual weather strip may disappear when space is constrained; run progress keeps the rail slot.
+Weather stays subordinate to the K-line, Return, Excess, trade markers, and controls. On compact mobile layouts its textual strip may disappear when space is constrained; run progress keeps the rail slot.
 
 ## Settlement
 
@@ -152,13 +169,13 @@ The hierarchy is:
 5. expandable accounting detail;
 6. next action.
 
-Excess Return is allowed to become the largest number on the screen and may use a short scale/position reveal. Success/failure color carries semantic meaning. The screen must still remain contained within the viewport and scroll internally when needed on short phones.
+Excess Return may become the largest number on the screen. Its reveal uses short discrete motion and hard text depth, not glow or a new celebration theme. The screen remains contained within the viewport and scrolls internally when needed on short phones.
 
 ## Run complete
 
-The final three-market result uses the same dark surface, typography, separators, and command language as the rest of the product.
+The final three-market result uses the same dark surface, typography, hard separators, hard depth, and command language as the rest of the product.
 
-No isolated champagne skin or alternate gold/orange theme should return. Celebration comes from hierarchy, final-score scale, completion state, restrained accent atmosphere, and the tactile restart/share actions.
+No isolated champagne skin or alternate gold/orange theme should return. Celebration comes from final-score hierarchy, completion state, semantic color, and tactile restart/share actions.
 
 ## Chinese and English
 
@@ -173,13 +190,13 @@ Chinese and English are one product, not two layouts.
 
 ## Architecture boundary
 
-`premium-ui.css` is the single canonical owner of shared visual tokens, atmosphere, typography scale, shared surfaces, home presentation, HUD appearance, Story analysis mode, settlement, run-complete presentation, and shared secondary-screen presentation. It does not take over geometry already owned by a feature stylesheet.
+`premium-ui.css` is the single canonical owner of shared visual tokens, typography scale, hard-depth treatment, home presentation, HUD appearance, Story state, settlement, run-complete presentation, and shared secondary-screen presentation. It does not take over geometry already owned by a feature stylesheet.
 
 `style.css` owns only base document, canvas, screen containment, and generic interaction foundations.
 
 `mobile-controls.css` is the canonical owner for mobile command-dock geometry, thumb-zone placement, mobile speed placement, safe-area spacing, and chart clearance. `premium-ui.css` may skin those controls but must not position the dock.
 
-`indicator-cards.css` owns BOLL/MACD power-up geometry and its relationship to the mobile command dock.
+`indicator-cards.css` owns BOLL/MACD power-up geometry and presentation relative to the mobile command dock.
 
 `account-integration.css` owns account-toolbar placement and account-specific presentation.
 
@@ -189,21 +206,23 @@ Chinese and English are one product, not two layouts.
 
 `scripts/premium-ui-refinement.js` owns HUD rail composition and DOM normalization. It must not inject presentation styles or erase semantic control content.
 
-`market-weather.css` and `scripts/market-weather.js` continue to own weather semantics and environmental feedback only.
+`market-weather.css` and `scripts/market-weather.js` own weather semantics and environmental feedback only.
 
 Core game data, scoring, pass rules, account/cloud history, Daily Run, friend challenge, leaderboard, sharing, PWA behavior, and market loading are unchanged by this visual evolution.
 
 ## Rules for future visual work
 
-1. Do not add a second theme, compatibility skin, `*-polish.css`, `*-fix.css`, or canvas patch layer.
-2. Change the actual owning component or shared visual system directly.
-3. Keep one continuous visual world from home to final result.
-4. Keep the chart visually dominant during play.
+1. Pixel Market Arcade is the only expressive visual language inside Single-Surface Market OS.
+2. Do not add a second theme, compatibility skin, `*-polish.css`, `*-fix.css`, or canvas patch layer.
+3. Change the actual owning component or shared visual system directly.
+4. Keep the K-line visually dominant and treat it as the level, not a dashboard chart.
 5. Readability outranks terminal density; do not reintroduce 7–9 px operational text as a default.
-6. Use depth only when it communicates primary interaction or state hierarchy; do not rebuild card stacks.
-7. Reserve semantic colors: cyan for system state, yellow for primary action/focus, green/red for performance and trades.
-8. Preserve the same information and actions in Chinese and English.
-9. Treat mobile as the same game with different control geometry, not a reduced product.
-10. Keep weather semantic and subordinate to trading information.
-11. Keep `scripts/market-canvas.js` as the single authoritative chart renderer.
-12. Make new motion answer one question: what changed, what can I press, or what result did I achieve?
+6. Use only hard, unblurred depth to communicate interaction or foreground order.
+7. Do not add gradients, ambient lighting, scan sweeps, glow, glass, emoji markers, or rounded analytical trace styling.
+8. Reserve semantic colors: cyan for system state, yellow for primary action/focus, green/red for performance and trades.
+9. Preserve the same information and actions in Chinese and English.
+10. Treat mobile as the same game with different control geometry, not a reduced product.
+11. Keep weather semantic and subordinate to trading information.
+12. Keep `scripts/market-canvas.js` as the single authoritative chart renderer.
+13. Keep `indicator-cards.css` as the sole power-up presentation owner.
+14. Make new motion answer one question: what changed, what can I press, or what result did I achieve?
