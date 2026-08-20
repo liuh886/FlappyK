@@ -19,11 +19,14 @@ const direction = fs.readFileSync('docs/ARCADE_VISUAL_DIRECTION.md', 'utf8');
 
 for (const contract of [
   'FLAPPY K / SINGLE-SURFACE MARKET OS',
+  'MARKET ARCADE pass',
   "--pixel-font-display: 'Press Start 2P'",
   "--pixel-font-ui: 'Pixelify Sans'",
   '--game-accent:',
   '--game-system:',
   '#game-hud-rail',
+  '#game-hud-rail::before',
+  '@keyframes arcade-rail-scan',
   "'performance controls'",
   "'weather progress'",
   ".stats-box[data-composition='returns-only']",
@@ -34,13 +37,17 @@ for (const contract of [
   '#start-screen.arcade-home',
   '.home-console-bezel',
   '.home-console-screen',
+  ".home-console-screen::after",
+  "content: 'K'",
   '.home-mode-stack',
   '.home-primary-actions #start-btn',
+  'box-shadow: 0 7px 0 #8e7520',
   '.home-world-strip',
   'Story: analysis mode, not a second visual world',
   '.home-story-slide',
   'Settlement: same market surface',
   '.profit-card',
+  '@keyframes arcade-score-pop',
   'Run complete: no separate celebration skin',
   '.legend-terminal-head',
   "html[data-flappyk-language='zh']",
@@ -48,7 +55,7 @@ for (const contract of [
   '@media (max-width: 719px)',
   '@media (prefers-reduced-motion: reduce)',
 ]) {
-  assert.ok(css.includes(contract), `Missing Single-Surface Market OS contract: ${contract}`);
+  assert.ok(css.includes(contract), `Missing Single-Surface Market Arcade contract: ${contract}`);
 }
 
 for (const contract of [
@@ -72,7 +79,7 @@ for (const retired of [
   'background: #e7e2d4',
   '--pixel-cut:',
   'clip-path: var(--pixel-cut)',
-  'box-shadow: 8px 8px',
+  'shadowBlur',
 ]) {
   assert.ok(!css.includes(retired), `Retired mixed visual metaphor returned: ${retired}`);
 }
@@ -116,11 +123,13 @@ for (const canvasContract of [
   'window.FlappyKMarketCanvas',
   'drawHairlineGrid',
   'drawTradeMarker',
+  'drawLatestFocus',
+  'drawPriceBadge',
   "cssToken('--game-system'",
   "cssToken('--game-green'",
   "cssToken('--game-red'",
-  "drawSectionLabel(ctx, 'PRICE'",
-  "drawSectionLabel(ctx, 'PLAYER'",
+  "drawSectionLabel(ctx, 'MARKET PRICE'",
+  "drawSectionLabel(ctx, 'PLAYER EQUITY'",
 ]) {
   assert.ok(marketCanvas.includes(canvasContract), `Missing canonical market visualization contract: ${canvasContract}`);
 }
@@ -164,4 +173,4 @@ for (const principle of [
   assert.ok(direction.includes(principle), `Missing visual-direction principle: ${principle}`);
 }
 
-console.log('Single-Surface Market OS, canonical market visualization, deleted legacy render paths, bilingual parity, state-driven mobile geometry, and single-owner shared visual contracts passed.');
+console.log('Single-Surface Market Arcade, canonical live-market focus, deleted legacy render paths, bilingual parity, state-driven mobile geometry, and single-owner shared visual contracts passed.');
