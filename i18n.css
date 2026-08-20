@@ -65,6 +65,11 @@ html[lang='zh-CN'] body :where(
     -moz-osx-font-smoothing: grayscale;
 }
 
+html[lang='zh-CN'] #btn-buy,
+html[lang='zh-CN'] #btn-sell {
+    font-family: var(--font-zh-unified) !important;
+}
+
 html[lang='zh-CN'] body {
     font-weight: 400;
 }
