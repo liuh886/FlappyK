@@ -48,9 +48,9 @@ for (const contract of [
   'right: max(6px, env(safe-area-inset-right))',
   'left: max(6px, env(safe-area-inset-left))',
   'z-index: 82',
-  'grid-template-columns: 60px 60px',
+  'grid-template-columns: 64px 64px',
   'justify-content: space-between',
-  'width: 60px',
+  'width: 64px',
   '.indicator-card-copy small',
   'display: none',
   'grid-template-columns: minmax(0, 1fr) auto',
@@ -67,4 +67,4 @@ assert.ok(!mobile.includes('grid-template-columns: 88px minmax(106px, 1fr) 88px'
 assert.ok(!mobile.includes(":has(#indicator-card-deck:not([hidden])) #game-canvas"), 'Power-ups must not reserve a separate tray above the mobile command dock.');
 assert.ok(!cards.includes('width: min(248px, calc(100% - 28px))'), 'The previous oversized mobile tactical tray must not return.');
 
-console.log('State-driven touch geometry, dock-contained speed, 44px navigation, compact system power-ups, and always-visible settlement identity contracts passed.');
+console.log('State-driven touch geometry, dock-contained speed, 44px navigation, system power-ups, and always-visible settlement identity contracts passed.');
