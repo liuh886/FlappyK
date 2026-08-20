@@ -91,14 +91,16 @@ test('360px short phone keeps the console, account toolbar, and primary actions 
     };
     return {
       viewport: { left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight },
-      weather: box('#weather-status'),
+      weatherDisplay: getComputedStyle(document.getElementById('weather-status')).display,
       topControls: box('#game-top-controls'),
       mobileControls: box('#mobile-controls'),
+      rail: box('#game-hud-rail'),
     };
   });
 
-  expect(inside(game.weather, game.viewport, 2)).toBe(true);
-  expect(game.weather.top).toBeGreaterThanOrEqual(game.topControls.bottom - 2);
+  expect(game.weatherDisplay).toBe('none');
+  expect(inside(game.topControls, game.rail, 2)).toBe(true);
+  expect(inside(game.rail, game.viewport, 2)).toBe(true);
   expect(inside(game.mobileControls, game.viewport, 2)).toBe(true);
 });
 
