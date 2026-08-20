@@ -53,7 +53,7 @@ let dayIndex = 0;
 let cash = INITIAL_CASH;
 let shares = 0;
 let totalHistory = [];
-let actions = []; 
+let actions = [];
 let collectedCards = [];
 let gameInterval;
 let isPlaying = false;
@@ -108,12 +108,12 @@ function scheduleAudio() {
         osc.frequency.value = melody[noteIndex];
         osc.connect(gain);
         gain.connect(audioCtx.destination);
-        
+
         osc.start(nextNoteTime);
         gain.gain.setValueAtTime(0.05, nextNoteTime);
         gain.gain.exponentialRampToValueAtTime(0.001, nextNoteTime + 0.15);
         osc.stop(nextNoteTime + 0.2);
-        
+
         // Advance time and note
         nextNoteTime += 0.2; // 200ms per note
         noteIndex = (noteIndex + 1) % melody.length;
@@ -141,10 +141,10 @@ function changeSpeed(delta) {
     speedMultiplier += delta;
     if (speedMultiplier < 1) speedMultiplier = 1;
     if (speedMultiplier > 20) speedMultiplier = 20;
-    
+
     TICK_RATE = 5000 / speedMultiplier;
     speedBtn.innerText = `${speedMultiplier}x [←/→]`;
-    
+
     if (isPlaying) {
         clearInterval(gameInterval);
         gameInterval = setInterval(gameTick, TICK_RATE);
@@ -230,7 +230,7 @@ saveBtn.addEventListener('click', () => {
 
 champagneBtn.addEventListener('click', () => {
     settlementScreen.classList.remove('active');
-    
+
     // Inject cards
     let html = '';
     collectedCards.forEach(c => {
@@ -257,7 +257,7 @@ champagneBtn.addEventListener('click', () => {
 
 champagneSaveBtn.addEventListener('click', () => {
     html2canvas(champagneExportArea, {
-        backgroundColor: '#0d1117',
+        backgroundColor: '#07090c',
         scale: 2,
         onclone: (clonedDoc) => {
             const exportArea = clonedDoc.getElementById('champagne-export-area');
@@ -293,7 +293,7 @@ function pickRandomData() {
     if (level === 1) currentMarket = 'crypto';
     else if (level === 2) currentMarket = 'ashare';
     else currentMarket = 'usstock';
-    
+
     if (!stockData[currentMarket] || Object.keys(stockData[currentMarket]).length === 0) {
         throw new Error(`Market data is not loaded: ${currentMarket}`);
     }
@@ -301,18 +301,18 @@ function pickRandomData() {
     const assets = Object.keys(stockData[currentMarket]);
     currentAsset = assets[Math.floor(Math.random() * assets.length)];
     const data = stockData[currentMarket][currentAsset];
-    
+
     // Pick a random starting point ensuring we have enough days
     const maxStart = data.length - DAYS_PER_LEVEL;
     const startIndex = Math.floor(Math.random() * maxStart);
-    
+
     return data.slice(startIndex, startIndex + DAYS_PER_LEVEL);
 }
 
 function startLevel() {
     currentData = pickRandomData();
     dayIndex = 0;
-    
+
     if (level === 1) {
         cash = INITIAL_CASH;
     }
@@ -321,19 +321,19 @@ function startLevel() {
     totalHistory = [];
     actions = [];
     isPlaying = true;
-    
+
     levelDisp.innerText = level;
     targetDisp.innerText = level === 1 ? "ANY PROFIT" : `> CUMULATIVE ${(targetReturn * 100).toFixed(2)}%`;
-    
+
     resizeCanvas(); // Ensure canvas is sized correctly before drawing
-    
+
     // Add initial state to history
     currentPrice = currentData[0].close;
     totalHistory.push(cash);
-    
+
     updateUI();
-    draw(); 
-    
+    draw();
+
     startAudio();
     gameInterval = setInterval(gameTick, TICK_RATE);
 }
@@ -343,13 +343,13 @@ function gameTick() {
         endLevel();
         return;
     }
-    
+
     dayIndex++;
     currentPrice = currentData[dayIndex].close;
-    
+
     const total = cash + (shares * currentPrice);
     totalHistory.push(total);
-    
+
     updateUI();
     draw();
 }
@@ -358,27 +358,27 @@ function endLevel() {
     clearInterval(gameInterval);
     isPlaying = false;
     stopAudio();
-    
+
     // Liquidate remaining shares
     cash += shares * currentPrice;
     shares = 0;
-    
+
     // Show Settlement
     settlementScreen.classList.add('active');
     const profitCard = document.getElementById('profit-card');
     profitCard.className = 'profit-card'; // Reset base class
     profitCard.classList.add(`card-theme-${currentMarket}`);
-    
+
     document.getElementById('card-title').innerText = `PROFIT CARD (${level})`;
     document.getElementById('card-asset').innerText = currentAsset;
     document.getElementById('card-start-cash').innerText = levelStartCash.toFixed(2);
     document.getElementById('card-final-cash').innerText = cash.toFixed(2);
-    
+
     // Evaluate Result
     const levelReturn = ((cash - levelStartCash) / levelStartCash);
     const levelRetStr = (levelReturn >= 0 ? '+' : '') + (levelReturn * 100).toFixed(2) + '%';
     document.getElementById('card-level-return').innerText = levelRetStr;
-    
+
     // Calculate Max Drawdown
     let peak = totalHistory[0];
     let maxDrawdown = 0;
@@ -392,32 +392,32 @@ function endLevel() {
         }
     }
     const mddStr = '-' + (maxDrawdown * 100).toFixed(2) + '%';
-    
+
     const cumReturn = ((cash - INITIAL_CASH) / INITIAL_CASH);
     const cumRetStr = (cumReturn >= 0 ? '+' : '') + (cumReturn * 100).toFixed(2) + '%';
-    
+
     document.getElementById('card-return').innerText = cumRetStr;
     document.getElementById('card-small-return').innerText = cumRetStr;
     document.getElementById('card-final').innerText = cash.toFixed(2);
-    
+
     const startDate = currentData[0].date;
     const endDate = currentData[dayIndex].date;
     document.getElementById('card-period').innerText = `${startDate} ~ ${endDate}`;
-    
+
     let isSuccess = false;
     if (level === 1) {
         isSuccess = cumReturn > 0;
     } else {
         isSuccess = cumReturn > targetReturn;
     }
-    
+
     const statusMsg = document.getElementById('card-status');
     const retElem = document.getElementById('card-return');
     if (isSuccess) {
         retElem.className = 'big-return card-positive';
         statusMsg.innerText = "SUCCESS! TARGET BEATEN.";
         statusMsg.className = 'status-msg card-positive';
-        
+
         collectedCards.push({
             level: level,
             market: currentMarket,
@@ -429,7 +429,7 @@ function endLevel() {
             levelRetStr: levelRetStr,
             cumRetStr: cumRetStr
         });
-        
+
         if (level === 3) {
             nextBtn.style.display = 'none';
             champagneBtn.style.display = 'block';
@@ -440,7 +440,7 @@ function endLevel() {
             saveBtn.style.display = 'block';
         }
         restartBtn.style.display = 'none';
-        
+
         // Update state for next level
         level++;
         targetReturn = finalReturn;
@@ -493,7 +493,7 @@ function handleSell() {
 // Input Handling
 window.addEventListener('keydown', (e) => {
     if (!isPlaying) return;
-    
+
     if (e.key === 'ArrowUp') {
         handleBuy();
     } else if (e.key === 'ArrowDown') {
@@ -531,18 +531,18 @@ if (btnSpeedDown) {
 function updateUI() {
     if (!currentData || !currentData[dayIndex]) return;
     currentPrice = currentData[dayIndex].close;
-    
+
     const assetValue = shares * currentPrice;
     const total = cash + assetValue;
     const ret = (total - INITIAL_CASH) / INITIAL_CASH * 100;
-    
+
     if (dayDisp) dayDisp.innerText = (dayIndex + 1);
     cashDisp.innerText = cash.toFixed(2);
     assetDisp.innerText = assetValue.toFixed(2);
     totalDisp.innerText = total.toFixed(2);
-    
+
     returnDisp.innerText = ret.toFixed(2) + "%";
-    
+
     if (ret > 0) returnDisp.className = 'positive';
     else if (ret < 0) returnDisp.className = 'negative';
     else returnDisp.className = 'neutral';
@@ -554,7 +554,7 @@ function playActionSound(type) {
     const gain = audioCtx.createGain();
     osc.connect(gain);
     gain.connect(audioCtx.destination);
-    
+
     const now = audioCtx.currentTime;
     if (type === 'buy') {
         osc.type = 'sine';
@@ -576,158 +576,21 @@ function playActionSound(type) {
 }
 
 function draw() {
-    ctx.clearRect(0, 0, canvasCssWidth, canvasCssHeight);
-    
-    // Draw neon grid background
-    ctx.strokeStyle = 'rgba(46, 204, 113, 0.05)';
-    ctx.lineWidth = 1;
-    for (let x = 0; x < canvasCssWidth; x += 40) {
-        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvasCssHeight); ctx.stroke();
+    const renderer = window.FlappyKMarketCanvas;
+    if (!renderer) {
+        throw new Error('FlappyK market canvas renderer is unavailable');
     }
-    for (let y = 0; y < canvasCssHeight; y += 40) {
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvasCssWidth, y); ctx.stroke();
-    }
-    
-    if (!currentData || currentData.length === 0) return;
-    
-    // Determine View Window (Scroll)
-    const startDay = Math.max(0, dayIndex - VISIBLE_DAYS + 1);
-    
-    let minPrice = Infinity;
-    let maxPrice = -Infinity;
-    
-    for (let i = startDay; i <= dayIndex; i++) {
-        const d = currentData[i];
-        if (d.low < minPrice) minPrice = d.low;
-        if (d.high > maxPrice) maxPrice = d.high;
-    }
-    
-    const pricePadding = (maxPrice - minPrice) * 0.1 || 1;
-    minPrice -= pricePadding;
-    maxPrice += pricePadding;
-    
-    const candleWidth = canvasCssWidth / VISIBLE_DAYS;
-    const chartHeight = canvasCssHeight * 0.7; // Top 70% for K-line
-    
-    function getY(price) {
-        return chartHeight - ((price - minPrice) / (maxPrice - minPrice) * chartHeight);
-    }
-    
-    ctx.shadowBlur = 0;
-    
-    // Draw K-lines
-    for (let i = startDay; i <= dayIndex; i++) {
-        const d = currentData[i];
-        const displayIdx = i - startDay;
-        const x = displayIdx * candleWidth;
-        
-        const openY = getY(d.open);
-        const closeY = getY(d.close);
-        const highY = getY(d.high);
-        const lowY = getY(d.low);
-        
-        const isUp = d.close >= d.open;
-        
-        let upColor = '#2ecc71';
-        let downColor = '#e74c3c';
-        if (currentMarket === 'ashare') {
-            upColor = '#e74c3c'; // Red for UP in A-shares
-            downColor = '#2ecc71'; // Green for DOWN in A-shares
-        }
-        
-        const color = isUp ? upColor : downColor;
-        
-        ctx.fillStyle = color;
-        ctx.strokeStyle = color;
-        ctx.shadowColor = color;
-        ctx.shadowBlur = 5; // Glow effect
-        
-        // Draw wick
-        ctx.beginPath();
-        ctx.moveTo(x + candleWidth/2, highY);
-        ctx.lineTo(x + candleWidth/2, lowY);
-        ctx.stroke();
-        
-        // Draw body
-        const bodyY = Math.min(openY, closeY);
-        const bodyH = Math.max(Math.abs(closeY - openY), 1);
-        ctx.fillRect(x + candleWidth*0.1, bodyY, candleWidth*0.8, bodyH);
-        
-        ctx.shadowBlur = 0; // reset
-    }
-    
-    // Draw Actions (Emojis)
-    ctx.font = "20px Arial";
-    ctx.textAlign = "center";
-    for (const action of actions) {
-        if (action.day >= startDay && action.day <= dayIndex) {
-            const displayIdx = action.day - startDay;
-            const x = displayIdx * candleWidth + candleWidth/2;
-            const y = getY(action.price);
-            
-            if (action.type === 'buy') {
-                ctx.fillText("👏", x, y + 25); // Below candle
-            } else {
-                ctx.fillText("🤷", x, y - 10); // Above candle
-            }
-        }
-    }
-    
-    // Draw Total Return Curve (Bottom 30%)
-    const curveTop = canvasCssHeight * 0.75;
-    const curveHeight = canvasCssHeight * 0.2;
-    
-    let minTotal = Math.min(levelStartCash, ...totalHistory.slice(startDay));
-    let maxTotal = Math.max(levelStartCash, ...totalHistory.slice(startDay));
-    const totalPadding = (maxTotal - minTotal) * 0.1 || 100;
-    minTotal -= totalPadding;
-    maxTotal += totalPadding;
-    
-    function getTotalY(total) {
-        return curveTop + curveHeight - ((total - minTotal) / (maxTotal - minTotal) * curveHeight);
-    }
-    
-    // Draw dividing line
-    ctx.strokeStyle = '#555';
-    ctx.beginPath();
-    ctx.moveTo(0, chartHeight + 10);
-    ctx.lineTo(canvasCssWidth, chartHeight + 10);
-    ctx.stroke();
-    
-    // Draw initial cash reference line
-    const refY = getTotalY(levelStartCash);
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-    ctx.setLineDash([5, 5]);
-    ctx.beginPath();
-    ctx.moveTo(0, refY);
-    ctx.lineTo(canvasCssWidth, refY);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    
-    // Draw curve
-    if (totalHistory.length > 0) {
-        ctx.strokeStyle = '#f1c40f';
-        ctx.lineWidth = 3;
-        ctx.shadowColor = '#f1c40f';
-        ctx.shadowBlur = 10;
-        ctx.beginPath();
-        
-        let started = false;
-        for (let i = startDay; i <= dayIndex; i++) {
-            if (i < totalHistory.length) {
-                const displayIdx = i - startDay;
-                const tx = (displayIdx * candleWidth) + candleWidth/2;
-                const ty = getTotalY(totalHistory[i]);
-                if (!started) {
-                    ctx.moveTo(tx, ty);
-                    started = true;
-                } else {
-                    ctx.lineTo(tx, ty);
-                }
-            }
-        }
-        ctx.stroke();
-        ctx.lineWidth = 1;
-        ctx.shadowBlur = 0;
-    }
+
+    renderer.draw({
+        ctx,
+        width: canvasCssWidth,
+        height: canvasCssHeight,
+        currentData,
+        dayIndex,
+        visibleDays: VISIBLE_DAYS,
+        currentMarket,
+        actions,
+        totalHistory,
+        levelStartCash,
+    });
 }
