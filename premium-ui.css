@@ -2,19 +2,20 @@
     --pixel-font-display: 'Press Start 2P', 'ZCOOL QingKe HuangYou', monospace;
     --pixel-font-ui: 'Pixelify Sans', 'ZCOOL QingKe HuangYou', ui-monospace, monospace;
 
-    --game-bg: #07090c;
-    --game-surface: #0b1016;
-    --game-surface-raised: #101720;
-    --game-surface-active: #151e28;
-    --game-border: #26313c;
-    --game-border-strong: #556371;
-    --game-text: #eef2f5;
-    --game-muted: #81909e;
-    --game-faint: #4e5d69;
-    --game-accent: #f0c94b;
-    --game-system: #6bcbd4;
-    --game-green: #5ed48a;
-    --game-red: #ef7370;
+    --game-bg: #06080c;
+    --game-surface: #0b1118;
+    --game-surface-raised: #111a24;
+    --game-surface-active: #172330;
+    --game-border: #2a3946;
+    --game-border-strong: #607180;
+    --game-text: #f5f9fc;
+    --game-muted: #a7b4c2;
+    --game-faint: #667583;
+    --game-accent: #ffd84d;
+    --game-system: #73e6f2;
+    --game-green: #66e38f;
+    --game-red: #ff6d77;
+    --game-depth: #020405;
 
     --pixel-ink: var(--game-bg);
     --pixel-paper: var(--game-text);
@@ -42,7 +43,8 @@
 
 /*
  * FLAPPY K / SINGLE-SURFACE MARKET OS
- * One visual grammar from home to gameplay to settlement.
+ * MARKET ARCADE pass, now expressed as PIXEL MARKET ARCADE.
+ * Hard edges, hard depth, large score hierarchy and tactile controls.
  * Feature styles keep feature geometry; this file owns shared presentation.
  */
 
@@ -60,6 +62,9 @@ summary,
 input,
 textarea {
     font-family: var(--pixel-font-ui);
+    font-weight: 500;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
 }
 
 button,
@@ -70,11 +75,12 @@ textarea {
 }
 
 button {
-    transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease, transform 120ms ease;
-}
-
-button:active {
-    transform: translateY(1px);
+    transition:
+        background-color 70ms linear,
+        border-color 70ms linear,
+        color 70ms linear,
+        transform 70ms linear,
+        box-shadow 70ms linear;
 }
 
 button:focus-visible,
@@ -82,8 +88,8 @@ select:focus-visible,
 input:focus-visible,
 summary:focus-visible,
 a:focus-visible {
-    outline: 2px solid var(--game-accent);
-    outline-offset: 2px;
+    outline: 3px solid var(--game-accent);
+    outline-offset: 3px;
 }
 
 #game-container {
@@ -91,16 +97,7 @@ a:focus-visible {
 }
 
 #game-container::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
-    opacity: 0.08;
-    background-image:
-        linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
-    background-size: 48px 48px;
+    content: none;
 }
 
 .screen {
@@ -108,11 +105,11 @@ a:focus-visible {
 }
 
 .screen.active {
-    animation: market-surface-enter 180ms ease-out both;
+    animation: market-surface-enter 140ms steps(2, end) both;
 }
 
 @keyframes market-surface-enter {
-    from { opacity: 0; transform: translateY(4px); }
+    from { opacity: 0; transform: translateY(6px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
@@ -139,17 +136,30 @@ a:focus-visible {
 
 #game-hud-rail {
     position: absolute;
-    inset: 8px 8px auto 8px;
+    inset: 10px 10px auto 10px;
     display: grid;
-    grid-template-columns: minmax(270px, 1.45fr) minmax(205px, 0.75fr);
+    grid-template-columns: minmax(320px, 1.5fr) minmax(230px, 0.72fr);
     grid-template-areas:
         'performance controls'
         'weather progress';
     gap: 0;
     align-items: stretch;
     overflow: hidden;
-    border: 1px solid var(--game-border);
-    background: rgba(7, 9, 12, 0.93);
+    border: 2px solid var(--game-border-strong);
+    background: var(--game-bg);
+    box-shadow: 5px 5px 0 var(--game-depth);
+    pointer-events: none;
+}
+
+#game-hud-rail::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    width: 84px;
+    height: 4px;
+    background: var(--game-system);
     pointer-events: none;
 }
 
@@ -181,7 +191,6 @@ a:focus-visible {
     border: 0;
     border-radius: 0;
     background: transparent;
-    box-shadow: none;
     backdrop-filter: none;
 }
 
@@ -189,7 +198,7 @@ a:focus-visible {
     position: static !important;
     width: auto;
     min-width: 0;
-    padding: 8px 10px;
+    padding: 12px 14px 10px;
     border-right: 1px solid var(--game-border);
     border-bottom: 1px solid var(--game-border);
 }
@@ -197,7 +206,7 @@ a:focus-visible {
 .hud-main {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 16px;
+    gap: 22px;
     align-items: end;
 }
 
@@ -207,10 +216,11 @@ a:focus-visible {
 
 .hud-metric-label {
     display: block;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
     color: var(--game-muted);
-    font-size: 9px;
-    letter-spacing: 0.09em;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.11em;
     text-transform: uppercase;
 }
 
@@ -225,8 +235,8 @@ a:focus-visible {
     overflow: hidden;
     color: var(--game-text);
     font-family: var(--pixel-font-display);
-    font-size: clamp(13px, 1.45vw, 19px);
-    line-height: 1.35;
+    font-size: clamp(20px, 1.9vw, 28px);
+    line-height: 1.25;
     text-overflow: ellipsis;
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
@@ -243,8 +253,8 @@ a:focus-visible {
 }
 
 .excess-meter {
-    margin-top: 7px;
-    padding-top: 6px;
+    margin-top: 10px;
+    padding-top: 8px;
     border-top: 1px solid var(--game-border);
 }
 
@@ -252,16 +262,17 @@ a:focus-visible {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
+    gap: 12px;
     color: var(--game-muted);
-    font-size: 9px;
-    letter-spacing: 0.09em;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
 }
 
 .excess-meter-label strong {
     color: var(--game-red);
     font-family: var(--pixel-font-display);
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 400;
     font-variant-numeric: tabular-nums;
 }
@@ -272,11 +283,11 @@ a:focus-visible {
 
 .excess-meter-track {
     position: relative;
-    height: 7px;
-    margin-top: 5px;
+    height: 11px;
+    margin-top: 7px;
     overflow: hidden;
-    border: 1px solid var(--game-border);
-    background: #05070a;
+    border: 2px solid var(--game-border-strong);
+    background: #030507;
 }
 
 .excess-meter-negative,
@@ -285,23 +296,16 @@ a:focus-visible {
     top: 0;
     bottom: 0;
     width: 50%;
-    opacity: 0.18;
+    opacity: 0.2;
 }
 
-.excess-meter-negative {
-    left: 0;
-    background: var(--game-red);
-}
-
-.excess-meter-positive {
-    right: 0;
-    background: var(--game-green);
-}
+.excess-meter-negative { left: 0; background: var(--game-red); }
+.excess-meter-positive { right: 0; background: var(--game-green); }
 
 .excess-meter-zero {
     position: absolute;
     inset: -2px auto -2px 50%;
-    width: 1px;
+    width: 2px;
     background: var(--game-text);
 }
 
@@ -309,12 +313,12 @@ a:focus-visible {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 6px;
-    height: 11px;
-    border: 1px solid var(--game-text);
+    width: 9px;
+    height: 17px;
+    border: 2px solid var(--game-bg);
     background: var(--game-red);
     transform: translate(-50%, -50%);
-    transition: left 160ms linear, background 120ms ease;
+    transition: left 120ms linear, background 70ms linear;
 }
 
 .excess-meter[data-leading='true'] .excess-meter-indicator {
@@ -324,11 +328,11 @@ a:focus-visible {
 .run-progress-panel {
     position: static !important;
     display: grid;
-    grid-template-columns: auto minmax(90px, 1fr) auto;
-    gap: 8px;
+    grid-template-columns: auto minmax(100px, 1fr) auto;
+    gap: 10px;
     align-items: center;
     min-width: 0;
-    padding: 6px 9px;
+    padding: 8px 12px;
 }
 
 .run-progress-panel .hud-header {
@@ -339,25 +343,27 @@ a:focus-visible {
 .run-progress-panel .hud-day {
     display: flex;
     align-items: baseline;
-    gap: 5px;
+    gap: 6px;
     color: var(--game-text);
-    font-size: 10px;
+    font-size: 12px;
+    font-weight: 700;
     white-space: nowrap;
 }
 
 .run-progress-panel .hud-metric-label {
     display: inline;
     margin: 0;
-    font-size: 8px;
+    font-size: 10px;
 }
 
 .day-progress {
     position: relative;
     grid-column: 2;
     grid-row: 1;
-    height: 5px;
+    height: 9px;
     overflow: hidden;
-    background: var(--game-border);
+    border: 2px solid var(--game-border);
+    background: #030507;
 }
 
 .day-progress-fill {
@@ -365,7 +371,7 @@ a:focus-visible {
     width: 0;
     height: 100%;
     background: var(--game-system);
-    transition: width 160ms linear;
+    transition: width 120ms linear;
 }
 
 .hud-details,
@@ -378,24 +384,23 @@ a:focus-visible {
     display: flex;
     align-items: center;
     min-width: 0;
-    padding: 6px 9px;
+    padding: 8px 12px;
     border-right: 1px solid var(--game-border);
     color: var(--game-muted);
-    font-size: 9px;
-    letter-spacing: 0.07em;
-    opacity: 0.9;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    opacity: 1;
     transform: none;
 }
 
 #game-hud-rail .weather-status.is-event {
     color: var(--game-text);
-    opacity: 1;
-    transform: none;
 }
 
 #game-hud-rail .weather-status::before {
-    content: '●';
-    margin-right: 6px;
+    content: '■';
+    margin-right: 7px;
     color: var(--game-system);
 }
 
@@ -408,7 +413,7 @@ html[data-market-weather='rain'] #game-hud-rail .weather-status::before {
 #game-top-controls {
     position: static !important;
     display: grid;
-    grid-template-columns: minmax(116px, 1fr) 42px 42px;
+    grid-template-columns: minmax(132px, 1fr) 48px 48px;
     gap: 0;
     align-items: stretch;
     padding: 0;
@@ -422,7 +427,7 @@ html[data-market-weather='rain'] #game-hud-rail .weather-status::before {
 .game-speed-control,
 .mobile-speed-control {
     display: grid;
-    grid-template-columns: 34px minmax(44px, 1fr) 34px;
+    grid-template-columns: 40px minmax(52px, 1fr) 40px;
     gap: 0;
     align-items: stretch;
 }
@@ -444,16 +449,15 @@ html[data-market-weather='rain'] #game-hud-rail .weather-status::before {
     border-radius: 0;
     background: transparent;
     color: var(--game-muted);
-    box-shadow: none !important;
 }
 
 .speed-step,
 #game-back-btn,
 #pause-btn {
-    min-height: 34px;
+    min-height: 44px;
     padding: 0;
     font-family: var(--pixel-font-display);
-    font-size: 9px;
+    font-size: 11px;
 }
 
 .speed-step:hover,
@@ -475,23 +479,24 @@ html[data-market-weather='rain'] #game-hud-rail .weather-status::before {
     display: grid;
     place-items: center;
     border-left: 1px solid var(--game-border);
-    background: transparent;
+    background: var(--game-surface);
     color: var(--game-accent);
     font-family: var(--pixel-font-display);
-    font-size: 9px;
+    font-size: 11px;
     font-variant-numeric: tabular-nums;
 }
 
 .controls-hint {
     position: absolute;
-    right: 8px;
-    bottom: 8px;
+    right: 10px;
+    bottom: 10px;
     z-index: 44;
     display: grid;
-    width: 208px;
+    width: 240px;
     overflow: hidden;
-    border: 1px solid var(--game-border);
-    background: rgba(7, 9, 12, 0.9);
+    border: 2px solid var(--game-border-strong);
+    background: var(--game-bg);
+    box-shadow: 4px 4px 0 var(--game-depth);
 }
 
 .trade-key-hints {
@@ -502,11 +507,11 @@ html[data-market-weather='rain'] #game-hud-rail .weather-status::before {
 .trade-key-hint {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     min-width: 0;
-    padding: 6px 7px;
+    padding: 8px 9px;
     color: var(--game-muted);
-    font-size: 10px;
+    font-size: 12px;
     white-space: nowrap;
 }
 
@@ -515,10 +520,12 @@ html[data-market-weather='rain'] #game-hud-rail .weather-status::before {
 }
 
 .trade-key-hint .key {
-    min-width: 26px;
-    padding: 2px;
-    border: 1px solid var(--game-border-strong);
+    min-width: 30px;
+    padding: 3px 4px;
+    border: 2px solid var(--game-border-strong);
+    background: var(--game-surface-raised);
     color: var(--game-text);
+    box-shadow: 2px 2px 0 var(--game-depth);
     text-align: center;
 }
 
@@ -551,19 +558,29 @@ html[data-virtual-controls='true'] #game-top-controls .desktop-speed-control {
 
 #btn-buy,
 #btn-sell {
-    border: 1px solid var(--game-border-strong) !important;
-    background: rgba(7, 9, 12, 0.97) !important;
+    border: 2px solid var(--game-border-strong) !important;
     color: var(--game-text) !important;
-    box-shadow: none !important;
-    font-size: 16px !important;
+    font-family: var(--pixel-font-display) !important;
+    font-size: 17px !important;
+    letter-spacing: 0.04em;
 }
 
 #btn-buy {
-    border-top: 3px solid var(--game-green) !important;
+    border-top: 4px solid var(--game-green) !important;
+    background: color-mix(in srgb, var(--game-green) 10%, var(--game-bg)) !important;
+    box-shadow: 0 5px 0 #173423 !important;
 }
 
 #btn-sell {
-    border-top: 3px solid var(--game-red) !important;
+    border-top: 4px solid var(--game-red) !important;
+    background: color-mix(in srgb, var(--game-red) 9%, var(--game-bg)) !important;
+    box-shadow: 0 5px 0 #3c1b22 !important;
+}
+
+#btn-buy:active,
+#btn-sell:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 var(--game-depth) !important;
 }
 
 #btn-buy .trade-emoji,
@@ -573,8 +590,8 @@ html[data-virtual-controls='true'] #game-top-controls .desktop-speed-control {
 
 #btn-buy .pixel-trade-glyph,
 #btn-sell .pixel-trade-glyph {
-    margin-right: 5px;
-    font-size: 12px;
+    margin-right: 6px;
+    font-size: 14px;
 }
 
 #btn-buy > span:last-child,
@@ -622,32 +639,44 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     min-width: 0;
     min-height: 0;
     overflow: hidden;
-    border: 1px solid var(--game-border);
+    border: 3px solid var(--game-border-strong);
     background: var(--game-bg);
+    box-shadow: 7px 7px 0 var(--game-depth);
+}
+
+.home-console-bezel::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    z-index: 5;
+    width: 4px;
+    background: var(--game-system);
+    pointer-events: none;
 }
 
 .home-console-topline {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto auto;
-    gap: 10px;
+    gap: 12px;
     align-items: center;
-    min-height: 38px;
-    padding: 6px 10px;
-    border-bottom: 1px solid var(--game-border);
+    min-height: 46px;
+    padding: 8px 12px;
+    border-bottom: 2px solid var(--game-border);
     background: var(--game-surface);
 }
 
 .home-console-brand {
     color: var(--game-text);
     font-family: var(--pixel-font-display);
-    font-size: 9px;
+    font-size: 11px;
     white-space: nowrap;
 }
 
 .home-console-series {
     overflow: hidden;
-    color: var(--game-faint);
-    font-size: 9px;
+    color: var(--game-muted);
+    font-size: 11px;
+    font-weight: 600;
     letter-spacing: 0.12em;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -655,12 +684,13 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 
 .home-console-lamps {
     display: flex;
-    gap: 4px;
+    gap: 5px;
 }
 
 .home-console-lamps span {
-    width: 5px;
-    height: 5px;
+    width: 8px;
+    height: 8px;
+    border: 2px solid var(--game-border-strong);
     background: var(--game-border);
 }
 
@@ -671,7 +701,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 .home-console-screen {
     position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 1.42fr) minmax(230px, 0.58fr);
+    grid-template-columns: minmax(0, 1.42fr) minmax(260px, 0.58fr);
     grid-template-areas:
         'kicker profile'
         'title side'
@@ -679,11 +709,11 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
         'worlds side'
         'play side'
         'ticker ticker';
-    gap: 10px 30px;
+    gap: 14px 34px;
     align-content: center;
     min-width: 0;
     min-height: 0;
-    padding: clamp(18px, 4vw, 46px);
+    padding: clamp(24px, 4.6vw, 62px);
     overflow: hidden;
     background: var(--game-bg);
 }
@@ -691,13 +721,25 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 .home-console-screen::before {
     content: '';
     position: absolute;
-    inset: 0;
+    right: 32%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--game-border);
     pointer-events: none;
-    opacity: 0.13;
-    background:
-        linear-gradient(90deg, transparent 0 67%, rgba(107, 203, 212, 0.07) 67% 67.1%, transparent 67.1%),
-        linear-gradient(rgba(255, 255, 255, 0.026) 1px, transparent 1px);
-    background-size: 100% 100%, 100% 48px;
+}
+
+.home-console-screen::after {
+    content: 'K';
+    position: absolute;
+    right: -0.06em;
+    bottom: -0.22em;
+    z-index: 0;
+    color: #0d1b24;
+    font-family: var(--pixel-font-display);
+    font-size: clamp(260px, 34vw, 560px);
+    line-height: 1;
+    pointer-events: none;
 }
 
 .home-console-screen > * {
@@ -709,8 +751,9 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     grid-area: kicker;
     align-self: end;
     color: var(--game-system);
-    font-size: 10px;
-    letter-spacing: 0.13em;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
 }
 
 #start-screen #game-title {
@@ -719,20 +762,21 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     margin: 0;
     color: var(--game-text);
     font-family: var(--pixel-font-display);
-    font-size: clamp(34px, 6vw, 68px);
-    line-height: 1.04;
-    letter-spacing: -0.035em;
+    font-size: clamp(48px, 7.8vw, 98px);
+    line-height: 0.98;
+    letter-spacing: -0.045em;
     text-align: left;
-    text-shadow: none;
+    text-shadow: 5px 5px 0 var(--game-depth);
 }
 
 .home-console-intro-copy {
     grid-area: copy;
-    max-width: 620px;
+    max-width: 680px;
     margin: 0;
     color: var(--game-muted);
-    font-size: clamp(15px, 1.35vw, 18px);
-    line-height: 1.4;
+    font-size: clamp(17px, 1.6vw, 21px);
+    font-weight: 500;
+    line-height: 1.5;
     text-align: left;
 }
 
@@ -745,19 +789,21 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0;
-    max-width: 640px;
-    margin-top: 4px;
-    border: 1px solid var(--game-border);
+    max-width: 700px;
+    margin-top: 6px;
+    border: 2px solid var(--game-border-strong);
+    background: var(--game-surface);
+    box-shadow: 4px 4px 0 var(--game-depth);
 }
 
 .home-world {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
-    gap: 8px;
+    gap: 9px;
     align-items: center;
     min-width: 0;
-    min-height: 42px;
-    padding: 6px 8px;
+    min-height: 50px;
+    padding: 8px 10px;
     background: transparent;
 }
 
@@ -768,7 +814,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 .home-world-index {
     color: var(--game-system);
     font-family: var(--pixel-font-display);
-    font-size: 8px;
+    font-size: 10px;
 }
 
 .home-world--ashare .home-world-index,
@@ -779,9 +825,10 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 
 .home-world-name {
     overflow: hidden;
-    color: var(--game-muted);
-    font-size: 11px;
-    letter-spacing: 0.04em;
+    color: var(--game-text);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -789,8 +836,9 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 .home-primary-actions {
     grid-area: play;
     display: block;
-    max-width: 640px;
-    margin-top: 6px;
+    max-width: 700px;
+    margin-top: 8px;
+    padding-bottom: 7px;
 }
 
 .home-primary-actions #start-btn {
@@ -798,25 +846,38 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    min-height: 58px;
-    padding: 11px 14px;
-    border: 1px solid var(--game-accent);
+    min-height: 72px;
+    padding: 14px 18px;
+    border: 3px solid #ffe478;
     border-radius: 0;
     background: var(--game-accent);
     color: var(--game-bg);
-    box-shadow: none !important;
+    box-shadow: 7px 7px 0 #8e7520 !important;
     font-family: var(--pixel-font-display);
-    font-size: 18px;
+    font-size: clamp(20px, 2vw, 26px);
+    letter-spacing: 0.03em;
     text-align: left;
 }
 
 .home-primary-actions #start-btn:hover {
-    background: #f6d65f;
+    background: #ffe474;
+    transform: translate(-1px, -1px);
+    box-shadow: 8px 8px 0 #8e7520 !important;
+}
+
+.home-primary-actions #start-btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: 3px 3px 0 #8e7520 !important;
 }
 
 .home-play-icon {
     order: 2;
-    font-size: 14px;
+    font-size: 18px;
+    transition: transform 70ms linear;
+}
+
+.home-primary-actions #start-btn:hover .home-play-icon {
+    transform: translateX(4px);
 }
 
 .home-mode-stack {
@@ -825,8 +886,9 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     gap: 0;
     align-content: start;
     min-width: 0;
-    border: 1px solid var(--game-border);
-    background: rgba(11, 16, 22, 0.52);
+    border: 2px solid var(--game-border-strong);
+    background: var(--game-surface);
+    box-shadow: 6px 6px 0 var(--game-depth);
 }
 
 .local-records-summary {
@@ -834,58 +896,53 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     align-self: end;
     display: grid;
     grid-template-columns: 1fr auto;
-    gap: 12px;
+    gap: 14px;
     align-items: baseline;
-    min-height: 46px;
-    padding: 8px 10px;
+    min-height: 58px;
+    padding: 10px 12px;
     border: 0;
     border-bottom: 1px solid var(--game-border);
-    background: transparent;
+    background: var(--game-surface);
     color: var(--game-muted);
-    font-size: 10px;
+    font-size: 12px;
 }
 
 .local-records-summary strong {
     display: block;
-    margin-top: 3px;
+    margin-top: 4px;
     color: var(--game-text);
     font-family: var(--pixel-font-display);
-    font-size: 13px;
+    font-size: 18px;
 }
 
 .daily-mode-card {
     display: grid;
-    gap: 8px;
-    padding: 12px;
+    gap: 10px;
+    padding: 14px;
     border: 0;
     border-bottom: 1px solid var(--game-border);
     background: transparent;
 }
 
-.daily-mode-copy {
-    display: grid;
-    gap: 3px;
-}
-
-.daily-mode-copy strong {
-    color: var(--game-system);
-    font-family: var(--pixel-font-display);
-    font-size: 8px;
-}
-
-.daily-mode-copy span,
 .daily-run-summary {
     color: var(--game-muted);
-    font-size: 11px;
-    line-height: 1.35;
+    font-size: 13px;
+    line-height: 1.4;
 }
 
 #daily-run-btn {
-    min-height: 40px;
-    border: 1px solid var(--game-border);
-    background: transparent;
+    min-height: 48px;
+    border: 2px solid var(--game-border-strong);
+    background: var(--game-bg);
     color: var(--game-text);
-    font-size: 14px;
+    box-shadow: 3px 3px 0 var(--game-depth);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+#daily-run-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--game-depth);
 }
 
 .home-secondary-actions {
@@ -896,9 +953,10 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 
 .home-secondary-actions button {
     min-width: 0;
-    min-height: 40px;
-    padding: 6px;
-    font-size: 13px;
+    min-height: 46px;
+    padding: 8px;
+    font-size: 14px;
+    font-weight: 700;
 }
 
 .home-secondary-actions button + button {
@@ -908,15 +966,17 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 .start-data-ticker {
     grid-area: ticker;
     align-self: end;
-    margin-top: 10px;
+    margin-top: 12px;
     overflow: hidden;
-    border-top: 1px solid var(--game-border);
-    border-bottom: 1px solid var(--game-border);
-    background: transparent;
+    border-top: 2px solid var(--game-border);
+    border-bottom: 2px solid var(--game-border);
+    background: var(--game-bg);
 }
 
 .start-data-ticker-track {
-    color: var(--game-faint);
+    color: var(--game-muted);
+    font-size: 11px;
+    font-weight: 700;
 }
 
 .home-console-footer {
@@ -924,27 +984,28 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     grid-template-columns: auto minmax(0, 1fr);
     gap: 14px;
     align-items: center;
-    min-height: 28px;
-    padding: 5px 10px;
-    border-top: 1px solid var(--game-border);
+    min-height: 34px;
+    padding: 7px 12px;
+    border-top: 2px solid var(--game-border);
     background: var(--game-surface);
 }
 
 .home-console-speaker {
     display: flex;
-    gap: 3px;
+    gap: 4px;
 }
 
 .home-console-speaker span {
-    width: 3px;
-    height: 3px;
-    background: var(--game-border);
+    width: 4px;
+    height: 4px;
+    background: var(--game-border-strong);
 }
 
 .home-console-legend {
     overflow: hidden;
-    color: var(--game-faint);
-    font-size: 9px;
+    color: var(--game-muted);
+    font-size: 10px;
+    font-weight: 700;
     letter-spacing: 0.08em;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -963,22 +1024,29 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     z-index: 8;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
 .home-story-arrow {
-    min-height: 34px;
-    padding: 6px 9px;
-    border: 1px solid var(--game-border);
+    min-width: 44px;
+    min-height: 44px;
+    padding: 8px 11px;
+    border: 2px solid var(--game-border-strong);
     border-radius: 0;
-    background: var(--game-surface);
+    background: var(--game-surface-raised);
     color: var(--game-text);
-    box-shadow: none;
+    box-shadow: 3px 3px 0 var(--game-depth);
+}
+
+.home-story-arrow:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--game-depth);
 }
 
 .home-story-page-status {
     color: var(--game-muted);
-    font-size: 10px;
+    font-size: 12px;
+    font-weight: 700;
 }
 
 .home-story-page-status strong {
@@ -998,10 +1066,10 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     inset: 0;
     z-index: 6;
     display: grid;
-    grid-template-columns: minmax(230px, 0.7fr) minmax(0, 1.3fr);
-    gap: clamp(18px, 4vw, 48px);
+    grid-template-columns: minmax(260px, 0.7fr) minmax(0, 1.3fr);
+    gap: clamp(24px, 4vw, 56px);
     align-items: center;
-    padding: clamp(22px, 4vw, 50px);
+    padding: clamp(28px, 4.5vw, 58px);
     overflow: auto;
     border: 0;
     border-radius: 0;
@@ -1017,58 +1085,61 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 .home-story-slide::before {
     content: 'FLAPPY K / MARKET NOTE 001';
     position: absolute;
-    top: 14px;
-    right: 18px;
-    color: var(--game-faint);
+    top: 16px;
+    right: 20px;
+    color: var(--game-muted);
     font-family: var(--pixel-font-display);
-    font-size: 7px;
+    font-size: 9px;
     letter-spacing: 0.08em;
 }
 
 .home-story-copy {
     display: grid;
-    gap: 12px;
+    gap: 16px;
     min-width: 0;
 }
 
 .home-story-kicker {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 9px;
     color: var(--game-system);
-    font-size: 10px;
+    font-size: 12px;
+    font-weight: 700;
     letter-spacing: 0.14em;
 }
 
 .home-story-kicker::before {
-    content: '●';
+    content: '■';
 }
 
 .home-story-title {
     margin: 0;
     color: var(--game-text);
     font-family: var(--pixel-font-display);
-    font-size: clamp(22px, 3.8vw, 44px);
-    line-height: 1.18;
+    font-size: clamp(30px, 4.4vw, 56px);
+    line-height: 1.16;
+    text-shadow: 4px 4px 0 var(--game-depth);
 }
 
 .home-story-lead,
 .home-story-body {
     margin: 0;
     color: var(--game-muted);
-    font-size: clamp(15px, 1.35vw, 18px);
-    line-height: 1.48;
+    font-size: clamp(17px, 1.55vw, 21px);
+    line-height: 1.55;
 }
 
 .home-story-equation {
     display: grid;
     grid-template-columns: 1fr auto 1fr auto 1fr;
-    gap: 8px;
+    gap: 10px;
     align-items: center;
-    margin-top: 6px;
-    padding: 10px;
-    border: 1px solid var(--game-border);
+    margin-top: 8px;
+    padding: 14px;
+    border: 2px solid var(--game-border-strong);
     background: var(--game-surface);
+    box-shadow: 4px 4px 0 var(--game-depth);
 }
 
 .home-story-equation-term {
@@ -1080,41 +1151,48 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     display: block;
     color: var(--game-text);
     font-family: var(--pixel-font-display);
-    font-size: clamp(16px, 2vw, 22px);
+    font-size: clamp(18px, 2.3vw, 28px);
 }
 
 .home-story-equation-term span,
 .home-story-equation-symbol {
     color: var(--game-muted);
-    font-size: 10px;
+    font-size: 12px;
 }
 
 .home-story-play {
-    min-height: 48px;
-    border: 1px solid var(--game-accent);
+    min-height: 58px;
+    border: 3px solid #ffe478;
     border-radius: 0;
     background: var(--game-accent);
     color: var(--game-bg);
-    box-shadow: none;
+    box-shadow: 5px 5px 0 #8e7520;
     font-family: var(--pixel-font-display);
-    font-size: 9px;
+    font-size: 11px;
+}
+
+.home-story-play:active {
+    transform: translate(3px, 3px);
+    box-shadow: 2px 2px 0 #8e7520;
 }
 
 .home-story-tape {
     min-width: 0;
     margin: 0;
-    padding: 14px;
-    border: 1px solid var(--game-border);
+    padding: 18px;
+    border: 2px solid var(--game-border-strong);
     background: var(--game-surface);
+    box-shadow: 6px 6px 0 var(--game-depth);
 }
 
 .home-story-tape-header {
     display: flex;
     justify-content: space-between;
     gap: 12px;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     color: var(--game-muted);
-    font-size: 10px;
+    font-size: 12px;
+    font-weight: 700;
 }
 
 .home-story-chart {
@@ -1124,11 +1202,11 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 }
 
 .home-story-chart-grid line {
-    stroke: rgba(129, 144, 158, 0.16);
+    stroke: rgba(167, 180, 194, 0.18);
 }
 
 .home-story-chart-baseline {
-    stroke: rgba(238, 242, 245, 0.3);
+    stroke: rgba(245, 249, 252, 0.32);
     stroke-dasharray: 4 4;
 }
 
@@ -1140,7 +1218,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 }
 
 .home-story-chart-candle-body {
-    fill: rgba(107, 203, 212, 0.14);
+    fill: rgba(115, 230, 242, 0.16);
 }
 
 .home-story-marker-line {
@@ -1156,7 +1234,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 .home-story-marker-day {
     fill: var(--game-muted);
     font-family: var(--pixel-font-ui);
-    font-size: 10px;
+    font-size: 12px;
 }
 
 /* ---------- Settlement: same market surface ---------- */
@@ -1166,30 +1244,30 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     grid-template-columns: minmax(0, 1fr);
     align-content: center;
     justify-items: center;
-    gap: 10px;
-    padding: 18px;
-    background: rgba(7, 9, 12, 0.96);
+    gap: 14px;
+    padding: 22px;
+    background: var(--game-bg);
 }
 
 .profit-card {
-    width: min(660px, calc(100vw - 28px));
-    max-height: calc(100dvh - 130px);
+    width: min(760px, calc(100vw - 28px));
+    max-height: calc(100dvh - 140px);
     overflow: auto;
     padding: 0;
-    border: 1px solid var(--game-border);
+    border: 3px solid var(--game-border-strong);
     border-radius: 0;
-    background: var(--game-bg);
+    background: var(--game-surface);
     color: var(--game-text);
-    box-shadow: none;
+    box-shadow: 8px 8px 0 var(--game-depth);
 }
 
 .profit-card #card-title {
     margin: 0;
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--game-border);
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--game-border);
     color: var(--game-muted);
     font-family: var(--pixel-font-display);
-    font-size: 9px;
+    font-size: 11px;
     letter-spacing: 0.08em;
     text-align: left;
 }
@@ -1200,9 +1278,9 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     grid-template-areas:
         'verdict excess'
         'compare compare';
-    gap: 12px 18px;
-    padding: 20px 18px;
-    border-bottom: 1px solid var(--game-border);
+    gap: 18px 24px;
+    padding: 28px 24px 24px;
+    border-bottom: 2px solid var(--game-border);
 }
 
 #settlement-verdict {
@@ -1210,8 +1288,8 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     align-self: end;
     color: var(--game-muted);
     font-family: var(--pixel-font-display);
-    font-size: 10px;
-    line-height: 1.5;
+    font-size: 12px;
+    line-height: 1.65;
 }
 
 .settlement-excess-summary {
@@ -1219,51 +1297,63 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     justify-self: end;
     color: var(--game-text);
     font-family: var(--pixel-font-display);
-    font-size: clamp(34px, 7vw, 62px);
+    font-size: clamp(46px, 7.4vw, 76px);
     line-height: 1;
+    text-shadow: 5px 5px 0 var(--game-depth);
     font-variant-numeric: tabular-nums;
 }
 
 .profit-card[data-result='success'] .settlement-excess-summary {
     color: var(--game-green);
+    animation: arcade-score-pop 210ms steps(3, end) both;
 }
 
 .profit-card[data-result='failure'] .settlement-excess-summary {
     color: var(--game-red);
+    animation: arcade-score-pop 210ms steps(3, end) both;
+}
+
+@keyframes arcade-score-pop {
+    from { opacity: 0; transform: translateY(12px); }
+    66% { opacity: 1; transform: translateY(-3px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .settlement-comparison {
     grid-area: compare;
     display: grid;
-    gap: 7px;
+    gap: 10px;
 }
 
 .settlement-comparison-row {
     display: grid;
-    grid-template-columns: 58px minmax(0, 1fr) 72px;
-    gap: 8px;
+    grid-template-columns: 70px minmax(0, 1fr) 86px;
+    gap: 10px;
     align-items: center;
     color: var(--game-muted);
-    font-size: 10px;
+    font-size: 12px;
+    font-weight: 700;
 }
 
 .settlement-comparison-row strong {
     color: var(--game-text);
+    font-size: 13px;
     text-align: right;
     font-variant-numeric: tabular-nums;
 }
 
 .settlement-comparison-track {
     position: relative;
-    height: 7px;
-    background: var(--game-border);
+    height: 11px;
+    border: 2px solid var(--game-border);
+    background: #030507;
 }
 
 .settlement-comparison-track::after {
     content: '';
     position: absolute;
     inset: -1px auto -1px 50%;
-    width: 1px;
+    width: 2px;
     background: var(--game-text);
 }
 
@@ -1278,13 +1368,13 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 
 .settlement-market-identity {
     margin: 0;
-    padding: 12px 18px;
+    padding: 14px 24px;
     border-bottom: 1px solid var(--game-border);
 }
 
 .settlement-market-identity .settlement-verdict {
     color: var(--game-muted);
-    font-size: 11px;
+    font-size: 13px;
 }
 
 .settlement-market-identity .highlight {
@@ -1293,15 +1383,15 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 
 .card-details {
     display: none;
-    padding: 12px 18px;
+    padding: 14px 24px;
     color: var(--game-muted);
-    font-size: 11px;
+    font-size: 13px;
 }
 
 .profit-card[data-details-expanded='true'] .card-details {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px 14px;
+    gap: 8px 18px;
     border-bottom: 1px solid var(--game-border);
 }
 
@@ -1311,12 +1401,14 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 
 .settlement-details-toggle {
     width: 100%;
-    min-height: 38px;
+    min-height: 46px;
     margin: 0;
     border: 0;
     border-top: 1px solid var(--game-border);
-    background: var(--game-surface);
+    background: var(--game-surface-raised);
     color: var(--game-muted);
+    font-size: 13px;
+    font-weight: 700;
 }
 
 .big-return,
@@ -1329,26 +1421,35 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 1px;
-    width: min(660px, calc(100vw - 28px));
-    background: var(--game-border);
+    gap: 4px;
+    width: min(760px, calc(100vw - 28px));
+    background: transparent;
 }
 
 .settlement-actions > button,
 #custom-result-actions button {
-    min-height: 42px;
+    min-height: 50px;
     margin: 0;
-    padding: 0 14px;
-    border: 0 !important;
-    background: var(--game-surface) !important;
+    padding: 0 18px;
+    border: 2px solid var(--game-border-strong) !important;
+    background: var(--game-surface-raised) !important;
     color: var(--game-text) !important;
-    box-shadow: none !important;
+    box-shadow: 3px 3px 0 var(--game-depth) !important;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.settlement-actions > button:active,
+#custom-result-actions button:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--game-depth) !important;
 }
 
 .settlement-actions > button:not([hidden]):first-child,
 #champagne-btn:not([hidden]) {
     background: var(--game-accent) !important;
     color: var(--game-bg) !important;
+    box-shadow: 4px 4px 0 #8e7520 !important;
 }
 
 #custom-result-actions[hidden] {
@@ -1357,7 +1458,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 
 #custom-result-actions:not([hidden]) {
     display: flex !important;
-    gap: 1px;
+    gap: 4px;
 }
 
 /* ---------- Dialogs: same system shell ---------- */
@@ -1365,25 +1466,25 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 .leaderboard-panel,
 .custom-challenge-panel,
 .onboarding-panel {
-    width: min(620px, calc(100vw - 28px));
+    width: min(680px, calc(100vw - 28px));
     padding: 0;
     overflow: hidden;
-    border: 1px solid var(--game-border) !important;
+    border: 3px solid var(--game-border-strong) !important;
     border-radius: 0 !important;
     background: var(--game-bg) !important;
     color: var(--game-text);
-    box-shadow: none !important;
+    box-shadow: 8px 8px 0 var(--game-depth) !important;
 }
 
 .leaderboard-panel h2,
 .custom-challenge-panel h2,
 .onboarding-panel h2 {
     margin: 0;
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--game-border);
+    padding: 18px 20px;
+    border-bottom: 2px solid var(--game-border);
     color: var(--game-text);
     font-family: var(--pixel-font-display);
-    font-size: clamp(14px, 2.6vw, 22px);
+    font-size: clamp(18px, 2.8vw, 28px);
 }
 
 .leaderboard-subtitle,
@@ -1392,6 +1493,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 .onboarding-kicker,
 .onboarding-panel > small {
     color: var(--game-muted) !important;
+    font-size: 13px;
 }
 
 .leaderboard-subtitle,
@@ -1403,46 +1505,50 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 .onboarding-rules,
 .leaderboard-status,
 .leaderboard-table {
-    margin-left: 16px;
-    margin-right: 16px;
+    margin-left: 20px;
+    margin-right: 20px;
 }
 
 .custom-field select {
     width: 100%;
-    margin-top: 5px;
-    border: 1px solid var(--game-border);
+    min-height: 44px;
+    margin-top: 6px;
+    border: 2px solid var(--game-border-strong);
     background: var(--game-surface);
     color: var(--game-text);
+    font-size: 14px;
 }
 
 .custom-challenge-actions,
 .onboarding-panel > button,
 .leaderboard-panel > button {
-    margin-top: 14px;
+    margin-top: 16px;
 }
 
 .custom-challenge-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1px;
-    background: var(--game-border);
+    gap: 4px;
+    background: transparent;
 }
 
 .custom-challenge-actions button,
 .onboarding-panel > button,
 .leaderboard-panel > button {
-    min-height: 44px;
-    border: 0 !important;
-    border-top: 1px solid var(--game-border) !important;
-    background: var(--game-surface) !important;
+    min-height: 50px;
+    border: 2px solid var(--game-border-strong) !important;
+    background: var(--game-surface-raised) !important;
     color: var(--game-text) !important;
-    box-shadow: none !important;
+    box-shadow: 3px 3px 0 var(--game-depth) !important;
+    font-size: 14px;
+    font-weight: 700;
 }
 
 #custom-start-btn,
 #onboarding-start-btn {
     background: var(--game-accent) !important;
     color: var(--game-bg) !important;
+    box-shadow: 4px 4px 0 #8e7520 !important;
 }
 
 .onboarding-rule {
@@ -1462,7 +1568,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     justify-content: flex-start;
     gap: 0;
     min-height: 100dvh;
-    padding: max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+    padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
     overflow-y: auto;
     background: var(--game-bg);
     color: var(--game-text);
@@ -1475,16 +1581,17 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 .legend-terminal-head {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
-    gap: 14px;
+    gap: 16px;
     align-items: baseline;
-    padding: clamp(18px, 4vw, 42px) 0 18px;
-    border-bottom: 1px solid var(--game-border);
+    padding: clamp(24px, 4.5vw, 48px) 0 22px;
+    border-bottom: 2px solid var(--game-border-strong);
 }
 
 .legend-terminal-kicker,
 .legend-terminal-status {
     color: var(--game-system);
-    font-size: 10px;
+    font-size: 12px;
+    font-weight: 700;
     letter-spacing: 0.12em;
 }
 
@@ -1492,19 +1599,21 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     margin: 0;
     color: var(--game-text);
     font-family: var(--pixel-font-display);
-    font-size: clamp(24px, 5vw, 54px);
+    font-size: clamp(32px, 5.6vw, 66px);
+    line-height: 1.05;
     text-align: left;
-    text-shadow: none;
+    text-shadow: 5px 5px 0 var(--game-depth);
 }
 
 #legend-ticker {
     margin: 0;
-    border-bottom: 1px solid var(--game-border);
-    background: transparent;
+    border-bottom: 2px solid var(--game-border);
+    background: var(--game-bg);
 }
 
 .legend-ticker-item {
     color: var(--game-muted) !important;
+    font-size: 12px;
 }
 
 #daily-run-result,
@@ -1514,7 +1623,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 .legend-actions,
 #leaderboard-submit-status,
 #champagne-screen .support-button {
-    width: min(760px, 100%);
+    width: min(820px, 100%);
     margin-left: auto;
     margin-right: auto;
 }
@@ -1523,41 +1632,46 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 #personal-best-result,
 #friend-challenge-result {
     border-radius: 0 !important;
-    border-color: var(--game-border) !important;
+    border: 2px solid var(--game-border-strong) !important;
     background: var(--game-surface) !important;
     color: var(--game-text) !important;
-    box-shadow: none !important;
+    box-shadow: 6px 6px 0 var(--game-depth) !important;
 }
 
 .legend-export-wrapper {
     display: flex;
     justify-content: center;
-    padding: 18px 0;
+    padding: 22px 0;
 }
 
 .legend-actions {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1px;
-    background: var(--game-border);
+    gap: 4px;
+    background: transparent;
 }
 
 .legend-actions button {
-    min-height: 44px;
-    padding: 8px 10px;
-    background: var(--game-surface);
+    min-height: 50px;
+    padding: 10px 12px;
+    border: 2px solid var(--game-border-strong);
+    background: var(--game-surface-raised);
     color: var(--game-text);
+    box-shadow: 3px 3px 0 var(--game-depth);
+    font-size: 14px;
+    font-weight: 700;
 }
 
 #champagne-restart-btn {
     background: var(--game-accent) !important;
     color: var(--game-bg) !important;
+    box-shadow: 4px 4px 0 #8e7520 !important;
 }
 
 #champagne-screen .support-button {
-    margin-top: 14px;
+    margin-top: 16px;
     border-radius: 0 !important;
-    border-color: var(--game-border) !important;
+    border-color: var(--game-border-strong) !important;
     background: transparent !important;
     color: var(--game-muted) !important;
     box-shadow: none !important;
@@ -1568,18 +1682,21 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 .game-feedback-toast {
     position: absolute;
     left: 50%;
-    bottom: 20px;
+    bottom: 24px;
     z-index: 94;
-    min-width: 180px;
-    padding: 8px 12px;
-    border: 1px solid var(--game-border-strong);
-    background: var(--game-surface);
+    min-width: 220px;
+    padding: 11px 16px;
+    border: 2px solid var(--game-border-strong);
+    background: var(--game-surface-raised);
     color: var(--game-text);
+    box-shadow: 4px 4px 0 var(--game-depth);
+    font-size: 14px;
+    font-weight: 700;
     text-align: center;
     transform: translate(-50%, 6px);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 120ms ease, transform 120ms ease;
+    transition: opacity 80ms linear, transform 80ms linear;
 }
 
 .game-feedback-toast.is-visible {
@@ -1597,55 +1714,59 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 
 .game-coachmark {
     position: absolute;
-    right: 12px;
-    bottom: 12px;
+    right: 14px;
+    bottom: 14px;
     z-index: 96;
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    gap: 12px;
-    width: min(420px, calc(100% - 24px));
-    padding: 12px;
-    border: 1px solid var(--game-border-strong);
-    background: var(--game-bg);
+    gap: 14px;
+    width: min(460px, calc(100% - 28px));
+    padding: 16px;
+    border: 2px solid var(--game-border-strong);
+    background: var(--game-surface-raised);
     color: var(--game-text);
+    box-shadow: 6px 6px 0 var(--game-depth);
 }
 
 .game-coachmark-copy {
     display: grid;
-    gap: 4px;
+    gap: 6px;
 }
 
 .game-coachmark-copy strong {
     color: var(--game-system);
     font-family: var(--pixel-font-display);
-    font-size: 8px;
+    font-size: 10px;
 }
 
 .game-coachmark-copy span {
     color: var(--game-muted);
-    font-size: 11px;
-    line-height: 1.4;
+    font-size: 13px;
+    line-height: 1.5;
 }
 
 .game-coachmark button {
-    min-width: 80px;
-    border: 1px solid var(--game-border);
+    min-width: 88px;
+    min-height: 44px;
+    border: 2px solid var(--game-border-strong);
     background: var(--game-surface);
-    color: var(--game-muted);
+    color: var(--game-text);
+    box-shadow: 3px 3px 0 var(--game-depth);
+    font-size: 13px;
 }
 
 .is-guide-target {
-    outline: 2px solid var(--game-accent) !important;
-    outline-offset: 2px;
+    outline: 3px solid var(--game-accent) !important;
+    outline-offset: 3px;
 }
 
 #btn-buy.is-rejected,
 #btn-sell.is-rejected {
-    animation: terminal-reject 160ms ease-in-out 2;
+    animation: terminal-reject 140ms steps(2, end) 2;
 }
 
 @keyframes terminal-reject {
-    50% { border-color: var(--game-red); transform: translateX(2px); }
+    50% { border-color: var(--game-red); transform: translateX(3px); }
 }
 
 /* ---------- Bilingual typography ---------- */
@@ -1656,6 +1777,7 @@ html[data-flappyk-language='zh'] select,
 html[data-flappyk-language='zh'] output,
 html[data-flappyk-language='zh'] summary {
     font-family: 'ZCOOL QingKe HuangYou', var(--pixel-font-ui);
+    font-weight: 400;
 }
 
 html[data-flappyk-language='zh'] #start-screen #game-title,
@@ -1670,7 +1792,14 @@ html[data-flappyk-language='zh'] .local-records-summary strong {
 html[data-flappyk-language='zh'] .home-console-intro-copy,
 html[data-flappyk-language='zh'] .home-story-lead,
 html[data-flappyk-language='zh'] .home-story-body {
-    line-height: 1.6;
+    line-height: 1.7;
+}
+
+html[data-flappyk-language='zh'] .hud-metric-label,
+html[data-flappyk-language='zh'] .excess-meter-label,
+html[data-flappyk-language='zh'] .run-progress-panel .hud-game,
+html[data-flappyk-language='zh'] .run-progress-panel .hud-day {
+    font-size: 12px;
 }
 
 /* ---------- Responsive convergence ---------- */
@@ -1684,9 +1813,9 @@ html[data-flappyk-language='zh'] .home-story-body {
     }
 
     .home-console-screen {
-        grid-template-columns: minmax(0, 1fr) minmax(200px, 0.55fr);
-        gap: 8px 18px;
-        padding: clamp(16px, 3vw, 28px);
+        grid-template-columns: minmax(0, 1fr) minmax(220px, 0.55fr);
+        gap: 10px 22px;
+        padding: clamp(18px, 3vw, 32px);
     }
 
     .home-mode-stack {
@@ -1694,9 +1823,9 @@ html[data-flappyk-language='zh'] .home-story-body {
     }
 
     .home-story-slide {
-        grid-template-columns: minmax(190px, 0.65fr) minmax(0, 1.35fr);
-        gap: 18px;
-        padding: 24px;
+        grid-template-columns: minmax(210px, 0.65fr) minmax(0, 1.35fr);
+        gap: 22px;
+        padding: 28px;
     }
 }
 
@@ -1707,6 +1836,7 @@ html[data-flappyk-language='zh'] .home-story-body {
         grid-template-areas:
             'performance controls'
             'progress progress';
+        box-shadow: 4px 4px 0 var(--game-depth);
     }
 
     #game-hud-rail .weather-status {
@@ -1714,21 +1844,38 @@ html[data-flappyk-language='zh'] .home-story-body {
     }
 
     .stats-box {
-        padding: 7px 8px;
+        padding: 9px 10px 8px;
+    }
+
+    .hud-main {
+        gap: 10px;
+    }
+
+    .hud-metric-label {
+        margin-bottom: 3px;
+        font-size: 10px;
     }
 
     .hud-total > span:last-child,
     .hud-return > span:last-child {
-        font-size: clamp(12px, 3.7vw, 16px);
+        font-size: clamp(16px, 4.5vw, 21px);
     }
 
     .excess-meter {
-        margin-top: 5px;
-        padding-top: 5px;
+        margin-top: 7px;
+        padding-top: 6px;
+    }
+
+    .excess-meter-label {
+        font-size: 10px;
+    }
+
+    .excess-meter-label strong {
+        font-size: 11px;
     }
 
     #game-top-controls {
-        grid-template-columns: 36px 36px;
+        grid-template-columns: 44px 44px;
     }
 
     #game-top-controls .game-speed-control {
@@ -1743,10 +1890,16 @@ html[data-flappyk-language='zh'] .home-story-body {
         min-height: 100%;
         height: auto;
         overflow: visible;
+        box-shadow: 4px 4px 0 var(--game-depth);
     }
 
     .home-console-topline {
         grid-template-columns: auto minmax(0, 1fr) auto;
+        min-height: 42px;
+    }
+
+    .home-console-brand {
+        font-size: 10px;
     }
 
     .home-console-lamps {
@@ -1765,18 +1918,47 @@ html[data-flappyk-language='zh'] .home-story-body {
             'side'
             'ticker';
         align-content: start;
-        gap: 10px;
-        padding: 18px 14px 70px;
+        gap: 14px;
+        padding: 22px 16px 78px;
         overflow: visible;
     }
 
+    .home-console-screen::before {
+        display: none;
+    }
+
+    .home-console-screen::after {
+        right: 0;
+        bottom: 18%;
+        font-size: clamp(220px, 76vw, 340px);
+    }
+
+    .home-console-kicker {
+        font-size: 11px;
+    }
+
     #start-screen #game-title {
-        font-size: clamp(38px, 13vw, 54px);
+        font-size: clamp(52px, 16vw, 72px);
+        text-shadow: 4px 4px 0 var(--game-depth);
+    }
+
+    .home-console-intro-copy {
+        font-size: 17px;
+        line-height: 1.55;
     }
 
     .home-world-strip,
     .home-primary-actions {
         max-width: none;
+    }
+
+    .home-world {
+        min-height: 48px;
+    }
+
+    .home-primary-actions #start-btn {
+        min-height: 68px;
+        font-size: 20px;
     }
 
     .home-mode-stack,
@@ -1789,19 +1971,30 @@ html[data-flappyk-language='zh'] .home-story-body {
         inset: auto;
         grid-template-columns: 1fr;
         align-items: start;
-        gap: 18px;
+        gap: 22px;
         min-height: calc(100dvh - 96px);
-        padding: 22px 14px 72px;
+        padding: 28px 16px 84px;
         overflow: visible;
     }
 
     .home-story-slide::before {
-        top: 8px;
-        right: 10px;
+        top: 10px;
+        right: 12px;
+        font-size: 8px;
+    }
+
+    .home-story-title {
+        font-size: clamp(30px, 10vw, 44px);
+    }
+
+    .home-story-lead,
+    .home-story-body {
+        font-size: 17px;
     }
 
     .home-story-equation {
         grid-template-columns: 1fr;
+        padding: 14px;
     }
 
     .home-story-equation-symbol {
@@ -1822,6 +2015,7 @@ html[data-flappyk-language='zh'] .home-story-body {
 
     .profit-card {
         max-height: none;
+        box-shadow: 5px 5px 0 var(--game-depth);
     }
 
     .settlement-summary {
@@ -1830,10 +2024,12 @@ html[data-flappyk-language='zh'] .home-story-body {
             'verdict'
             'excess'
             'compare';
+        padding: 22px 18px;
     }
 
     .settlement-excess-summary {
         justify-self: start;
+        font-size: clamp(46px, 16vw, 68px);
     }
 
     .settlement-actions {
@@ -1852,8 +2048,8 @@ html[data-flappyk-language='zh'] .home-story-body {
 
 @media (max-width: 430px) {
     .home-console-topline {
-        min-height: 34px;
-        padding-inline: 8px;
+        min-height: 40px;
+        padding-inline: 9px;
     }
 
     .home-console-series {
@@ -1861,12 +2057,29 @@ html[data-flappyk-language='zh'] .home-story-body {
     }
 
     .home-world-strip {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .home-world {
         grid-template-columns: 1fr;
+        gap: 4px;
+        min-height: 52px;
+        padding: 6px 4px;
+        text-align: center;
     }
 
     .home-world + .home-world {
-        border-left: 0;
-        border-top: 1px solid var(--game-border);
+        border-left: 1px solid var(--game-border);
+        border-top: 0;
+    }
+
+    .home-world-index {
+        justify-self: center;
+    }
+
+    .home-world-name {
+        font-size: 10px;
+        text-align: center;
     }
 
     .home-secondary-actions,
@@ -1876,7 +2089,8 @@ html[data-flappyk-language='zh'] .home-story-body {
     }
 
     .settlement-comparison-row {
-        grid-template-columns: 48px minmax(0, 1fr) 62px;
+        grid-template-columns: 58px minmax(0, 1fr) 70px;
+        font-size: 11px;
     }
 
     .profit-card[data-details-expanded='true'] .card-details {
@@ -1891,25 +2105,25 @@ html[data-flappyk-language='zh'] .home-story-body {
 
     .home-console-screen {
         align-content: center;
-        padding: 14px 18px;
+        padding: 16px 20px;
     }
 
     #start-screen #game-title {
-        font-size: clamp(28px, 8vh, 46px);
+        font-size: clamp(38px, 10vh, 58px);
     }
 
     .home-console-intro-copy {
-        font-size: 14px;
+        font-size: 15px;
     }
 
     .home-primary-actions #start-btn {
-        min-height: 46px;
-        font-size: 14px;
+        min-height: 54px;
+        font-size: 16px;
     }
 
     .home-story-slide {
-        grid-template-columns: minmax(210px, 0.75fr) minmax(0, 1.25fr);
-        padding: 16px 22px 52px;
+        grid-template-columns: minmax(220px, 0.75fr) minmax(0, 1.25fr);
+        padding: 18px 24px 54px;
     }
 }
 

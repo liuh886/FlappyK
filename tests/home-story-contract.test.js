@@ -34,7 +34,9 @@ for (const contract of [
   '.home-console-screen > :not(.home-story-slide):not(.home-story-navigation)',
   '.home-story-slide',
   'Story: analysis mode, not a second visual world',
-  'grid-template-columns: minmax(230px, 0.7fr) minmax(0, 1.3fr)',
+  'grid-template-columns: minmax(260px, 0.7fr) minmax(0, 1.3fr)',
+  'font-size: clamp(30px, 4.4vw, 56px)',
+  'font-size: clamp(17px, 1.55vw, 21px)',
   '.home-story-equation',
   '.home-story-tape',
   '.home-story-chart-price',
@@ -43,7 +45,7 @@ for (const contract of [
   'grid-template-columns: 1fr',
   '@media (prefers-reduced-motion: reduce)',
 ]) {
-  assert.ok(uiCss.includes(contract), `Missing single-surface story visual contract: ${contract}`);
+  assert.ok(uiCss.includes(contract), `Missing readable Market Arcade story contract: ${contract}`);
 }
 
 for (const retired of ['background: #e7e2d4', 'FIELD NOTE 001', 'clip-path: var(--pixel-cut)']) {
@@ -64,4 +66,4 @@ assert.ok(!serviceWorker.includes("'./home-story.css'"));
 assert.ok(serviceWorker.includes("'./scripts/home-story.js'"));
 assert.ok(!/flappyk-(?:app|runtime)-v\d+/.test(serviceWorker));
 
-console.log('Canonical single-surface UI retains the bilingual decisive-trades analysis mode, keyboard navigation, mobile containment, and stable PWA cache contracts.');
+console.log('Market Arcade retains the bilingual decisive-trades analysis mode with larger readable copy, keyboard navigation, mobile containment, and stable PWA cache contracts.');

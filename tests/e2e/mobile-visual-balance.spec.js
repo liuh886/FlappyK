@@ -42,6 +42,8 @@ test('mobile home keeps PLAY first and settlement remains contained in the same 
       play: box('#start-btn'),
       modeStack: box('.home-mode-stack'),
       navigation: box('.home-story-navigation'),
+      titleSize: parseFloat(getComputedStyle(document.getElementById('game-title')).fontSize),
+      playSize: parseFloat(getComputedStyle(document.getElementById('start-btn')).fontSize),
       horizontalOverflow: screenNode.scrollWidth > screenNode.clientWidth + 1,
     };
   });
@@ -51,6 +53,8 @@ test('mobile home keeps PLAY first and settlement remains contained in the same 
   expect(inside(home.play, home.screen)).toBe(true);
   expect(inside(home.modeStack, home.screen)).toBe(true);
   expect(home.horizontalOverflow).toBe(false);
+  expect(home.titleSize).toBeGreaterThanOrEqual(52);
+  expect(home.playSize).toBeGreaterThanOrEqual(20);
   expect(home.play.top).toBeLessThan(home.modeStack.top);
   expect(home.modeStack.bottom).toBeLessThan(home.navigation.top);
 
@@ -62,7 +66,9 @@ test('mobile home keeps PLAY first and settlement remains contained in the same 
     const restart = document.getElementById('restart-btn');
     if (restart) restart.hidden = false;
   });
-  await page.waitForTimeout(80);
+  await page.locator('#settlement-screen').evaluate(async (screen) => {
+    await Promise.all(screen.getAnimations().map((animation) => animation.finished));
+  });
 
   const settlementBalance = await page.evaluate(() => {
     const screen = document.getElementById('settlement-screen');
@@ -82,15 +88,15 @@ test('mobile home keeps PLAY first and settlement remains contained in the same 
   });
 
   // Chromium can place a 100dvh fixed surface on a fractional visual-viewport origin.
-  // Keep the acceptance strict to two CSS pixels while validating the full surface and its children.
+  // Keep the acceptance strict to two CSS pixels while validating the settled surface and its children.
   expect(inside(settlementBalance.screen, settlementBalance.viewport)).toBe(true);
   expect(inside(settlementBalance.card, settlementBalance.screen)).toBe(true);
   expect(inside(settlementBalance.actions, settlementBalance.screen)).toBe(true);
-  expect(settlementBalance.cardShadow).toBe('none');
+  expect(settlementBalance.cardShadow).not.toBe('none');
   expect(settlementBalance.cardRadius).toBe('0px');
 });
 
-test('mobile command dock centers trade actions while the HUD uses one opaque rail and transparent internal regions', async ({ page }) => {
+test('mobile command dock centers tactile trade actions while the HUD stays one rail', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await preparePage(page);
   await page.goto('/');
@@ -124,8 +130,10 @@ test('mobile command dock centers trade actions while the HUD uses one opaque ra
   });
 
   const layout = await page.evaluate(() => {
-    const buy = document.getElementById('btn-buy').getBoundingClientRect();
-    const sell = document.getElementById('btn-sell').getBoundingClientRect();
+    const buyNode = document.getElementById('btn-buy');
+    const sellNode = document.getElementById('btn-sell');
+    const buy = buyNode.getBoundingClientRect();
+    const sell = sellNode.getBoundingClientRect();
     const boll = document.querySelector('.indicator-card--boll').getBoundingClientRect();
     const macd = document.querySelector('.indicator-card--macd').getBoundingClientRect();
     const stats = document.querySelector(".stats-box[data-composition='returns-only']");
@@ -146,6 +154,10 @@ test('mobile command dock centers trade actions while the HUD uses one opaque ra
       statsBackground: getComputedStyle(stats).backgroundColor,
       runBackground: getComputedStyle(run).backgroundColor,
       railShadow: getComputedStyle(rail).boxShadow,
+      buyShadow: getComputedStyle(buyNode).boxShadow,
+      sellShadow: getComputedStyle(sellNode).boxShadow,
+      buyFont: parseFloat(getComputedStyle(buyNode).fontSize),
+      sellFont: parseFloat(getComputedStyle(sellNode).fontSize),
     };
   });
 
@@ -156,5 +168,9 @@ test('mobile command dock centers trade actions while the HUD uses one opaque ra
   expect(alphaFromCssColor(layout.railBackground)).toBeGreaterThan(0.8);
   expect(alphaFromCssColor(layout.statsBackground)).toBeLessThan(0.1);
   expect(alphaFromCssColor(layout.runBackground)).toBeLessThan(0.1);
-  expect(layout.railShadow).toBe('none');
+  expect(layout.railShadow).not.toBe('none');
+  expect(layout.buyShadow).not.toBe('none');
+  expect(layout.sellShadow).not.toBe('none');
+  expect(layout.buyFont).toBeGreaterThanOrEqual(17);
+  expect(layout.sellFont).toBeGreaterThanOrEqual(17);
 });

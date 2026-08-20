@@ -94,7 +94,7 @@ test('analysis mode keeps decisive-trades story, bilingual navigation, and direc
   expect(layout.titleFont).toContain('Press Start 2P');
   expect(layout.titleSize).toBeGreaterThanOrEqual(22);
   expect(layout.arrowRadius).toBe('0px');
-  expect(layout.arrowShadow).toBe('none');
+  expect(layout.arrowShadow).toContain('3px 3px 0px');
   expect(layout.slideRadius).toBe('0px');
   expect(layout.slideShadow).toBe('none');
   expect(layout.slideBackground).not.toBe('rgb(231, 226, 212)');

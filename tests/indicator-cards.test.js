@@ -122,16 +122,21 @@ for (const contract of [
   '.indicator-card.is-empty',
   "@media (max-width: 720px), (pointer: coarse)",
   'touch-action: manipulation',
-  'min-height: 44px',
+  'min-height: 48px',
   'grid-template-columns: 64px 64px',
+  'grid-template-rows: auto auto',
+  'font-size: 9px',
   'right: max(6px, env(safe-area-inset-right))',
   'left: max(6px, env(safe-area-inset-left))',
   'var(--game-system',
   'var(--game-accent',
   'var(--game-bg',
-  'box-shadow: none',
+  'border: 2px solid var(--game-border-strong',
+  'box-shadow: 4px 4px 0 var(--game-bg',
+  'transform: translate(3px, 3px)',
+  '.indicator-card-feedback',
 ]) {
-  assert.ok(cardsStyles.includes(contract), `Missing single-surface power-up visual contract: ${contract}`);
+  assert.ok(cardsStyles.includes(contract), `Missing tactile Pixel Market Arcade power-up visual contract: ${contract}`);
 }
 for (const retired of [
   '.indicator-hand-label::before',
@@ -144,6 +149,7 @@ for (const retired of [
   '.indicator-card.is-revealing',
   'var(--hud-shell',
   'var(--pixel-yellow',
+  'box-shadow: inset 0',
 ]) {
   assert.ok(!cardsStyles.includes(retired), `Retired power-up visual path returned: ${retired}`);
 }
@@ -187,4 +193,4 @@ for (const asset of [
   assert.ok(serviceWorkerSource.includes(asset), `Stable PWA shell is missing ${asset}`);
 }
 
-console.log('BOLL/MACD math, Pro daily grants, Daily Run trials, account/access separation, single-surface power-ups, overlay stacking, mobile controls, retired draw deletion, and stable PWA contracts validated');
+console.log('BOLL/MACD math, Pro daily grants, Daily Run trials, account/access separation, tactile Pixel Market Arcade power-ups, overlay stacking, mobile controls, retired draw deletion, and stable PWA contracts validated');

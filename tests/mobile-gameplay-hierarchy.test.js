@@ -53,18 +53,23 @@ for (const contract of [
   'width: 64px',
   '.indicator-card-copy small',
   'display: none',
-  'grid-template-columns: minmax(0, 1fr) auto',
-  'min-height: 44px',
-  'border-width: 1px',
-  'background: var(--game-bg, #07090c)',
+  'grid-template-columns: 1fr',
+  'grid-template-rows: auto auto',
+  'min-height: 48px',
+  'font-size: 9px',
+  'border-width: 2px',
+  'background: var(--game-bg, #06080c)',
+  'box-shadow: 3px 3px 0 var(--game-bg',
+  'transform: translate(2px, 2px)',
 ]) {
-  assert.ok(cards.includes(contract), `Missing outer mobile power-up contract: ${contract}`);
+  assert.ok(cards.includes(contract), `Missing tactile outer mobile power-up contract: ${contract}`);
 }
 
 assert.ok(!cards.includes('clip-path:'), 'Power-up controls must not return to clipped-card decoration.');
 assert.ok(!cards.includes('#a98bff'), 'Purple power-up styling must not return.');
+assert.ok(!cards.includes('box-shadow: inset 0'), 'Mobile power-ups must use physical hard depth instead of inset terminal styling.');
 assert.ok(!mobile.includes('grid-template-columns: 88px minmax(106px, 1fr) 88px'), 'The oversized centered speed-control layout must not return to the mobile spatial owner.');
 assert.ok(!mobile.includes(":has(#indicator-card-deck:not([hidden])) #game-canvas"), 'Power-ups must not reserve a separate tray above the mobile command dock.');
 assert.ok(!cards.includes('width: min(248px, calc(100% - 28px))'), 'The previous oversized mobile tactical tray must not return.');
 
-console.log('State-driven touch geometry, dock-contained speed, 44px navigation, system power-ups, and always-visible settlement identity contracts passed.');
+console.log('State-driven touch geometry, dock-contained speed, 44px navigation, tactile pixel power-ups, and always-visible settlement identity contracts passed.');

@@ -21,8 +21,6 @@
     };
 
     const copy = {
-        dailyKicker: t('DAILY MODE', '每日模式'),
-        dailyBody: t('Same three hidden markets for every player today.', '今天所有玩家面对相同的三段隐藏行情。'),
         rankings: t('RANKINGS', '排行榜'),
         details: t('VIEW DETAILS', '查看详情'),
         hideDetails: t('HIDE DETAILS', '收起详情'),
@@ -66,11 +64,6 @@
 
         const dailyCard = document.createElement('section');
         dailyCard.className = 'daily-mode-card';
-        dailyCard.innerHTML = `
-            <div class="daily-mode-copy">
-                <strong>${copy.dailyKicker}</strong>
-                <span>${copy.dailyBody}</span>
-            </div>`;
         if (refs.dailySummary) dailyCard.appendChild(refs.dailySummary);
         if (refs.dailyButton) dailyCard.appendChild(refs.dailyButton);
 

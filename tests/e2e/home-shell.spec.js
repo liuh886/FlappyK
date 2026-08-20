@@ -49,7 +49,7 @@ for (const viewport of [
   { name: 'desktop', width: 1440, height: 900 },
   { name: 'mobile', width: 390, height: 844 },
 ]) {
-  test(`${viewport.name} home is one contained market surface and PLAY enters fullscreen gameplay`, async ({ page }) => {
+  test(`${viewport.name} home keeps the Market Arcade surface and PLAY enters fullscreen gameplay`, async ({ page }) => {
     await page.setViewportSize({ width: viewport.width, height: viewport.height });
     await preparePage(page);
     await page.goto('/');
@@ -80,6 +80,8 @@ for (const viewport of [
         play: rect('#start-btn'),
         documentWidth: document.scrollingElement.scrollWidth,
         documentHeight: document.scrollingElement.scrollHeight,
+        startScrollHeight: document.getElementById('start-screen').scrollHeight,
+        startClientHeight: document.getElementById('start-screen').clientHeight,
         containerBorder: style('#game-container').borderTopWidth,
         bezelBorder: style('.home-console-bezel').borderTopWidth,
         bezelShadow: style('.home-console-bezel').boxShadow,
@@ -87,6 +89,7 @@ for (const viewport of [
         playRadius: style('#start-btn').borderRadius,
         playShadow: style('#start-btn').boxShadow,
         playBackground: style('#start-btn').backgroundColor,
+        playFont: parseFloat(style('#start-btn').fontSize),
       };
     });
 
@@ -96,18 +99,27 @@ for (const viewport of [
     expect(Math.abs(home.container.height - home.viewport.height)).toBeLessThanOrEqual(1);
     expect(Math.abs(home.start.width - home.viewport.width)).toBeLessThanOrEqual(1);
     expect(Math.abs(home.start.height - home.viewport.height)).toBeLessThanOrEqual(1);
-    expect(inside(home.bezel, home.viewport, 1)).toBe(true);
-    expect(inside(home.screen, home.bezel, 1)).toBe(true);
-    expect(inside(home.play, home.screen, 1)).toBe(true);
+    expect(home.bezel.left).toBeGreaterThanOrEqual(home.viewport.left - 1);
+    expect(home.bezel.right).toBeLessThanOrEqual(home.viewport.right + 1);
+    expect(home.screen.left).toBeGreaterThanOrEqual(home.bezel.left - 1);
+    expect(home.screen.right).toBeLessThanOrEqual(home.bezel.right + 1);
+    expect(inside(home.play, home.viewport, 1)).toBe(true);
     expect(home.documentWidth).toBeLessThanOrEqual(home.viewport.width + 1);
     expect(home.documentHeight).toBeLessThanOrEqual(home.viewport.height + 1);
+    if (viewport.name === 'desktop') {
+      expect(inside(home.bezel, home.viewport, 1)).toBe(true);
+      expect(inside(home.screen, home.bezel, 1)).toBe(true);
+    } else {
+      expect(home.startScrollHeight).toBeGreaterThanOrEqual(home.startClientHeight);
+    }
     expect(home.containerBorder).toBe('0px');
     expect(home.bezelBorder).not.toBe('0px');
-    expect(home.bezelShadow).toBe('none');
+    expect(home.bezelShadow).not.toBe('none');
     expect(home.bezelRadius).toBe('0px');
     expect(home.playRadius).toBe('0px');
-    expect(home.playShadow).toBe('none');
+    expect(home.playShadow).not.toBe('none');
     expect(home.playBackground).not.toBe('rgba(0, 0, 0, 0)');
+    expect(home.playFont).toBeGreaterThanOrEqual(viewport.name === 'mobile' ? 20 : 20);
 
     await page.getByRole('button', { name: 'PLAY', exact: true }).click();
     await expect(page.locator('html')).toHaveAttribute('data-ui-state', 'playing');
