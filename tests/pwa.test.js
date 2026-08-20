@@ -43,6 +43,7 @@ for (const shellAsset of [
     'mobile-controls.css',
     'premium-ui.css',
     'pwa.css',
+    'scripts/market-canvas.js',
     'scripts/ui-state.js',
     'scripts/premium-ui.js',
     'scripts/home-story.js',
@@ -58,6 +59,7 @@ for (const retiredAsset of [
     'home-story.css',
     'account-upgrade.css',
     'account-upgrade.js',
+    'ui-polish.js',
 ]) {
     assert.ok(!index.includes(retiredAsset), `Retired shell asset returned: ${retiredAsset}`);
 }
@@ -80,6 +82,7 @@ for (const cachedAsset of [
     "'./manifest.webmanifest'",
     "'./data-loader.js'",
     "'./analytics.js'",
+    "'./scripts/market-canvas.js'",
     "'./scripts/ui-state.js'",
     "'./scripts/premium-ui.js'",
     "'./scripts/home-story.js'",
@@ -100,6 +103,7 @@ for (const retiredCachedAsset of [
     "'./home-story.css'",
     "'./hud-compact.css'",
     "'./visual-polish.css'",
+    "'./ui-polish.js'",
 ]) {
     assert.ok(!sw.includes(retiredCachedAsset), `Retired cached asset returned: ${retiredCachedAsset}`);
 }
