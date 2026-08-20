@@ -8,9 +8,11 @@ const premium = fs.readFileSync('premium-ui.css', 'utf8');
 const cards = fs.readFileSync('indicator-cards.css', 'utf8');
 
 for (const contract of [
-  'grid-template-columns: minmax(64px, 1fr) 78px 10px 78px minmax(64px, 1fr);',
+  'grid-template-columns: minmax(36px, 1fr) 78px 108px 78px minmax(36px, 1fr);',
   'grid-column: 2;',
+  'grid-column: 3;',
   'grid-column: 4;',
+  'grid-template-columns: 44px 44px;',
   'Touch geometry only. Shared color, typography and button skin live in premium-ui.css.',
   'Runtime state decides whether this dock exists; viewport width does not.',
 ]) {
@@ -23,6 +25,7 @@ for (const retiredCrossOwner of [
   'background: rgba(6, 12, 20, 0.44) !important;',
   'background: rgba(6, 12, 20, 0.3) !important;',
   'background: rgba(6, 12, 20, 0.08) !important;',
+  'top: calc(max(6px, env(safe-area-inset-top)) + 88px)',
 ]) {
   assert.ok(!mobile.includes(retiredCrossOwner), `Cross-owner mobile visual rule returned: ${retiredCrossOwner}`);
 }
@@ -46,4 +49,4 @@ for (const contract of [
   assert.ok(cards.includes(contract), `Missing outer power-up contract: ${contract}`);
 }
 
-console.log('Mobile visual balance now enforces centered touch geometry without cross-owner HUD/home/settlement overrides.');
+console.log('Mobile visual balance enforces a centered command dock, 44px navigation, and no cross-owner HUD/home/settlement overrides.');
