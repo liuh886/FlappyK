@@ -68,7 +68,9 @@ for (const mobileContract of [
   'position: fixed;',
   'display: grid;',
   'width: 100vw;',
-  'grid-template-columns: minmax(64px, 1fr) 78px 10px 78px minmax(64px, 1fr);',
+  'grid-template-columns: minmax(36px, 1fr) 78px 108px 78px minmax(36px, 1fr);',
+  'grid-column: 3;',
+  'grid-template-columns: 44px 44px;',
 ]) {
   assert.ok(mobileCss.includes(mobileContract), `Missing mobile feature geometry contract: ${mobileContract}`);
 }
@@ -81,6 +83,7 @@ assert.ok(!baseStyles.includes('--hud-shell:'), 'Legacy HUD theme variables must
 assert.ok(!baseStyles.includes('.profit-card'), 'Base CSS must not regain settlement styling.');
 assert.ok(!mobileCss.includes('#settlement-screen.active'), 'Touch geometry must not own settlement layout.');
 assert.ok(!mobileCss.includes('#game-hud-rail .weather-status'), 'Touch geometry must not own shared HUD presentation.');
+assert.ok(!mobileCss.includes('top: calc(max(6px, env(safe-area-inset-top)) + 88px)'), 'Touch speed control must not float over market data.');
 assert.ok(!canonicalCss.includes('width: min(896px'), 'Fixed desktop viewport width must not return.');
 assert.ok(!canonicalCss.includes('aspect-ratio: 4 / 3'), 'Fixed desktop viewport aspect ratio must not return.');
 
@@ -109,4 +112,4 @@ assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"));
 assert.ok(!serviceWorker.includes("'./home-story.css'"));
 assert.ok(!/flappyk-(?:app|runtime)-v\d+/.test(serviceWorker));
 
-console.log('Single-Surface Market OS has one shared CSS owner, runtime-state-driven touch geometry, stable DOM composition, isolated weather, account placement, responsive state, and stable PWA cache contracts.');
+console.log('Single-Surface Market OS has one shared CSS owner, dock-contained runtime touch geometry, stable DOM composition, isolated weather, account placement, responsive state, and stable PWA cache contracts.');
