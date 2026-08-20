@@ -43,7 +43,7 @@
 
     function syncPauseControl() {
         if (!pauseButton) return;
-        pauseButton.textContent = '';
+        pauseButton.textContent = paused ? '▶' : 'Ⅱ';
         pauseButton.setAttribute('aria-label', paused ? 'Resume game' : 'Pause game');
         pauseButton.setAttribute('aria-pressed', String(paused));
         pauseButton.setAttribute('title', `${paused ? 'Resume' : 'Pause'} [Space]`);
