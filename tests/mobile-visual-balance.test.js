@@ -41,15 +41,15 @@ assert.ok(
 for (const contract of [
   'bottom: calc(28px + env(safe-area-inset-bottom));',
   'z-index: 82;',
-  'grid-template-columns: 60px 60px;',
+  'grid-template-columns: 64px 64px;',
   'justify-content: space-between;',
-  'width: 60px;',
+  'width: 64px;',
   'min-height: 44px;',
 ]) {
-  assert.ok(cards.includes(contract), `Missing compact system power-up contract: ${contract}`);
+  assert.ok(cards.includes(contract), `Missing system power-up contract: ${contract}`);
 }
 
 assert.ok(!cards.includes('clip-path:'));
 assert.ok(!cards.includes('#a98bff'));
 
-console.log('Mobile visual balance enforces a centered command dock, 44px navigation, compact system power-ups, and no cross-owner HUD/home/settlement overrides.');
+console.log('Mobile visual balance enforces a centered command dock, 44px navigation, 64px system power-ups, and no cross-owner HUD/home/settlement overrides.');
