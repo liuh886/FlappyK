@@ -16,8 +16,7 @@
     pointer-events: none;
 }
 
-.indicator-card-deck[hidden],
-.indicator-card-draw[hidden] {
+.indicator-card-deck[hidden] {
     display: none !important;
 }
 
@@ -42,32 +41,28 @@
     gap: 6px;
 }
 
-#game-container .indicator-card,
-#game-container .indicator-card-draw {
-    position: relative;
-    margin: 0;
-    border-radius: 0;
-    box-shadow: none;
-    font-family: var(--pixel-font-ui, monospace);
-    pointer-events: auto;
-    touch-action: manipulation;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-}
-
 #game-container .indicator-card {
     --card-accent: var(--game-system, #6bcbd4);
+    position: relative;
     display: grid;
     grid-template-columns: 24px minmax(0, 1fr) auto;
     min-height: 52px;
+    margin: 0;
     padding: 7px 8px;
     align-items: center;
     gap: 7px;
     overflow: hidden;
     border: 1px solid var(--game-border, #26313c);
+    border-radius: 0;
     background: var(--game-surface, #0b1016);
+    box-shadow: none;
     color: var(--game-text, #eef2f5);
+    font-family: var(--pixel-font-ui, monospace);
     text-align: left;
+    pointer-events: auto;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
     transition: border-color 100ms ease, background-color 100ms ease, color 100ms ease;
 }
 
@@ -161,37 +156,6 @@
     color: var(--game-muted, #81909e);
 }
 
-#game-container .indicator-card-draw {
-    display: inline-flex;
-    min-height: 30px;
-    padding: 5px 9px;
-    align-items: center;
-    justify-self: start;
-    border: 1px solid var(--game-border, #26313c);
-    background: var(--game-surface, #0b1016);
-    color: var(--game-system, #6bcbd4);
-    font-family: var(--pixel-font-display, monospace);
-    font-size: 7px;
-    line-height: 1.25;
-    letter-spacing: 0.035em;
-    text-align: center;
-}
-
-#game-container .indicator-card-draw:not(:disabled):hover,
-#game-container .indicator-card-draw:not(:disabled):focus-visible {
-    border-color: var(--game-system, #6bcbd4);
-    outline: 2px solid var(--game-accent, #f0c94b);
-    outline-offset: 2px;
-}
-
-#game-container .indicator-card-draw:disabled {
-    border-color: var(--game-border, #26313c);
-    background: var(--game-surface, #0b1016);
-    color: var(--game-muted, #81909e);
-    cursor: not-allowed;
-    opacity: 0.55;
-}
-
 .indicator-card-feedback {
     position: absolute;
     left: 0;
@@ -275,15 +239,6 @@
         font-size: 7px;
     }
 
-    #game-container .indicator-card-draw {
-        justify-self: center;
-        min-height: 20px;
-        padding: 2px 4px;
-        border: 0;
-        background: transparent;
-        color: var(--game-muted, #81909e);
-    }
-
     .indicator-card-feedback {
         right: 0;
         left: 0;
@@ -294,7 +249,6 @@
 
 @media (prefers-reduced-motion: reduce) {
     #game-container .indicator-card,
-    #game-container .indicator-card-draw,
     .indicator-card-feedback {
         transition: none !important;
     }
