@@ -18,16 +18,19 @@ assert.equal((index.match(/id="card-period"/g) || []).length, 1, 'Period ID must
 for (const contract of [
   '#mobile-controls:not([hidden])',
   'display: grid',
-  'grid-template-columns: minmax(64px, 1fr) 78px 10px 78px minmax(64px, 1fr)',
+  'grid-template-columns: minmax(36px, 1fr) 78px 108px 78px minmax(36px, 1fr)',
   '#mobile-controls #btn-buy',
   '#mobile-controls #btn-sell',
   'grid-column: 2',
   'grid-column: 4',
   '#mobile-controls .mobile-speed-control',
-  'position: fixed',
-  'top: calc(max(6px, env(safe-area-inset-top)) + 88px)',
-  'right: max(10px, env(safe-area-inset-right))',
-  'grid-template-columns: 28px 38px 28px',
+  'grid-column: 3',
+  'position: static',
+  'grid-template-columns: 30px 44px 30px',
+  "html[data-virtual-controls='true'] #game-top-controls",
+  'grid-template-columns: 44px 44px',
+  'width: 44px',
+  'height: 44px',
   "data-ui-state='playing'",
   'margin-bottom: 102px',
 ]) {
@@ -39,6 +42,7 @@ assert.ok(premium.includes('#btn-buy'));
 assert.ok(premium.includes('#btn-sell'));
 assert.ok(!mobile.includes('opacity: 0.68'), 'Mobile geometry must not encode visual hierarchy through opacity.');
 assert.ok(!mobile.includes('background: rgba(6, 12, 20'), 'Mobile geometry must not own HUD translucency.');
+assert.ok(!mobile.includes('top: calc(max(6px, env(safe-area-inset-top)) + 88px)'), 'Speed must not float over the market canvas.');
 
 for (const contract of [
   'right: max(8px, env(safe-area-inset-right))',
@@ -61,4 +65,4 @@ assert.ok(!mobile.includes('grid-template-columns: 88px minmax(106px, 1fr) 88px'
 assert.ok(!mobile.includes(":has(#indicator-card-deck:not([hidden])) #game-canvas"), 'Power-ups must not reserve a separate tray above the mobile command dock.');
 assert.ok(!cards.includes('width: min(248px, calc(100% - 28px))'), 'The previous oversized mobile tactical tray must not return.');
 
-console.log('State-driven touch geometry, shared visual ownership, outer power-ups, and always-visible settlement identity contracts passed.');
+console.log('State-driven touch geometry, dock-contained speed, 44px navigation, outer power-ups, and always-visible settlement identity contracts passed.');
