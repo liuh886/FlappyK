@@ -243,14 +243,14 @@
     }
 
     .indicator-card-row {
-        grid-template-columns: 60px 60px;
+        grid-template-columns: 64px 64px;
         justify-content: space-between;
         gap: 0;
     }
 
     #game-container .indicator-card {
         grid-template-columns: minmax(0, 1fr) auto;
-        width: 60px;
+        width: 64px;
         min-height: 44px;
         padding: 4px 5px;
         gap: 4px;
