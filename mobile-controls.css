@@ -167,7 +167,7 @@ html[data-virtual-controls='true'][data-ui-state='paused'] #game-canvas {
 
 @media (max-height: 650px) and (max-width: 720px) {
     #mobile-controls:not([hidden]) {
-        grid-template-columns: minmax(24px, 1fr) 66px 96px 66px minmax(24px, 1fr);
+        grid-template-columns: minmax(24px, 1fr) 66px 100px 66px minmax(24px, 1fr);
     }
 
     #mobile-controls #btn-buy,
@@ -179,19 +179,19 @@ html[data-virtual-controls='true'][data-ui-state='paused'] #game-canvas {
     }
 
     #mobile-controls .mobile-speed-control {
-        grid-template-columns: 26px 40px 26px;
+        grid-template-columns: 28px 40px 28px;
     }
 
     #mobile-controls .mobile-speed-control .small-btn {
-        width: 26px;
-        min-width: 26px;
-        height: 26px;
-        min-height: 26px;
+        width: 28px;
+        min-width: 28px;
+        height: 28px;
+        min-height: 28px;
     }
 
     #mobile-controls .mobile-speed-control .speed-readout {
         min-width: 40px;
-        line-height: 26px;
+        line-height: 28px;
     }
 
     html[data-virtual-controls='true'][data-ui-state='playing'] #game-canvas,
