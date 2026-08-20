@@ -3,7 +3,6 @@
     z-index: 10;
     display: block;
     pointer-events: none;
-    image-rendering: pixelated;
 }
 
 .indicator-card-deck {
@@ -25,29 +24,16 @@
 .indicator-hand-label {
     display: inline-flex;
     min-height: 20px;
-    padding: 4px 7px 3px;
+    padding: 4px 7px;
     align-items: center;
     justify-self: start;
-    gap: 6px;
-    border: 1px solid color-mix(in srgb, var(--pixel-yellow, #f6c84a) 62%, #30445a);
-    background:
-        linear-gradient(90deg, rgba(246, 200, 74, 0.12), transparent 58%),
-        var(--hud-shell, rgba(6, 12, 20, 0.94));
-    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.62);
-    color: var(--pixel-yellow, #f6c84a);
+    border: 1px solid var(--game-border, #26313c);
+    background: var(--game-surface, #0b1016);
+    color: var(--game-system, #6bcbd4);
     font-family: var(--pixel-font-display, monospace);
-    font-size: 6px;
+    font-size: 7px;
     line-height: 1;
     letter-spacing: 0.08em;
-    clip-path: var(--pixel-cut, none);
-}
-
-.indicator-hand-label::before {
-    width: 5px;
-    height: 5px;
-    background: var(--pixel-yellow, #f6c84a);
-    box-shadow: 7px 0 0 rgba(246, 200, 74, 0.28);
-    content: '';
 }
 
 .indicator-card-row {
@@ -61,90 +47,44 @@
     position: relative;
     margin: 0;
     border-radius: 0;
+    box-shadow: none;
     font-family: var(--pixel-font-ui, monospace);
     pointer-events: auto;
     touch-action: manipulation;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
-    clip-path: polygon(0 4px, 4px 4px, 4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px));
 }
 
 #game-container .indicator-card {
-    --card-accent: var(--hud-neutral, #70d8e4);
-    --card-glow: color-mix(in srgb, var(--card-accent) 22%, transparent);
+    --card-accent: var(--game-system, #6bcbd4);
     display: grid;
     grid-template-columns: 24px minmax(0, 1fr) auto;
-    min-height: 56px;
+    min-height: 52px;
     padding: 7px 8px;
     align-items: center;
     gap: 7px;
     overflow: hidden;
-    border: 2px solid color-mix(in srgb, var(--card-accent) 58%, #617186);
-    background:
-        linear-gradient(to bottom, var(--card-accent) 0 3px, transparent 3px),
-        linear-gradient(135deg, var(--card-glow), transparent 48%),
-        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 8px),
-        var(--hud-shell, rgba(6, 12, 20, 0.96));
-    box-shadow:
-        inset 0 0 0 1px color-mix(in srgb, var(--card-accent) 10%, transparent),
-        4px 4px 0 rgba(0, 0, 0, 0.66);
-    color: var(--hud-value, #f4f8fc);
+    border: 1px solid var(--game-border, #26313c);
+    background: var(--game-surface, #0b1016);
+    color: var(--game-text, #eef2f5);
     text-align: left;
-    transition:
-        transform 80ms steps(2, end),
-        box-shadow 80ms steps(2, end),
-        border-color 120ms steps(3, end),
-        filter 120ms steps(3, end);
-}
-
-#game-container .indicator-card::before {
-    position: absolute;
-    inset: 5px;
-    border: 1px solid color-mix(in srgb, var(--card-accent) 20%, transparent);
-    background:
-        linear-gradient(90deg, var(--card-accent), transparent) 7px 7px / 18px 1px no-repeat,
-        linear-gradient(180deg, var(--card-accent), transparent) 7px 7px / 1px 14px no-repeat;
-    content: '';
-    opacity: 0.68;
-    pointer-events: none;
-}
-
-#game-container .indicator-card::after {
-    position: absolute;
-    inset: 3px;
-    background: repeating-linear-gradient(
-        to bottom,
-        transparent 0 3px,
-        color-mix(in srgb, var(--card-accent) 22%, transparent) 3px 4px
-    );
-    content: '';
-    opacity: 0;
-    pointer-events: none;
-    transform: translateX(-105%);
+    transition: border-color 100ms ease, background-color 100ms ease, color 100ms ease;
 }
 
 #game-container .indicator-card:hover,
 #game-container .indicator-card:focus-visible {
-    transform: translate(-1px, -1px);
-    border-color: var(--card-accent);
-    box-shadow:
-        inset 0 0 0 1px color-mix(in srgb, var(--card-accent) 22%, transparent),
-        5px 5px 0 rgba(0, 0, 0, 0.66);
-    filter: brightness(1.08);
-    outline: none;
+    border-color: var(--game-system, #6bcbd4);
+    outline: 2px solid var(--game-accent, #f0c94b);
+    outline-offset: 2px;
 }
 
 #game-container .indicator-card:active {
-    transform: translate(3px, 3px);
-    box-shadow: none;
+    background: color-mix(in srgb, var(--game-system, #6bcbd4) 8%, var(--game-surface, #0b1016));
 }
 
-.indicator-card--boll {
-    --card-accent: #55e6ff !important;
-}
-
+.indicator-card--boll,
 .indicator-card--macd {
-    --card-accent: #a98bff !important;
+    --card-accent: var(--game-system, #6bcbd4) !important;
 }
 
 .indicator-card-key {
@@ -152,14 +92,9 @@
     width: 24px;
     height: 28px;
     place-items: center;
-    border: 1px solid color-mix(in srgb, var(--card-accent) 72%, #314459);
-    background:
-        linear-gradient(180deg, color-mix(in srgb, var(--card-accent) 16%, transparent), transparent),
-        #07111c;
-    box-shadow:
-        inset 0 0 0 2px #050912,
-        2px 2px 0 rgba(0, 0, 0, 0.52);
-    color: var(--card-accent);
+    border: 1px solid var(--game-border-strong, #556371);
+    background: transparent;
+    color: var(--game-system, #6bcbd4);
     font-family: var(--pixel-font-display, monospace);
     font-size: 8px;
     line-height: 1;
@@ -172,20 +107,19 @@
 }
 
 .indicator-card-copy strong {
-    color: var(--hud-value, #f4f8fc);
+    color: var(--game-text, #eef2f5);
     font-family: var(--pixel-font-display, monospace);
     font-size: 9px;
     font-weight: 400;
     line-height: 1;
     letter-spacing: 0.04em;
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.64);
 }
 
 .indicator-card-copy small {
     overflow: hidden;
-    color: color-mix(in srgb, var(--card-accent) 58%, #9db0c2);
+    color: var(--game-muted, #81909e);
     font-size: 7px;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1;
     letter-spacing: 0.04em;
     text-overflow: ellipsis;
@@ -194,122 +128,68 @@
 
 .indicator-card-count {
     display: inline-grid;
-    min-width: 29px;
-    min-height: 24px;
-    padding: 4px 5px;
+    min-width: 28px;
+    min-height: 22px;
+    padding: 3px 5px;
     place-items: center;
-    border: 1px solid rgba(246, 200, 74, 0.64);
-    background: rgba(246, 200, 74, 0.08);
-    box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.22);
-    color: var(--pixel-yellow, #f6c84a);
+    border-left: 1px solid var(--game-border, #26313c);
+    color: var(--game-muted, #81909e);
     font-family: var(--pixel-font-display, monospace);
     font-size: 8px;
     line-height: 1;
 }
 
 #game-container .indicator-card.is-active {
-    border-color: var(--card-accent);
-    background:
-        linear-gradient(to bottom, var(--card-accent) 0 4px, transparent 4px),
-        linear-gradient(135deg, color-mix(in srgb, var(--card-accent) 22%, transparent), transparent 52%),
-        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 8px),
-        color-mix(in srgb, var(--card-accent) 9%, var(--hud-shell, #060c14));
-    box-shadow:
-        inset 0 0 0 1px color-mix(in srgb, var(--card-accent) 34%, transparent),
-        0 0 0 2px color-mix(in srgb, var(--card-accent) 11%, transparent),
-        4px 4px 0 rgba(0, 0, 0, 0.66);
-    animation: indicator-power-active 920ms steps(2, end) infinite alternate;
+    border-color: var(--game-accent, #f0c94b);
+    background: color-mix(in srgb, var(--game-accent, #f0c94b) 7%, var(--game-surface, #0b1016));
 }
 
-.indicator-card.is-active .indicator-card-key {
-    border-color: #effcff;
-    background: var(--card-accent);
-    box-shadow:
-        inset 0 0 0 2px color-mix(in srgb, var(--card-accent) 42%, #071019),
-        2px 2px 0 rgba(0, 0, 0, 0.52);
-    color: #071019;
-}
-
+.indicator-card.is-active .indicator-card-key,
 .indicator-card.is-active .indicator-card-copy strong,
 .indicator-card.is-active .indicator-card-count {
-    color: var(--card-accent);
-}
-
-.indicator-card.is-active .indicator-card-count {
-    border-color: var(--card-accent);
-    background: color-mix(in srgb, var(--card-accent) 12%, #071019);
-}
-
-#game-container .indicator-card.is-revealing::after {
-    opacity: 1;
-    animation: indicator-card-decode 440ms steps(8, end) both;
+    color: var(--game-accent, #f0c94b);
 }
 
 #game-container .indicator-card.is-empty {
-    border-color: rgba(255, 109, 119, 0.48);
-    background:
-        repeating-linear-gradient(-45deg, rgba(255, 109, 119, 0.035) 0 6px, transparent 6px 12px),
-        var(--hud-shell, rgba(6, 12, 20, 0.94));
-    filter: saturate(0.35) brightness(0.76);
-    opacity: 0.72;
+    border-color: var(--game-border, #26313c);
+    background: var(--game-surface, #0b1016);
+    color: var(--game-muted, #81909e);
+    opacity: 0.55;
 }
 
 #game-container .indicator-card.is-empty .indicator-card-count {
-    border-color: rgba(255, 109, 119, 0.5);
-    background: rgba(255, 109, 119, 0.07);
-    color: #ff9aa2;
+    color: var(--game-muted, #81909e);
 }
 
 #game-container .indicator-card-draw {
     display: inline-flex;
-    min-height: 28px;
+    min-height: 30px;
     padding: 5px 9px;
     align-items: center;
     justify-self: start;
-    gap: 6px;
-    border: 1px solid rgba(246, 200, 74, 0.72);
-    background:
-        linear-gradient(90deg, rgba(246, 200, 74, 0.12), transparent 68%),
-        var(--hud-shell, rgba(6, 12, 20, 0.94));
-    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.6);
-    color: var(--pixel-yellow, #f6c84a);
+    border: 1px solid var(--game-border, #26313c);
+    background: var(--game-surface, #0b1016);
+    color: var(--game-system, #6bcbd4);
     font-family: var(--pixel-font-display, monospace);
-    font-size: 6px;
+    font-size: 7px;
     line-height: 1.25;
     letter-spacing: 0.035em;
     text-align: center;
 }
 
-#game-container .indicator-card-draw::before {
-    width: 6px;
-    height: 6px;
-    border: 1px solid var(--pixel-yellow, #f6c84a);
-    background: rgba(246, 200, 74, 0.18);
-    content: '';
-}
-
 #game-container .indicator-card-draw:not(:disabled):hover,
 #game-container .indicator-card-draw:not(:disabled):focus-visible {
-    transform: translate(-1px, -1px);
-    border-color: #fff0a6;
-    background:
-        linear-gradient(90deg, rgba(246, 200, 74, 0.2), transparent 68%),
-        var(--hud-shell, rgba(6, 12, 20, 0.94));
-    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.6);
-    outline: none;
+    border-color: var(--game-system, #6bcbd4);
+    outline: 2px solid var(--game-accent, #f0c94b);
+    outline-offset: 2px;
 }
 
 #game-container .indicator-card-draw:disabled {
-    border-color: var(--hud-divider, rgba(159, 176, 196, 0.28));
-    background: var(--hud-shell, rgba(6, 12, 20, 0.94));
-    box-shadow: none;
-    color: #6f7d8d;
+    border-color: var(--game-border, #26313c);
+    background: var(--game-surface, #0b1016);
+    color: var(--game-muted, #81909e);
     cursor: not-allowed;
-}
-
-#game-container .indicator-card-draw:disabled::before {
-    border-color: #526173;
-    background: transparent;
+    opacity: 0.55;
 }
 
 .indicator-card-feedback {
@@ -319,17 +199,16 @@
     max-width: 100%;
     min-height: 28px;
     padding: 6px 8px;
-    border: 1px solid var(--hud-divider, rgba(159, 176, 196, 0.28));
-    background: var(--hud-shell, rgba(6, 12, 20, 0.96));
-    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.62);
-    color: var(--hud-value, #f4f8fc);
+    border: 1px solid var(--game-border-strong, #556371);
+    background: var(--game-bg, #07090c);
+    color: var(--game-text, #eef2f5);
     font-size: 10px;
     font-weight: 700;
     line-height: 1.2;
     opacity: 0;
     pointer-events: none;
-    transform: translateY(4px);
-    transition: opacity 100ms steps(2, end), transform 100ms steps(2, end);
+    transform: translateY(3px);
+    transition: opacity 100ms ease, transform 100ms ease;
 }
 
 .indicator-card-feedback.is-visible {
@@ -338,30 +217,19 @@
 }
 
 .indicator-card-feedback[data-kind='success'] {
-    border-color: rgba(77, 227, 154, 0.72);
-    color: #baffd6;
+    border-color: var(--game-system, #6bcbd4);
+    color: var(--game-system, #6bcbd4);
 }
 
 .indicator-card-feedback[data-kind='empty'] {
-    border-color: rgba(255, 109, 119, 0.68);
-    color: #ffb7bd;
-}
-
-@keyframes indicator-card-decode {
-    0% { transform: translateX(-105%); }
-    100% { transform: translateX(105%); }
-}
-
-@keyframes indicator-power-active {
-    from { filter: brightness(1); }
-    to { filter: brightness(1.12); }
+    color: var(--game-muted, #81909e);
 }
 
 @media (max-width: 720px), (pointer: coarse) {
     .indicator-card-deck {
-        right: max(8px, env(safe-area-inset-right));
+        right: max(6px, env(safe-area-inset-right));
         bottom: calc(28px + env(safe-area-inset-bottom));
-        left: max(8px, env(safe-area-inset-left));
+        left: max(6px, env(safe-area-inset-left));
         z-index: 82;
         width: auto;
         gap: 0;
@@ -375,29 +243,19 @@
     }
 
     .indicator-card-row {
-        grid-template-columns: 64px 64px;
+        grid-template-columns: 60px 60px;
         justify-content: space-between;
         gap: 0;
     }
 
     #game-container .indicator-card {
         grid-template-columns: minmax(0, 1fr) auto;
-        width: 64px;
+        width: 60px;
         min-height: 44px;
         padding: 4px 5px;
         gap: 4px;
         border-width: 1px;
-        background:
-            linear-gradient(to bottom, var(--card-accent) 0 2px, transparent 2px),
-            linear-gradient(135deg, color-mix(in srgb, var(--card-accent) 11%, transparent), transparent 58%),
-            var(--hud-shell, rgba(6, 12, 20, 0.94));
-        box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.62);
-    }
-
-    #game-container .indicator-card::before {
-        inset: 4px;
-        background: none;
-        opacity: 0.5;
+        background: var(--game-bg, #07090c);
     }
 
     .indicator-card-copy {
@@ -410,103 +268,34 @@
     }
 
     .indicator-card-count {
-        min-width: 23px;
+        min-width: 22px;
         min-height: 20px;
         padding: 3px;
+        border-left: 1px solid var(--game-border, #26313c);
         font-size: 7px;
-    }
-
-    #game-container .indicator-card.is-active {
-        box-shadow:
-            inset 0 0 0 1px color-mix(in srgb, var(--card-accent) 28%, transparent),
-            1px 1px 0 rgba(0, 0, 0, 0.62);
     }
 
     #game-container .indicator-card-draw {
         justify-self: center;
-        min-height: 18px;
+        min-height: 20px;
         padding: 2px 4px;
         border: 0;
         background: transparent;
-        box-shadow: none;
-        color: var(--pixel-yellow, #f6c84a);
-        font-size: 5px;
-        opacity: 0.66;
-    }
-
-    #game-container .indicator-card-draw::before {
-        display: none;
-    }
-
-    #game-container .indicator-card-draw:not(:disabled):hover,
-    #game-container .indicator-card-draw:not(:disabled):focus-visible {
-        transform: none;
-        border: 0;
-        background: transparent;
-        box-shadow: none;
-        opacity: 1;
-    }
-
-    #game-container .indicator-card-draw:disabled {
-        border: 0;
-        background: transparent;
-        color: #6f7d8d;
-        opacity: 0.5;
+        color: var(--game-muted, #81909e);
     }
 
     .indicator-card-feedback {
-        left: 50%;
-        width: max-content;
-        max-width: min(300px, calc(100vw - 24px));
-        transform: translate(-50%, 4px);
-    }
-
-    .indicator-card-feedback.is-visible {
-        transform: translate(-50%, 0);
-    }
-}
-
-@media (max-width: 430px) {
-    .indicator-card-deck {
-        bottom: calc(25px + env(safe-area-inset-bottom));
-    }
-}
-
-@media (max-height: 650px) and (max-width: 720px) {
-    .indicator-card-deck {
-        bottom: calc(22px + env(safe-area-inset-bottom));
-    }
-
-    #game-container .indicator-card {
-        min-height: 44px;
-        padding-block: 4px;
-    }
-}
-
-@media (max-height: 650px) and (min-width: 721px) {
-    .indicator-card-deck {
-        left: 10px;
-        bottom: 10px;
-        width: 248px;
-    }
-
-    #game-container .indicator-card {
-        min-height: 50px;
+        right: 0;
+        left: 0;
+        max-width: none;
+        text-align: center;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .indicator-card-feedback,
-    #game-container .indicator-card {
-        transition: none;
-    }
-
-    #game-container .indicator-card.is-active {
-        animation: none;
-    }
-
-    #game-container .indicator-card.is-revealing::after {
-        animation: none;
-        opacity: 0;
+    #game-container .indicator-card,
+    #game-container .indicator-card-draw,
+    .indicator-card-feedback {
+        transition: none !important;
     }
 }
