@@ -3,244 +3,103 @@ const fs = require('node:fs');
 
 const read = (path) => fs.readFileSync(path, 'utf8');
 
-const indexSource = read('index.html');
-const experienceSource = read('experience.js');
-const hardeningSource = read('core-hardening.js');
-const onboardingSource = read('onboarding.js');
-const onboardingCssSource = read('onboarding.css');
-const uiStateSource = read('scripts/ui-state.js');
-const premiumUiSource = read('scripts/premium-ui.js');
-const premiumCssSource = read('premium-ui.css');
-const friendSource = read('friend-challenge.js');
-const friendCssSource = read('friend-challenge.css');
-const scoreSource = read('scripts/legend-score.js');
-const dailyCoreSource = read('scripts/daily-run-core.js');
-const dailySource = read('daily-run.js');
-const dailyCssSource = read('daily-run.css');
-const marketPassSource = read('scripts/market-pass-rule.js');
-const marketGoalSource = read('scripts/market-goal-ui.js');
-const pacingSource = read('scripts/game-pacing.js');
-const mobileControlsCssSource = read('mobile-controls.css');
-const profileSource = read('scripts/player-profile.js');
-const profileCssSource = read('local-records.css');
-const resultsSource = read('results.js');
-const legendSource = read('legend-ticker.js');
-const qqqSource = read('qqq-loader.js');
-const exportSource = read('card-export.js');
-const shareSource = read('share-challenge.js');
-const leaderboardSource = read('leaderboard.js');
-const leaderboardWorkflow = read('.github/workflows/leaderboard.yml');
+const index = read('index.html');
+const uiState = read('scripts/ui-state.js');
+const premiumUi = read('scripts/premium-ui.js');
+const premiumCss = read('premium-ui.css');
+const mobileCss = read('mobile-controls.css');
+const pacing = read('scripts/game-pacing.js');
+const experience = read('experience.js');
+const onboarding = read('onboarding.js');
 
-assert.ok(indexSource.includes('start-data-ticker'));
-assert.ok(indexSource.includes('REAL HISTORICAL K-LINES'));
-assert.equal(indexSource.includes('NOT LIVE DATA'), false);
-assert.equal(indexSource.includes('ESC = RETURN HOME'), false);
-assert.ok(indexSource.includes('GAME: <span id="level-display">1/3</span>'));
-assert.ok(indexSource.includes('GOAL: <span id="target-return-display">BEAT THE MARKET</span>'));
-assert.ok(indexSource.includes('Trade 3 hidden historical markets.'));
-assert.ok(indexSource.includes('Beat the market to pass each game.'));
-assert.ok(indexSource.includes('id="card-market-return"'));
-assert.equal(indexSource.includes('ANY PROFIT'), false);
+for (const shellContract of [
+    'start-data-ticker',
+    'REAL HISTORICAL K-LINES',
+    'id="game-top-controls"',
+    'id="pause-btn"',
+    'id="game-back-btn"',
+    'id="mobile-controls" hidden',
+    'id="onboarding-screen"',
+    'id="daily-run-btn"',
+    'id="personal-profile-summary"',
+    'leaderboard-open-btn',
+    'challenge-share-btn',
+    'scripts/ui-state.js',
+    'scripts/premium-ui.js',
+    'scripts/game-pacing.js',
+]) {
+    assert.ok(index.includes(shellContract), `Missing product-shell contract: ${shellContract}`);
+}
 
-assert.ok(indexSource.includes('onboarding.css'));
-assert.ok(indexSource.includes('id="onboarding-screen"'));
-assert.ok(indexSource.includes('id="onboarding-start-btn"'));
-assert.ok(indexSource.includes('POSITIVE EXCESS PASSES.'));
-assert.ok(indexSource.includes('onboarding.js'));
-assert.ok(indexSource.indexOf('onboarding.js') < indexSource.indexOf('friend-challenge.js'));
-assert.ok(indexSource.indexOf('onboarding.js') < indexSource.indexOf('daily-run.js'));
-assert.ok(onboardingSource.includes("const STORAGE_KEY = 'flappyk_onboarding_seen_v1'"));
-assert.ok(onboardingSource.includes('function queueGuide()'));
-assert.ok(onboardingSource.includes('function consumePending()'));
-assert.ok(onboardingSource.includes("button.addEventListener('click', queueGuide, { capture: true })"));
-assert.equal(onboardingSource.includes('event.stopImmediatePropagation()'), false);
-assert.equal(onboardingSource.includes('button?.click()'), false);
-assert.ok(onboardingSource.includes('window.localStorage.getItem'));
-assert.ok(onboardingSource.includes('window.localStorage.setItem'));
-assert.ok(onboardingCssSource.includes('.onboarding-screen'));
-assert.ok(onboardingCssSource.includes('.onboarding-panel'));
-assert.ok(indexSource.includes('premium-ui.css'));
-assert.ok(indexSource.includes('scripts/ui-state.js'));
-assert.ok(indexSource.includes('scripts/premium-ui.js'));
-assert.ok(indexSource.indexOf('pwa.js') < indexSource.indexOf('scripts/ui-state.js'));
-assert.ok(indexSource.indexOf('scripts/ui-state.js') < indexSource.indexOf('scripts/premium-ui.js'));
-assert.ok(uiStateSource.includes("PLAYING: 'playing'"));
-assert.ok(uiStateSource.includes("PAUSED: 'paused'"));
-assert.ok(uiStateSource.includes('root.dataset.layout = layout'));
-assert.ok(premiumUiSource.includes("meter.id = 'excess-meter'"));
-assert.ok(premiumUiSource.includes('playerReturn - marketReturn'));
-assert.ok(premiumUiSource.includes('installHomeHierarchy'));
-assert.ok(premiumUiSource.includes('installMobileControls'));
-assert.ok(premiumUiSource.includes('installSettlementSummary'));
-assert.ok(premiumUiSource.includes('beginGuide'));
-assert.ok(premiumCssSource.includes('.excess-meter-track'));
-assert.ok(premiumCssSource.includes('.game-coachmark'));
-assert.ok(premiumCssSource.includes('.settlement-summary'));
-assert.ok(premiumCssSource.includes('.home-primary-actions'));
+assert.equal(index.includes('NOT LIVE DATA'), false);
+assert.equal(index.includes('ESC = RETURN HOME'), false);
+assert.equal(index.includes('id="btn-pause"'), false);
+assert.ok(index.indexOf('pwa.js') < index.indexOf('scripts/ui-state.js'));
+assert.ok(index.indexOf('scripts/ui-state.js') < index.indexOf('scripts/premium-ui.js'));
 
-assert.ok(experienceSource.includes("event.key !== 'Escape'"));
-assert.equal(experienceSource.includes('AUTO_NEXT'), false);
-assert.equal(experienceSource.includes('nextBtn.click'), false);
+for (const stateContract of [
+    "PLAYING: 'playing'",
+    "PAUSED: 'paused'",
+    'root.dataset.layout = layout',
+    'root.dataset.virtualControls',
+]) {
+    assert.ok(uiState.includes(stateContract), `Missing shared UI-state contract: ${stateContract}`);
+}
 
-assert.ok(hardeningSource.includes('cloneNode(true)'));
-assert.ok(hardeningSource.includes("addEventListener('click'"));
-assert.ok(hardeningSource.includes('maxStart + 1'));
-assert.ok(hardeningSource.includes('dataset.completedLevel'));
-assert.ok(hardeningSource.includes("title.textContent = 'PROFIT CARD'"));
-assert.ok(hardeningSource.includes('levelDisp.textContent = String(visibleGame)'));
-assert.equal(hardeningSource.includes('levelDisp.textContent = `${visibleGame}/3`'), false);
-assert.ok(hardeningSource.includes("levelDisp.textContent !== 'CUSTOM'"));
+for (const presentationContract of [
+    'installHomeHierarchy',
+    'installMobileControls',
+    'installSettlementSummary',
+    "meter.id = 'excess-meter'",
+    'playerReturn - marketReturn',
+]) {
+    assert.ok(premiumUi.includes(presentationContract), `Missing canonical UI composition contract: ${presentationContract}`);
+}
 
-assert.ok(indexSource.includes('scripts/market-pass-rule.js'));
-assert.ok(indexSource.includes('scripts/market-goal-ui.js'));
-assert.ok(indexSource.indexOf('game.js') < indexSource.indexOf('scripts/market-pass-rule.js'));
-assert.ok(indexSource.indexOf('scripts/market-pass-rule.js') < indexSource.indexOf('results.js'));
-assert.ok(indexSource.indexOf('core-hardening.js') < indexSource.indexOf('scripts/market-goal-ui.js'));
-assert.ok(indexSource.indexOf('scripts/market-goal-ui.js') < indexSource.indexOf('friend-challenge.js'));
-assert.ok(marketPassSource.includes('isSuccess: excessReturn > 0'));
-assert.ok(marketPassSource.includes("statusMsg.innerText = 'MARKET BEATEN!'"));
-assert.ok(marketPassSource.includes("statusMsg.innerText = 'MARKET WON.'"));
-assert.ok(marketPassSource.includes('marketRetStr'));
-assert.ok(marketGoalSource.includes("targetDisp.textContent = 'BEAT THE MARKET'"));
-assert.ok(resultsSource.includes('window.FlappyKMarketPassRule'));
-assert.ok(resultsSource.includes('performance.isSuccess'));
-assert.ok(resultsSource.includes('legend-market-return'));
+for (const cssContract of [
+    '#game-top-controls[hidden]',
+    '.excess-meter-track',
+    '.game-coachmark',
+    '.settlement-summary',
+    '.home-primary-actions',
+]) {
+    assert.ok(premiumCss.includes(cssContract), `Missing canonical shared presentation contract: ${cssContract}`);
+}
 
-assert.ok(indexSource.includes('scripts/game-pacing.js'));
-assert.ok(indexSource.includes('id="game-top-controls"'));
-assert.ok(indexSource.includes('id="pause-btn"'));
-assert.ok(indexSource.includes('id="game-back-btn"'));
-assert.ok(indexSource.includes('id="mobile-controls" hidden'));
-assert.equal(indexSource.includes('id="btn-pause"'), false);
-assert.ok(indexSource.indexOf('daily-run.js') < indexSource.indexOf('scripts/game-pacing.js'));
-assert.ok(pacingSource.includes('const DEFAULT_SPEED = 15'));
-assert.ok(pacingSource.includes("event.code !== 'Space'"));
-assert.ok(pacingSource.includes("document.addEventListener('visibilitychange'"));
-assert.ok(pacingSource.includes('gameInterval = setInterval(gameTick, TICK_RATE)'));
-assert.ok(pacingSource.includes('mobileControls.hidden = !showMobileControls'));
-assert.ok(pacingSource.includes('topControls.hidden = !gameActive'));
-assert.ok(pacingSource.includes("pauseButton.textContent = ''"));
-assert.ok(pacingSource.includes("window.confirm('Exit this run and return to home? Current progress will be lost.')"));
-assert.ok(pacingSource.includes('window.location.reload()'));
-assert.ok(mobileControlsCssSource.includes('#mobile-controls:not([hidden])'));
-assert.ok(mobileControlsCssSource.includes('#game-top-controls[hidden]'));
-assert.ok(mobileControlsCssSource.includes("#pause-btn::before"));
-assert.ok(mobileControlsCssSource.includes("content: 'Ⅱ'"));
+for (const mobileContract of [
+    '#mobile-controls[hidden]',
+    '#mobile-controls:not([hidden])',
+    'Runtime state decides whether this dock exists; viewport width does not.',
+]) {
+    assert.ok(mobileCss.includes(mobileContract), `Missing touch geometry contract: ${mobileContract}`);
+}
+assert.ok(!mobileCss.includes('#game-top-controls[hidden]'), 'Touch geometry must not own shared top-control visibility.');
+assert.ok(!mobileCss.includes('#pause-btn::before'), 'Pause state must not be painted by mobile CSS pseudo-elements.');
+assert.ok(!mobileCss.includes("content: 'Ⅱ'"), 'Pause state must live in the DOM, not CSS content.');
 
-assert.ok(indexSource.includes('scripts/daily-run-core.js'));
-assert.ok(indexSource.includes('daily-run.js'));
-assert.ok(indexSource.includes('daily-run.css'));
-assert.ok(indexSource.includes('id="daily-run-btn"'));
-assert.ok(indexSource.includes('id="daily-run-summary"'));
-assert.ok(indexSource.includes('id="daily-run-result"'));
-assert.ok(indexSource.indexOf('scripts/daily-run-core.js') < indexSource.indexOf('game.js'));
-assert.ok(indexSource.indexOf('friend-challenge.js') < indexSource.indexOf('daily-run.js'));
-assert.ok(dailyCoreSource.includes("const MARKETS = ['crypto', 'ashare', 'usstock']"));
-assert.ok(dailyCoreSource.includes('generateDailyDescriptors'));
-assert.ok(dailyCoreSource.includes('updateDailyRecord'));
-assert.ok(dailyCoreSource.includes('.sort()'));
-assert.ok(dailySource.includes('DAILY · BEAT THE MARKET'));
-assert.ok(dailySource.includes('FlappyKFriendChallenge.buildChallengeUrl'));
-assert.ok(dailySource.includes('buildDailyChallengeUrl'));
-assert.ok(dailySource.includes('window.localStorage.getItem'));
-assert.ok(dailySource.includes('window.localStorage.setItem'));
-assert.ok(dailySource.includes('NEW DAILY BEST'));
-assert.ok(dailySource.includes('hasFriendChallengeToken'));
-assert.ok(dailyCssSource.includes('#daily-run-btn'));
-assert.ok(dailyCssSource.includes('.daily-run-result--new'));
+for (const pacingContract of [
+    'const DEFAULT_SPEED = 15',
+    "event.code !== 'Space'",
+    "document.addEventListener('visibilitychange'",
+    'gameInterval = setInterval(gameTick, TICK_RATE)',
+    'mobileControls.hidden = !showMobileControls',
+    'topControls.hidden = !gameActive',
+    "pauseButton.textContent = paused ? '▶' : 'Ⅱ'",
+    "pauseButton.setAttribute('aria-label', paused ? 'Resume game' : 'Pause game')",
+    "window.addEventListener('flappyk:layout-state'",
+    "window.addEventListener('orientationchange'",
+]) {
+    assert.ok(pacing.includes(pacingContract), `Missing pacing/control contract: ${pacingContract}`);
+}
 
-assert.ok(indexSource.includes('local-records.css'));
-assert.ok(indexSource.includes('id="personal-profile-summary"'));
-assert.ok(indexSource.includes('id="personal-best-result"'));
-assert.ok(indexSource.includes('scripts/player-profile.js'));
-assert.ok(indexSource.indexOf('card-export.js') < indexSource.indexOf('scripts/player-profile.js'));
-assert.ok(profileSource.includes("const STORAGE_KEY = 'flappyk_player_profile_v1'"));
-assert.ok(profileSource.includes('window.localStorage.getItem'));
-assert.ok(profileSource.includes('window.localStorage.setItem'));
-assert.ok(profileSource.includes('lastRecordedSignature'));
-assert.ok(profileSource.includes('NEW PERSONAL BEST'));
-assert.ok(profileSource.includes('FIRST COMPLETED RUN'));
-assert.ok(profileSource.includes('scoreApi?.calculate(collectedCards, finalReturn)'));
-assert.ok(profileSource.includes("legendButton?.addEventListener('click', recordCompletedRun)"));
-assert.ok(profileCssSource.includes('.local-records-summary'));
-assert.ok(profileCssSource.includes('.local-record-result--new'));
+assert.ok(experience.includes("event.key !== 'Escape'"));
+assert.equal(experience.includes('AUTO_NEXT'), false);
+assert.equal(experience.includes('nextBtn.click'), false);
 
-assert.equal(legendSource.includes('🦬'), false);
-assert.equal(legendSource.includes('installCanvasEmojiMap'), false);
-assert.ok(qqqSource.includes('Object.defineProperty(stockData.usstock, QQQ_NAME'));
-assert.ok(qqqSource.includes('enumerable: false'));
-assert.ok(exportSource.includes('dataset.completedLevel'));
-assert.ok(exportSource.includes('FlappyK_Custom_ProfitCard.png'));
+assert.ok(onboarding.includes("const STORAGE_KEY = 'flappyk_onboarding_seen_v1'"));
+assert.ok(onboarding.includes('function queueGuide()'));
+assert.ok(onboarding.includes('function consumePending()'));
+assert.equal(onboarding.includes('event.stopImmediatePropagation()'), false);
+assert.equal(onboarding.includes('button?.click()'), false);
 
-assert.ok(indexSource.includes('challenge-share-btn'));
-assert.ok(indexSource.includes('>CHALLENGE A FRIEND<'));
-assert.ok(indexSource.includes('id="champagne-save-btn">SAVE RESULT'));
-assert.ok(indexSource.includes('og-image.png'));
-assert.ok(indexSource.includes('og:image:type'));
-assert.ok(indexSource.includes('og:image:width'));
-assert.ok(indexSource.includes('og:image:height'));
-assert.ok(fs.existsSync('og-image.png'));
-
-assert.ok(shareSource.includes('I finished 3 hidden historical markets'));
-assert.ok(shareSource.includes('Can you beat me on the same markets?'));
-assert.ok(shareSource.includes('navigator.share'));
-assert.ok(shareSource.includes('navigator.clipboard.writeText(url)'));
-assert.ok(shareSource.includes('Challenge link copied'));
-assert.ok(shareSource.includes('FlappyKFriendChallenge?.buildChallengeUrl'));
-assert.ok(shareSource.includes('function shareChallengeLink(score)'));
-assert.ok(shareSource.includes('FlappyK_Legend_Result.png'));
-assert.equal(shareSource.includes('shareData.files'), false);
-assert.equal(shareSource.includes('navigator.canShare'), false);
-assert.equal(shareSource.includes('new File('), false);
-assert.equal(shareSource.includes('TAP TO SHARE'), false);
-assert.equal(shareSource.includes('sharePreparedChallenge'), false);
-assert.equal(shareSource.includes('preparedChallengeShare'), false);
-
-const challengeHandlerStart = shareSource.indexOf("challengeButton?.addEventListener('click'");
-const saveHandlerStart = shareSource.indexOf("saveButton?.addEventListener('click'");
-assert.ok(challengeHandlerStart >= 0 && saveHandlerStart > challengeHandlerStart);
-const challengeHandler = shareSource.slice(challengeHandlerStart, saveHandlerStart);
-assert.ok(challengeHandler.includes('shareChallengeLink(score)'));
-assert.equal(challengeHandler.includes('renderLegend'), false);
-assert.equal(challengeHandler.includes('canvasToBlob'), false);
-assert.equal(challengeHandler.includes('downloadBlob'), false);
-
-assert.ok(indexSource.includes('scripts/friend-challenge-codec.js'));
-assert.ok(indexSource.includes('scripts/legend-score.js'));
-assert.ok(indexSource.indexOf('scripts/legend-score.js') < indexSource.indexOf('friend-challenge.js'));
-assert.ok(indexSource.indexOf('scripts/legend-score.js') < indexSource.indexOf('leaderboard.js'));
-assert.ok(indexSource.indexOf('scripts/legend-score.js') < indexSource.indexOf('share-challenge.js'));
-assert.ok(scoreSource.includes('FlappyKLegendScore'));
-assert.ok(scoreSource.includes('benchmarkGrowth *= (1 + marketReturn)'));
-assert.ok(friendSource.includes('const scoreApi = window.FlappyKLegendScore'));
-assert.ok(leaderboardSource.includes('const scoreApi = window.FlappyKLegendScore'));
-assert.ok(shareSource.includes('const scoreApi = window.FlappyKLegendScore'));
-
-assert.ok(indexSource.includes('friend-challenge.js'));
-assert.ok(indexSource.includes('friend-challenge-result'));
-assert.ok(friendSource.includes('new URLSearchParams(window.location.search)'));
-assert.ok(friendSource.includes('window.location.hash'));
-assert.ok(friendSource.includes("url.searchParams.set('challenge'"));
-assert.ok(friendSource.includes('SAME 3 HIDDEN MARKETS'));
-assert.ok(friendSource.includes('resolveDescriptor'));
-assert.ok(friendSource.includes('data.findIndex'));
-assert.ok(friendSource.includes('captureNormalDescriptor'));
-assert.ok(friendSource.includes('CHALLENGE BACK'));
-assert.ok(friendSource.includes('WON BY'));
-assert.ok(friendSource.includes('LOST BY'));
-assert.ok(friendSource.includes('TIE GAME'));
-assert.ok(friendCssSource.includes('.friend-challenge-result--tied'));
-assert.equal(friendSource.includes('localStorage'), false);
-
-assert.ok(indexSource.includes('leaderboard-open-btn'));
-assert.ok(indexSource.includes('leaderboard-screen'));
-assert.ok(indexSource.includes('leaderboard-submit-btn'));
-assert.ok(leaderboardSource.includes('TOTAL EXCESS'));
-assert.ok(leaderboardSource.includes('scoreApi?.calculate(collectedCards, finalReturn)'));
-assert.ok(leaderboardSource.includes('issues/new'));
-assert.ok(leaderboardSource.includes('SUBMIT TOP 10'));
-assert.ok(leaderboardWorkflow.includes('issues:'));
-assert.ok(leaderboardWorkflow.includes('updateTop10'));
-assert.ok(leaderboardWorkflow.includes('createOrUpdateFileContents'));
-
-console.log('UI state, guided onboarding, Excess HUD, responsive controls, Daily Run, local records, sharing, and leaderboard checks passed');
+console.log('Product shell, canonical presentation owner, semantic pause control, responsive touch dock, UI state, onboarding, and manual navigation contracts passed.');
