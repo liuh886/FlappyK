@@ -29,12 +29,16 @@ assert.ok(css.includes('inset: auto 0 0;'));
 assert.ok(css.includes('display: grid'));
 assert.ok(css.includes('width: 100vw'));
 assert.ok(css.includes('env(safe-area-inset-bottom)'));
-assert.ok(css.includes('grid-template-columns: minmax(64px, 1fr) 78px 10px 78px minmax(64px, 1fr)'));
+assert.ok(css.includes('grid-template-columns: minmax(36px, 1fr) 78px 108px 78px minmax(36px, 1fr)'));
 assert.ok(css.includes('#mobile-controls #btn-buy'));
 assert.ok(css.includes('grid-column: 2'));
 assert.ok(css.includes('#mobile-controls #btn-sell'));
 assert.ok(css.includes('grid-column: 4'));
 assert.ok(css.includes('#mobile-controls .mobile-speed-control'));
+assert.ok(css.includes('grid-column: 3'));
+assert.ok(css.includes('Speed is secondary: keep it in the command dock instead of floating over market data.'));
+assert.ok(css.includes("html[data-virtual-controls='true'] #game-top-controls"));
+assert.ok(css.includes('grid-template-columns: 44px 44px'));
 assert.ok(css.includes("data-ui-state='playing'"));
 assert.ok(!css.includes(":has(#indicator-card-deck:not([hidden])) #game-canvas"));
 
@@ -48,4 +52,4 @@ assert.ok(!css.includes('#settlement-screen.active'));
 assert.ok(!css.includes('#game-hud-rail .weather-status'));
 assert.ok(!css.includes('opacity: 0.68'));
 
-console.log('Responsive state, state-driven touch geometry, and single-owner mobile presentation checks passed');
+console.log('Responsive state, dock-contained speed control, 44px navigation targets, and single-owner mobile presentation checks passed');
