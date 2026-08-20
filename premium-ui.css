@@ -924,18 +924,6 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     background: transparent;
 }
 
-.daily-mode-copy {
-    display: grid;
-    gap: 4px;
-}
-
-.daily-mode-copy strong {
-    color: var(--game-system);
-    font-family: var(--pixel-font-display);
-    font-size: 10px;
-}
-
-.daily-mode-copy span,
 .daily-run-summary {
     color: var(--game-muted);
     font-size: 13px;
@@ -1940,7 +1928,7 @@ html[data-flappyk-language='zh'] .run-progress-panel .hud-day {
     }
 
     .home-console-screen::after {
-        right: -0.12em;
+        right: 0;
         bottom: 18%;
         font-size: clamp(220px, 76vw, 340px);
     }
@@ -2069,16 +2057,29 @@ html[data-flappyk-language='zh'] .run-progress-panel .hud-day {
     }
 
     .home-world-strip {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .home-world {
         grid-template-columns: 1fr;
+        gap: 4px;
+        min-height: 52px;
+        padding: 6px 4px;
+        text-align: center;
     }
 
     .home-world + .home-world {
-        border-left: 0;
-        border-top: 1px solid var(--game-border);
+        border-left: 1px solid var(--game-border);
+        border-top: 0;
+    }
+
+    .home-world-index {
+        justify-self: center;
     }
 
     .home-world-name {
-        font-size: 13px;
+        font-size: 10px;
+        text-align: center;
     }
 
     .home-secondary-actions,
