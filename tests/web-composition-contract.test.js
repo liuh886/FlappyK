@@ -63,7 +63,8 @@ for (const contract of [
 
 for (const mobileContract of [
   '#mobile-controls:not([hidden])',
-  'Virtual-control geometry is driven by runtime state, not viewport width.',
+  'Touch geometry only. Shared color, typography and button skin live in premium-ui.css.',
+  'Runtime state decides whether this dock exists; viewport width does not.',
   'position: fixed;',
   'display: grid;',
   'width: 100vw;',
@@ -77,6 +78,9 @@ assert.ok(!canonicalCss.includes('--pixel-cut:'), 'Decorative clipped-corner vis
 assert.ok(!canonicalCss.includes('background: #e7e2d4'), 'Paper surfaces must not return.');
 assert.ok(!baseStyles.includes('html body #game-container #game-hud-rail'), 'Legacy high-specificity HUD owner must not return.');
 assert.ok(!baseStyles.includes('--hud-shell:'), 'Legacy HUD theme variables must not return to style.css.');
+assert.ok(!baseStyles.includes('.profit-card'), 'Base CSS must not regain settlement styling.');
+assert.ok(!mobileCss.includes('#settlement-screen.active'), 'Touch geometry must not own settlement layout.');
+assert.ok(!mobileCss.includes('#game-hud-rail .weather-status'), 'Touch geometry must not own shared HUD presentation.');
 assert.ok(!canonicalCss.includes('width: min(896px'), 'Fixed desktop viewport width must not return.');
 assert.ok(!canonicalCss.includes('aspect-ratio: 4 / 3'), 'Fixed desktop viewport aspect ratio must not return.');
 
@@ -105,4 +109,4 @@ assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"));
 assert.ok(!serviceWorker.includes("'./home-story.css'"));
 assert.ok(!/flappyk-(?:app|runtime)-v\d+/.test(serviceWorker));
 
-console.log('Single-Surface Market OS has one shared CSS owner, runtime-state-driven feature-owned mobile geometry, stable DOM composition, isolated weather, account placement, responsive state, and stable PWA cache contracts.');
+console.log('Single-Surface Market OS has one shared CSS owner, runtime-state-driven touch geometry, stable DOM composition, isolated weather, account placement, responsive state, and stable PWA cache contracts.');
