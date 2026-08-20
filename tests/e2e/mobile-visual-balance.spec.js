@@ -66,7 +66,9 @@ test('mobile home keeps PLAY first and settlement remains contained in the same 
     const restart = document.getElementById('restart-btn');
     if (restart) restart.hidden = false;
   });
-  await page.waitForTimeout(80);
+  await page.locator('#settlement-screen').evaluate(async (screen) => {
+    await Promise.all(screen.getAnimations().map((animation) => animation.finished));
+  });
 
   const settlementBalance = await page.evaluate(() => {
     const screen = document.getElementById('settlement-screen');
@@ -86,7 +88,7 @@ test('mobile home keeps PLAY first and settlement remains contained in the same 
   });
 
   // Chromium can place a 100dvh fixed surface on a fractional visual-viewport origin.
-  // Keep the acceptance strict to two CSS pixels while validating the full surface and its children.
+  // Keep the acceptance strict to two CSS pixels while validating the settled surface and its children.
   expect(inside(settlementBalance.screen, settlementBalance.viewport)).toBe(true);
   expect(inside(settlementBalance.card, settlementBalance.screen)).toBe(true);
   expect(inside(settlementBalance.actions, settlementBalance.screen)).toBe(true);
