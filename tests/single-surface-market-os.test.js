@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 
 const css = fs.readFileSync('premium-ui.css', 'utf8');
+const base = fs.readFileSync('style.css', 'utf8');
 const mobile = fs.readFileSync('mobile-controls.css', 'utf8');
 const index = fs.readFileSync('index.html', 'utf8');
 const weather = fs.readFileSync('scripts/market-weather.js', 'utf8');
@@ -49,7 +50,8 @@ for (const contract of [
 
 for (const contract of [
   '#mobile-controls:not([hidden])',
-  'Virtual-control geometry is driven by runtime state, not viewport width.',
+  'Touch geometry only. Shared color, typography and button skin live in premium-ui.css.',
+  'Runtime state decides whether this dock exists; viewport width does not.',
   'position: fixed;',
   'display: grid;',
   'width: 100vw;',
@@ -58,6 +60,8 @@ for (const contract of [
 }
 
 assert.ok(!css.includes('#mobile-controls:not([hidden]) {'), 'Shared theme must not take ownership of mobile dock geometry.');
+assert.ok(base.includes('.home-story-equation'));
+assert.ok(base.includes('pointer-events: none;'));
 
 for (const retired of [
   'Settlement as a score receipt',
@@ -68,6 +72,25 @@ for (const retired of [
   'box-shadow: 8px 8px',
 ]) {
   assert.ok(!css.includes(retired), `Retired mixed visual metaphor returned: ${retired}`);
+}
+
+for (const retiredBase of [
+  '.card-theme-crypto',
+  '.card-theme-ashare',
+  '.card-theme-usstock',
+  '.export-area',
+  '.action-btn',
+  '.trade-emoji',
+]) {
+  assert.ok(!base.includes(retiredBase), `Legacy base visual owner returned: ${retiredBase}`);
+}
+
+for (const retiredMobileOwner of [
+  '#settlement-screen.active',
+  "html[data-ui-state='home'] body #game-container #start-screen.arcade-home",
+  '#game-hud-rail .weather-status',
+]) {
+  assert.ok(!mobile.includes(retiredMobileOwner), `Cross-owner mobile rule returned: ${retiredMobileOwner}`);
 }
 
 for (const retiredInline of [
@@ -103,4 +126,4 @@ for (const principle of [
   assert.ok(direction.includes(principle), `Missing visual-direction principle: ${principle}`);
 }
 
-console.log('Single-Surface Market OS, bilingual parity, state-driven mobile geometry, unified story/settlement/run-complete surfaces, and single-owner shared visual contracts passed.');
+console.log('Single-Surface Market OS, deleted legacy base skin, bilingual parity, state-driven mobile geometry, and single-owner shared visual contracts passed.');
