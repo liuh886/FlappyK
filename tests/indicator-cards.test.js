@@ -116,21 +116,36 @@ for (const contract of [
   'z-index: 10',
   '.indicator-card-deck',
   '.indicator-hand-label',
-  '.indicator-hand-label::before',
-  '--card-glow:',
+  '--card-accent: var(--game-system',
   '.indicator-card-count',
   '.indicator-card.is-active',
   '.indicator-card.is-empty',
-  '.indicator-card.is-revealing',
-  '@keyframes indicator-card-decode',
-  '@keyframes indicator-power-active',
   "@media (max-width: 720px), (pointer: coarse)",
   'touch-action: manipulation',
   'min-height: 44px',
+  'grid-template-columns: 64px 64px',
+  'right: max(6px, env(safe-area-inset-right))',
+  'left: max(6px, env(safe-area-inset-left))',
+  'var(--game-system',
+  'var(--game-accent',
+  'var(--game-bg',
+  'box-shadow: none',
+]) {
+  assert.ok(cardsStyles.includes(contract), `Missing single-surface power-up visual contract: ${contract}`);
+}
+for (const retired of [
+  '.indicator-hand-label::before',
+  '--card-glow:',
+  'clip-path:',
+  '#a98bff',
+  '@keyframes indicator-card-decode',
+  '@keyframes indicator-power-active',
+  '.indicator-card-draw',
+  '.indicator-card.is-revealing',
   'var(--hud-shell',
   'var(--pixel-yellow',
 ]) {
-  assert.ok(cardsStyles.includes(contract), `Missing tactical power-up visual contract: ${contract}`);
+  assert.ok(!cardsStyles.includes(retired), `Retired power-up visual path returned: ${retired}`);
 }
 assert.ok(weatherStyles.includes('#game-canvas'));
 assert.ok(weatherStyles.includes('z-index: 8'));
@@ -172,4 +187,4 @@ for (const asset of [
   assert.ok(serviceWorkerSource.includes(asset), `Stable PWA shell is missing ${asset}`);
 }
 
-console.log('BOLL/MACD math, Pro daily grants, Daily Run trials, account/access separation, scarce power-up visuals, overlay stacking, mobile controls, retired draw deletion, and stable PWA contracts validated');
+console.log('BOLL/MACD math, Pro daily grants, Daily Run trials, account/access separation, single-surface power-ups, overlay stacking, mobile controls, retired draw deletion, and stable PWA contracts validated');
