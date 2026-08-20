@@ -96,17 +96,19 @@ for (const detailContract of [
   assert.ok(weatherScript.includes(detailContract), `Missing arcade detail contract: ${detailContract}`);
 }
 
-assert.ok(baseStyles.includes('#start-btn.has-dom-play-icon::before'));
-assert.ok(baseStyles.includes('.home-play-icon'));
-assert.ok(baseStyles.includes('.pixel-trade-glyph'));
-assert.ok(baseStyles.includes('.sell-btn .trade-emoji'));
-assert.ok(baseStyles.includes(':where(button, select, summary, a[href]):focus-visible'));
-assert.ok(!baseStyles.includes('#game-hud-rail .weather-status::before'), 'Base CSS must not regain weather/HUD presentation ownership.');
+// Shared presentation is canonical in premium-ui.css. Base CSS stays structural.
+assert.ok(uiStyles.includes('.home-play-icon'));
+assert.ok(uiStyles.includes('.pixel-trade-glyph'));
 assert.ok(uiStyles.includes('#game-hud-rail .weather-status::before'));
 assert.ok(uiStyles.includes("html[data-market-weather='rain']"));
 assert.ok(uiStyles.includes('--game-system:'), 'Weather/system state must use the canonical system color token.');
 assert.ok(uiStyles.includes('--game-accent:'), 'Primary focus color must remain distinct from weather/system state.');
 assert.ok(!uiStyles.includes('--game-yellow:'), 'Retired generic yellow token must not return.');
+assert.ok(baseStyles.includes(':where(button, select, summary, a[href], input, textarea):focus-visible'));
+assert.ok(!baseStyles.includes('#start-btn.has-dom-play-icon::before'));
+assert.ok(!baseStyles.includes('.pixel-trade-glyph'));
+assert.ok(!baseStyles.includes('.sell-btn .trade-emoji'));
+assert.ok(!baseStyles.includes('#game-hud-rail .weather-status::before'), 'Base CSS must not regain weather/HUD presentation ownership.');
 assert.ok(!baseStyles.includes('"Apple Color Emoji"'), 'Native color emoji must not own trade-button styling.');
 
 assert.ok(pwa.includes("'./market-weather.css'"), 'PWA loader must attach market-weather.css.');
@@ -123,4 +125,4 @@ assert.ok(serviceWorker.includes("'./scripts/home-story.js'"), 'Offline shell mu
 assert.ok(serviceWorker.includes("'./account-integration.css'"), 'Offline shell must cache the account toolbar styles.');
 assert.ok(serviceWorker.includes("'./scripts/account-cloud-sync.js'"), 'Offline shell must cache the account cloud bridge.');
 
-console.log('Isolated market weather, staged transitions, explicit event ownership, single-surface HUD ownership, account toolbar, cloud history, and stable PWA cache contracts passed.');
+console.log('Isolated market weather, staged transitions, canonical shared presentation ownership, account toolbar, cloud history, and stable PWA cache contracts passed.');
