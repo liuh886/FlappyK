@@ -3,6 +3,7 @@ const fs = require('node:fs');
 
 const index = fs.readFileSync('index.html', 'utf8');
 const mobile = fs.readFileSync('mobile-controls.css', 'utf8');
+const premium = fs.readFileSync('premium-ui.css', 'utf8');
 const cards = fs.readFileSync('indicator-cards.css', 'utf8');
 
 const identityStart = index.indexOf('settlement-market-identity');
@@ -27,13 +28,17 @@ for (const contract of [
   'top: calc(max(6px, env(safe-area-inset-top)) + 88px)',
   'right: max(10px, env(safe-area-inset-right))',
   'grid-template-columns: 28px 38px 28px',
-  'opacity: 0.68',
-  'background: transparent',
   "data-ui-state='playing'",
   'margin-bottom: 102px',
 ]) {
   assert.ok(mobile.includes(contract), `Missing mobile gameplay hierarchy contract: ${contract}`);
 }
+
+assert.ok(premium.includes('.mobile-speed-control .speed-readout'));
+assert.ok(premium.includes('#btn-buy'));
+assert.ok(premium.includes('#btn-sell'));
+assert.ok(!mobile.includes('opacity: 0.68'), 'Mobile geometry must not encode visual hierarchy through opacity.');
+assert.ok(!mobile.includes('background: rgba(6, 12, 20'), 'Mobile geometry must not own HUD translucency.');
 
 for (const contract of [
   'right: max(8px, env(safe-area-inset-right))',
@@ -56,4 +61,4 @@ assert.ok(!mobile.includes('grid-template-columns: 88px minmax(106px, 1fr) 88px'
 assert.ok(!mobile.includes(":has(#indicator-card-deck:not([hidden])) #game-canvas"), 'Power-ups must not reserve a separate tray above the mobile command dock.');
 assert.ok(!cards.includes('width: min(248px, calc(100% - 28px))'), 'The previous oversized mobile tactical tray must not return.');
 
-console.log('State-driven dock, top speed utility, centered trade cluster, outer power-ups, and always-visible settlement identity contracts passed.');
+console.log('State-driven touch geometry, shared visual ownership, outer power-ups, and always-visible settlement identity contracts passed.');
