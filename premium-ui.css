@@ -15,6 +15,7 @@
     --game-system: #73e6f2;
     --game-green: #66e38f;
     --game-red: #ff6d77;
+    --game-depth: #020405;
 
     --pixel-ink: var(--game-bg);
     --pixel-paper: var(--game-text);
@@ -42,7 +43,8 @@
 
 /*
  * FLAPPY K / SINGLE-SURFACE MARKET OS
- * MARKET ARCADE pass: readable type, stronger state drama and tactile controls.
+ * MARKET ARCADE pass, now expressed as PIXEL MARKET ARCADE.
+ * Hard edges, hard depth, large score hierarchy and tactile controls.
  * Feature styles keep feature geometry; this file owns shared presentation.
  */
 
@@ -74,11 +76,11 @@ textarea {
 
 button {
     transition:
-        background-color 120ms ease,
-        border-color 120ms ease,
-        color 120ms ease,
-        transform 90ms ease,
-        box-shadow 90ms ease;
+        background-color 70ms linear,
+        border-color 70ms linear,
+        color 70ms linear,
+        transform 70ms linear,
+        box-shadow 70ms linear;
 }
 
 button:focus-visible,
@@ -95,17 +97,7 @@ a:focus-visible {
 }
 
 #game-container::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
-    opacity: 0.22;
-    background-image:
-        linear-gradient(rgba(115, 230, 242, 0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(115, 230, 242, 0.02) 1px, transparent 1px),
-        linear-gradient(115deg, transparent 0 48%, rgba(255, 216, 77, 0.018) 48% 49%, transparent 49% 100%);
-    background-size: 56px 56px, 56px 56px, 240px 240px;
+    content: none;
 }
 
 .screen {
@@ -113,11 +105,11 @@ a:focus-visible {
 }
 
 .screen.active {
-    animation: market-surface-enter 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation: market-surface-enter 140ms steps(2, end) both;
 }
 
 @keyframes market-surface-enter {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translateY(6px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
@@ -153,9 +145,9 @@ a:focus-visible {
     gap: 0;
     align-items: stretch;
     overflow: hidden;
-    border: 1px solid var(--game-border-strong);
-    background: rgba(6, 8, 12, 0.94);
-    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.34);
+    border: 2px solid var(--game-border-strong);
+    background: var(--game-bg);
+    box-shadow: 5px 5px 0 var(--game-depth);
     pointer-events: none;
 }
 
@@ -163,17 +155,12 @@ a:focus-visible {
     content: '';
     position: absolute;
     top: 0;
-    left: -34%;
+    left: 0;
     z-index: 2;
-    width: 34%;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--game-system), transparent);
-    animation: arcade-rail-scan 4.2s linear infinite;
+    width: 84px;
+    height: 4px;
+    background: var(--game-system);
     pointer-events: none;
-}
-
-@keyframes arcade-rail-scan {
-    to { left: 100%; }
 }
 
 #game-hud-rail > * {
@@ -248,7 +235,7 @@ a:focus-visible {
     overflow: hidden;
     color: var(--game-text);
     font-family: var(--pixel-font-display);
-    font-size: clamp(18px, 1.8vw, 26px);
+    font-size: clamp(20px, 1.9vw, 28px);
     line-height: 1.25;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -296,10 +283,10 @@ a:focus-visible {
 
 .excess-meter-track {
     position: relative;
-    height: 10px;
+    height: 11px;
     margin-top: 7px;
     overflow: hidden;
-    border: 1px solid var(--game-border-strong);
+    border: 2px solid var(--game-border-strong);
     background: #030507;
 }
 
@@ -309,7 +296,7 @@ a:focus-visible {
     top: 0;
     bottom: 0;
     width: 50%;
-    opacity: 0.22;
+    opacity: 0.2;
 }
 
 .excess-meter-negative { left: 0; background: var(--game-red); }
@@ -326,12 +313,12 @@ a:focus-visible {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 8px;
-    height: 16px;
+    width: 9px;
+    height: 17px;
     border: 2px solid var(--game-bg);
     background: var(--game-red);
     transform: translate(-50%, -50%);
-    transition: left 160ms linear, background 120ms ease;
+    transition: left 120ms linear, background 70ms linear;
 }
 
 .excess-meter[data-leading='true'] .excess-meter-indicator {
@@ -373,9 +360,9 @@ a:focus-visible {
     position: relative;
     grid-column: 2;
     grid-row: 1;
-    height: 8px;
+    height: 9px;
     overflow: hidden;
-    border: 1px solid var(--game-border);
+    border: 2px solid var(--game-border);
     background: #030507;
 }
 
@@ -384,7 +371,7 @@ a:focus-visible {
     width: 0;
     height: 100%;
     background: var(--game-system);
-    transition: width 160ms linear;
+    transition: width 120ms linear;
 }
 
 .hud-details,
@@ -412,7 +399,7 @@ a:focus-visible {
 }
 
 #game-hud-rail .weather-status::before {
-    content: '●';
+    content: '■';
     margin-right: 7px;
     color: var(--game-system);
 }
@@ -492,7 +479,7 @@ html[data-market-weather='rain'] #game-hud-rail .weather-status::before {
     display: grid;
     place-items: center;
     border-left: 1px solid var(--game-border);
-    background: rgba(255, 216, 77, 0.05);
+    background: var(--game-surface);
     color: var(--game-accent);
     font-family: var(--pixel-font-display);
     font-size: 11px;
@@ -507,9 +494,9 @@ html[data-market-weather='rain'] #game-hud-rail .weather-status::before {
     display: grid;
     width: 240px;
     overflow: hidden;
-    border: 1px solid var(--game-border-strong);
-    background: rgba(6, 8, 12, 0.92);
-    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28);
+    border: 2px solid var(--game-border-strong);
+    background: var(--game-bg);
+    box-shadow: 4px 4px 0 var(--game-depth);
 }
 
 .trade-key-hints {
@@ -535,9 +522,10 @@ html[data-market-weather='rain'] #game-hud-rail .weather-status::before {
 .trade-key-hint .key {
     min-width: 30px;
     padding: 3px 4px;
-    border: 1px solid var(--game-border-strong);
+    border: 2px solid var(--game-border-strong);
     background: var(--game-surface-raised);
     color: var(--game-text);
+    box-shadow: 2px 2px 0 var(--game-depth);
     text-align: center;
 }
 
@@ -580,19 +568,19 @@ html[data-virtual-controls='true'] #game-top-controls .desktop-speed-control {
 #btn-buy {
     border-top: 4px solid var(--game-green) !important;
     background: color-mix(in srgb, var(--game-green) 10%, var(--game-bg)) !important;
-    box-shadow: 0 5px 0 #173423, 0 9px 20px rgba(0, 0, 0, 0.28) !important;
+    box-shadow: 0 5px 0 #173423 !important;
 }
 
 #btn-sell {
     border-top: 4px solid var(--game-red) !important;
     background: color-mix(in srgb, var(--game-red) 9%, var(--game-bg)) !important;
-    box-shadow: 0 5px 0 #3c1b22, 0 9px 20px rgba(0, 0, 0, 0.28) !important;
+    box-shadow: 0 5px 0 #3c1b22 !important;
 }
 
 #btn-buy:active,
 #btn-sell:active {
     transform: translateY(3px);
-    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.75) !important;
+    box-shadow: 0 2px 0 var(--game-depth) !important;
 }
 
 #btn-buy .trade-emoji,
@@ -651,9 +639,9 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     min-width: 0;
     min-height: 0;
     overflow: hidden;
-    border: 1px solid var(--game-border-strong);
+    border: 3px solid var(--game-border-strong);
     background: var(--game-bg);
-    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.36);
+    box-shadow: 7px 7px 0 var(--game-depth);
 }
 
 .home-console-bezel::before {
@@ -661,8 +649,8 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     position: absolute;
     inset: 0 auto 0 0;
     z-index: 5;
-    width: 3px;
-    background: linear-gradient(var(--game-system), transparent 34%, transparent 66%, var(--game-accent));
+    width: 4px;
+    background: var(--game-system);
     pointer-events: none;
 }
 
@@ -673,7 +661,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     align-items: center;
     min-height: 46px;
     padding: 8px 12px;
-    border-bottom: 1px solid var(--game-border);
+    border-bottom: 2px solid var(--game-border);
     background: var(--game-surface);
 }
 
@@ -700,9 +688,9 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 }
 
 .home-console-lamps span {
-    width: 7px;
-    height: 7px;
-    border: 1px solid var(--game-border-strong);
+    width: 8px;
+    height: 8px;
+    border: 2px solid var(--game-border-strong);
     background: var(--game-border);
 }
 
@@ -727,22 +715,18 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     min-height: 0;
     padding: clamp(24px, 4.6vw, 62px);
     overflow: hidden;
-    background:
-        radial-gradient(circle at 78% 30%, rgba(115, 230, 242, 0.10), transparent 30%),
-        linear-gradient(125deg, rgba(255, 216, 77, 0.025), transparent 36%),
-        var(--game-bg);
+    background: var(--game-bg);
 }
 
 .home-console-screen::before {
     content: '';
     position: absolute;
-    inset: 0;
+    right: 32%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--game-border);
     pointer-events: none;
-    opacity: 0.3;
-    background:
-        linear-gradient(90deg, transparent 0 67%, rgba(115, 230, 242, 0.08) 67% 67.15%, transparent 67.15%),
-        linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px);
-    background-size: 100% 100%, 100% 56px;
 }
 
 .home-console-screen::after {
@@ -751,7 +735,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     right: -0.06em;
     bottom: -0.22em;
     z-index: 0;
-    color: rgba(115, 230, 242, 0.035);
+    color: #0d1b24;
     font-family: var(--pixel-font-display);
     font-size: clamp(260px, 34vw, 560px);
     line-height: 1;
@@ -782,7 +766,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     line-height: 0.98;
     letter-spacing: -0.045em;
     text-align: left;
-    text-shadow: 0 4px 0 rgba(115, 230, 242, 0.11);
+    text-shadow: 5px 5px 0 var(--game-depth);
 }
 
 .home-console-intro-copy {
@@ -807,8 +791,9 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     gap: 0;
     max-width: 700px;
     margin-top: 6px;
-    border: 1px solid var(--game-border-strong);
-    background: rgba(11, 17, 24, 0.72);
+    border: 2px solid var(--game-border-strong);
+    background: var(--game-surface);
+    box-shadow: 4px 4px 0 var(--game-depth);
 }
 
 .home-world {
@@ -863,11 +848,11 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     width: 100%;
     min-height: 72px;
     padding: 14px 18px;
-    border: 2px solid #ffe478;
+    border: 3px solid #ffe478;
     border-radius: 0;
     background: var(--game-accent);
     color: var(--game-bg);
-    box-shadow: 0 7px 0 #8e7520, 0 14px 28px rgba(0, 0, 0, 0.32) !important;
+    box-shadow: 7px 7px 0 #8e7520 !important;
     font-family: var(--pixel-font-display);
     font-size: clamp(20px, 2vw, 26px);
     letter-spacing: 0.03em;
@@ -876,19 +861,19 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 
 .home-primary-actions #start-btn:hover {
     background: #ffe474;
-    transform: translateY(-2px);
-    box-shadow: 0 9px 0 #8e7520, 0 18px 32px rgba(0, 0, 0, 0.36) !important;
+    transform: translate(-1px, -1px);
+    box-shadow: 8px 8px 0 #8e7520 !important;
 }
 
 .home-primary-actions #start-btn:active {
-    transform: translateY(4px);
-    box-shadow: 0 3px 0 #8e7520, 0 8px 18px rgba(0, 0, 0, 0.28) !important;
+    transform: translate(4px, 4px);
+    box-shadow: 3px 3px 0 #8e7520 !important;
 }
 
 .home-play-icon {
     order: 2;
     font-size: 18px;
-    transition: transform 120ms ease;
+    transition: transform 70ms linear;
 }
 
 .home-primary-actions #start-btn:hover .home-play-icon {
@@ -901,9 +886,9 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     gap: 0;
     align-content: start;
     min-width: 0;
-    border: 1px solid var(--game-border-strong);
-    background: rgba(11, 17, 24, 0.78);
-    box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.18);
+    border: 2px solid var(--game-border-strong);
+    background: var(--game-surface);
+    box-shadow: 6px 6px 0 var(--game-depth);
 }
 
 .local-records-summary {
@@ -917,7 +902,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     padding: 10px 12px;
     border: 0;
     border-bottom: 1px solid var(--game-border);
-    background: rgba(11, 17, 24, 0.72);
+    background: var(--game-surface);
     color: var(--game-muted);
     font-size: 12px;
 }
@@ -959,11 +944,17 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 
 #daily-run-btn {
     min-height: 48px;
-    border: 1px solid var(--game-border-strong);
-    background: rgba(115, 230, 242, 0.05);
+    border: 2px solid var(--game-border-strong);
+    background: var(--game-bg);
     color: var(--game-text);
+    box-shadow: 3px 3px 0 var(--game-depth);
     font-size: 16px;
     font-weight: 700;
+}
+
+#daily-run-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--game-depth);
 }
 
 .home-secondary-actions {
@@ -989,9 +980,9 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     align-self: end;
     margin-top: 12px;
     overflow: hidden;
-    border-top: 1px solid var(--game-border);
-    border-bottom: 1px solid var(--game-border);
-    background: rgba(115, 230, 242, 0.025);
+    border-top: 2px solid var(--game-border);
+    border-bottom: 2px solid var(--game-border);
+    background: var(--game-bg);
 }
 
 .start-data-ticker-track {
@@ -1007,7 +998,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     align-items: center;
     min-height: 34px;
     padding: 7px 12px;
-    border-top: 1px solid var(--game-border);
+    border-top: 2px solid var(--game-border);
     background: var(--game-surface);
 }
 
@@ -1052,11 +1043,16 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     min-width: 44px;
     min-height: 44px;
     padding: 8px 11px;
-    border: 1px solid var(--game-border-strong);
+    border: 2px solid var(--game-border-strong);
     border-radius: 0;
     background: var(--game-surface-raised);
     color: var(--game-text);
-    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.5);
+    box-shadow: 3px 3px 0 var(--game-depth);
+}
+
+.home-story-arrow:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--game-depth);
 }
 
 .home-story-page-status {
@@ -1089,9 +1085,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     overflow: auto;
     border: 0;
     border-radius: 0;
-    background:
-        radial-gradient(circle at 82% 34%, rgba(115, 230, 242, 0.07), transparent 30%),
-        var(--game-bg);
+    background: var(--game-bg);
     color: var(--game-text);
     box-shadow: none;
 }
@@ -1128,7 +1122,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 }
 
 .home-story-kicker::before {
-    content: '●';
+    content: '■';
 }
 
 .home-story-title {
@@ -1137,6 +1131,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     font-family: var(--pixel-font-display);
     font-size: clamp(30px, 4.4vw, 56px);
     line-height: 1.16;
+    text-shadow: 4px 4px 0 var(--game-depth);
 }
 
 .home-story-lead,
@@ -1154,8 +1149,9 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     align-items: center;
     margin-top: 8px;
     padding: 14px;
-    border: 1px solid var(--game-border-strong);
+    border: 2px solid var(--game-border-strong);
     background: var(--game-surface);
+    box-shadow: 4px 4px 0 var(--game-depth);
 }
 
 .home-story-equation-term {
@@ -1178,27 +1174,27 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 
 .home-story-play {
     min-height: 58px;
-    border: 2px solid #ffe478;
+    border: 3px solid #ffe478;
     border-radius: 0;
     background: var(--game-accent);
     color: var(--game-bg);
-    box-shadow: 0 5px 0 #8e7520;
+    box-shadow: 5px 5px 0 #8e7520;
     font-family: var(--pixel-font-display);
     font-size: 11px;
 }
 
 .home-story-play:active {
-    transform: translateY(3px);
-    box-shadow: 0 2px 0 #8e7520;
+    transform: translate(3px, 3px);
+    box-shadow: 2px 2px 0 #8e7520;
 }
 
 .home-story-tape {
     min-width: 0;
     margin: 0;
     padding: 18px;
-    border: 1px solid var(--game-border-strong);
-    background: rgba(11, 17, 24, 0.84);
-    box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.16);
+    border: 2px solid var(--game-border-strong);
+    background: var(--game-surface);
+    box-shadow: 6px 6px 0 var(--game-depth);
 }
 
 .home-story-tape-header {
@@ -1262,9 +1258,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     justify-items: center;
     gap: 14px;
     padding: 22px;
-    background:
-        radial-gradient(circle at 50% 20%, rgba(115, 230, 242, 0.06), transparent 32%),
-        rgba(6, 8, 12, 0.97);
+    background: var(--game-bg);
 }
 
 .profit-card {
@@ -1272,17 +1266,17 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     max-height: calc(100dvh - 140px);
     overflow: auto;
     padding: 0;
-    border: 1px solid var(--game-border-strong);
+    border: 3px solid var(--game-border-strong);
     border-radius: 0;
     background: var(--game-surface);
     color: var(--game-text);
-    box-shadow: 0 18px 46px rgba(0, 0, 0, 0.36);
+    box-shadow: 8px 8px 0 var(--game-depth);
 }
 
 .profit-card #card-title {
     margin: 0;
     padding: 12px 16px;
-    border-bottom: 1px solid var(--game-border);
+    border-bottom: 2px solid var(--game-border);
     color: var(--game-muted);
     font-family: var(--pixel-font-display);
     font-size: 11px;
@@ -1298,7 +1292,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
         'compare compare';
     gap: 18px 24px;
     padding: 28px 24px 24px;
-    border-bottom: 1px solid var(--game-border);
+    border-bottom: 2px solid var(--game-border);
 }
 
 #settlement-verdict {
@@ -1317,22 +1311,24 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     font-family: var(--pixel-font-display);
     font-size: clamp(46px, 7.4vw, 76px);
     line-height: 1;
+    text-shadow: 5px 5px 0 var(--game-depth);
     font-variant-numeric: tabular-nums;
 }
 
 .profit-card[data-result='success'] .settlement-excess-summary {
     color: var(--game-green);
-    animation: arcade-score-pop 300ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation: arcade-score-pop 210ms steps(3, end) both;
 }
 
 .profit-card[data-result='failure'] .settlement-excess-summary {
     color: var(--game-red);
-    animation: arcade-score-pop 300ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation: arcade-score-pop 210ms steps(3, end) both;
 }
 
 @keyframes arcade-score-pop {
-    from { opacity: 0; transform: translateY(10px) scale(0.96); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
+    from { opacity: 0; transform: translateY(12px); }
+    66% { opacity: 1; transform: translateY(-3px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .settlement-comparison {
@@ -1360,8 +1356,8 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 
 .settlement-comparison-track {
     position: relative;
-    height: 10px;
-    border: 1px solid var(--game-border);
+    height: 11px;
+    border: 2px solid var(--game-border);
     background: #030507;
 }
 
@@ -1437,9 +1433,9 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 2px;
+    gap: 4px;
     width: min(760px, calc(100vw - 28px));
-    background: var(--game-border);
+    background: transparent;
 }
 
 .settlement-actions > button,
@@ -1447,18 +1443,25 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     min-height: 50px;
     margin: 0;
     padding: 0 18px;
-    border: 0 !important;
+    border: 2px solid var(--game-border-strong) !important;
     background: var(--game-surface-raised) !important;
     color: var(--game-text) !important;
+    box-shadow: 3px 3px 0 var(--game-depth) !important;
     font-size: 14px;
     font-weight: 700;
+}
+
+.settlement-actions > button:active,
+#custom-result-actions button:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--game-depth) !important;
 }
 
 .settlement-actions > button:not([hidden]):first-child,
 #champagne-btn:not([hidden]) {
     background: var(--game-accent) !important;
     color: var(--game-bg) !important;
-    box-shadow: inset 0 -4px 0 #8e7520 !important;
+    box-shadow: 4px 4px 0 #8e7520 !important;
 }
 
 #custom-result-actions[hidden] {
@@ -1467,7 +1470,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 
 #custom-result-actions:not([hidden]) {
     display: flex !important;
-    gap: 2px;
+    gap: 4px;
 }
 
 /* ---------- Dialogs: same system shell ---------- */
@@ -1478,11 +1481,11 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     width: min(680px, calc(100vw - 28px));
     padding: 0;
     overflow: hidden;
-    border: 1px solid var(--game-border-strong) !important;
+    border: 3px solid var(--game-border-strong) !important;
     border-radius: 0 !important;
     background: var(--game-bg) !important;
     color: var(--game-text);
-    box-shadow: 0 18px 46px rgba(0, 0, 0, 0.36) !important;
+    box-shadow: 8px 8px 0 var(--game-depth) !important;
 }
 
 .leaderboard-panel h2,
@@ -1490,7 +1493,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 .onboarding-panel h2 {
     margin: 0;
     padding: 18px 20px;
-    border-bottom: 1px solid var(--game-border);
+    border-bottom: 2px solid var(--game-border);
     color: var(--game-text);
     font-family: var(--pixel-font-display);
     font-size: clamp(18px, 2.8vw, 28px);
@@ -1522,7 +1525,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     width: 100%;
     min-height: 44px;
     margin-top: 6px;
-    border: 1px solid var(--game-border-strong);
+    border: 2px solid var(--game-border-strong);
     background: var(--game-surface);
     color: var(--game-text);
     font-size: 14px;
@@ -1537,18 +1540,18 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 .custom-challenge-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 2px;
-    background: var(--game-border);
+    gap: 4px;
+    background: transparent;
 }
 
 .custom-challenge-actions button,
 .onboarding-panel > button,
 .leaderboard-panel > button {
     min-height: 50px;
-    border: 0 !important;
-    border-top: 1px solid var(--game-border) !important;
+    border: 2px solid var(--game-border-strong) !important;
     background: var(--game-surface-raised) !important;
     color: var(--game-text) !important;
+    box-shadow: 3px 3px 0 var(--game-depth) !important;
     font-size: 14px;
     font-weight: 700;
 }
@@ -1557,7 +1560,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 #onboarding-start-btn {
     background: var(--game-accent) !important;
     color: var(--game-bg) !important;
-    box-shadow: inset 0 -4px 0 #8e7520 !important;
+    box-shadow: 4px 4px 0 #8e7520 !important;
 }
 
 .onboarding-rule {
@@ -1579,9 +1582,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     min-height: 100dvh;
     padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
     overflow-y: auto;
-    background:
-        radial-gradient(circle at 50% 0%, rgba(255, 216, 77, 0.08), transparent 34%),
-        var(--game-bg);
+    background: var(--game-bg);
     color: var(--game-text);
 }
 
@@ -1595,7 +1596,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     gap: 16px;
     align-items: baseline;
     padding: clamp(24px, 4.5vw, 48px) 0 22px;
-    border-bottom: 1px solid var(--game-border-strong);
+    border-bottom: 2px solid var(--game-border-strong);
 }
 
 .legend-terminal-kicker,
@@ -1613,13 +1614,13 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     font-size: clamp(32px, 5.6vw, 66px);
     line-height: 1.05;
     text-align: left;
-    text-shadow: 0 4px 0 rgba(255, 216, 77, 0.09);
+    text-shadow: 5px 5px 0 var(--game-depth);
 }
 
 #legend-ticker {
     margin: 0;
-    border-bottom: 1px solid var(--game-border);
-    background: rgba(255, 216, 77, 0.02);
+    border-bottom: 2px solid var(--game-border);
+    background: var(--game-bg);
 }
 
 .legend-ticker-item {
@@ -1643,10 +1644,10 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 #personal-best-result,
 #friend-challenge-result {
     border-radius: 0 !important;
-    border-color: var(--game-border-strong) !important;
+    border: 2px solid var(--game-border-strong) !important;
     background: var(--game-surface) !important;
     color: var(--game-text) !important;
-    box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.16) !important;
+    box-shadow: 6px 6px 0 var(--game-depth) !important;
 }
 
 .legend-export-wrapper {
@@ -1658,15 +1659,17 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 .legend-actions {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 2px;
-    background: var(--game-border);
+    gap: 4px;
+    background: transparent;
 }
 
 .legend-actions button {
     min-height: 50px;
     padding: 10px 12px;
+    border: 2px solid var(--game-border-strong);
     background: var(--game-surface-raised);
     color: var(--game-text);
+    box-shadow: 3px 3px 0 var(--game-depth);
     font-size: 14px;
     font-weight: 700;
 }
@@ -1674,7 +1677,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 #champagne-restart-btn {
     background: var(--game-accent) !important;
     color: var(--game-bg) !important;
-    box-shadow: inset 0 -4px 0 #8e7520 !important;
+    box-shadow: 4px 4px 0 #8e7520 !important;
 }
 
 #champagne-screen .support-button {
@@ -1695,16 +1698,17 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     z-index: 94;
     min-width: 220px;
     padding: 11px 16px;
-    border: 1px solid var(--game-border-strong);
+    border: 2px solid var(--game-border-strong);
     background: var(--game-surface-raised);
     color: var(--game-text);
+    box-shadow: 4px 4px 0 var(--game-depth);
     font-size: 14px;
     font-weight: 700;
     text-align: center;
-    transform: translate(-50%, 8px);
+    transform: translate(-50%, 6px);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 120ms ease, transform 120ms ease;
+    transition: opacity 80ms linear, transform 80ms linear;
 }
 
 .game-feedback-toast.is-visible {
@@ -1730,10 +1734,10 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     gap: 14px;
     width: min(460px, calc(100% - 28px));
     padding: 16px;
-    border: 1px solid var(--game-border-strong);
+    border: 2px solid var(--game-border-strong);
     background: var(--game-surface-raised);
     color: var(--game-text);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.32);
+    box-shadow: 6px 6px 0 var(--game-depth);
 }
 
 .game-coachmark-copy {
@@ -1756,9 +1760,10 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 .game-coachmark button {
     min-width: 88px;
     min-height: 44px;
-    border: 1px solid var(--game-border-strong);
+    border: 2px solid var(--game-border-strong);
     background: var(--game-surface);
     color: var(--game-text);
+    box-shadow: 3px 3px 0 var(--game-depth);
     font-size: 13px;
 }
 
@@ -1769,7 +1774,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 
 #btn-buy.is-rejected,
 #btn-sell.is-rejected {
-    animation: terminal-reject 160ms ease-in-out 2;
+    animation: terminal-reject 140ms steps(2, end) 2;
 }
 
 @keyframes terminal-reject {
@@ -1843,6 +1848,7 @@ html[data-flappyk-language='zh'] .run-progress-panel .hud-day {
         grid-template-areas:
             'performance controls'
             'progress progress';
+        box-shadow: 4px 4px 0 var(--game-depth);
     }
 
     #game-hud-rail .weather-status {
@@ -1896,6 +1902,7 @@ html[data-flappyk-language='zh'] .run-progress-panel .hud-day {
         min-height: 100%;
         height: auto;
         overflow: visible;
+        box-shadow: 4px 4px 0 var(--game-depth);
     }
 
     .home-console-topline {
@@ -1928,6 +1935,10 @@ html[data-flappyk-language='zh'] .run-progress-panel .hud-day {
         overflow: visible;
     }
 
+    .home-console-screen::before {
+        display: none;
+    }
+
     .home-console-screen::after {
         right: -0.12em;
         bottom: 18%;
@@ -1940,6 +1951,7 @@ html[data-flappyk-language='zh'] .run-progress-panel .hud-day {
 
     #start-screen #game-title {
         font-size: clamp(52px, 16vw, 72px);
+        text-shadow: 4px 4px 0 var(--game-depth);
     }
 
     .home-console-intro-copy {
@@ -2015,6 +2027,7 @@ html[data-flappyk-language='zh'] .run-progress-panel .hud-day {
 
     .profit-card {
         max-height: none;
+        box-shadow: 5px 5px 0 var(--game-depth);
     }
 
     .settlement-summary {
