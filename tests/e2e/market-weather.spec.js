@@ -57,7 +57,7 @@ function inside(inner, outer, tolerance = 2) {
     && inner.bottom <= outer.bottom + tolerance;
 }
 
-test('home opens as one inset market surface with immediate play', async ({ page }) => {
+test('home opens as one readable Market Arcade surface with immediate play', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await preparePage(page);
   await page.goto('/');
@@ -72,17 +72,28 @@ test('home opens as one inset market surface with immediate play', async ({ page
   const surface = await page.evaluate(() => {
     const rect = document.querySelector('.home-console-bezel').getBoundingClientRect();
     const style = getComputedStyle(document.querySelector('.home-console-bezel'));
+    const titleStyle = getComputedStyle(document.getElementById('game-title'));
+    const playStyle = getComputedStyle(document.getElementById('start-btn'));
+    const introStyle = getComputedStyle(document.querySelector('.home-console-intro-copy'));
     return {
       rect: { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom },
       viewport: { left: 0, top: 0, right: innerWidth, bottom: innerHeight },
       radius: style.borderRadius,
       shadow: style.boxShadow,
+      titleSize: parseFloat(titleStyle.fontSize),
+      introSize: parseFloat(introStyle.fontSize),
+      playSize: parseFloat(playStyle.fontSize),
+      playHeight: document.getElementById('start-btn').getBoundingClientRect().height,
     };
   });
 
   expect(inside(surface.rect, surface.viewport)).toBe(true);
   expect(surface.radius).toBe('0px');
-  expect(surface.shadow).toBe('none');
+  expect(surface.shadow).not.toBe('none');
+  expect(surface.titleSize).toBeGreaterThanOrEqual(48);
+  expect(surface.introSize).toBeGreaterThanOrEqual(17);
+  expect(surface.playSize).toBeGreaterThanOrEqual(20);
+  expect(surface.playHeight).toBeGreaterThanOrEqual(68);
 });
 
 test('arcade controls use semantic DOM labels and keyboard press feedback', async ({ page }) => {
@@ -133,7 +144,7 @@ test('weather stages clear to rain and back through cloudy', async ({ page }) =>
   await expect(layer).toHaveAttribute('data-weather', 'clear', { timeout: 1600 });
 });
 
-test('desktop HUD is one compact command rail', async ({ page }) => {
+test('desktop HUD remains one rail while key game state is readable', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await preparePage(page);
   await page.goto('/');
@@ -146,6 +157,8 @@ test('desktop HUD is one compact command rail', async ({ page }) => {
       return { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom };
     };
     const rail = document.getElementById('game-hud-rail');
+    const total = document.querySelector('.hud-total > span:last-child');
+    const label = document.querySelector('.hud-metric-label');
     return {
       rail: box('#game-hud-rail'),
       weather: box('#weather-status'),
@@ -159,13 +172,17 @@ test('desktop HUD is one compact command rail', async ({ page }) => {
         document.getElementById('game-top-controls').parentElement?.id,
       ],
       shadow: getComputedStyle(rail).boxShadow,
+      totalSize: parseFloat(getComputedStyle(total).fontSize),
+      labelSize: parseFloat(getComputedStyle(label).fontSize),
     };
   });
 
   geometry.parents.forEach((parent) => expect(parent).toBe('game-hud-rail'));
   [geometry.weather, geometry.stats, geometry.progress, geometry.controls]
     .forEach((child) => expect(inside(child, geometry.rail)).toBe(true));
-  expect(geometry.shadow).toBe('none');
+  expect(geometry.shadow).not.toBe('none');
+  expect(geometry.totalSize).toBeGreaterThanOrEqual(18);
+  expect(geometry.labelSize).toBeGreaterThanOrEqual(11);
 });
 
 test('mobile gameplay keeps navigation tappable and speed inside the command dock', async ({ page }) => {
@@ -181,6 +198,7 @@ test('mobile gameplay keeps navigation tappable and speed inside the command doc
       return { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom, width: rect.width, height: rect.height };
     };
     const weather = document.getElementById('weather-status');
+    const total = document.querySelector('.hud-total > span:last-child');
     return {
       viewport: { left: 0, top: 0, right: innerWidth, bottom: innerHeight },
       dock: box('#mobile-controls'),
@@ -190,6 +208,7 @@ test('mobile gameplay keeps navigation tappable and speed inside the command doc
       back: box('#game-back-btn'),
       pause: box('#pause-btn'),
       weatherDisplay: getComputedStyle(weather).display,
+      totalSize: parseFloat(getComputedStyle(total).fontSize),
     };
   });
 
@@ -202,6 +221,7 @@ test('mobile gameplay keeps navigation tappable and speed inside the command doc
   expect(layout.back.height).toBeGreaterThanOrEqual(44);
   expect(layout.pause.width).toBeGreaterThanOrEqual(44);
   expect(layout.pause.height).toBeGreaterThanOrEqual(44);
+  expect(layout.totalSize).toBeGreaterThanOrEqual(16);
   expect(layout.speed.top).toBeGreaterThanOrEqual(layout.dock.top);
 });
 
