@@ -96,14 +96,19 @@ for (const detailContract of [
   assert.ok(weatherScript.includes(detailContract), `Missing arcade detail contract: ${detailContract}`);
 }
 
-assert.ok(baseStyles.includes('#start-btn.has-dom-play-icon::before'));
-assert.ok(baseStyles.includes('.home-play-icon'));
-assert.ok(baseStyles.includes('.pixel-trade-glyph'));
-assert.ok(baseStyles.includes('.sell-btn .trade-emoji'));
-assert.ok(baseStyles.includes(':where(button, select, summary, a[href]):focus-visible'));
-assert.ok(baseStyles.includes('#game-hud-rail .weather-status::before'));
-assert.ok(baseStyles.includes("html[data-market-weather='rain']"));
-assert.ok(baseStyles.includes('--hud-warning:'));
+// Shared presentation is canonical in premium-ui.css. Base CSS stays structural.
+assert.ok(uiStyles.includes('.home-play-icon'));
+assert.ok(uiStyles.includes('.pixel-trade-glyph'));
+assert.ok(uiStyles.includes('#game-hud-rail .weather-status::before'));
+assert.ok(uiStyles.includes("html[data-market-weather='rain']"));
+assert.ok(uiStyles.includes('--game-system:'), 'Weather/system state must use the canonical system color token.');
+assert.ok(uiStyles.includes('--game-accent:'), 'Primary focus color must remain distinct from weather/system state.');
+assert.ok(!uiStyles.includes('--game-yellow:'), 'Retired generic yellow token must not return.');
+assert.ok(baseStyles.includes(':where(button, select, summary, a[href], input, textarea):focus-visible'));
+assert.ok(!baseStyles.includes('#start-btn.has-dom-play-icon::before'));
+assert.ok(!baseStyles.includes('.pixel-trade-glyph'));
+assert.ok(!baseStyles.includes('.sell-btn .trade-emoji'));
+assert.ok(!baseStyles.includes('#game-hud-rail .weather-status::before'), 'Base CSS must not regain weather/HUD presentation ownership.');
 assert.ok(!baseStyles.includes('"Apple Color Emoji"'), 'Native color emoji must not own trade-button styling.');
 
 assert.ok(pwa.includes("'./market-weather.css'"), 'PWA loader must attach market-weather.css.');
@@ -114,10 +119,10 @@ assert.ok(serviceWorker.includes("const APP_CACHE = 'flappyk-app'"), 'PWA must u
 assert.ok(serviceWorker.includes("const RUNTIME_CACHE = 'flappyk-runtime'"), 'PWA must use the stable runtime cache lifecycle.');
 assert.ok(serviceWorker.includes('isCriticalSameOriginAsset'), 'Critical same-origin assets must be refreshed network-first.');
 assert.ok(!/flappyk-(?:app|runtime)-v\d+/.test(serviceWorker), 'Feature-numbered cache names must not return.');
-assert.ok(serviceWorker.includes("'./premium-ui.css'"), 'Offline shell must cache the canonical home and pixel UI styles.');
+assert.ok(serviceWorker.includes("'./premium-ui.css'"), 'Offline shell must cache the canonical shared UI styles.');
 assert.ok(!serviceWorker.includes("'./home-story.css'"), 'Retired home-story stylesheet path must not return.');
 assert.ok(serviceWorker.includes("'./scripts/home-story.js'"), 'Offline shell must cache the second home panel behavior.');
 assert.ok(serviceWorker.includes("'./account-integration.css'"), 'Offline shell must cache the account toolbar styles.');
 assert.ok(serviceWorker.includes("'./scripts/account-cloud-sync.js'"), 'Offline shell must cache the account cloud bridge.');
 
-console.log('Isolated market weather, staged transitions, explicit event ownership, curated canonical home shell, account toolbar, cloud history, and stable PWA cache contracts passed.');
+console.log('Isolated market weather, staged transitions, canonical shared presentation ownership, account toolbar, cloud history, and stable PWA cache contracts passed.');

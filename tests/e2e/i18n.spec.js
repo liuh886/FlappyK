@@ -89,7 +89,6 @@ test('language toggle switches, persists, and uses one Chinese UI typeface', asy
     const style = (selector) => getComputedStyle(document.querySelector(selector));
     const card = document.getElementById('profit-card');
     card.dataset.detailsExpanded = 'true';
-    const firstCardRow = document.querySelector('.card-details p');
     return {
       bodyFamily: style('body').fontFamily,
       titleFamily: style('#game-title').fontFamily,
@@ -106,7 +105,6 @@ test('language toggle switches, persists, and uses one Chinese UI typeface', asy
       utilityBackdrop: style('.home-utility-bar').backdropFilter,
       utilityShadow: style('.home-utility-bar').boxShadow,
       cardLayout: style('.card-details').display,
-      cardRowLayout: getComputedStyle(firstCardRow).display,
     };
   });
 
@@ -136,7 +134,6 @@ test('language toggle switches, persists, and uses one Chinese UI typeface', asy
   expect(typography.utilityBackdrop).toBe('none');
   expect(typography.utilityShadow).not.toBe('none');
   expect(typography.cardLayout).toBe('grid');
-  expect(typography.cardRowLayout).toBe('flex');
 
   await expect(page.locator('.hud-total .hud-metric-label')).toHaveText('总资产');
   await expect(page.locator('.hud-return .hud-metric-label')).toHaveText('收益');
@@ -172,10 +169,10 @@ test('Chinese mobile gameplay keeps one typeface and readable controls', async (
   await expect(page.locator('#btn-buy')).toBeVisible();
   await expect(page.locator('#btn-sell')).toBeVisible();
   await expect(page.locator('#pause-btn')).toBeVisible();
-  await expect(page.locator('#pause-btn')).toHaveText('');
+  await expect(page.locator('#pause-btn')).toHaveText('Ⅱ');
   await expect(page.locator('#pause-btn')).toHaveAttribute('aria-label', '暂停游戏');
   await expect(page.locator('#game-back-btn')).toBeVisible();
-  await expect(page.locator('#game-back-btn')).toHaveText('');
+  await expect(page.locator('#game-back-btn')).toHaveText('↩');
   await expect(page.locator('#game-back-btn')).toHaveAttribute('aria-label', '返回首页');
 
   await expect(page.locator('.hud-game .hud-metric-label')).toHaveText('局数');

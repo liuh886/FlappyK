@@ -77,10 +77,28 @@
     }
 
     function normalizeTopControls() {
-        ['game-back-btn', 'pause-btn'].forEach((id) => {
-            const button = document.getElementById(id);
-            if (button && button.textContent) button.textContent = '';
-        });
+        const backButton = document.getElementById('game-back-btn');
+        if (backButton) {
+            backButton.textContent = '↩';
+            backButton.setAttribute('aria-label', isChinese() ? '返回首页' : 'Return to home');
+            backButton.setAttribute('title', isChinese() ? '返回首页' : 'Return to home');
+        }
+
+        const pauseButton = document.getElementById('pause-btn');
+        if (pauseButton) {
+            const paused = pauseButton.getAttribute('aria-pressed') === 'true';
+            pauseButton.textContent = paused ? '▶' : 'Ⅱ';
+            pauseButton.setAttribute(
+                'aria-label',
+                paused
+                    ? (isChinese() ? '继续游戏' : 'Resume game')
+                    : (isChinese() ? '暂停游戏' : 'Pause game'),
+            );
+            pauseButton.setAttribute(
+                'title',
+                `${paused ? (isChinese() ? '继续' : 'Resume') : (isChinese() ? '暂停' : 'Pause')} [Space]`,
+            );
+        }
     }
 
     function ensureHudRail() {
@@ -284,7 +302,6 @@
             attributeFilter: ['class'],
         });
     }
-
 
     [
         topControls,

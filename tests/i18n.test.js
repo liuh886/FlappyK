@@ -65,8 +65,12 @@ assert.equal(
     false,
     'Chinese UI must not force the pixel font before CJK fallbacks'
 );
-assert.ok(pixelSource.includes('--pixel-cut'));
-assert.ok(pixelSource.includes('--pixel-shadow-step'));
-assert.ok(pixelSource.includes('backdrop-filter: none'));
 
-console.log('Chinese-English i18n, unified typography, and canonical modern pixel ownership checks passed');
+assert.ok(pixelSource.includes('FLAPPY K / SINGLE-SURFACE MARKET OS'));
+assert.ok(pixelSource.includes('--game-accent:'));
+assert.ok(pixelSource.includes('--game-system:'));
+assert.ok(pixelSource.includes('backdrop-filter: none'));
+assert.ok(pixelSource.includes("html[data-flappyk-language='zh']"));
+assert.ok(!pixelSource.includes('--pixel-cut:'), 'Chinese and English must share the simplified geometry without retired clipped-corner styling.');
+
+console.log('Chinese-English i18n, unified typography, and canonical single-surface visual ownership checks passed');

@@ -2,6 +2,7 @@
     'use strict';
 
     const DEFAULT_SPEED = 15;
+    const root = document.documentElement;
     const gameContainer = document.getElementById('game-container');
     const topControls = document.getElementById('game-top-controls');
     const mobileControls = document.getElementById('mobile-controls');
@@ -11,6 +12,11 @@
     const coarsePointer = window.matchMedia('(pointer: coarse)');
     let paused = false;
     let gameActive = false;
+
+    function isChinese() {
+        return root.dataset.flappykLanguage === 'zh'
+            || root.lang.toLowerCase().startsWith('zh');
+    }
 
     function wantsVirtualControls() {
         const sharedLayout = window.FlappyKUiState;
@@ -42,11 +48,24 @@
     }
 
     function syncPauseControl() {
-        if (!pauseButton) return;
-        pauseButton.textContent = '';
-        pauseButton.setAttribute('aria-label', paused ? 'Resume game' : 'Pause game');
-        pauseButton.setAttribute('aria-pressed', String(paused));
-        pauseButton.setAttribute('title', `${paused ? 'Resume' : 'Pause'} [Space]`);
+        if (pauseButton) {
+            const resume = paused;
+            const action = resume
+                ? (isChinese() ? '继续游戏' : 'Resume game')
+                : (isChinese() ? '暂停游戏' : 'Pause game');
+            pauseButton.textContent = resume ? '▶' : 'Ⅱ';
+            pauseButton.setAttribute('aria-label', action);
+            pauseButton.setAttribute('aria-pressed', String(paused));
+            pauseButton.setAttribute(
+                'title',
+                `${resume ? (isChinese() ? '继续' : 'Resume') : (isChinese() ? '暂停' : 'Pause')} [Space]`,
+            );
+        }
+        if (backButton) {
+            backButton.textContent = '↩';
+            backButton.setAttribute('aria-label', isChinese() ? '返回首页' : 'Return to home');
+            backButton.setAttribute('title', isChinese() ? '返回首页' : 'Return to home');
+        }
     }
 
     function pauseGame() {
@@ -83,7 +102,10 @@
         if (!gameActive) return false;
         const wasPaused = paused;
         if (!wasPaused) pauseGame();
-        const confirmed = window.confirm('Exit this run and return to home? Current progress will be lost.');
+        const message = isChinese()
+            ? '退出本局并返回首页？当前进度将丢失。'
+            : 'Exit this run and return to home? Current progress will be lost.';
+        const confirmed = window.confirm(message);
         if (confirmed) {
             setGameActive(false);
             window.location.reload();
@@ -148,6 +170,10 @@
     window.addEventListener('flappyk:layout-state', syncControlVisibility);
     window.addEventListener('resize', syncControlVisibility);
     window.addEventListener('orientationchange', syncControlVisibility);
+    new MutationObserver(syncPauseControl).observe(root, {
+        attributes: true,
+        attributeFilter: ['lang', 'data-flappyk-language'],
+    });
 
     setGameActive(false);
     syncPauseControl();

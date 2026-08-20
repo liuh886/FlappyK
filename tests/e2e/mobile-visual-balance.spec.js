@@ -16,72 +16,81 @@ function alphaFromCssColor(value) {
   return match?.[1] === undefined ? 1 : Number(match[1]);
 }
 
-test('mobile home and settlement keep their primary content visually centered', async ({ page }) => {
+function inside(inner, outer, tolerance = 2) {
+  return inner.left >= outer.left - tolerance
+    && inner.right <= outer.right + tolerance
+    && inner.top >= outer.top - tolerance
+    && inner.bottom <= outer.bottom + tolerance;
+}
+
+test('mobile home keeps PLAY first and settlement remains contained in the same surface', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await preparePage(page);
   await page.goto('/');
   await expect(page.locator('#start-screen.arcade-home')).toBeVisible();
 
-  const homeBalance = await page.evaluate(() => {
-    const screen = document.querySelector('.home-console-screen');
-    const selectors = [
-      '.home-console-kicker',
-      '#game-title',
-      '.home-console-screen > p',
-      '.home-world-strip',
-      '.home-primary-actions',
-      '.local-records-summary',
-      '.home-mode-stack',
-    ];
-    const boxes = selectors.flatMap((selector) => Array.from(document.querySelectorAll(selector)))
-      .filter((element) => {
-        const style = getComputedStyle(element);
-        return style.display !== 'none' && style.visibility !== 'hidden';
-      })
-      .map((element) => element.getBoundingClientRect())
-      .filter((box) => box.height > 0 && box.width > 0);
-    const top = Math.min(...boxes.map((box) => box.top));
-    const bottom = Math.max(...boxes.map((box) => box.bottom));
-    const screenBox = screen.getBoundingClientRect();
+  const home = await page.evaluate(() => {
+    const box = (selector) => {
+      const rect = document.querySelector(selector).getBoundingClientRect();
+      return { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom, width: rect.width, height: rect.height };
+    };
+    const screenNode = document.querySelector('.home-console-screen');
     return {
-      justifyContent: getComputedStyle(screen).justifyContent,
-      delta: Math.abs(((top + bottom) / 2) - ((screenBox.top + screenBox.bottom) / 2)),
+      screen: box('.home-console-screen'),
+      title: box('#game-title'),
+      worlds: box('.home-world-strip'),
+      play: box('#start-btn'),
+      modeStack: box('.home-mode-stack'),
+      navigation: box('.home-story-navigation'),
+      horizontalOverflow: screenNode.scrollWidth > screenNode.clientWidth + 1,
     };
   });
 
-  expect(homeBalance.justifyContent).toBe('center');
-  expect(homeBalance.delta).toBeLessThan(76);
+  expect(inside(home.title, home.screen)).toBe(true);
+  expect(inside(home.worlds, home.screen)).toBe(true);
+  expect(inside(home.play, home.screen)).toBe(true);
+  expect(inside(home.modeStack, home.screen)).toBe(true);
+  expect(home.horizontalOverflow).toBe(false);
+  expect(home.play.top).toBeLessThan(home.modeStack.top);
+  expect(home.modeStack.bottom).toBeLessThan(home.navigation.top);
 
   await page.evaluate(() => {
-    document.documentElement.dataset.uiState = 'run-complete';
+    document.documentElement.dataset.uiState = 'settlement';
     document.getElementById('start-screen')?.classList.remove('active');
     const settlement = document.getElementById('settlement-screen');
     settlement?.classList.add('active');
     const restart = document.getElementById('restart-btn');
-    if (restart) restart.style.display = 'block';
+    if (restart) restart.hidden = false;
   });
   await page.waitForTimeout(80);
 
   const settlementBalance = await page.evaluate(() => {
     const screen = document.getElementById('settlement-screen');
     const card = document.getElementById('profit-card');
-    const restart = document.getElementById('restart-btn');
+    const actions = document.querySelector('.settlement-actions');
     const screenBox = screen.getBoundingClientRect();
     const cardBox = card.getBoundingClientRect();
-    const restartBox = restart.getBoundingClientRect();
-    const groupTop = Math.min(cardBox.top, restartBox.top);
-    const groupBottom = Math.max(cardBox.bottom, restartBox.bottom);
+    const actionsBox = actions.getBoundingClientRect();
     return {
-      justifyContent: getComputedStyle(screen).justifyContent,
-      delta: Math.abs(((groupTop + groupBottom) / 2) - ((screenBox.top + screenBox.bottom) / 2)),
+      viewport: { left: 0, top: 0, right: innerWidth, bottom: innerHeight },
+      screen: { left: screenBox.left, top: screenBox.top, right: screenBox.right, bottom: screenBox.bottom },
+      card: { left: cardBox.left, top: cardBox.top, right: cardBox.right, bottom: cardBox.bottom },
+      actions: { left: actionsBox.left, top: actionsBox.top, right: actionsBox.right, bottom: actionsBox.bottom },
+      cardShadow: getComputedStyle(card).boxShadow,
+      cardRadius: getComputedStyle(card).borderRadius,
     };
   });
 
-  expect(settlementBalance.justifyContent).toBe('center');
-  expect(settlementBalance.delta).toBeLessThan(64);
+  // Chromium can place a 100dvh fixed surface on a fractional visual-viewport origin.
+  // Keep the acceptance strict to two CSS pixels while validating the full surface and its children.
+  expect(inside(settlementBalance.screen, settlementBalance.viewport)).toBe(true);
+  expect(inside(settlementBalance.card, settlementBalance.screen)).toBe(true);
+  expect(inside(settlementBalance.actions, settlementBalance.screen)).toBe(true);
+  expect(settlementBalance.cardShadow).toBe('none');
+  expect(settlementBalance.cardRadius).toBe('0px');
 });
 
-test('mobile command dock centers trade actions, moves power-ups outside, and softens HUD layer two', async ({ page }) => {
+test('mobile command dock centers trade actions while the HUD uses one opaque rail and transparent internal regions', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await preparePage(page);
   await page.goto('/');
@@ -120,7 +129,6 @@ test('mobile command dock centers trade actions, moves power-ups outside, and so
     const boll = document.querySelector('.indicator-card--boll').getBoundingClientRect();
     const macd = document.querySelector('.indicator-card--macd').getBoundingClientRect();
     const stats = document.querySelector(".stats-box[data-composition='returns-only']");
-    const weather = document.querySelector('.weather-status');
     const run = document.querySelector('.run-progress-panel');
     const rail = document.getElementById('game-hud-rail');
     return {
@@ -135,9 +143,9 @@ test('mobile command dock centers trade actions, moves power-ups outside, and so
         Math.abs(((macd.top + macd.bottom) / 2) - ((sell.top + sell.bottom) / 2)),
       ),
       railBackground: getComputedStyle(rail).backgroundColor,
-      firstLayerBackground: getComputedStyle(stats).backgroundColor,
-      weatherBackground: getComputedStyle(weather).backgroundColor,
+      statsBackground: getComputedStyle(stats).backgroundColor,
       runBackground: getComputedStyle(run).backgroundColor,
+      railShadow: getComputedStyle(rail).boxShadow,
     };
   });
 
@@ -145,7 +153,8 @@ test('mobile command dock centers trade actions, moves power-ups outside, and so
   expect(layout.bollRight).toBeLessThan(layout.buyLeft);
   expect(layout.macdLeft).toBeGreaterThan(layout.sellRight);
   expect(layout.powerVerticalDelta).toBeLessThan(20);
-  expect(alphaFromCssColor(layout.railBackground)).toBeLessThan(0.5);
-  expect(alphaFromCssColor(layout.weatherBackground)).toBeLessThan(alphaFromCssColor(layout.firstLayerBackground));
-  expect(alphaFromCssColor(layout.runBackground)).toBeLessThan(alphaFromCssColor(layout.firstLayerBackground));
+  expect(alphaFromCssColor(layout.railBackground)).toBeGreaterThan(0.8);
+  expect(alphaFromCssColor(layout.statsBackground)).toBeLessThan(0.1);
+  expect(alphaFromCssColor(layout.runBackground)).toBeLessThan(0.1);
+  expect(layout.railShadow).toBe('none');
 });

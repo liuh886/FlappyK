@@ -22,24 +22,34 @@ assert.ok(uiState.includes('get virtualControls()'));
 assert.ok(uiState.includes('root.dataset.virtualControls'));
 
 assert.ok(css.includes('#mobile-controls:not([hidden])'));
+assert.ok(css.includes('Touch geometry only. Shared color, typography and button skin live in premium-ui.css.'));
+assert.ok(css.includes('Runtime state decides whether this dock exists; viewport width does not.'));
 assert.ok(css.includes('position: fixed'));
-assert.ok(css.includes('bottom: 0'));
+assert.ok(css.includes('inset: auto 0 0;'));
+assert.ok(css.includes('display: grid'));
 assert.ok(css.includes('width: 100vw'));
 assert.ok(css.includes('env(safe-area-inset-bottom)'));
-assert.ok(css.includes('grid-template-columns: minmax(64px, 1fr) 78px 10px 78px minmax(64px, 1fr)'));
+assert.ok(css.includes('grid-template-columns: minmax(36px, 1fr) 78px 108px 78px minmax(36px, 1fr)'));
 assert.ok(css.includes('#mobile-controls #btn-buy'));
 assert.ok(css.includes('grid-column: 2'));
 assert.ok(css.includes('#mobile-controls #btn-sell'));
 assert.ok(css.includes('grid-column: 4'));
 assert.ok(css.includes('#mobile-controls .mobile-speed-control'));
-assert.ok(css.includes('opacity: 0.68'));
+assert.ok(css.includes('grid-column: 3'));
+assert.ok(css.includes('Speed is secondary: keep it in the command dock instead of floating over market data.'));
+assert.ok(css.includes("html[data-virtual-controls='true'] #game-top-controls"));
+assert.ok(css.includes('grid-template-columns: 44px 44px'));
 assert.ok(css.includes("data-ui-state='playing'"));
 assert.ok(!css.includes(":has(#indicator-card-deck:not([hidden])) #game-canvas"));
 
-// Premium UI still creates the three controls, while mobile-controls.css owns
-// their phone spatial hierarchy. The mobile dock now centers BUY/SELL and leaves
-// the outer thumb zones to BOLL/MACD rather than preserving the retired edge layout.
-assert.ok(premiumCss.includes('#mobile-controls:not([hidden])'));
-assert.ok(premiumCss.includes('.mobile-speed-control'));
+// Touch geometry has one owner. Shared presentation stays in premium-ui.css.
+assert.ok(premiumCss.includes('#btn-buy'));
+assert.ok(premiumCss.includes('#btn-sell'));
+assert.ok(premiumCss.includes('.mobile-speed-control .speed-readout'));
+assert.ok(!premiumCss.includes('#mobile-controls:not([hidden]) {'));
+assert.ok(!css.includes("html[data-ui-state='home'] body #game-container #start-screen.arcade-home"));
+assert.ok(!css.includes('#settlement-screen.active'));
+assert.ok(!css.includes('#game-hud-rail .weather-status'));
+assert.ok(!css.includes('opacity: 0.68'));
 
-console.log('Shared responsive state, centered virtual-control dock, and mobile thumb hierarchy checks passed');
+console.log('Responsive state, dock-contained speed control, 44px navigation targets, and single-owner mobile presentation checks passed');
