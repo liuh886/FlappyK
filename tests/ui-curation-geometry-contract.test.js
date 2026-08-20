@@ -27,7 +27,8 @@ for (const visualContract of [
 
 for (const mobileContract of [
   '#mobile-controls:not([hidden])',
-  'Virtual-control geometry is driven by runtime state, not viewport width.',
+  'Touch geometry only. Shared color, typography and button skin live in premium-ui.css.',
+  'Runtime state decides whether this dock exists; viewport width does not.',
   'position: fixed;',
   'display: grid;',
   'width: 100vw;',
@@ -40,7 +41,10 @@ assert.ok(!canonical.includes('#mobile-controls:not([hidden]) {'), 'premium-ui.c
 assert.ok(!canonical.includes('--pixel-cut:'), 'Decorative clipped-corner geometry must not return.');
 assert.ok(!base.includes('html body #game-container #game-hud-rail'), 'style.css must not regain HUD-specific high-specificity rules.');
 assert.ok(!base.includes('--hud-shell:'), 'Legacy HUD theme variables must not return to style.css.');
+assert.ok(!base.includes('.profit-card'), 'Base CSS must not regain settlement presentation ownership.');
+assert.ok(!mobile.includes('#settlement-screen.active'), 'Mobile geometry must not own settlement composition.');
+assert.ok(!mobile.includes('#game-hud-rail .weather-status'), 'Mobile geometry must not own HUD/weather presentation.');
 assert.ok(!refinementJs.includes('style.textContent = `'));
 assert.ok(!refinementJs.includes('installPixelCompatibilityStyles'));
 
-console.log('Shared single-surface HUD geometry and state-driven feature-owned mobile command geometry remain separated without legacy specificity or decorative containers.');
+console.log('Shared single-surface presentation, minimal base styles, and state-driven feature-owned mobile command geometry remain separated.');
