@@ -98,6 +98,7 @@ test('first launch teaches by doing, exposes Excess, and pause freezes progressi
   await expect(page.locator('html')).toHaveAttribute('data-ui-state', 'playing');
 
   await page.locator('#pause-btn').click();
+  await expect(page.locator('#pause-btn')).toHaveText('▶');
   await expect(page.locator('#pause-btn')).toHaveAttribute('aria-label', 'Resume game');
   await expect(page.locator('#pause-btn')).toHaveAttribute('aria-pressed', 'true');
   const pausedDay = Number(await page.locator('#day-display').textContent());
@@ -106,6 +107,7 @@ test('first launch teaches by doing, exposes Excess, and pause freezes progressi
   await expect(page.locator('html')).toHaveAttribute('data-ui-state', 'paused');
 
   await page.locator('#pause-btn').click();
+  await expect(page.locator('#pause-btn')).toHaveText('Ⅱ');
   await expect(page.locator('#pause-btn')).toHaveAttribute('aria-label', 'Pause game');
   await expect(page.locator('#pause-btn')).toHaveAttribute('aria-pressed', 'false');
   await expect.poll(async () => Number(await page.locator('#day-display').textContent())).toBeGreaterThan(pausedDay);
@@ -195,7 +197,7 @@ test('mobile gameplay keeps virtual keys and rail-integrated navigation visible'
   await expect(page.locator('#btn-speed-up')).toBeVisible();
   await expect(page.locator('#mobile-speed-readout')).toHaveText('15×');
   await expect(page.locator('.dpad-pause')).toHaveCount(0);
-  await expect(page.locator('#pause-btn')).toHaveText('');
+  await expect(page.locator('#pause-btn')).toHaveText('Ⅱ');
 
   const controlsDisplay = await page.locator('#mobile-controls').evaluate((element) => getComputedStyle(element).display);
   expect(controlsDisplay).toBe('grid');
@@ -219,10 +221,11 @@ test('mobile gameplay keeps virtual keys and rail-integrated navigation visible'
 
   const pauseBox = await page.locator('#pause-btn').boundingBox();
   expect(pauseBox).not.toBeNull();
-  expect(pauseBox.width).toBeGreaterThanOrEqual(30);
-  expect(pauseBox.width).toBeLessThanOrEqual(34);
-  expect(pauseBox.height).toBeGreaterThanOrEqual(30);
-  expect(pauseBox.height).toBeLessThanOrEqual(34);
+  expect(pauseBox.width).toBeGreaterThanOrEqual(34);
+  expect(pauseBox.height).toBeGreaterThanOrEqual(34);
+  expect(pauseBox.width).toBeLessThanOrEqual(44);
+  expect(pauseBox.height).toBeLessThanOrEqual(44);
+  expect(Math.abs(pauseBox.width - pauseBox.height)).toBeLessThanOrEqual(3);
 
   await page.mouse.wheel(0, 800);
   await page.waitForTimeout(100);
