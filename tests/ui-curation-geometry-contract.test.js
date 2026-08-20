@@ -32,7 +32,9 @@ for (const mobileContract of [
   'position: fixed;',
   'display: grid;',
   'width: 100vw;',
-  'grid-template-columns: minmax(64px, 1fr) 78px 10px 78px minmax(64px, 1fr);',
+  'grid-template-columns: minmax(36px, 1fr) 78px 108px 78px minmax(36px, 1fr);',
+  'grid-column: 3;',
+  'grid-template-columns: 44px 44px;',
 ]) {
   assert.ok(mobile.includes(mobileContract), `Missing feature-owned mobile geometry contract: ${mobileContract}`);
 }
@@ -44,7 +46,8 @@ assert.ok(!base.includes('--hud-shell:'), 'Legacy HUD theme variables must not r
 assert.ok(!base.includes('.profit-card'), 'Base CSS must not regain settlement presentation ownership.');
 assert.ok(!mobile.includes('#settlement-screen.active'), 'Mobile geometry must not own settlement composition.');
 assert.ok(!mobile.includes('#game-hud-rail .weather-status'), 'Mobile geometry must not own HUD/weather presentation.');
+assert.ok(!mobile.includes('top: calc(max(6px, env(safe-area-inset-top)) + 88px)'), 'Mobile speed control must stay out of the market canvas.');
 assert.ok(!refinementJs.includes('style.textContent = `'));
 assert.ok(!refinementJs.includes('installPixelCompatibilityStyles'));
 
-console.log('Shared single-surface presentation, minimal base styles, and state-driven feature-owned mobile command geometry remain separated.');
+console.log('Shared single-surface presentation, minimal base styles, and dock-contained state-driven mobile command geometry remain separated.');
