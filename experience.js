@@ -1,13 +1,57 @@
 (() => {
     'use strict';
 
-    function returnToHome() {
-        clearInterval(gameInterval);
-        isPlaying = false;
-        stopAudio();
+    function closeActiveModal() {
+        const leaderboardScreen = document.getElementById('leaderboard-screen');
+        if (leaderboardScreen && leaderboardScreen.classList.contains('active')) {
+            const closeBtn = document.getElementById('leaderboard-close-btn');
+            if (closeBtn) {
+                closeBtn.click();
+                return true;
+            }
+        }
 
-        // Reloading guarantees that normal mode, custom mode, settlement state,
-        // audio, timers, and collected cards all return to the same clean home state.
+        const customScreen = document.getElementById('custom-challenge-screen');
+        if (customScreen && customScreen.classList.contains('active')) {
+            const cancelBtn = document.getElementById('custom-cancel-btn');
+            if (cancelBtn) {
+                cancelBtn.click();
+                return true;
+            }
+        }
+
+        const onboardingScreen = document.getElementById('onboarding-screen');
+        if (onboardingScreen && !onboardingScreen.hidden) {
+            const startBtn = document.getElementById('onboarding-start-btn');
+            if (startBtn) {
+                startBtn.click();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    function returnToHome() {
+        if (closeActiveModal()) return;
+
+        if (typeof isPlaying !== 'undefined' && isPlaying) {
+            if (window.FlappyKPacing && typeof window.FlappyKPacing.returnHome === 'function') {
+                window.FlappyKPacing.returnHome();
+                return;
+            }
+        }
+
+        if (typeof gameInterval !== 'undefined') clearInterval(gameInterval);
+        if (typeof isPlaying !== 'undefined') isPlaying = false;
+        if (typeof stopAudio === 'function') stopAudio();
+
+        if (window.FlappyKGame && typeof window.FlappyKGame.resetGame === 'function') {
+            window.FlappyKGame.resetGame();
+            return;
+        }
+
+        // Fallback reloading if engine is uninitialized
         window.location.reload();
     }
 

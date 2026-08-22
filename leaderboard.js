@@ -74,7 +74,8 @@
             const player = document.createElement('a');
             player.className = 'leaderboard-player';
             player.textContent = `@${entry.player}`;
-            player.href = entry.issueUrl || `https://github.com/${encodeURIComponent(entry.player)}`;
+            const isValidIssueUrl = typeof entry.issueUrl === 'string' && /^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+\/issues\/\d+$/.test(entry.issueUrl);
+            player.href = isValidIssueUrl ? entry.issueUrl : `https://github.com/${encodeURIComponent(entry.player)}`;
             player.target = '_blank';
             player.rel = 'noopener noreferrer';
 

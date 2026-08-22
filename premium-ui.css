@@ -1274,18 +1274,59 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 
 .settlement-summary {
     display: grid;
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    grid-template-columns: auto minmax(0, 1fr);
     grid-template-areas:
-        'verdict excess'
+        'medal main'
         'compare compare';
-    gap: 18px 24px;
-    padding: 28px 24px 24px;
+    gap: 16px 20px;
+    padding: 24px 20px 20px;
     border-bottom: 2px solid var(--game-border);
 }
 
+.settlement-medal-box {
+    grid-area: medal;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 86px;
+    padding: 6px;
+    border: 3px solid var(--game-border-strong);
+    background: var(--game-surface-raised);
+    box-shadow: 4px 4px 0 var(--game-depth);
+    animation: arcade-medal-drop 320ms cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+.settlement-medal-icon {
+    font-size: 36px;
+    line-height: 1;
+    filter: drop-shadow(2px 2px 0 var(--game-depth));
+}
+
+.settlement-medal-title {
+    margin-top: 4px;
+    color: var(--game-accent);
+    font-family: var(--pixel-font-display);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+}
+
+@keyframes arcade-medal-drop {
+    0% { transform: translateY(-40px) scale(0.5); opacity: 0; }
+    70% { transform: translateY(4px) scale(1.08); opacity: 1; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.settlement-main-result {
+    grid-area: main;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+}
+
 #settlement-verdict {
-    grid-area: verdict;
-    align-self: end;
     color: var(--game-muted);
     font-family: var(--pixel-font-display);
     font-size: 12px;
@@ -1293,11 +1334,10 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 }
 
 .settlement-excess-summary {
-    grid-area: excess;
     justify-self: end;
     color: var(--game-text);
     font-family: var(--pixel-font-display);
-    font-size: clamp(46px, 7.4vw, 76px);
+    font-size: clamp(40px, 6.4vw, 68px);
     line-height: 1;
     text-shadow: 5px 5px 0 var(--game-depth);
     font-variant-numeric: tabular-nums;
@@ -1682,21 +1722,22 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 .game-feedback-toast {
     position: absolute;
     left: 50%;
-    bottom: 24px;
+    bottom: 28px;
     z-index: 94;
     min-width: 220px;
-    padding: 11px 16px;
-    border: 2px solid var(--game-border-strong);
-    background: var(--game-surface-raised);
+    padding: 10px 18px;
+    border: 3px solid var(--game-border-strong);
+    background: var(--game-bg);
     color: var(--game-text);
     box-shadow: 4px 4px 0 var(--game-depth);
-    font-size: 14px;
-    font-weight: 700;
+    font-family: var(--pixel-font-display);
+    font-size: 11px;
+    letter-spacing: 0.06em;
     text-align: center;
-    transform: translate(-50%, 6px);
+    transform: translate(-50%, 8px);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 80ms linear, transform 80ms linear;
+    transition: opacity 70ms linear, transform 70ms ease-out;
 }
 
 .game-feedback-toast.is-visible {
@@ -1706,10 +1747,12 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 
 .game-feedback-toast[data-kind='error'] {
     border-color: var(--game-red);
+    color: var(--game-red);
 }
 
 .game-feedback-toast[data-kind='success'] {
     border-color: var(--game-green);
+    color: var(--game-green);
 }
 
 .game-coachmark {
@@ -2125,6 +2168,18 @@ html[data-flappyk-language='zh'] .run-progress-panel .hud-day {
         grid-template-columns: minmax(220px, 0.75fr) minmax(0, 1.25fr);
         padding: 18px 24px 54px;
     }
+}
+
+@keyframes arcade-screen-shake {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(-2px, 1px); }
+    50% { transform: translate(2px, -1px); }
+    75% { transform: translate(-1px, 2px); }
+    100% { transform: translate(0, 0); }
+}
+
+#game-container.is-shaking {
+    animation: arcade-screen-shake 90ms steps(4, end);
 }
 
 @media (prefers-reduced-motion: reduce) {
