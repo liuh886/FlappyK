@@ -92,10 +92,6 @@
         const height = baseCanvas.height;
         if (overlay.width !== width) overlay.width = width;
         if (overlay.height !== height) overlay.height = height;
-        overlay.style.left = `${baseCanvas.offsetLeft}px`;
-        overlay.style.top = `${baseCanvas.offsetTop}px`;
-        overlay.style.width = `${baseCanvas.clientWidth}px`;
-        overlay.style.height = `${baseCanvas.clientHeight}px`;
     }
 
     function clearActiveCards() {

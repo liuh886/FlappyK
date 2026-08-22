@@ -37,6 +37,7 @@ const APP_SHELL = [
     './scripts/indicator-card-store.js',
     './scripts/indicator-cards.js',
     './scripts/market-canvas.js',
+    './scripts/event-bus.js',
     './game.js',
     './scripts/market-pass-rule.js',
     './results.js',
@@ -68,7 +69,10 @@ const APP_SHELL = [
     './icons/apple-touch-icon-180.png',
     './icons/icon-192.png',
     './icons/icon-512.png',
-    './icons/icon-maskable-512.png'
+    './icons/icon-maskable-512.png',
+    './data/markets/crypto.json',
+    './data/markets/ashare.json',
+    './data/markets/usstock.json'
 ];
 
 self.addEventListener('install', (event) => {
@@ -118,7 +122,9 @@ async function staleWhileRevalidate(request) {
         })
         .catch(() => null);
 
-    return cached || update || Response.error();
+    if (cached) return cached;
+    const networkResponse = await update;
+    return networkResponse || Response.error();
 }
 
 function isCriticalSameOriginAsset(request, url) {

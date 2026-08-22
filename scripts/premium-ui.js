@@ -391,8 +391,14 @@
         summary.id = 'settlement-summary';
         summary.className = 'settlement-summary';
         summary.innerHTML = `
-            <div id="settlement-verdict" class="settlement-verdict"></div>
-            <div id="settlement-excess-summary" class="settlement-excess-summary">---%</div>
+            <div id="settlement-medal-box" class="settlement-medal-box">
+                <span class="settlement-medal-icon">🏅</span>
+                <strong class="settlement-medal-title">MEDAL</strong>
+            </div>
+            <div class="settlement-main-result">
+                <div id="settlement-verdict" class="settlement-verdict"></div>
+                <div id="settlement-excess-summary" class="settlement-excess-summary">---%</div>
+            </div>
             <div class="settlement-comparison">
                 <div class="settlement-comparison-row">
                     <span>${copy.player}</span>
@@ -443,12 +449,37 @@
         const marketSummary = document.getElementById('settlement-market-summary');
         const playerBar = document.getElementById('settlement-player-bar');
         const marketBar = document.getElementById('settlement-market-bar');
+        const medalBox = document.getElementById('settlement-medal-box');
+
         if (verdict) verdict.textContent = success ? copy.success : copy.failure;
         if (excessSummary) excessSummary.textContent = excessText;
         if (playerSummary) playerSummary.textContent = playerText;
         if (marketSummary) marketSummary.textContent = marketText;
         if (playerBar) playerBar.style.width = `${Math.max(4, Math.abs(player) / scale * 100)}%`;
         if (marketBar) marketBar.style.width = `${Math.max(4, Math.abs(market) / scale * 100)}%`;
+
+        if (medalBox) {
+            const icon = medalBox.querySelector('.settlement-medal-icon');
+            const medalTitle = medalBox.querySelector('.settlement-medal-title');
+            if (excess >= 10) {
+                if (icon) icon.textContent = '🏆';
+                if (medalTitle) medalTitle.textContent = t('LEGEND', '传奇金杯');
+                medalBox.dataset.medal = 'legend';
+            } else if (excess > 0) {
+                if (icon) icon.textContent = '🥇';
+                if (medalTitle) medalTitle.textContent = t('GOLD', '通关金牌');
+                medalBox.dataset.medal = 'gold';
+            } else if (player > 0) {
+                if (icon) icon.textContent = '🥈';
+                if (medalTitle) medalTitle.textContent = t('SILVER', '正收益');
+                medalBox.dataset.medal = 'silver';
+            } else {
+                if (icon) icon.textContent = '💀';
+                if (medalTitle) medalTitle.textContent = t('BUST', '未达标');
+                medalBox.dataset.medal = 'fail';
+            }
+        }
+
         refs.card.dataset.result = success ? 'success' : 'failure';
         refs.card.dataset.detailsExpanded = 'false';
         const toggle = document.getElementById('settlement-details-toggle');

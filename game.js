@@ -129,6 +129,7 @@ function initAudio() {
 function startAudio() {
     if (!audioCtx) initAudio();
     if (audioCtx.state === 'suspended') audioCtx.resume();
+    cancelAnimationFrame(audioTimerID);
     nextNoteTime = audioCtx.currentTime + 0.1;
     scheduleAudio();
 }
@@ -335,6 +336,7 @@ function startLevel() {
     draw();
 
     startAudio();
+    clearInterval(gameInterval);
     gameInterval = setInterval(gameTick, TICK_RATE);
 }
 
@@ -417,6 +419,7 @@ function endLevel() {
         retElem.className = 'big-return card-positive';
         statusMsg.innerText = "SUCCESS! TARGET BEATEN.";
         statusMsg.className = 'status-msg card-positive';
+        playActionSound('win');
 
         collectedCards.push({
             level: level,
@@ -448,11 +451,20 @@ function endLevel() {
         retElem.className = 'big-return card-negative';
         statusMsg.innerText = "FAILED TO BEAT TARGET.";
         statusMsg.className = 'status-msg card-negative';
+        playActionSound('fail');
         nextBtn.style.display = 'none';
         champagneBtn.style.display = 'none';
         saveBtn.style.display = 'none';
         restartBtn.style.display = 'block';
     }
+}
+
+function triggerScreenShake() {
+    const container = document.getElementById('game-container');
+    if (!container) return;
+    container.classList.remove('is-shaking');
+    void container.offsetWidth;
+    container.classList.add('is-shaking');
 }
 
 function handleBuy() {
@@ -463,6 +475,7 @@ function handleBuy() {
         shares += TRADE_AMOUNT / currentPrice;
         actions.push({ type: 'buy', day: dayIndex, price: currentPrice });
         playActionSound('buy');
+        triggerScreenShake();
         updateUI();
         draw();
     }
@@ -477,6 +490,7 @@ function handleSell() {
         shares -= TRADE_AMOUNT / currentPrice;
         actions.push({ type: 'sell', day: dayIndex, price: currentPrice });
         playActionSound('sell');
+        triggerScreenShake();
         updateUI();
         draw();
     } else if (assetValue > FEE) {
@@ -485,6 +499,7 @@ function handleSell() {
         shares = 0;
         actions.push({ type: 'sell', day: dayIndex, price: currentPrice });
         playActionSound('sell');
+        triggerScreenShake();
         updateUI();
         draw();
     }
@@ -550,28 +565,63 @@ function updateUI() {
 
 function playActionSound(type) {
     if (!audioCtx) return;
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => null);
+    }
     const now = audioCtx.currentTime;
     if (type === 'buy') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(400, now);
-        osc.frequency.exponentialRampToValueAtTime(800, now + 0.1);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        // 8-bit coin jump (two-tone rising chirp)
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(587.33, now); // D5
+        osc.frequency.setValueAtTime(880.00, now + 0.05); // A5
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
         osc.start(now);
-        osc.stop(now + 0.2);
-    } else {
+        osc.stop(now + 0.15);
+    } else if (type === 'sell') {
+        // 8-bit cash register drop
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(783.99, now); // G5
+        osc.frequency.setValueAtTime(523.25, now + 0.05); // C5
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.15);
+    } else if (type === 'win') {
+        // 8-bit victory fanfare: C5 -> E5 -> G5 -> C6
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(freq, now + i * 0.08);
+            gain.gain.setValueAtTime(0.08, now + i * 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.12);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now + i * 0.08);
+            osc.stop(now + i * 0.08 + 0.12);
+        });
+    } else if (type === 'fail') {
+        // 8-bit low game-over buzz
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(300, now);
-        osc.frequency.exponentialRampToValueAtTime(150, now + 0.1);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.exponentialRampToValueAtTime(110, now + 0.25);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
         osc.start(now);
-        osc.stop(now + 0.2);
+        osc.stop(now + 0.3);
     }
 }
 
@@ -594,3 +644,44 @@ function draw() {
         levelStartCash,
     });
 }
+
+function resetGame() {
+    isPlaying = false;
+    if (typeof gameInterval !== 'undefined') clearInterval(gameInterval);
+    if (typeof stopAudio === 'function') stopAudio();
+    level = 1;
+    targetReturn = 0;
+    collectedCards = [];
+    dayIndex = 0;
+    cash = INITIAL_CASH;
+    shares = 0;
+    actions = [];
+    totalHistory = [];
+
+    document.querySelectorAll('.modal.active, .screen.active').forEach((el) => {
+        if (el.id !== 'start-screen') el.classList.remove('active');
+    });
+    if (startScreen) startScreen.classList.add('active');
+
+    window.FlappyKEvents?.emit?.('flappyk:game-reset', {});
+    window.FlappyKUiState?.transition?.(window.FlappyKUiState?.STATES?.HOME || 'home', { source: 'game-reset' });
+}
+
+window.FlappyKGame = {
+    startLevel,
+    endLevel,
+    resetGame,
+    changeSpeed,
+    handleBuy,
+    handleSell,
+    getState: () => ({
+        level,
+        dayIndex,
+        cash,
+        shares,
+        isPlaying,
+        currentMarket,
+        currentAsset,
+        speedMultiplier,
+    }),
+};

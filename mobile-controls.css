@@ -71,12 +71,21 @@ body {
 }
 
 #mobile-controls .mobile-speed-control .small-btn {
+    position: relative;
     width: 30px;
     min-width: 30px;
     height: 30px;
     min-height: 30px;
     margin: 0;
     padding: 0;
+    touch-action: manipulation;
+}
+
+#mobile-controls .mobile-speed-control .small-btn::before {
+    content: '';
+    position: absolute;
+    inset: -7px;
+    pointer-events: auto;
 }
 
 #mobile-controls .mobile-speed-control .speed-readout {
@@ -105,6 +114,7 @@ html[data-virtual-controls='true'] #game-top-controls #pause-btn {
 html[data-virtual-controls='true'][data-ui-state='playing'] #game-canvas,
 html[data-virtual-controls='true'][data-ui-state='paused'] #game-canvas {
     margin-bottom: 102px;
+    margin-bottom: calc(102px + env(safe-area-inset-bottom));
 }
 
 @media (max-width: 1024px) {
@@ -148,10 +158,18 @@ html[data-virtual-controls='true'][data-ui-state='paused'] #game-canvas {
     }
 
     #mobile-controls .mobile-speed-control .small-btn {
+        position: relative;
         width: 28px;
         min-width: 28px;
         height: 28px;
         min-height: 28px;
+    }
+
+    #mobile-controls .mobile-speed-control .small-btn::before {
+        content: '';
+        position: absolute;
+        inset: -8px;
+        pointer-events: auto;
     }
 
     #mobile-controls .mobile-speed-control .speed-readout {
@@ -162,6 +180,7 @@ html[data-virtual-controls='true'][data-ui-state='paused'] #game-canvas {
     html[data-virtual-controls='true'][data-ui-state='playing'] #game-canvas,
     html[data-virtual-controls='true'][data-ui-state='paused'] #game-canvas {
         margin-bottom: 94px;
+        margin-bottom: calc(94px + env(safe-area-inset-bottom));
     }
 }
 
@@ -183,10 +202,18 @@ html[data-virtual-controls='true'][data-ui-state='paused'] #game-canvas {
     }
 
     #mobile-controls .mobile-speed-control .small-btn {
+        position: relative;
         width: 28px;
         min-width: 28px;
         height: 28px;
         min-height: 28px;
+    }
+
+    #mobile-controls .mobile-speed-control .small-btn::before {
+        content: '';
+        position: absolute;
+        inset: -8px;
+        pointer-events: auto;
     }
 
     #mobile-controls .mobile-speed-control .speed-readout {
@@ -197,5 +224,6 @@ html[data-virtual-controls='true'][data-ui-state='paused'] #game-canvas {
     html[data-virtual-controls='true'][data-ui-state='playing'] #game-canvas,
     html[data-virtual-controls='true'][data-ui-state='paused'] #game-canvas {
         margin-bottom: 86px;
+        margin-bottom: calc(86px + env(safe-area-inset-bottom));
     }
 }

@@ -9,8 +9,11 @@
         return value || fallback;
     }
 
-    function palette() {
-        return {
+    let cachedPalette = null;
+    let lastPaletteCheck = 0;
+
+    function refreshPalette() {
+        cachedPalette = {
             bg: cssToken('--game-bg', '#06080c'),
             surface: cssToken('--game-surface', '#0b1118'),
             raised: cssToken('--game-surface-raised', '#111a24'),
@@ -23,6 +26,16 @@
             green: cssToken('--game-green', '#66e38f'),
             red: cssToken('--game-red', '#ff6d77'),
         };
+        return cachedPalette;
+    }
+
+    function palette() {
+        const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+        if (!cachedPalette || now - lastPaletteCheck > 1000) {
+            lastPaletteCheck = now;
+            return refreshPalette();
+        }
+        return cachedPalette;
     }
 
     function clamp(value, minimum, maximum) {
@@ -292,17 +305,42 @@
         drawCheckpointRail(ctx, plot, state, startDay, colors);
     }
 
-    function drawPlayerCursor(ctx, x, y, value, colors) {
+    function drawPixelAvatar(ctx, x, y, colors, isHolding) {
         ctx.save();
-        drawHardBox(ctx, x - 6, y - 6, 12, 12, colors.accent, colors.bg, 3, colors.bg);
+        const px = snap(x);
+        const py = snap(y);
+
+        if (isHolding) {
+            ctx.fillStyle = colors.accent;
+            ctx.fillRect(px - 10, py - 2, 4, 4);
+            ctx.fillStyle = colors.red;
+            ctx.fillRect(px - 14, py - 1, 4, 2);
+        } else {
+            ctx.fillStyle = colors.system;
+            ctx.fillRect(px - 6, py - 10, 12, 3);
+            ctx.fillRect(px - 4, py - 7, 8, 2);
+        }
+
+        ctx.fillStyle = isHolding ? colors.green : colors.surface;
+        ctx.fillRect(px - 5, py - 5, 10, 10);
+        drawHardBox(ctx, px - 5, py - 5, 10, 10, isHolding ? colors.green : colors.surface, colors.text, 2, colors.bg);
+
+        ctx.fillStyle = colors.accent;
+        ctx.fillRect(px + 1, py - 3, 3, 3);
+        ctx.restore();
+    }
+
+    function drawPlayerCursor(ctx, x, y, value, colors, isHolding = false) {
+        ctx.save();
+        drawPixelAvatar(ctx, x, y, colors, isHolding);
 
         const label = Number(value).toLocaleString(undefined, { maximumFractionDigits: 0 });
         ctx.font = `700 11px ${FONT_UI}`;
         const labelWidth = Math.ceil(ctx.measureText(label).width) + 12;
-        const boxX = x - labelWidth - 12;
+        const boxX = x - labelWidth - 14;
         const boxY = y - 12;
-        drawHardBox(ctx, boxX, boxY, labelWidth, 22, colors.surface, colors.accent, 3, colors.bg);
-        ctx.fillStyle = colors.accent;
+        drawHardBox(ctx, boxX, boxY, labelWidth, 22, colors.surface, isHolding ? colors.green : colors.accent, 3, colors.bg);
+        ctx.fillStyle = isHolding ? colors.green : colors.accent;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(label, snap(boxX + labelWidth / 2), snap(boxY + 11) + 1);
@@ -310,11 +348,18 @@
     }
 
     function drawReturnPlot(ctx, state, plot, colors, startDay) {
-        const history = state.totalHistory.slice(startDay, state.dayIndex + 1);
-        if (!history.length) return;
+        if (!state.totalHistory || !state.totalHistory.length) return;
+        const endDay = Math.min(state.dayIndex + 1, state.totalHistory.length);
+        if (startDay >= endDay) return;
 
-        let minTotal = Math.min(state.levelStartCash, ...history);
-        let maxTotal = Math.max(state.levelStartCash, ...history);
+        let minTotal = state.levelStartCash;
+        let maxTotal = state.levelStartCash;
+        for (let i = startDay; i < endDay; i += 1) {
+            const val = state.totalHistory[i];
+            if (val < minTotal) minTotal = val;
+            if (val > maxTotal) maxTotal = val;
+        }
+
         const padding = (maxTotal - minTotal) * 0.16 || Math.max(50, state.levelStartCash * 0.01);
         minTotal -= padding;
         maxTotal += padding;
@@ -363,7 +408,8 @@
             const displayIndex = latestIndex - startDay;
             const x = snap(plot.left + displayIndex * slot + slot / 2);
             const y = snap(getY(latest));
-            drawPlayerCursor(ctx, x, y, latest, colors);
+            const isHolding = Array.isArray(state.actions) && state.actions.length > 0 && state.actions[state.actions.length - 1].type === 'buy';
+            drawPlayerCursor(ctx, x, y, latest, colors, isHolding);
         }
     }
 

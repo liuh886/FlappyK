@@ -108,7 +108,11 @@
         const confirmed = window.confirm(message);
         if (confirmed) {
             setGameActive(false);
-            window.location.reload();
+            if (window.FlappyKGame && typeof window.FlappyKGame.resetGame === 'function') {
+                window.FlappyKGame.resetGame();
+            } else {
+                window.location.reload();
+            }
             return true;
         }
         if (!wasPaused) resumeGame();

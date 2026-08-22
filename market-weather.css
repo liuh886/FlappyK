@@ -217,9 +217,7 @@ html[data-ui-state='home'] .weather-status {
 #ui-layer,
 #run-progress-panel,
 #game-top-controls,
-.controls-hint,
-#mobile-controls,
-.game-feedback-toast {
+.controls-hint {
     z-index: 40;
 }
 
