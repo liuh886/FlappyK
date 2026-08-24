@@ -7,6 +7,10 @@
 # Tasks: FlappyK Architecture Hardening & Retro Pixel Arcade
 
 ## Task Board
+- [x] 27. Living-world skin pass: progress/mood-reactive scenery (city lights-up, aurora vigor, sun arc), per-skin checkpoint celebrations, mascot identities (bird/penguin/scarab), per-skin particle shapes and frame chrome
+- [x] 24. HUD compaction pass: tighter rail metrics, in-plot section labels/day rail, canvas plots raised to clear the rail
+- [x] 25. In-game skin cycle button on the command rail (desktop 56px accent slot; touch dock back/pause/skin, mute stays keyboard-owned)
+- [x] 26. Per-skin deterministic backdrop scenery: arcade starfield + skyline, polar aurora + ice ridge, amber sun + dunes
 - [x] 23. Skin depth pass: ambient atmosphere layer (snow/dust) + mascot outfit variants on all three skins
 - [x] 15. GameController kernel: hook registry + data-source registry (priority daily>friend>custom)
 - [x] 16. Migrate 11 wrapper consumers to controller subscriptions; delete monkey-patch chain

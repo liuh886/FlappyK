@@ -12,7 +12,7 @@ for (const contract of [
   'grid-column: 2;',
   'grid-column: 3;',
   'grid-column: 4;',
-  'grid-template-columns: 44px 44px;',
+  'grid-template-columns: 44px 44px 44px;',
   'Touch geometry only. Shared color, typography and button skin live in premium-ui.css.',
   'Runtime state decides whether this dock exists; viewport width does not.',
 ]) {

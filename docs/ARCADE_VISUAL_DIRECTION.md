@@ -86,9 +86,12 @@ Skins are palette-and-rhythm variations of Pixel Market Arcade, never new layout
 
 - `skins.css` is the single owner of non-default token sets; each `html[data-skin]` block must define the complete required token list with concrete hex values;
 - semantic color roles are invariant across skins: yellow-family accent = primary action/focus, system cyan-family = reference state, green/red = market/trade semantics (A-share red-up/green-down included);
-- `scripts/skin-system.js` owns the catalog (ids, bilingual names, motion profile, atmosphere kind), persistence under `flappyk_skin_v1`, the home toolbar cycle button, and instant canvas re-theming through `FlappyKMarketCanvas.refreshPalette`;
+- `scripts/skin-system.js` owns the catalog (ids, bilingual names, motion profile, atmosphere kind), persistence under `flappyk_skin_v1`, cycle buttons in the home toolbar and the in-game command rail (both share labels, persistence, and canvas re-theming), and instant canvas re-theming through `FlappyKMarketCanvas.refreshPalette`;
 - the pixel avatar may carry one small identity crest per skin; it may not change silhouette rules or add glow;
 - skins may declare an ambient atmosphere (`snow` for Polar Exchange, `dust` for Amber Terminal): a small capped backdrop layer drawn inside `market-canvas.js`, behind all game objects and grid lines, colored only from palette tokens, wrapping at stage edges, and disabled entirely under `prefers-reduced-motion`. Atmosphere never carries gameplay information.
+- each skin owns one deterministic backdrop scenery layer in `market-canvas.js` (Market Arcade: starfield, drifting clouds, and a city skyline whose windows light up with run progress; Polar Exchange: aurora bands over a jagged ice ridge; Amber Terminal: a sun that arcs from sunrise to sunset over layered dunes). Scenery is seeded per skin and stage size, drawn with hard-edged rects only from palette tokens, sits strictly behind plot chrome, and freezes its animation phase under `prefers-reduced-motion` while remaining visible as a still layer;
+- scenery may mirror run progress and the leading/losing state the HUD already publishes (window glow, aurora vigor, sun brightness, snow/dust weight). This is cosmetic reinforcement of existing information: it must never introduce a new information channel, change rules, or alter scoring;
+- every 50-day checkpoint triggers a skin-flavored celebration (sky volley particles plus one stepped flash: aurora band, window flash, or sun pulse). Celebrations stay hard-edged, token-colored, and are suppressed under `prefers-reduced-motion`.
 
 ## Interaction model
 

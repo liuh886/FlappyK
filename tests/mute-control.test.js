@@ -55,11 +55,11 @@ assert.ok(
 
 assert.ok(premiumCss.includes('#sound-toggle-btn'), 'The canonical stylesheet must present the sound control.');
 assert.ok(
-    premiumCss.includes('grid-template-columns: minmax(132px, 1fr) 48px 48px 48px;'),
+    premiumCss.includes('grid-template-columns: minmax(132px, 1fr) 48px 48px 56px 48px;'),
     'Desktop top controls must reserve a column for the sound control.',
 );
 assert.ok(
-    premiumCss.includes('grid-template-columns: 44px 44px 44px;'),
+    premiumCss.includes('grid-template-columns: 44px 44px 44px 44px;'),
     'Compact top controls must reserve a column for the sound control.',
 );
 

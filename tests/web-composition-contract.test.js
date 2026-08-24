@@ -74,7 +74,7 @@ for (const mobileContract of [
   'width: 100vw;',
   'grid-template-columns: minmax(36px, 1fr) 78px 108px 78px minmax(36px, 1fr);',
   'grid-column: 3;',
-  'grid-template-columns: 44px 44px;',
+  'grid-template-columns: 44px 44px 44px;',
 ]) {
   assert.ok(mobileCss.includes(mobileContract), `Missing mobile feature geometry contract: ${mobileContract}`);
 }

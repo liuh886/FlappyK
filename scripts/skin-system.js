@@ -81,13 +81,19 @@
 
     let activeSkin = SKINS[0].id;
 
+    // One cycle control per surface: the home toolbar slot and the in-game
+    // command rail share labels, persistence, and the canvas palette refresh.
+    const BUTTON_IDS = ['skin-toggle-btn', 'game-skin-toggle-btn'];
+
     function syncButton() {
-        const button = document.getElementById('skin-toggle-btn');
-        if (!button) return;
         const skin = findSkin(activeSkin) || SKINS[0];
-        button.textContent = skin.short;
-        button.setAttribute('aria-label', isChinese() ? `皮肤：${skin.nameZh}` : `Skin: ${skin.nameEn}`);
-        button.setAttribute('title', isChinese() ? `皮肤：${skin.nameZh}` : `Skin: ${skin.nameEn}`);
+        for (const buttonId of BUTTON_IDS) {
+            const button = document.getElementById(buttonId);
+            if (!button) continue;
+            button.textContent = skin.short;
+            button.setAttribute('aria-label', isChinese() ? `皮肤：${skin.nameZh}` : `Skin: ${skin.nameEn}`);
+            button.setAttribute('title', isChinese() ? `皮肤：${skin.nameZh}` : `Skin: ${skin.nameEn}`);
+        }
     }
 
     window.FlappyKSkins = Object.freeze({
@@ -129,15 +135,35 @@
 
     document.addEventListener('flappyk:language-changed', syncButton);
 
-    function ensureButton() {
-        const slot = document.getElementById('skin-toggle-slot');
-        if (!slot || document.getElementById('skin-toggle-btn')) return;
+    function createCycleButton(buttonId) {
         const button = document.createElement('button');
-        button.id = 'skin-toggle-btn';
+        button.id = buttonId;
         button.type = 'button';
         button.addEventListener('click', () => window.FlappyKSkins.cycle());
-        slot.append(button);
-        syncButton();
+        return button;
+    }
+
+    function ensureButton() {
+        let mounted = false;
+
+        // Home toolbar slot (owned by membership-config.js).
+        const slot = document.getElementById('skin-toggle-slot');
+        if (slot && !document.getElementById('skin-toggle-btn')) {
+            slot.append(createCycleButton('skin-toggle-btn'));
+            mounted = true;
+        }
+
+        // In-game command rail: sits between pause and mute.
+        const host = document.getElementById('game-top-controls');
+        if (host && !document.getElementById('game-skin-toggle-btn')) {
+            const anchor = document.getElementById('sound-toggle-btn');
+            const button = createCycleButton('game-skin-toggle-btn');
+            if (anchor && anchor.parentElement === host) host.insertBefore(button, anchor);
+            else host.append(button);
+            mounted = true;
+        }
+
+        if (mounted) syncButton();
     }
 
     if (document.readyState === 'loading') {

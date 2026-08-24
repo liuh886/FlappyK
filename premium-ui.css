@@ -203,7 +203,7 @@ a:focus-visible {
     position: static !important;
     width: auto;
     min-width: 0;
-    padding: 12px 14px 10px;
+    padding: 8px 12px 7px;
     border-right: 1px solid var(--game-border);
     border-bottom: 1px solid var(--game-border);
 }
@@ -211,7 +211,7 @@ a:focus-visible {
 .hud-main {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 22px;
+    gap: 18px;
     align-items: end;
 }
 
@@ -240,8 +240,8 @@ a:focus-visible {
     overflow: hidden;
     color: var(--game-text);
     font-family: var(--pixel-font-display);
-    font-size: clamp(20px, 1.9vw, 28px);
-    line-height: 1.25;
+    font-size: clamp(18px, 1.55vw, 23px);
+    line-height: 1.2;
     text-overflow: ellipsis;
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
@@ -258,8 +258,8 @@ a:focus-visible {
 }
 
 .excess-meter {
-    margin-top: 10px;
-    padding-top: 8px;
+    margin-top: 6px;
+    padding-top: 6px;
     border-top: 1px solid var(--game-border);
 }
 
@@ -288,8 +288,8 @@ a:focus-visible {
 
 .excess-meter-track {
     position: relative;
-    height: 11px;
-    margin-top: 7px;
+    height: 9px;
+    margin-top: 5px;
     overflow: hidden;
     border: 2px solid var(--game-border-strong);
     background: #030507;
@@ -318,8 +318,8 @@ a:focus-visible {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 9px;
-    height: 17px;
+    width: 8px;
+    height: 15px;
     border: 2px solid var(--game-bg);
     background: var(--game-red);
     transform: translate(-50%, -50%);
@@ -334,10 +334,10 @@ a:focus-visible {
     position: static !important;
     display: grid;
     grid-template-columns: auto minmax(100px, 1fr) auto;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
     min-width: 0;
-    padding: 8px 12px;
+    padding: 5px 12px;
 }
 
 .run-progress-panel .hud-header {
@@ -389,7 +389,7 @@ a:focus-visible {
     display: flex;
     align-items: center;
     min-width: 0;
-    padding: 8px 12px;
+    padding: 5px 12px;
     border-right: 1px solid var(--game-border);
     color: var(--game-muted);
     font-size: 11px;
@@ -418,7 +418,7 @@ html[data-market-weather='rain'] #game-hud-rail .weather-status::before {
 #game-top-controls {
     position: static !important;
     display: grid;
-    grid-template-columns: minmax(132px, 1fr) 48px 48px 48px;
+    grid-template-columns: minmax(132px, 1fr) 48px 48px 56px 48px;
     gap: 0;
     align-items: stretch;
     padding: 0;
@@ -441,6 +441,7 @@ html[data-market-weather='rain'] #game-hud-rail .weather-status::before {
 #game-back-btn,
 #pause-btn,
 #sound-toggle-btn,
+#game-skin-toggle-btn,
 #daily-run-btn,
 .home-secondary-actions button,
 .settlement-details-toggle,
@@ -460,17 +461,28 @@ html[data-market-weather='rain'] #game-hud-rail .weather-status::before {
 .speed-step,
 #game-back-btn,
 #pause-btn,
-#sound-toggle-btn {
-    min-height: 44px;
+#sound-toggle-btn,
+#game-skin-toggle-btn {
+    min-height: 40px;
     padding: 0;
     font-family: var(--pixel-font-display);
     font-size: 11px;
+}
+
+#game-skin-toggle-btn {
+    overflow: hidden;
+    color: var(--game-accent);
+    font-size: 8px;
+    letter-spacing: 0.02em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .speed-step:hover,
 #game-back-btn:hover,
 #pause-btn:hover,
 #sound-toggle-btn:hover,
+#game-skin-toggle-btn:hover,
 #daily-run-btn:hover,
 .home-secondary-actions button:hover,
 .settlement-details-toggle:hover,
@@ -554,6 +566,15 @@ html[data-virtual-controls='true'] .controls-hint {
 
 html[data-virtual-controls='true'] #game-top-controls .desktop-speed-control {
     display: none !important;
+}
+
+/* Touch dock shows back / pause / skin; mute stays keyboard-owned. */
+html[data-virtual-controls='true'] #game-top-controls #sound-toggle-btn {
+    display: none !important;
+}
+
+html[data-virtual-controls='true'] #game-skin-toggle-btn {
+    font-size: 7px;
 }
 
 /* Mobile geometry belongs to mobile-controls.css; this is skin only. */
@@ -1895,7 +1916,7 @@ html[data-flappyk-language='zh'] .run-progress-panel .hud-day {
     }
 
     .stats-box {
-        padding: 9px 10px 8px;
+        padding: 7px 9px 6px;
     }
 
     .hud-main {
@@ -1909,12 +1930,12 @@ html[data-flappyk-language='zh'] .run-progress-panel .hud-day {
 
     .hud-total > span:last-child,
     .hud-return > span:last-child {
-        font-size: clamp(16px, 4.5vw, 21px);
+        font-size: clamp(16px, 4.2vw, 19px);
     }
 
     .excess-meter {
-        margin-top: 7px;
-        padding-top: 6px;
+        margin-top: 5px;
+        padding-top: 5px;
     }
 
     .excess-meter-label {
@@ -1926,7 +1947,11 @@ html[data-flappyk-language='zh'] .run-progress-panel .hud-day {
     }
 
     #game-top-controls {
-        grid-template-columns: 44px 44px 44px;
+        grid-template-columns: 44px 44px 44px 44px;
+    }
+
+    #game-skin-toggle-btn {
+        font-size: 7px;
     }
 
     #game-top-controls .game-speed-control {

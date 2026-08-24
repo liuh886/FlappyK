@@ -6,6 +6,11 @@ All notable changes to FlappyK will be documented in this file.
 
 ### Added
 
+- Living-world skin gameplay pass: every skin now reacts to the run and to the already-published leading/losing state. Market Arcade's city windows light up progressively as the 250-day run matures (gold while beating the market, cool while behind) under a drifting cloud layer and a dusk-dimming starfield; Polar Exchange's aurora swells with run progress, burns brighter while leading, dims while behind, and thickens the snowfall when the market is ahead; Amber Terminal's pixel sun arcs from sunrise to sunset across the run and dims under a rising dust load when behind.
+- Checkpoint celebrations per skin: every 50-day milestone fires a skin-flavored sky volley (triple arcade firework burst, dual polar flare, amber solar volley) plus a stepped flash — aurora horizon band, window flash, or sun pulse — always hard-edged and skipped under `prefers-reduced-motion`.
+- Skin identities on shared game objects: the pixel mascot becomes a beaked arcade bird, a goggled penguin with a fluttering scarf and feet (polar), or a hover-jet scarab with a wing shimmer (amber); feedback particles take per-skin silhouettes (squares, snowflake crosses, sand sparks); plot frames gain frost ticks (polar) or brass rivets (amber).
+- In-game skin switcher: the command rail gains an accent-tinted cycle button (between pause and mute) sharing labels, persistence, and canvas re-theming with the home toolbar button. Touch docks show back / pause / skin; mute remains keyboard-owned (`M`).
+- Per-skin backdrop scenery in the market canvas, seeded and deterministic per stage size: Market Arcade draws a twinkling starfield over a two-layer city skyline with sparse blinking windows, Polar Exchange adds stepped aurora bands above a jagged ice ridge, and Amber Terminal adds a pixel sun disc above layered dunes. Scenery uses hard-edged palette-token rects only, sits behind all plot chrome, and freezes to a still layer under `prefers-reduced-motion`.
 - `window.FlappyKGameController`: one authoritative lifecycle with typed hooks (`level-will-start`, `level-did-start`, `tick`, `trade`, `level-will-settle`, `level-did-settle`) published through the event bus, plus a priority-ranked data-source registry (daily > friend > custom > normal). All feature modules now subscribe instead of wrapping globals; script load order no longer decides behaviour.
 - Skin pipeline per the amended visual direction: `skins.css` token-only palettes (default Market Arcade, Polar Exchange 极地冰原， Amber Terminal 琥珀终端）， a `scripts/skin-system.js` manifest with bilingual names and motion profiles, persistence under `flappyk_skin_v1`, a home toolbar cycle button, instant canvas re-theming, and offline caching.
 - Feedback FX layer: pooled hard-edged pixel particles on trades and milestones, progressive micro-haptics, checkpoint/speed/weather/UI chiptune blips, melody tempo that follows playback speed, candle breathing, milestone rail flashes, avatar cursor bob, and a two-frame thruster/glider mascot.
@@ -14,6 +19,7 @@ All notable changes to FlappyK will be documented in this file.
 
 ### Changed
 
+- The gameplay HUD rail is visibly more compact: tighter stats padding and value sizes, a shorter excess meter, slimmer run-progress and weather rows, and 40px command buttons. The market canvas raises its plots to clear the rail and now draws section labels and the day-progress rail inside the plot area instead of underneath the HUD.
 - Settlement is rendered once by the controller using the shared pass rule; results/legend/custom adjustments are hook subscribers. The pixel avatar now reads palette tokens so every skin re-themes it automatically.
 - The mobile back-to-home flow keeps its in-place reset; the corresponding E2E no longer waits for a page navigation.
 

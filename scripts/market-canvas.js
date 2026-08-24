@@ -111,6 +111,67 @@
     const ambientData = new Float32Array(AMBIENT_POOL * AMBIENT_FIELDS);
     let ambientKind = '';
     let ambientSeeded = false;
+    // Weather weight mirrors the published leading/losing state (cosmetic only).
+    let ambientIntensity = 1;
+
+    // World state shared by scenery layers. It mirrors values the HUD already
+    // publishes (run progress, leading/losing) so every skin can react without
+    // opening a new information channel or touching game rules.
+    let worldProgress = 0;
+    let worldLeading = null;
+    let flareUntil = 0;
+
+    function readWorldMood(state) {
+        const total = Math.max(1, state.currentData?.length || 250);
+        const progress = clamp((state.dayIndex + 1) / total, 0, 1);
+        let leading = null;
+        const startPrice = Number(state.currentData?.[0]?.close);
+        const price = Number(state.currentData?.[state.dayIndex]?.close);
+        const equity = Number(state.totalHistory?.[Math.min(state.dayIndex, (state.totalHistory?.length || 1) - 1)]);
+        const baseCash = Number(state.levelStartCash);
+        if (Number.isFinite(startPrice) && startPrice > 0
+            && Number.isFinite(price)
+            && Number.isFinite(equity)
+            && Number.isFinite(baseCash) && baseCash > 0) {
+            leading = (equity - baseCash) / baseCash >= (price - startPrice) / startPrice;
+        }
+        return { progress, leading };
+    }
+
+    function flarePulse(now, step = 140) {
+        if (now >= flareUntil) return 0;
+        return Math.floor((flareUntil - now) / step) % 2 ? 1 : 0;
+    }
+
+    // Checkpoint celebration: a skin-flavored volley in the sky band.
+    function triggerSkinFlare(now, skinId, width, height) {
+        flareUntil = now + 1500;
+        if (prefersReducedMotion()) return;
+        const volley = (originX, originY, primary, secondary) => {
+            for (let i = 0; i < 14; i += 1) {
+                const angle = (Math.PI * 2 * i) / 14 + (i % 3) * 0.21;
+                const speed = 46 + (i % 4) * 26;
+                spawnParticle(
+                    i % 2 ? secondary : primary,
+                    originX,
+                    originY,
+                    Math.cos(angle) * speed,
+                    Math.sin(angle) * speed - 30,
+                    0.5 + (i % 5) * 0.09,
+                );
+            }
+        };
+        if (skinId === 'polar') {
+            volley(width * 0.3, height * 0.2, 2, 0);
+            volley(width * 0.72, height * 0.26, 0, 2);
+        } else if (skinId === 'amber') {
+            volley(width * 0.78, height * 0.2, 3, 1);
+        } else {
+            volley(width * 0.28, height * 0.18, 3, 2);
+            volley(width * 0.66, height * 0.24, 2, 3);
+            volley(width * 0.47, height * 0.15, 0, 3);
+        }
+    }
 
     function seedAmbient(kind, width, height) {
         for (let i = 0; i < AMBIENT_POOL; i += 1) {
@@ -147,9 +208,10 @@
             ambientData[base + 1] = y;
 
             const depthPhase = Math.sin(now / 700 + ambientData[base + 3]);
-            ctx.globalAlpha = kind === 'snow'
+            const baseAlpha = kind === 'snow'
                 ? (depthPhase > 0 ? 0.42 : 0.22)
                 : (depthPhase > 0 ? 0.26 : 0.12);
+            ctx.globalAlpha = Math.min(0.6, baseAlpha * ambientIntensity);
             if (kind === 'snow') {
                 ctx.fillRect(snap(x), snap(y), depthPhase > 0 ? 2 : 1, 2);
             } else {
@@ -161,6 +223,7 @@
 
     function drawParticles(ctx, colors) {
         const swatches = [colors.green, colors.red, colors.system, colors.accent];
+        const skinId = window.FlappyKSkins?.getActive?.() || 'arcade';
         ctx.save();
         for (let i = 0; i < PARTICLE_POOL; i += 1) {
             const base = i * PARTICLE_FIELDS;
@@ -169,10 +232,304 @@
             const ratio = life / particleData[base + 5];
             ctx.globalAlpha = ratio > 0.66 ? 1 : ratio > 0.33 ? 0.62 : 0.28;
             ctx.fillStyle = swatches[particleKind[i]];
+            const px = snap(particleData[base]);
+            const py = snap(particleData[base + 1]);
             const size = ratio > 0.5 ? 4 : 3;
-            ctx.fillRect(snap(particleData[base]), snap(particleData[base + 1]), size, size);
+            if (skinId === 'polar') {
+                // Snowflake cross: hard-edged plus sign.
+                ctx.fillRect(px, py + 1, size, size - 2);
+                ctx.fillRect(px + 1, py, size - 2, size);
+            } else if (skinId === 'amber') {
+                // Sand spark: streak with a bright core.
+                ctx.fillRect(px - 1, py + 1, size + 2, 2);
+                ctx.fillRect(px + 1, py, 2, size);
+            } else {
+                ctx.fillRect(px, py, size, size);
+            }
         }
         ctx.restore();
+    }
+
+    // ---------- Backdrop scenery: deterministic per-skin silhouettes ----------
+    // Every layer is seeded once per (skin, size) so frames stay stable, drawn
+    // with hard-edged rects only, and sit strictly behind plot chrome.
+    const STAR_POOL = 96;
+    const STAR_FIELDS = 4; // x, y, phase, size
+    const starData = new Float32Array(STAR_POOL * STAR_FIELDS);
+    const CLOUD_POOL = 3;
+    const CLOUD_FIELDS = 4; // x0, y, width, speed
+    const cloudData = new Float32Array(CLOUD_POOL * CLOUD_FIELDS);
+    let skylineFar = [];
+    let skylineNear = [];
+    let ridgeHeights = [];
+    let dunePhases = [0, 1.7];
+    let sceneryKey = '';
+
+    function mulberry32(seed) {
+        let state = seed >>> 0;
+        return () => {
+            state = (state + 0x6D2B79F5) >>> 0;
+            let t = state;
+            t = Math.imul(t ^ (t >>> 15), t | 1);
+            t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+    }
+
+    function hash01(index, salt) {
+        const value = Math.sin(index * 127.1 + salt * 311.7) * 43758.5453;
+        return value - Math.floor(value);
+    }
+
+    function buildSkyline(rand, width, maxHeight, gapChance) {
+        const blocks = [];
+        let x = -12;
+        while (x < width + 12) {
+            const blockWidth = 14 + Math.floor(rand() * 26);
+            const blockHeight = Math.floor(maxHeight * (0.35 + rand() * 0.65));
+            blocks.push({ x, w: blockWidth, h: blockHeight });
+            x += blockWidth + (rand() < gapChance ? 4 + Math.floor(rand() * 8) : 0);
+        }
+        return blocks;
+    }
+
+    function ensureScenery(kind, width, height) {
+        const key = `${kind}:${width}x${height}`;
+        if (key === sceneryKey) return;
+        sceneryKey = key;
+
+        const rand = mulberry32(0x5EED);
+        for (let i = 0; i < STAR_POOL; i += 1) {
+            const base = i * STAR_FIELDS;
+            starData[base] = rand() * width;
+            starData[base + 1] = rand() * height * 0.6;
+            starData[base + 2] = rand() * Math.PI * 2;
+            starData[base + 3] = rand() < 0.24 ? 2 : 1;
+        }
+        skylineFar = buildSkyline(rand, width, clamp(height * 0.14, 60, 128), 0.3);
+        skylineNear = buildSkyline(rand, width, clamp(height * 0.1, 42, 92), 0.16);
+
+        ridgeHeights = [];
+        for (let x = 0; x <= width + 26; x += 26) {
+            ridgeHeights.push(Math.floor(clamp(height * 0.04, 16, 34) + rand() * clamp(height * 0.08, 20, 52)));
+        }
+
+        dunePhases = [rand() * Math.PI * 2, rand() * Math.PI * 2];
+
+        for (let i = 0; i < CLOUD_POOL; i += 1) {
+            const base = i * CLOUD_FIELDS;
+            cloudData[base] = rand() * width;
+            cloudData[base + 1] = height * (0.06 + rand() * 0.16);
+            cloudData[base + 2] = 26 + rand() * 22;
+            cloudData[base + 3] = 4 + rand() * 6;
+        }
+    }
+
+    function drawStarfield(ctx, colors, width, height, now, isStatic) {
+        // Stars fade toward dusk as the 250-day run matures.
+        const duskDim = 1 - worldProgress * 0.45;
+        ctx.save();
+        ctx.fillStyle = colors.text;
+        for (let i = 0; i < STAR_POOL; i += 1) {
+            const base = i * STAR_FIELDS;
+            const x = starData[base];
+            const y = starData[base + 1];
+            if (x > width || y > height) continue;
+            const twinkle = (isStatic
+                ? 0.3
+                : 0.2 + 0.26 * (0.5 + 0.5 * Math.sin(now / 650 + starData[base + 2]))) * duskDim;
+            ctx.globalAlpha = twinkle;
+            const size = starData[base + 3];
+            ctx.fillRect(snap(x), snap(y), size, size);
+        }
+        ctx.restore();
+    }
+
+    function drawClouds(ctx, colors, width, height, now, isStatic) {
+        ctx.save();
+        ctx.fillStyle = colors.raised;
+        for (let i = 0; i < CLOUD_POOL; i += 1) {
+            const base = i * CLOUD_FIELDS;
+            const cloudWidth = cloudData[base + 2];
+            const speed = cloudData[base + 3];
+            const travel = isStatic ? 0 : (now / 1000) * speed;
+            const x = ((cloudData[base] + travel) % (width + cloudWidth * 2)) - cloudWidth;
+            const y = cloudData[base + 1];
+            ctx.globalAlpha = 0.26;
+            ctx.fillRect(snap(x), snap(y), snap(cloudWidth), 4);
+            ctx.fillRect(snap(x + cloudWidth * 0.16), snap(y - 3), snap(cloudWidth * 0.62), 3);
+            ctx.fillRect(snap(x + cloudWidth * 0.34), snap(y + 4), snap(cloudWidth * 0.44), 3);
+        }
+        ctx.restore();
+    }
+
+    function drawSkyline(ctx, colors, height, now) {
+        const drawBlocks = (blocks, fill, alpha) => {
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = fill;
+            for (const block of blocks) {
+                ctx.fillRect(snap(block.x), snap(height - block.h), snap(block.w), block.h + 2);
+            }
+            ctx.restore();
+        };
+        drawBlocks(skylineFar, colors.surface, 0.6);
+        drawBlocks(skylineNear, colors.raised, 0.85);
+
+        // The city wakes up as the run matures: the window lit-threshold drops
+        // with progress, windows burn gold while leading and cool while behind.
+        const litThreshold = 0.74 - worldProgress * 0.4 - (flarePulse(now) ? 0.5 : 0);
+        const windowColor = worldLeading === false ? colors.muted : colors.accent;
+        ctx.save();
+        ctx.fillStyle = windowColor;
+        for (let b = 0; b < skylineNear.length; b += 1) {
+            const block = skylineNear[b];
+            const cols = Math.max(1, Math.floor(block.w / 9));
+            const rows = Math.max(1, Math.floor(block.h / 12));
+            for (let c = 0; c < cols; c += 1) {
+                for (let r = 0; r < rows; r += 1) {
+                    const seedRoll = hash01(b * 97 + c * 13 + r, 3);
+                    if (seedRoll < litThreshold) continue;
+                    const blink = (now / 1600 + hash01(b * 41 + c, 7) * 4) % 2;
+                    ctx.globalAlpha = flarePulse(now)
+                        ? 0.6
+                        : (blink > 0.24 ? 0.34 : 0.1);
+                    ctx.fillRect(
+                        snap(block.x + 4 + c * 9),
+                        snap(height - block.h + 5 + r * 12),
+                        2,
+                        3,
+                    );
+                }
+            }
+        }
+        ctx.restore();
+    }
+
+    function drawAurora(ctx, colors, width, height, now, isStatic) {
+        // Aurora swells with run progress, burns bright while leading, and
+        // dims to an ember while the market is ahead.
+        const flare = flarePulse(now);
+        const vigor = (0.5 + worldProgress * 0.7)
+            * (worldLeading === false ? 0.5 : worldLeading === true ? 1.3 : 1)
+            * (flare ? 1.9 : 1);
+        ctx.save();
+        ctx.fillStyle = colors.system;
+        const columns = Math.ceil(width / 12) + 1;
+        for (let ribbon = 0; ribbon < 3; ribbon += 1) {
+            const baseY = height * (0.08 + ribbon * 0.06);
+            for (let c = 0; c < columns; c += 1) {
+                const x = c * 12;
+                const drift = isStatic ? 0 : now / (1500 + ribbon * 400);
+                const wave =
+                    Math.sin(x * 0.016 + drift + ribbon * 2.1) * 10
+                    + Math.sin(x * 0.005 - drift * 0.6 + ribbon) * 6;
+                const length = (26 + Math.sin(x * 0.011 + drift * 1.4 + ribbon * 1.3) * 14)
+                    * (worldLeading === true ? 1.3 : 1);
+                const shimmer = (isStatic
+                    ? 0.05
+                    : 0.04 + 0.025 * Math.sin(drift * 2 + c * 0.45)) * vigor;
+                ctx.globalAlpha = Math.max(0.015, Math.min(0.3, shimmer));
+                ctx.fillRect(snap(x), snap(baseY + wave), 10, snap(length));
+            }
+        }
+        if (flare) {
+            // Checkpoint flash: one hard-edged horizon band.
+            ctx.globalAlpha = 0.09;
+            ctx.fillRect(0, snap(height * 0.1), snap(width), 8);
+        }
+        ctx.restore();
+    }
+
+    function drawIceRidge(ctx, colors, width, height, now) {
+        const baseY = height;
+        ctx.save();
+        ctx.globalAlpha = 0.75;
+        ctx.fillStyle = colors.surface;
+        ctx.beginPath();
+        ctx.moveTo(-2, baseY + 2);
+        for (let i = 0; i < ridgeHeights.length; i += 1) {
+            ctx.lineTo(snap(i * 26), snap(baseY - ridgeHeights[i]));
+        }
+        ctx.lineTo(width + 2, baseY + 2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.globalAlpha = flarePulse(now) ? 0.9 : 0.5;
+        ctx.strokeStyle = colors.borderStrong;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(-2, snap(baseY - ridgeHeights[0]));
+        for (let i = 1; i < ridgeHeights.length; i += 1) {
+            ctx.lineTo(snap(i * 26), snap(baseY - ridgeHeights[i]));
+        }
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    function drawPixelSun(ctx, colors, width, height, now, isStatic) {
+        // The sun arcs across the sky with the 250-day run: sunrise at day 1,
+        // zenith mid-run, sunset at day 250. Pulses on checkpoints, dims
+        // while the market is ahead.
+        const radius = clamp(height * 0.055, 24, 42)
+            * (flarePulse(now) ? 1.18 : 1);
+        const progress = isStatic ? Math.max(worldProgress, 0.001) : worldProgress;
+        const cx = width * (0.14 + 0.72 * progress);
+        const cy = height * (0.36 - Math.sin(clamp(progress, 0, 1) * Math.PI) * 0.13);
+        const alpha = (worldLeading === false ? 0.1 : 0.16) * (flarePulse(now) ? 1.7 : 1);
+        ctx.save();
+        ctx.globalAlpha = Math.min(0.3, alpha);
+        ctx.fillStyle = colors.accent;
+        for (let dy = -radius; dy <= radius; dy += 3) {
+            const half = Math.sqrt(Math.max(0, radius * radius - dy * dy));
+            ctx.fillRect(snap(cx - half), snap(cy + dy), snap(half * 2), 3);
+        }
+        // Horizon glow bar under the sun position (hard-edged, stepped).
+        ctx.globalAlpha = Math.min(0.2, alpha * 0.8);
+        ctx.fillRect(snap(cx - radius * 1.6), snap(cy + radius + 6), snap(radius * 3.2), 3);
+        ctx.restore();
+    }
+
+    function drawDunes(ctx, colors, width, height, now, isStatic) {
+        const layers = [
+            { amp: clamp(height * 0.028, 12, 22), wave: 190, alpha: 0.55, fill: colors.surface, y: 0.86 },
+            { amp: clamp(height * 0.04, 16, 30), wave: 260, alpha: 0.85, fill: colors.raised, y: 0.93 },
+        ];
+        ctx.save();
+        for (let l = 0; l < layers.length; l += 1) {
+            const layer = layers[l];
+            const drift = isStatic ? 0 : Math.sin(now / 2600 + l) * 6;
+            ctx.globalAlpha = layer.alpha;
+            ctx.fillStyle = layer.fill;
+            ctx.beginPath();
+            ctx.moveTo(-2, height + 2);
+            for (let x = -2; x <= width + 2; x += 8) {
+                const y = height * layer.y
+                    + Math.sin((x + drift * (l + 1)) / layer.wave * Math.PI * 2 + dunePhases[l]) * layer.amp;
+                ctx.lineTo(snap(x), snap(y));
+            }
+            ctx.lineTo(width + 2, height + 2);
+            ctx.closePath();
+            ctx.fill();
+        }
+        ctx.restore();
+    }
+
+    function drawBackdrop(ctx, colors, kind, width, height, now) {
+        if (!Number.isFinite(width) || !Number.isFinite(height) || width < 40 || height < 40) return;
+        ensureScenery(kind, width, height);
+        const isStatic = prefersReducedMotion();
+
+        if (kind === 'polar') {
+            drawAurora(ctx, colors, width, height, now, isStatic);
+            drawIceRidge(ctx, colors, width, height, now);
+        } else if (kind === 'amber') {
+            drawPixelSun(ctx, colors, width, height, now, isStatic);
+            drawDunes(ctx, colors, width, height, now, isStatic);
+        } else {
+            drawStarfield(ctx, colors, width, height, now, isStatic);
+            drawClouds(ctx, colors, width, height, now, isStatic);
+            drawSkyline(ctx, colors, height, now);
+        }
     }
 
     function clamp(value, minimum, maximum) {
@@ -206,7 +563,7 @@
         ctx.restore();
     }
 
-    function drawStageFrame(ctx, plot, colors) {
+    function drawStageFrame(ctx, plot, colors, skinId = 'arcade') {
         ctx.save();
         ctx.strokeStyle = colors.borderStrong;
         ctx.globalAlpha = 0.72;
@@ -228,6 +585,29 @@
             ctx.lineTo(snap(x), snap(y));
             ctx.lineTo(snap(x + sx * corner), snap(y));
             ctx.stroke();
+        }
+
+        // Skin chrome trim along the shared hard frame.
+        ctx.fillStyle = skinId === 'amber' ? colors.accent : colors.system;
+        if (skinId === 'polar') {
+            // Frost ticks hanging from the top edge.
+            ctx.globalAlpha = 0.35;
+            for (let x = plot.left + 20; x < plot.right - 8; x += 28) {
+                ctx.fillRect(snap(x), snap(plot.top) + 2, 2, 4);
+            }
+        } else if (skinId === 'amber') {
+            // Brass rivets at corners and edge midpoints.
+            ctx.globalAlpha = 0.45;
+            const midX = snap((plot.left + plot.right) / 2);
+            const midY = snap((plot.top + plot.bottom) / 2);
+            for (const [rx, ry] of [
+                [plot.left + 4, plot.top + 4], [plot.right - 6, plot.top + 4],
+                [plot.left + 4, plot.bottom - 6], [plot.right - 6, plot.bottom - 6],
+                [midX, plot.top + 4], [midX, plot.bottom - 6],
+                [plot.left + 4, midY], [plot.right - 6, midY],
+            ]) {
+                ctx.fillRect(snap(rx), snap(ry), 2, 2);
+            }
         }
         ctx.restore();
     }
@@ -452,9 +832,10 @@
         ctx.save();
         const px = snap(x);
         const py = snap(y);
+        const skinId = window.FlappyKSkins?.getActive?.() || 'arcade';
 
         if (isHolding) {
-            // Jetpack thruster: two-frame exhaust flicker.
+            // Thruster: two-frame exhaust flicker, shaped per skin.
             const flameLength = frame ? 6 : 3;
             ctx.fillStyle = colors.accent;
             ctx.fillRect(px - 10, py - 2, 4, 4);
@@ -463,6 +844,15 @@
             if (!frame) {
                 ctx.fillRect(px - 13, py - 2, 2, 1);
                 ctx.fillRect(px - 13, py + 1, 2, 1);
+            }
+        } else if (skinId === 'amber') {
+            // Scarab hover jets: two stepped exhausts under the shell.
+            if (!prefersReducedMotion()) {
+                ctx.fillStyle = colors.system;
+                ctx.globalAlpha = frame ? 0.7 : 0.4;
+                ctx.fillRect(px - 4, py + 6, 2, frame ? 3 : 2);
+                ctx.fillRect(px + 2, py + 6, 2, frame ? 2 : 3);
+                ctx.globalAlpha = 1;
             }
         } else {
             // Glider: two-frame wing flap.
@@ -481,10 +871,12 @@
         ctx.fillRect(px - 5, py - 5, 10, 10);
         drawHardBox(ctx, px - 5, py - 5, 10, 10, isHolding ? colors.green : colors.surface, colors.text, 2, colors.bg);
 
-        // Skin outfit variants stay inside the body silhouette.
-        const skinId = window.FlappyKSkins?.getActive?.();
+        // Skin identities stay inside the 10x10 silhouette plus small trim.
         if (skinId === 'polar') {
-            // Goggle band with two dark lenses; scarf stripe inside the lower body.
+            // Penguin: goggle band with dark lenses, white belly, scarf tail
+            // that flutters between two frames, and accent feet.
+            ctx.fillStyle = colors.text;
+            ctx.fillRect(px - 2, py - 1, 4, 6);
             ctx.fillStyle = colors.system;
             ctx.fillRect(px - 5, py - 4, 10, 3);
             ctx.fillStyle = colors.bg;
@@ -492,15 +884,23 @@
             ctx.fillRect(px + 1, py - 4, 2, 3);
             ctx.fillStyle = colors.accent;
             ctx.fillRect(px - 5, py + 2, 10, 2);
+            ctx.fillRect(px + 5, py + 4, frame ? 3 : 5, 2);
+            ctx.fillRect(px - 4, py + 5, 3, 1);
+            ctx.fillRect(px + 1, py + 5, 3, 1);
         } else if (skinId === 'amber') {
-            // Visor beam above the body and a chest core instead of the classic eye.
+            // Scarab: visor beam, chest core, and a wing shimmer line.
             ctx.fillStyle = colors.accent;
             ctx.fillRect(px - 4, py - 7, 8, 2);
             ctx.fillRect(px - 2, py - 1, 3, 3);
+            ctx.globalAlpha = frame ? 0.55 : 0.3;
+            ctx.fillRect(px - 5, py - 6, 10, 1);
+            ctx.globalAlpha = 1;
         } else {
-            // Classic Market Arcade eye.
+            // Market Arcade bird: accent eye plus a two-step beak.
             ctx.fillStyle = colors.accent;
             ctx.fillRect(px + 1, py - 3, 3, 3);
+            ctx.fillRect(px + 5, py - 1, 3, 2);
+            ctx.fillRect(px + 5, py + 1, 2, 1);
         }
         ctx.restore();
     }
@@ -592,14 +992,14 @@
         }
     }
 
-    function drawLevelStatus(ctx, state, colors, width, topInset) {
+    function drawLevelStatus(ctx, state, colors, plot) {
         const day = Math.min(state.dayIndex + 1, 250);
         const total = Math.max(1, state.currentData?.length || 250);
         const progress = clamp(day / total, 0, 1);
-        const railWidth = clamp(width * 0.22, 120, 220);
+        const railWidth = clamp(plot.width * 0.2, 120, 200);
         const railHeight = 8;
-        const right = width - 16;
-        const top = clamp(topInset - 34, 58, 98);
+        const right = plot.right - 8;
+        const top = snap(plot.top) + 9;
         const left = right - railWidth;
 
         ctx.save();
@@ -607,7 +1007,7 @@
         ctx.fillStyle = colors.muted;
         ctx.textAlign = 'right';
         ctx.textBaseline = 'bottom';
-        ctx.fillText(`DAY ${day} / ${total}`, right, top - 5);
+        ctx.fillText(`DAY ${day} / ${total}`, right, top - 4);
         drawHardBox(ctx, left, top, railWidth, railHeight, colors.bg, colors.borderStrong, 0, colors.bg);
         const fillWidth = Math.max(2, snap((railWidth - 4) * progress));
         ctx.fillStyle = colors.system;
@@ -647,12 +1047,22 @@
         ctx.fillRect(0, 0, width, height);
         ctx.restore();
 
-        // Skin atmosphere sits behind every game object and grid line.
-        drawAmbient(ctx, colors, window.FlappyKSkins?.getActiveSkin?.()?.atmosphere || 'none', width, height, frameDt, now);
+        // Skin backdrop scenery + atmosphere sit behind every game object.
+        const skinId = window.FlappyKSkins?.getActive?.() || 'arcade';
+        const atmosphereKind = window.FlappyKSkins?.getActiveSkin?.()?.atmosphere || 'none';
+        const world = readWorldMood(state);
+        worldProgress = world.progress;
+        worldLeading = world.leading;
+        // Weather weight mirrors the published leading/losing state only.
+        ambientIntensity = worldLeading === false ? 1.35 : flarePulse(now) ? 1.15 : 1;
+        drawBackdrop(ctx, colors, skinId, width, height, now);
+        drawAmbient(ctx, colors, atmosphereKind, width, height, frameDt, now);
 
         if (!Array.isArray(currentData) || currentData.length === 0 || dayIndex < 0) return;
 
-        const topInset = clamp(height * 0.17, 104, 142);
+        const topInset = height >= 560
+            ? clamp(height * 0.16, 146, 176)
+            : clamp(height * 0.28, 120, 158);
         const sideInset = clamp(width * 0.028, 10, 22);
         const returnHeight = clamp(height * 0.18, 86, 138);
         const bottomInset = clamp(height * 0.055, 22, 42);
@@ -679,11 +1089,11 @@
 
         drawHairlineGrid(ctx, pricePlot, colors);
         drawHairlineGrid(ctx, returnPlot, colors);
-        drawStageFrame(ctx, pricePlot, colors);
-        drawStageFrame(ctx, returnPlot, colors);
-        drawSectionLabel(ctx, 'MARKET PRICE', pricePlot.left + 8, pricePlot.top - 22, colors);
-        drawSectionLabel(ctx, 'PLAYER EQUITY', returnPlot.left + 8, returnPlot.top - 22, colors);
-        drawLevelStatus(ctx, state, colors, width, topInset);
+        drawStageFrame(ctx, pricePlot, colors, skinId);
+        drawStageFrame(ctx, returnPlot, colors, skinId);
+        drawSectionLabel(ctx, 'MARKET PRICE', pricePlot.left + 8, pricePlot.top + 11, colors);
+        drawSectionLabel(ctx, 'PLAYER EQUITY', returnPlot.left + 8, returnPlot.top + 11, colors);
+        drawLevelStatus(ctx, state, colors, pricePlot);
 
         const startDay = Math.max(0, dayIndex - visibleDays + 1);
         let minPrice = Infinity;
@@ -723,6 +1133,7 @@
         const CHECKPOINT_DAYS = 50;
         if (lastDrawnDay >= 0 && dayIndex > lastDrawnDay && Math.floor(dayIndex / CHECKPOINT_DAYS) > Math.floor(lastDrawnDay / CHECKPOINT_DAYS)) {
             requestBurst('checkpoint');
+            triggerSkinFlare(now, skinId, width, height);
         }
         lastDrawnDay = dayIndex === 0 ? 0 : dayIndex;
         drawParticles(ctx, colors);
