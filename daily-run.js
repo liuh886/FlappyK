@@ -164,10 +164,12 @@
         startLevel();
     }
 
-    const previousPickRandomData = pickRandomData;
-    pickRandomData = function dailyRunPickRandomData() {
-        if (state.active) {
-            const descriptor = state.descriptors[level - 1];
+    window.FlappyKGameController?.registerDataSource({
+        id: 'daily-run',
+        mode: 'daily',
+        provide(levelNumber) {
+            if (!state.active) return null;
+            const descriptor = state.descriptors[levelNumber - 1];
             const resolved = descriptor && resolveDescriptor(descriptor);
             if (resolved) {
                 currentMarket = resolved.market;
@@ -177,15 +179,13 @@
 
             exitDailyMode();
             window.alert('Today’s Daily Run could not be restored. A random run will start instead.');
-        }
-        return previousPickRandomData();
-    };
+            return null;
+        },
+    });
 
-    const previousStartLevel = startLevel;
-    startLevel = function dailyRunAwareStartLevel() {
-        previousStartLevel();
+    window.FlappyKGameController?.on('level-did-start', () => {
         if (state.active && targetDisp) targetDisp.textContent = 'DAILY · BEAT THE MARKET';
-    };
+    });
 
     function buildDailyChallengeUrl(score) {
         if (!state.active || state.descriptors.length !== 3 || !codec) return null;

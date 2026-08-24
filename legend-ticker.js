@@ -9,29 +9,6 @@
         return Number.isFinite(parsed) ? parsed / 100 : 0;
     }
 
-    function attachCompletedLevelMetrics() {
-        const previousEndLevel = endLevel;
-
-        endLevel = function legendAwareEndLevel() {
-            const completedLevel = level;
-            const projectedCash = cash + (shares * currentPrice);
-            const levelReturn = (projectedCash - levelStartCash) / levelStartCash;
-            const startPrice = currentData[0].close;
-            const marketReturn = (currentPrice - startPrice) / startPrice;
-            const days = currentData.length;
-
-            previousEndLevel();
-
-            const completedCard = collectedCards.find((card) => card.level === completedLevel);
-            if (completedCard) {
-                completedCard.levelReturn = levelReturn;
-                completedCard.marketReturn = marketReturn;
-                completedCard.excessReturn = levelReturn - marketReturn;
-                completedCard.days = days;
-            }
-        };
-    }
-
     function buildLegendSummary() {
         const ticker = document.getElementById('legend-ticker');
         if (!ticker || collectedCards.length === 0) return;
@@ -73,8 +50,6 @@
             item.textContent = summary;
         });
     }
-
-    attachCompletedLevelMetrics();
 
     if (typeof champagneBtn !== 'undefined' && champagneBtn) {
         champagneBtn.addEventListener('click', () => {

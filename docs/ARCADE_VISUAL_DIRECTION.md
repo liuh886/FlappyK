@@ -25,7 +25,7 @@ The canonical system follows these rules:
 - green and red are reserved for market/performance/trade semantics;
 - desktop and mobile share the same information hierarchy, with mobile changing control geometry only.
 
-There is no alternative legacy skin, no compatibility theme, and no visual fallback. `premium-ui.css` is the single canonical owner for shared presentation.
+The default skin is Pixel Market Arcade. Additional skins are sanctioned expressions of the same grammar through the token pipeline: a skin may ONLY override `--game-*` design tokens (and motion rhythm tokens) inside `skins.css`, plus one catalog entry in `scripts/skin-system.js`. Component presentation never moves into skins. There is no alternative legacy skin, no compatibility theme, and no visual fallback outside this pipeline. `premium-ui.css` remains the single canonical owner of shared presentation and of the default token values.
 
 ## Pixel Market Arcade expression
 
@@ -67,6 +67,27 @@ Depth communicates physical interaction or foreground order only:
 - focus may move a control one pixel forward, but never turns it into a glowing card.
 
 The following are prohibited in the canonical presentation: ambient radial lighting, decorative gradients, scan-line sweeps, glow, bloom, `shadowBlur`, glass panels, blurred drop shadows, floating dashboard stacks, emoji chart markers, and ornamental neon fields.
+
+## Feedback FX
+
+Game feel is a sanctioned layer of the canonical language, subject to the same hard-pixel discipline:
+
+- trade and milestone particles are hard-edged squares drawn inside `scripts/market-canvas.js`, colored only from palette tokens, capped by a fixed zero-allocation pool, and skipped entirely under `prefers-reduced-motion`;
+- micro-haptics (`scripts/haptics.js`) are progressive enhancement on devices exposing the vibration API;
+- chiptune SFX cover trades, stage win/fail, milestones, speed, weather, and UI blips; melody tempo follows playback speed; everything respects the mute preference;
+- motion rhythm is tokenized (`--motion-step-fast/base/slow`); component animations read tokens instead of hard-coded durations;
+- settlement reveals use short stepped count-up motion with a reduced-motion bypass.
+
+The following remain prohibited in every skin and in FX work: ambient radial lighting, decorative gradients, scan-line sweeps, glow, bloom, `shadowBlur`, glass panels, blurred drop shadows, emoji chart markers, and ornamental neon fields.
+
+## Skins
+
+Skins are palette-and-rhythm variations of Pixel Market Arcade, never new layouts:
+
+- `skins.css` is the single owner of non-default token sets; each `html[data-skin]` block must define the complete required token list with concrete hex values;
+- semantic color roles are invariant across skins: yellow-family accent = primary action/focus, system cyan-family = reference state, green/red = market/trade semantics (A-share red-up/green-down included);
+- `scripts/skin-system.js` owns the catalog (ids, bilingual names, motion profile), persistence under `flappyk_skin_v1`, the home toolbar cycle button, and instant canvas re-theming through `FlappyKMarketCanvas.refreshPalette`;
+- the pixel avatar may carry one small identity crest per skin; it may not change silhouette rules or add glow.
 
 ## Interaction model
 
@@ -212,8 +233,8 @@ Core game data, scoring, pass rules, account/cloud history, Daily Run, friend ch
 
 ## Rules for future visual work
 
-1. Pixel Market Arcade is the only expressive visual language inside Single-Surface Market OS.
-2. Do not add a second theme, compatibility skin, `*-polish.css`, `*-fix.css`, or canvas patch layer.
+1. Pixel Market Arcade is the base visual language inside Single-Surface Market OS; additional skins are sanctioned only through the token pipeline (`skins.css` + `scripts/skin-system.js`).
+2. Do not add a second theme outside that pipeline, a compatibility skin, `*-polish.css`, `*-fix.css`, or a canvas patch layer. Skins stay token-only: no component selectors in `skins.css`.
 3. Change the actual owning component or shared visual system directly.
 4. Keep the K-line visually dominant and treat it as the level, not a dashboard chart.
 5. Readability outranks terminal density; do not reintroduce 7–9 px operational text as a default.

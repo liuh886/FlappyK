@@ -39,6 +39,11 @@
     --space-4: 16px;
     --space-5: 20px;
     --space-6: 24px;
+
+    /* Motion tokens: stepped arcade motion. Skins may retune rhythm here. */
+    --motion-step-fast: 90ms;
+    --motion-step-base: 160ms;
+    --motion-step-slow: 320ms;
 }
 
 /*
@@ -413,7 +418,7 @@ html[data-market-weather='rain'] #game-hud-rail .weather-status::before {
 #game-top-controls {
     position: static !important;
     display: grid;
-    grid-template-columns: minmax(132px, 1fr) 48px 48px;
+    grid-template-columns: minmax(132px, 1fr) 48px 48px 48px;
     gap: 0;
     align-items: stretch;
     padding: 0;
@@ -435,6 +440,7 @@ html[data-market-weather='rain'] #game-hud-rail .weather-status::before {
 .speed-step,
 #game-back-btn,
 #pause-btn,
+#sound-toggle-btn,
 #daily-run-btn,
 .home-secondary-actions button,
 .settlement-details-toggle,
@@ -453,7 +459,8 @@ html[data-market-weather='rain'] #game-hud-rail .weather-status::before {
 
 .speed-step,
 #game-back-btn,
-#pause-btn {
+#pause-btn,
+#sound-toggle-btn {
     min-height: 44px;
     padding: 0;
     font-family: var(--pixel-font-display);
@@ -463,6 +470,7 @@ html[data-market-weather='rain'] #game-hud-rail .weather-status::before {
 .speed-step:hover,
 #game-back-btn:hover,
 #pause-btn:hover,
+#sound-toggle-btn:hover,
 #daily-run-btn:hover,
 .home-secondary-actions button:hover,
 .settlement-details-toggle:hover,
@@ -1295,7 +1303,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     border: 3px solid var(--game-border-strong);
     background: var(--game-surface-raised);
     box-shadow: 4px 4px 0 var(--game-depth);
-    animation: arcade-medal-drop 320ms cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+    animation: arcade-medal-drop var(--motion-step-slow) cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
 }
 
 .settlement-medal-icon {
@@ -1918,7 +1926,7 @@ html[data-flappyk-language='zh'] .run-progress-panel .hud-day {
     }
 
     #game-top-controls {
-        grid-template-columns: 44px 44px;
+        grid-template-columns: 44px 44px 44px;
     }
 
     #game-top-controls .game-speed-control {
@@ -2179,7 +2187,7 @@ html[data-flappyk-language='zh'] .run-progress-panel .hud-day {
 }
 
 #game-container.is-shaking {
-    animation: arcade-screen-shake 90ms steps(4, end);
+    animation: arcade-screen-shake var(--motion-step-fast) steps(4, end);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -38,6 +38,92 @@
         return cachedPalette;
     }
 
+    // ---------- Feedback FX (hard-edged pixel particles, zero-allocation pool) ----------
+    const PARTICLE_POOL = 64;
+    const PARTICLE_FIELDS = 6; // x, y, vx, vy, life, maxLife
+    const particleData = new Float32Array(PARTICLE_POOL * PARTICLE_FIELDS);
+    const particleKind = new Uint8Array(PARTICLE_POOL);
+    let particleWrite = 0;
+    let lastFrameAt = 0;
+    let reducedMotionQuery = null;
+
+    const BURST_SLOTS = 8;
+    const pendingBursts = new Array(BURST_SLOTS).fill(null);
+    let burstCursor = 0;
+
+    function prefersReducedMotion() {
+        if (!reducedMotionQuery) {
+            reducedMotionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)') || null;
+        }
+        return Boolean(reducedMotionQuery?.matches);
+    }
+
+    function spawnParticle(kind, x, y, vx, vy, life) {
+        const base = particleWrite * PARTICLE_FIELDS;
+        particleData[base] = x;
+        particleData[base + 1] = y;
+        particleData[base + 2] = vx;
+        particleData[base + 3] = vy;
+        particleData[base + 4] = life;
+        particleData[base + 5] = life;
+        particleKind[particleWrite] = kind;
+        particleWrite = (particleWrite + 1) % PARTICLE_POOL;
+    }
+
+    function spawnBurst(kind, x, y) {
+        if (prefersReducedMotion()) return;
+        const colorKey = kind === 'sell' ? 1 : kind === 'checkpoint' ? 3 : 0;
+        const count = kind === 'checkpoint' ? 14 : 9;
+        for (let i = 0; i < count; i += 1) {
+            const angle = (Math.PI * 2 * i) / count + Math.random() * 0.5;
+            const speed = 40 + Math.random() * 70;
+            spawnParticle(
+                colorKey,
+                x,
+                y,
+                Math.cos(angle) * speed,
+                Math.sin(angle) * speed - (kind === 'buy' ? 60 : 20),
+                0.34 + Math.random() * 0.16,
+            );
+        }
+    }
+
+    function requestBurst(kind) {
+        if (kind !== 'buy' && kind !== 'sell' && kind !== 'checkpoint') return;
+        pendingBursts[burstCursor] = kind;
+        burstCursor = (burstCursor + 1) % BURST_SLOTS;
+    }
+
+    function stepParticles(now) {
+        let dt = (now - lastFrameAt) / 1000;
+        if (!Number.isFinite(dt) || dt <= 0 || dt > 0.25) dt = 0.016;
+        lastFrameAt = now;
+        for (let i = 0; i < PARTICLE_POOL; i += 1) {
+            const base = i * PARTICLE_FIELDS;
+            if (particleData[base + 4] <= 0) continue;
+            particleData[base + 4] -= dt;
+            particleData[base] += particleData[base + 2] * dt;
+            particleData[base + 1] += particleData[base + 3] * dt;
+            particleData[base + 3] += 190 * dt;
+        }
+    }
+
+    function drawParticles(ctx, colors) {
+        const swatches = [colors.green, colors.red, colors.system, colors.accent];
+        ctx.save();
+        for (let i = 0; i < PARTICLE_POOL; i += 1) {
+            const base = i * PARTICLE_FIELDS;
+            const life = particleData[base + 4];
+            if (life <= 0) continue;
+            const ratio = life / particleData[base + 5];
+            ctx.globalAlpha = ratio > 0.66 ? 1 : ratio > 0.33 ? 0.62 : 0.28;
+            ctx.fillStyle = swatches[particleKind[i]];
+            const size = ratio > 0.5 ? 4 : 3;
+            ctx.fillRect(snap(particleData[base]), snap(particleData[base + 1]), size, size);
+        }
+        ctx.restore();
+    }
+
     function clamp(value, minimum, maximum) {
         return Math.min(maximum, Math.max(minimum, value));
     }
@@ -261,7 +347,13 @@
             ctx.save();
             ctx.strokeStyle = color;
             ctx.fillStyle = color;
-            ctx.globalAlpha = i === state.dayIndex ? 1 : 0.9;
+            if (i === state.dayIndex && !prefersReducedMotion()) {
+                // Stepped two-frame breathing keeps the latest candle alive between ticks.
+                const pulseStep = Math.floor((typeof performance !== 'undefined' ? performance.now() : Date.now()) / 280) % 2;
+                ctx.globalAlpha = pulseStep ? 1 : 0.72;
+            } else {
+                ctx.globalAlpha = i === state.dayIndex ? 1 : 0.9;
+            }
             ctx.lineWidth = i === state.dayIndex ? 2 : 1;
             ctx.beginPath();
             ctx.moveTo(x, highY);
@@ -305,34 +397,61 @@
         drawCheckpointRail(ctx, plot, state, startDay, colors);
     }
 
-    function drawPixelAvatar(ctx, x, y, colors, isHolding) {
+    function drawPixelAvatar(ctx, x, y, colors, isHolding, frame = 0) {
         ctx.save();
         const px = snap(x);
         const py = snap(y);
 
         if (isHolding) {
+            // Jetpack thruster: two-frame exhaust flicker.
+            const flameLength = frame ? 6 : 3;
             ctx.fillStyle = colors.accent;
             ctx.fillRect(px - 10, py - 2, 4, 4);
             ctx.fillStyle = colors.red;
-            ctx.fillRect(px - 14, py - 1, 4, 2);
+            ctx.fillRect(px - 10 - flameLength, py - 1, flameLength, 2);
+            if (!frame) {
+                ctx.fillRect(px - 13, py - 2, 2, 1);
+                ctx.fillRect(px - 13, py + 1, 2, 1);
+            }
         } else {
-            ctx.fillStyle = colors.system;
-            ctx.fillRect(px - 6, py - 10, 12, 3);
-            ctx.fillRect(px - 4, py - 7, 8, 2);
+            // Glider: two-frame wing flap.
+            if (frame) {
+                ctx.fillStyle = colors.system;
+                ctx.fillRect(px - 8, py - 11, 16, 3);
+            } else {
+                ctx.fillStyle = colors.system;
+                ctx.fillRect(px - 6, py - 9, 12, 3);
+                ctx.fillRect(px - 8, py - 11, 4, 2);
+                ctx.fillRect(px + 4, py - 11, 4, 2);
+            }
         }
 
         ctx.fillStyle = isHolding ? colors.green : colors.surface;
         ctx.fillRect(px - 5, py - 5, 10, 10);
         drawHardBox(ctx, px - 5, py - 5, 10, 10, isHolding ? colors.green : colors.surface, colors.text, 2, colors.bg);
 
+        // Skin identity crest: one hard pixel distinguishing the active skin.
+        const skinId = window.FlappyKSkins?.getActive?.();
+        if (skinId === 'polar') {
+            ctx.fillStyle = colors.system;
+            ctx.fillRect(px - 1, py - 8, 2, 3);
+            ctx.fillRect(px - 2, py - 9, 4, 1);
+        } else if (skinId === 'amber') {
+            ctx.fillStyle = colors.accent;
+            ctx.fillRect(px - 4, py - 6, 8, 1);
+        }
+
         ctx.fillStyle = colors.accent;
         ctx.fillRect(px + 1, py - 3, 3, 3);
         ctx.restore();
     }
 
-    function drawPlayerCursor(ctx, x, y, value, colors, isHolding = false) {
+    function drawPlayerCursor(ctx, x, y, value, colors, isHolding = false, bob = 0) {
         ctx.save();
-        drawPixelAvatar(ctx, x, y, colors, isHolding);
+        const frame = prefersReducedMotion()
+            ? 0
+            : Math.floor((typeof performance !== 'undefined' ? performance.now() : Date.now()) / 240) % 2;
+        drawPixelAvatar(ctx, x, y + bob, colors, isHolding, frame);
 
         const label = Number(value).toLocaleString(undefined, { maximumFractionDigits: 0 });
         ctx.font = `700 11px ${FONT_UI}`;
@@ -409,7 +528,8 @@
             const x = snap(plot.left + displayIndex * slot + slot / 2);
             const y = snap(getY(latest));
             const isHolding = Array.isArray(state.actions) && state.actions.length > 0 && state.actions[state.actions.length - 1].type === 'buy';
-            drawPlayerCursor(ctx, x, y, latest, colors, isHolding);
+            const bob = prefersReducedMotion() ? 0 : (Math.floor((typeof performance !== 'undefined' ? performance.now() : Date.now()) / 320) % 2 ? -2 : 0);
+            drawPlayerCursor(ctx, x, y, latest, colors, isHolding, bob);
         }
     }
 
@@ -442,6 +562,8 @@
         ctx.restore();
     }
 
+    let lastDrawnDay = -1;
+
     function draw(state) {
         const {
             ctx,
@@ -453,6 +575,7 @@
         } = state;
         if (!ctx || !Number.isFinite(width) || !Number.isFinite(height)) return;
 
+        const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
         const colors = palette();
         ctx.save();
         ctx.imageSmoothingEnabled = false;
@@ -512,7 +635,32 @@
 
         drawCandles(ctx, state, pricePlot, colors, startDay, minPrice, maxPrice);
         drawReturnPlot(ctx, state, returnPlot, colors, startDay);
+
+        // Feedback FX: drain queued bursts at the current-day marker position.
+        stepParticles(now);
+        for (let i = 0; i < BURST_SLOTS; i += 1) {
+            const kind = pendingBursts[i];
+            if (!kind) continue;
+            pendingBursts[i] = null;
+            const slot = pricePlot.width / state.visibleDays;
+            const x = snap(pricePlot.left + (dayIndex - startDay) * slot + slot / 2);
+            const datum = currentData[dayIndex];
+            if (kind === 'checkpoint') {
+                spawnBurst(kind, x, snap(pricePlot.bottom - 13));
+            } else {
+                const range = Math.max(0.000001, maxPrice - minPrice);
+                const y = snap(pricePlot.bottom - 20 - ((datum.close - minPrice) / range) * (pricePlot.height - 20));
+                spawnBurst(kind, x, y);
+            }
+        }
+        // Milestone flash every CHECKPOINT_DAYS days of the run.
+        const CHECKPOINT_DAYS = 50;
+        if (lastDrawnDay >= 0 && dayIndex > lastDrawnDay && Math.floor(dayIndex / CHECKPOINT_DAYS) > Math.floor(lastDrawnDay / CHECKPOINT_DAYS)) {
+            requestBurst('checkpoint');
+        }
+        lastDrawnDay = dayIndex === 0 ? 0 : dayIndex;
+        drawParticles(ctx, colors);
     }
 
-    window.FlappyKMarketCanvas = Object.freeze({ draw });
+    window.FlappyKMarketCanvas = Object.freeze({ draw, requestBurst, refreshPalette });
 })();

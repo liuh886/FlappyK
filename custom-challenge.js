@@ -178,43 +178,38 @@
         titleHoldTimer = null;
     }
 
-    const originalPickRandomData = pickRandomData;
-    pickRandomData = function customAwarePickRandomData() {
-        if (!customState.active) {
-            return originalPickRandomData();
-        }
+    window.FlappyKGameController?.registerDataSource({
+        id: 'custom-challenge',
+        mode: 'custom',
+        provide(levelNumber) {
+            if (!customState.active || !Number.isFinite(Number(levelNumber))) {
+                return null;
+            }
 
-        currentMarket = customState.market;
-        currentAsset = customState.asset;
+            currentMarket = customState.market;
+            currentAsset = customState.asset;
 
-        const data = stockData[currentMarket][currentAsset];
-        const maxStart = Math.max(0, data.length - DAYS_PER_LEVEL);
+            const data = stockData[currentMarket][currentAsset];
+            const maxStart = Math.max(0, data.length - DAYS_PER_LEVEL);
 
-        if (!Number.isInteger(customState.startIndex)
-            || customState.startIndex < 0
-            || customState.startIndex > maxStart) {
-            customState.startIndex = Math.floor(Math.random() * (maxStart + 1));
-        }
+            if (!Number.isInteger(customState.startIndex)
+                || customState.startIndex < 0
+                || customState.startIndex > maxStart) {
+                customState.startIndex = Math.floor(Math.random() * (maxStart + 1));
+            }
 
-        return data.slice(customState.startIndex, customState.startIndex + DAYS_PER_LEVEL);
-    };
+            return data.slice(customState.startIndex, customState.startIndex + DAYS_PER_LEVEL);
+        },
+    });
 
-    const originalStartLevel = startLevel;
-    startLevel = function customAwareStartLevel() {
-        originalStartLevel();
+    window.FlappyKGameController?.on('level-did-start', () => {
+        if (!customState.active) return;
+        levelDisp.innerText = 'CUSTOM';
+        targetDisp.innerText = 'ANY PROFIT';
+    });
 
-        if (customState.active) {
-            levelDisp.innerText = 'CUSTOM';
-            targetDisp.innerText = 'ANY PROFIT';
-        }
-    };
-
-    const originalEndLevel = endLevel;
-    endLevel = function customAwareEndLevel() {
-        const wasCustom = customState.active;
-        originalEndLevel();
-
-        if (!wasCustom) return;
+    window.FlappyKGameController?.on('level-did-settle', () => {
+        if (!customState.active) return;
 
         document.getElementById('card-title').innerText = 'CUSTOM CARD';
 
@@ -227,7 +222,7 @@
         level = 1;
         targetReturn = 0;
         collectedCards = [];
-    };
+    });
 
     marketSelect.addEventListener('change', () => { void populateAssets(); });
 

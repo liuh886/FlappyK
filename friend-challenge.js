@@ -185,10 +185,12 @@
         if (!state.active) state.descriptors = [];
     }, { capture: true });
 
-    const previousPickRandomData = pickRandomData;
-    pickRandomData = function friendChallengePickRandomData() {
-        if (state.active && state.invite) {
-            const descriptor = state.descriptors[level - 1];
+    window.FlappyKGameController?.registerDataSource({
+        id: 'friend-challenge',
+        mode: 'friend',
+        provide(levelNumber) {
+            if (!(state.active && state.invite)) return null;
+            const descriptor = state.descriptors[levelNumber - 1];
             const resolved = descriptor && resolveDescriptor(descriptor);
             if (resolved) {
                 currentMarket = resolved.market;
@@ -202,14 +204,17 @@
             removeChallengeToken();
             clearInviteVisual();
             window.alert('This friend challenge could not be restored. A new random run will start instead.');
-        }
+            return null;
+        },
+    });
+
+    window.FlappyKGameController?.on('data-resolved', ({ data, source }) => {
+        if (source === 'friend' || source === 'daily') return;
 
         const wasCustomLaunch = state.customLaunchPending;
-        const data = previousPickRandomData();
         state.customLaunchPending = false;
         if (!wasCustomLaunch) captureNormalDescriptor(data);
-        return data;
-    };
+    });
 
     function buildChallengeUrl(score) {
         const games = state.descriptors.slice(0, 3);

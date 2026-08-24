@@ -180,8 +180,8 @@ for (const principle of [
   'one continuous dark market surface',
   'There is no alternative legacy skin',
   'Chinese and English are one product, not two layouts.',
-  '`premium-ui.css` is the single canonical owner',
-  'Pixel Market Arcade is the only expressive visual language',
+  '`premium-ui.css` remains the single canonical owner of shared presentation',
+  'Pixel Market Arcade is the base visual language inside Single-Surface Market OS',
 ]) {
   assert.ok(direction.includes(principle), `Missing visual-direction principle: ${principle}`);
 }

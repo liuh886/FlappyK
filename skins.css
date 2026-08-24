@@ -1,0 +1,51 @@
+/*
+ * FLAPPY K / SKIN TOKEN SETS
+ *
+ * Single canonical owner of non-default skin palettes. A skin may ONLY
+ * override the --game-* design tokens (plus the motion rhythm tokens);
+ * component presentation lives exclusively in premium-ui.css and its
+ * feature-owned stylesheets. Adding a skin = adding one html[data-skin]
+ * block below plus one entry in scripts/skin-system.js.
+ */
+
+html[data-skin='polar'] {
+    --game-bg: #081120;
+    --game-surface: #0e1b30;
+    --game-surface-raised: #142542;
+    --game-surface-active: #1c3050;
+    --game-border: #2b4160;
+    --game-border-strong: #62809f;
+    --game-text: #ecf4fc;
+    --game-muted: #9fb5cc;
+    --game-faint: #647d99;
+    --game-accent: #ffd97a;
+    --game-system: #8ed9ea;
+    --game-green: #6fe3a8;
+    --game-red: #ff8391;
+    --game-depth: #040a14;
+
+    --motion-step-fast: 110ms;
+    --motion-step-base: 190ms;
+    --motion-step-slow: 360ms;
+}
+
+html[data-skin='amber'] {
+    --game-bg: #120c06;
+    --game-surface: #1b130a;
+    --game-surface-raised: #26190d;
+    --game-surface-active: #332310;
+    --game-border: #48331a;
+    --game-border-strong: #8f6d3a;
+    --game-text: #f9efdc;
+    --game-muted: #c0aa89;
+    --game-faint: #87714f;
+    --game-accent: #ffae34;
+    --game-system: #7fd6c2;
+    --game-green: #8ade74;
+    --game-red: #ff7a66;
+    --game-depth: #0a0602;
+
+    --motion-step-fast: 80ms;
+    --motion-step-base: 150ms;
+    --motion-step-slow: 290ms;
+}

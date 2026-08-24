@@ -232,10 +232,7 @@ test('mobile gameplay keeps virtual keys and rail-integrated navigation visible'
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
 
   page.once('dialog', (dialog) => dialog.accept());
-  await Promise.all([
-    page.waitForNavigation(),
-    page.locator('#game-back-btn').click(),
-  ]);
+  await page.locator('#game-back-btn').click();
 
   await expect(page.locator('#start-screen')).toHaveClass(/active/);
   await expect(page.locator('#game-top-controls')).toBeHidden();

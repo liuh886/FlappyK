@@ -14,6 +14,10 @@
             toolbar.setAttribute('role', 'group');
             toolbar.setAttribute('aria-label', 'Player tools');
 
+            const skinSlot = document.createElement('div');
+            skinSlot.id = 'skin-toggle-slot';
+            skinSlot.className = 'home-skin-slot';
+
             const languageSlot = document.createElement('div');
             languageSlot.id = 'language-toggle-slot';
             languageSlot.className = 'home-language-slot';
@@ -22,7 +26,7 @@
             accountSlot.className = 'home-account-slot';
             accountSlot.dataset.accountSlot = '';
 
-            toolbar.append(languageSlot, accountSlot);
+            toolbar.append(skinSlot, languageSlot, accountSlot);
             startScreen.prepend(toolbar);
         }
 
