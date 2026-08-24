@@ -14,7 +14,7 @@
 - [x] 19. K-line vitality: candle breathing, milestone flash, cursor bob; mascot v2 two-frame thruster/glider
 - [x] 20. Motion tokens (--motion-step-*) with settlement excess count-up
 - [x] 21. Skin manifest pipeline: skins.css token sets, skin-system.js, toolbar cycle button, offline caching
-- [ ] 22. Final full-suite verification and release docs
+- [x] 22. Final full-suite verification and release docs
 - [x] 1. Intake & Brainstorming Alignment (Pure UI Overhaul, 100% logic preserved)
 - [x] 2. 8-Bit Retro Audio Engine (Web Audio square/sawtooth chiptune synthesis)
 - [x] 3. Arcade LED HUD & Bezel Framing (1UP, STAGE, DAY LED counters)

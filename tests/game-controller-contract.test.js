@@ -105,4 +105,13 @@ for (const [file, contracts] of Object.entries(SUBSCRIBERS)) {
 assert.ok(read('scripts/market-goal-ui.js').includes("'BEAT THE MARKET'"));
 assert.ok(read('daily-run.js').includes("'DAILY · BEAT THE MARKET'"));
 
+// did-start subscribers fire in script order, so the Daily goal override only
+// wins while market-goal-ui loads first. Pin that ordering explicitly.
+const indexSource = read('index.html');
+const goalAt = indexSource.indexOf('scripts/market-goal-ui.js');
+const dailyAt = indexSource.indexOf('daily-run.js');
+const customAt = indexSource.indexOf('custom-challenge.js');
+assert.ok(goalAt >= 0 && dailyAt > goalAt, 'market-goal-ui.js must load before daily-run.js so DAILY can override the goal label.');
+assert.ok(customAt >= 0 && goalAt > customAt, 'custom-challenge.js must load before market-goal-ui.js to keep the documented label precedence.');
+
 console.log('GameController lifecycle, data-source registry, and zero-wrapper contracts passed.');

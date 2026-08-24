@@ -337,21 +337,26 @@ saveBtn.addEventListener('click', () => {
 champagneBtn.addEventListener('click', () => {
     settlementScreen.classList.remove('active');
 
+    // Asset labels may come from supplemental data files; escape before templating.
+    const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (ch) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+    }[ch]));
+
     // Inject cards
     let html = '';
     collectedCards.forEach(c => {
         html += `
-        <div class="profit-card card-theme-${c.market}" style="transform: scale(1); margin: 0;">
-            <h2>PROFIT CARD (${c.level})</h2>
+        <div class="profit-card card-theme-${esc(c.market)}" style="transform: scale(1); margin: 0;">
+            <h2>PROFIT CARD (${esc(c.level)})</h2>
             <div class="card-details">
-                <p>ASSET: <span class="highlight">${c.asset}</span></p>
-                <p>STARTING: $<span class="highlight">${c.startCashStr}</span></p>
-                <p>FINAL: $<span class="highlight">${c.finalCashStr}</span></p>
-                <p>MAX DD: <span class="highlight">${c.mddStr}</span></p>
-                <p>PERIOD: <span class="highlight">${c.periodStr || '???'}</span></p>
-                <p>LVL RETURN: <span class="highlight">${c.levelRetStr}</span></p>
+                <p>ASSET: <span class="highlight">${esc(c.asset)}</span></p>
+                <p>STARTING: $<span class="highlight">${esc(c.startCashStr)}</span></p>
+                <p>FINAL: $<span class="highlight">${esc(c.finalCashStr)}</span></p>
+                <p>MAX DD: <span class="highlight">${esc(c.mddStr)}</span></p>
+                <p>PERIOD: <span class="highlight">${esc(c.periodStr || '???')}</span></p>
+                <p>LVL RETURN: <span class="highlight">${esc(c.levelRetStr)}</span></p>
             </div>
-            <div class="big-return card-positive">${c.cumRetStr}</div>
+            <div class="big-return card-positive">${esc(c.cumRetStr)}</div>
             <div style="font-size: 10px; text-align:center;">(CUMULATIVE RETURN)</div>
             <div class="status-msg card-positive">SUCCESS!</div>
         </div>
