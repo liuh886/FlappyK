@@ -109,7 +109,7 @@ test('language and player account share a dedicated home toolbar', async ({ page
       insideContainer: rect.left >= container.left && rect.right <= container.right && rect.top >= container.top,
     };
   });
-  expect(placement.childOrder).toEqual(['language-toggle-slot', 'home-account-slot']);
+  expect(placement.childOrder).toEqual(['skin-toggle-slot', 'language-toggle-slot', 'home-account-slot']);
   expect(placement.accountRightMost).toBe(true);
   expect(placement.insideContainer).toBe(true);
 

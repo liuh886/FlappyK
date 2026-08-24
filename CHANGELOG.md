@@ -2,6 +2,21 @@
 
 All notable changes to FlappyK will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- `window.FlappyKGameController`: one authoritative lifecycle with typed hooks (`level-will-start`, `level-did-start`, `tick`, `trade`, `level-will-settle`, `level-did-settle`) published through the event bus, plus a priority-ranked data-source registry (daily > friend > custom > normal). All feature modules now subscribe instead of wrapping globals; script load order no longer decides behaviour.
+- Skin pipeline per the amended visual direction: `skins.css` token-only palettes (default Market Arcade, Polar Exchange 极地冰原， Amber Terminal 琥珀终端）， a `scripts/skin-system.js` manifest with bilingual names and motion profiles, persistence under `flappyk_skin_v1`, a home toolbar cycle button, instant canvas re-theming, and offline caching.
+- Feedback FX layer: pooled hard-edged pixel particles on trades and milestones, progressive micro-haptics, checkpoint/speed/weather/UI chiptune blips, melody tempo that follows playback speed, candle breathing, milestone rail flashes, avatar cursor bob, and a two-frame thruster/glider mascot.
+- Motion tokens (`--motion-step-fast/base/slow`) consumed by screen shake and medal drop, plus a stepped settlement excess roll-up with reduced-motion bypass.
+- Persistent sound preference (`flappyk_sound_muted_v1`), a 🔊/🔇 HUD toggle, and the `M` keyboard shortcut.
+
+### Changed
+
+- Settlement is rendered once by the controller using the shared pass rule; results/legend/custom adjustments are hook subscribers. The pixel avatar now reads palette tokens so every skin re-themes it automatically.
+- The mobile back-to-home flow keeps its in-place reset; the corresponding E2E no longer waits for a page navigation.
+
 ## [0.1.0] - 2026-07-18
 
 ### Added

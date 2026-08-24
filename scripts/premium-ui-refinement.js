@@ -99,6 +99,24 @@
                 `${paused ? (isChinese() ? '继续' : 'Resume') : (isChinese() ? '暂停' : 'Pause')} [Space]`,
             );
         }
+
+        const soundButton = document.getElementById('sound-toggle-btn');
+        if (soundButton) {
+            const muted = soundButton.getAttribute('aria-pressed') === 'true';
+            soundButton.textContent = muted ? '🔇' : '🔊';
+            soundButton.setAttribute(
+                'aria-label',
+                muted
+                    ? (isChinese() ? '取消静音' : 'Unmute sound')
+                    : (isChinese() ? '静音' : 'Mute sound'),
+            );
+            soundButton.setAttribute(
+                'title',
+                muted
+                    ? (isChinese() ? '取消静音 [M]' : 'Unmute [M]')
+                    : (isChinese() ? '静音 [M]' : 'Mute [M]'),
+            );
+        }
     }
 
     function ensureHudRail() {

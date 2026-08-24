@@ -52,73 +52,57 @@
         return Number.isFinite(number) ? Number((number * 100).toFixed(2)) : undefined;
     }
 
+    let analyticsLevelStartedAt = 0;
+
     function installGameLifecycleTracking() {
-        if (typeof startLevel === 'function') {
-            const previousStartLevel = startLevel;
-            startLevel = function analyticsAwareStartLevel(...args) {
-                const startingLevel = Number(level);
-                const result = previousStartLevel.apply(this, args);
-                levelStartedAt = Date.now();
+        const controller = window.FlappyKGameController;
+        if (!controller) return;
 
-                if (startingLevel === 1) {
-                    track('play_start');
-                }
+        controller.on('level-will-start', () => {
+            analyticsLevelStartedAt = Date.now();
+        });
 
-                return result;
-            };
-        }
+        controller.on('level-did-start', ({ level }) => {
+            if (Number(level) === 1) track('play_start');
+        });
 
-        if (typeof endLevel === 'function') {
-            const previousEndLevel = endLevel;
-            endLevel = function analyticsAwareEndLevel(...args) {
-                const completedLevel = Number(level);
-                const gameMode = getGameMode();
-                const completedMarket = String(currentMarket || 'unknown');
-                const tradeCount = Array.isArray(actions) ? actions.length : 0;
-                const durationSeconds = levelStartedAt
-                    ? Math.max(0, Math.round((Date.now() - levelStartedAt) / 1000))
-                    : undefined;
-                const projectedCash = Number(cash) + (Number(shares) * Number(currentPrice));
-                const performance = window.FlappyKMarketPassRule?.evaluate?.({
-                    startCash: Number(levelStartCash),
-                    finalCash: projectedCash,
-                    startPrice: Number(currentData?.[0]?.close),
-                    finalPrice: Number(currentPrice),
-                });
+        controller.on('level-did-settle', ({
+            completedLevel,
+            market,
+            isSuccess,
+            playerReturn,
+            marketReturn,
+            excessReturn,
+        }) => {
+            const gameMode = getGameMode();
+            track('level_complete', {
+                game_mode: gameMode,
+                level_number: Number(completedLevel),
+                market: String(market || 'unknown'),
+                result: isSuccess ? 'success' : 'failure',
+                trade_count: Array.isArray(actions) ? actions.length : 0,
+                duration_seconds: analyticsLevelStartedAt
+                    ? Math.max(0, Math.round((Date.now() - analyticsLevelStartedAt) / 1000))
+                    : undefined,
+                player_return_pct: roundPercent(playerReturn),
+                market_return_pct: roundPercent(marketReturn),
+                excess_return_pct: roundPercent(excessReturn),
+            });
 
-                const result = previousEndLevel.apply(this, args);
-                const success = Boolean(performance?.isSuccess);
-
-                track('level_complete', {
+            if (gameMode !== 'custom' && Number(completedLevel) === 3 && isSuccess) {
+                const score = window.FlappyKLegendScore?.calculate?.(collectedCards, finalReturn);
+                track('run_complete', {
                     game_mode: gameMode,
-                    level_number: completedLevel,
-                    market: completedMarket,
-                    result: success ? 'success' : 'failure',
-                    trade_count: tradeCount,
-                    duration_seconds: durationSeconds,
-                    player_return_pct: roundPercent(performance?.playerReturn),
-                    market_return_pct: roundPercent(performance?.marketReturn),
-                    excess_return_pct: roundPercent(performance?.excessReturn),
+                    total_return_pct: Number.isFinite(Number(score?.totalReturn))
+                        ? Number(Number(score.totalReturn).toFixed(2))
+                        : undefined,
+                    total_excess_pct: Number.isFinite(Number(score?.excess))
+                        ? Number(Number(score.excess).toFixed(2))
+                        : undefined,
                 });
-
-                if (gameMode !== 'custom' && completedLevel === 3 && success) {
-                    const score = window.FlappyKLegendScore?.calculate?.(collectedCards, finalReturn);
-                    track('run_complete', {
-                        game_mode: gameMode,
-                        total_return_pct: Number.isFinite(Number(score?.totalReturn))
-                            ? Number(Number(score.totalReturn).toFixed(2))
-                            : undefined,
-                        total_excess_pct: Number.isFinite(Number(score?.excess))
-                            ? Number(Number(score.excess).toFixed(2))
-                            : undefined,
-                    });
-                }
-
-                return result;
-            };
-        }
+            }
+        });
     }
-
     function recordPwaInstall(source) {
         try {
             if (window.localStorage.getItem(PWA_INSTALL_KEY)) return;

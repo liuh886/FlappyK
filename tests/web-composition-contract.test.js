@@ -12,8 +12,12 @@ const accountCss = fs.readFileSync('account-integration.css', 'utf8');
 const pwaSource = fs.readFileSync('pwa.js', 'utf8');
 const serviceWorker = fs.readFileSync('sw.js', 'utf8');
 
-assert.ok(hardeningJs.includes('levelDisp.textContent = String(visibleGame)'));
-assert.ok(!hardeningJs.includes('levelDisp.textContent = `${visibleGame}/3`'));
+// The authoritative level display stays semantic: the controller writes the bare
+// number and no layer may re-wrap it with a `/3` suffix.
+assert.ok(gameJs.includes('levelDisp.innerText = level;'));
+assert.ok(!gameJs.includes('`${level}/3`'));
+// Settlement title normalization now lives in the hardening subscriber.
+assert.ok(hardeningJs.includes("title.textContent = 'PROFIT CARD'"));
 
 assert.ok(!refinementJs.includes('canvasElement.width ='));
 assert.ok(!refinementJs.includes('canvasElement.height ='));

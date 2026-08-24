@@ -90,6 +90,7 @@ const champagneScreen = document.getElementById('champagne-screen');
 const champagneExportArea = document.getElementById('champagne-export-area');
 const champagneSaveBtn = document.getElementById('champagne-save-btn');
 const champagneRestartBtn = document.getElementById('champagne-restart-btn');
+const soundToggleBtn = document.getElementById('sound-toggle-btn');
 
 // Audio Context
 let audioCtx;
@@ -100,22 +101,26 @@ let noteIndex = 0;
 
 function scheduleAudio() {
     if (!isPlaying) return;
+    // Melody tempo follows playback speed: 15x keeps the classic 200ms step.
+    const noteInterval = Math.min(0.32, Math.max(0.12, 0.32 - speedMultiplier * 0.008));
     while (nextNoteTime < audioCtx.currentTime + 0.1) {
-        // Play note
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'square';
-        osc.frequency.value = melody[noteIndex];
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        if (!soundMuted) {
+            // Play note
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.value = melody[noteIndex];
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
 
-        osc.start(nextNoteTime);
-        gain.gain.setValueAtTime(0.05, nextNoteTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, nextNoteTime + 0.15);
-        osc.stop(nextNoteTime + 0.2);
+            osc.start(nextNoteTime);
+            gain.gain.setValueAtTime(0.05, nextNoteTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, nextNoteTime + 0.15);
+            osc.stop(nextNoteTime + 0.2);
+        }
 
         // Advance time and note
-        nextNoteTime += 0.2; // 200ms per note
+        nextNoteTime += noteInterval;
         noteIndex = (noteIndex + 1) % melody.length;
     }
     audioTimerID = requestAnimationFrame(scheduleAudio);
@@ -138,13 +143,113 @@ function stopAudio() {
     cancelAnimationFrame(audioTimerID);
 }
 
+const SOUND_MUTED_KEY = 'flappyk_sound_muted_v1';
+let soundMuted = false;
+try {
+    soundMuted = window.localStorage?.getItem(SOUND_MUTED_KEY) === '1';
+} catch (error) {
+    soundMuted = false;
+}
+
+function applySoundControl() {
+    if (!soundToggleBtn) return;
+    soundToggleBtn.textContent = soundMuted ? '🔇' : '🔊';
+    soundToggleBtn.setAttribute('aria-pressed', String(soundMuted));
+    soundToggleBtn.setAttribute('aria-label', soundMuted ? 'Unmute sound' : 'Mute sound');
+    soundToggleBtn.setAttribute('title', soundMuted ? 'Unmute [M]' : 'Mute [M]');
+}
+
+function setSoundMuted(muted) {
+    const next = Boolean(muted);
+    if (next === soundMuted && soundToggleBtn?.getAttribute('aria-pressed') === String(next)) return;
+    soundMuted = next;
+    try {
+        window.localStorage?.setItem(SOUND_MUTED_KEY, soundMuted ? '1' : '0');
+    } catch (error) {
+        // Storage failures must never block gameplay.
+    }
+    applySoundControl();
+    window.FlappyKEvents?.emit?.('flappyk:sound-changed', { muted: soundMuted });
+}
+
+function toggleSound() {
+    setSoundMuted(!soundMuted);
+}
+
+// ---------- GameController kernel ----------
+// One authoritative lifecycle. Feature modules subscribe instead of wrapping
+// globals, so behaviour no longer depends on script load order.
+const CONTROLLER_HOOKS = {
+    'level-will-start': window.FlappyKEvents?.EVENTS?.LEVEL_WILL_START || 'flappyk:level-will-start',
+    'level-did-start': window.FlappyKEvents?.EVENTS?.LEVEL_DID_START || 'flappyk:level-did-start',
+    'tick': window.FlappyKEvents?.EVENTS?.TICK || 'flappyk:tick',
+    'trade': window.FlappyKEvents?.EVENTS?.TRADE || 'flappyk:trade',
+    'level-will-settle': window.FlappyKEvents?.EVENTS?.LEVEL_WILL_SETTLE || 'flappyk:level-will-settle',
+    'level-did-settle': window.FlappyKEvents?.EVENTS?.LEVEL_SETTLED || 'flappyk:level-settled',
+    // Local-only: fired once per resolution with the authoritative market window.
+    'data-resolved': null,
+};
+const hookBuckets = Object.fromEntries(Object.keys(CONTROLLER_HOOKS).map((name) => [name, []]));
+
+function emitHook(event, detail) {
+    for (const handler of hookBuckets[event].slice()) {
+        try {
+            handler(detail);
+        } catch (error) {
+            console.error(`FlappyK hook ${event} failed:`, error);
+        }
+    }
+    const busType = CONTROLLER_HOOKS[event];
+    if (busType) window.FlappyKEvents?.emit?.(busType, detail);
+}
+
+const DATA_SOURCE_PRIORITY = { daily: 40, friend: 30, custom: 20 };
+const dataSources = new Map();
+
+window.FlappyKGameController = {
+    HOOKS: Object.freeze(Object.keys(CONTROLLER_HOOKS)),
+    on(event, handler) {
+        if (!Object.prototype.hasOwnProperty.call(hookBuckets, event)) {
+            throw new TypeError(`Unknown FlappyK lifecycle hook: ${event}`);
+        }
+        if (typeof handler !== 'function') {
+            throw new TypeError('A FlappyK lifecycle handler must be a function');
+        }
+        hookBuckets[event].push(handler);
+        return () => {
+            const index = hookBuckets[event].indexOf(handler);
+            if (index >= 0) hookBuckets[event].splice(index, 1);
+        };
+    },
+    registerDataSource({ id, mode, provide }) {
+        if (typeof id !== 'string' || id.length === 0) {
+            throw new TypeError('A FlappyK data source requires a stable id');
+        }
+        if (!(mode in DATA_SOURCE_PRIORITY)) {
+            throw new TypeError(`Unknown FlappyK data source mode: ${mode}`);
+        }
+        if (typeof provide !== 'function') {
+            throw new TypeError('A FlappyK data source requires a provide(level) function');
+        }
+        const entry = { id, mode, priority: DATA_SOURCE_PRIORITY[mode], provide };
+        dataSources.set(id, entry);
+        return () => dataSources.delete(id);
+    },
+    playSfx(kind) {
+        playActionSound(kind);
+    },
+};
+
 function changeSpeed(delta) {
+    const previousSpeed = speedMultiplier;
     speedMultiplier += delta;
     if (speedMultiplier < 1) speedMultiplier = 1;
     if (speedMultiplier > 20) speedMultiplier = 20;
 
     TICK_RATE = 5000 / speedMultiplier;
     speedBtn.innerText = `${speedMultiplier}x [←/→]`;
+
+    if (speedMultiplier !== previousSpeed) playActionSound('speed');
 
     if (isPlaying) {
         clearInterval(gameInterval);
@@ -290,28 +395,52 @@ champagneRestartBtn.addEventListener('click', async () => {
     }
 });
 
-function pickRandomData() {
-    if (level === 1) currentMarket = 'crypto';
-    else if (level === 2) currentMarket = 'ashare';
+function pickNormalData(levelNumber) {
+    if (levelNumber === 1) currentMarket = 'crypto';
+    else if (levelNumber === 2) currentMarket = 'ashare';
     else currentMarket = 'usstock';
 
     if (!stockData[currentMarket] || Object.keys(stockData[currentMarket]).length === 0) {
         throw new Error(`Market data is not loaded: ${currentMarket}`);
     }
 
-    const assets = Object.keys(stockData[currentMarket]);
-    currentAsset = assets[Math.floor(Math.random() * assets.length)];
+    const eligibleAssets = Object.keys(stockData[currentMarket])
+        .filter((asset) => Array.isArray(stockData[currentMarket][asset]))
+        .filter((asset) => stockData[currentMarket][asset].length >= DAYS_PER_LEVEL);
+
+    if (eligibleAssets.length === 0) {
+        throw new Error(`No ${currentMarket} asset has ${DAYS_PER_LEVEL} usable days`);
+    }
+
+    currentAsset = eligibleAssets[Math.floor(Math.random() * eligibleAssets.length)];
     const data = stockData[currentMarket][currentAsset];
 
     // Pick a random starting point ensuring we have enough days
     const maxStart = data.length - DAYS_PER_LEVEL;
-    const startIndex = Math.floor(Math.random() * maxStart);
+    const startIndex = Math.floor(Math.random() * (maxStart + 1));
 
     return data.slice(startIndex, startIndex + DAYS_PER_LEVEL);
 }
 
+function resolveLevelMarketData(levelNumber) {
+    const ranked = [...dataSources.values()].sort((a, b) => b.priority - a.priority);
+    let source = 'normal';
+    let data = null;
+    for (const entry of ranked) {
+        data = entry.provide(levelNumber);
+        if (data) {
+            source = entry.mode;
+            break;
+        }
+    }
+    if (!data) data = pickNormalData(levelNumber);
+    emitHook('data-resolved', { level: levelNumber, market: currentMarket, asset: currentAsset, data, source });
+    return { data, source };
+}
+
 function startLevel() {
-    currentData = pickRandomData();
+    emitHook('level-will-start', { level });
+    currentData = resolveLevelMarketData(level).data;
     dayIndex = 0;
 
     if (level === 1) {
@@ -338,6 +467,7 @@ function startLevel() {
     startAudio();
     clearInterval(gameInterval);
     gameInterval = setInterval(gameTick, TICK_RATE);
+    emitHook('level-did-start', { level });
 }
 
 function gameTick() {
@@ -354,9 +484,18 @@ function gameTick() {
 
     updateUI();
     draw();
+    emitHook('tick', { day: dayIndex, price: currentPrice, total });
+
+    if (dayIndex % 50 === 0) {
+        playActionSound('checkpoint');
+        window.FlappyKMarketCanvas?.requestBurst?.('checkpoint');
+    }
 }
 
 function endLevel() {
+    const completedLevel = level;
+    emitHook('level-will-settle', { completedLevel });
+
     clearInterval(gameInterval);
     isPlaying = false;
     stopAudio();
@@ -365,21 +504,32 @@ function endLevel() {
     cash += shares * currentPrice;
     shares = 0;
 
+    // Authoritative pass evaluation
+    const performance = window.FlappyKMarketPassRule.evaluate({
+        startCash: levelStartCash,
+        finalCash: cash,
+        startPrice: currentData[0].close,
+        finalPrice: currentPrice,
+    });
+    const formatReturn = (value) => `${value >= 0 ? '+' : ''}${(value * 100).toFixed(2)}%`;
+    const levelRetStr = formatReturn(performance.playerReturn);
+    const marketRetStr = formatReturn(performance.marketReturn);
+    const excessRetStr = formatReturn(performance.excessReturn);
+    const cumRetStr = formatReturn((cash - INITIAL_CASH) / INITIAL_CASH);
+
     // Show Settlement
     settlementScreen.classList.add('active');
     const profitCard = document.getElementById('profit-card');
     profitCard.className = 'profit-card'; // Reset base class
     profitCard.classList.add(`card-theme-${currentMarket}`);
 
-    document.getElementById('card-title').innerText = `PROFIT CARD (${level})`;
+    document.getElementById('card-title').innerText = `PROFIT CARD (${completedLevel})`;
     document.getElementById('card-asset').innerText = currentAsset;
     document.getElementById('card-start-cash').innerText = levelStartCash.toFixed(2);
     document.getElementById('card-final-cash').innerText = cash.toFixed(2);
-
-    // Evaluate Result
-    const levelReturn = ((cash - levelStartCash) / levelStartCash);
-    const levelRetStr = (levelReturn >= 0 ? '+' : '') + (levelReturn * 100).toFixed(2) + '%';
     document.getElementById('card-level-return').innerText = levelRetStr;
+    document.getElementById('card-market-return').innerText = marketRetStr;
+    document.getElementById('card-excess-return').innerText = excessRetStr;
 
     // Calculate Max Drawdown
     let peak = totalHistory[0];
@@ -395,9 +545,6 @@ function endLevel() {
     }
     const mddStr = '-' + (maxDrawdown * 100).toFixed(2) + '%';
 
-    const cumReturn = ((cash - INITIAL_CASH) / INITIAL_CASH);
-    const cumRetStr = (cumReturn >= 0 ? '+' : '') + (cumReturn * 100).toFixed(2) + '%';
-
     document.getElementById('card-return').innerText = cumRetStr;
     document.getElementById('card-small-return').innerText = cumRetStr;
     document.getElementById('card-final').innerText = cash.toFixed(2);
@@ -406,34 +553,39 @@ function endLevel() {
     const endDate = currentData[dayIndex].date;
     document.getElementById('card-period').innerText = `${startDate} ~ ${endDate}`;
 
-    let isSuccess = false;
-    if (level === 1) {
-        isSuccess = cumReturn > 0;
-    } else {
-        isSuccess = cumReturn > targetReturn;
-    }
-
     const statusMsg = document.getElementById('card-status');
     const retElem = document.getElementById('card-return');
-    if (isSuccess) {
-        retElem.className = 'big-return card-positive';
-        statusMsg.innerText = "SUCCESS! TARGET BEATEN.";
+    const cumReturn = (cash - INITIAL_CASH) / INITIAL_CASH;
+    retElem.className = `big-return ${cumReturn > 0
+        ? 'card-positive'
+        : cumReturn < 0
+            ? 'card-negative'
+            : 'card-neutral'}`;
+
+    if (performance.isSuccess) {
+        statusMsg.innerText = 'MARKET BEATEN!';
         statusMsg.className = 'status-msg card-positive';
         playActionSound('win');
 
         collectedCards.push({
-            level: level,
+            level: completedLevel,
             market: currentMarket,
             asset: currentAsset,
+            levelReturn: performance.playerReturn,
+            marketReturn: performance.marketReturn,
+            excessReturn: performance.excessReturn,
+            days: currentData.length,
             startCashStr: `$${levelStartCash.toFixed(2)}`,
             finalCashStr: `$${cash.toFixed(2)}`,
             mddStr: mddStr,
             periodStr: `${startDate} ~ ${endDate}`,
             levelRetStr: levelRetStr,
+            marketRetStr: marketRetStr,
+            excessRetStr: excessRetStr,
             cumRetStr: cumRetStr
         });
 
-        if (level === 3) {
+        if (completedLevel === 3) {
             nextBtn.style.display = 'none';
             champagneBtn.style.display = 'block';
             saveBtn.style.display = 'none'; // Hide single save to encourage full save
@@ -446,10 +598,9 @@ function endLevel() {
 
         // Update state for next level
         level++;
-        targetReturn = finalReturn;
+        targetReturn = 0;
     } else {
-        retElem.className = 'big-return card-negative';
-        statusMsg.innerText = "FAILED TO BEAT TARGET.";
+        statusMsg.innerText = 'MARKET WON.';
         statusMsg.className = 'status-msg card-negative';
         playActionSound('fail');
         nextBtn.style.display = 'none';
@@ -457,8 +608,19 @@ function endLevel() {
         saveBtn.style.display = 'none';
         restartBtn.style.display = 'block';
     }
-}
 
+    emitHook('level-did-settle', {
+        completedLevel,
+        market: currentMarket,
+        asset: currentAsset,
+        isSuccess: performance.isSuccess,
+        playerReturn: performance.playerReturn,
+        marketReturn: performance.marketReturn,
+        excessReturn: performance.excessReturn,
+        projectedCash: cash,
+        days: currentData.length,
+    });
+}
 function triggerScreenShake() {
     const container = document.getElementById('game-container');
     if (!container) return;
@@ -475,6 +637,7 @@ function handleBuy() {
         shares += TRADE_AMOUNT / currentPrice;
         actions.push({ type: 'buy', day: dayIndex, price: currentPrice });
         playActionSound('buy');
+        emitHook('trade', { type: 'buy', day: dayIndex, price: currentPrice });
         triggerScreenShake();
         updateUI();
         draw();
@@ -490,6 +653,7 @@ function handleSell() {
         shares -= TRADE_AMOUNT / currentPrice;
         actions.push({ type: 'sell', day: dayIndex, price: currentPrice });
         playActionSound('sell');
+        emitHook('trade', { type: 'sell', day: dayIndex, price: currentPrice });
         triggerScreenShake();
         updateUI();
         draw();
@@ -499,6 +663,7 @@ function handleSell() {
         shares = 0;
         actions.push({ type: 'sell', day: dayIndex, price: currentPrice });
         playActionSound('sell');
+        emitHook('trade', { type: 'sell', day: dayIndex, price: currentPrice });
         triggerScreenShake();
         updateUI();
         draw();
@@ -507,6 +672,11 @@ function handleSell() {
 
 // Input Handling
 window.addEventListener('keydown', (e) => {
+    if (e.key === 'm' || e.key === 'M') {
+        toggleSound();
+        return;
+    }
+
     if (!isPlaying) return;
 
     if (e.key === 'ArrowUp') {
@@ -519,6 +689,10 @@ window.addEventListener('keydown', (e) => {
         changeSpeed(-1); // Decelerate
     }
 });
+
+soundToggleBtn?.addEventListener('click', () => toggleSound());
+document.addEventListener('flappyk:language-changed', applySoundControl);
+applySoundControl();
 
 // Mobile / Virtual Buttons Handling
 const btnBuy = document.getElementById('btn-buy');
@@ -564,7 +738,7 @@ function updateUI() {
 }
 
 function playActionSound(type) {
-    if (!audioCtx) return;
+    if (!audioCtx || soundMuted) return;
     if (audioCtx.state === 'suspended') {
         audioCtx.resume().catch(() => null);
     }
@@ -622,6 +796,34 @@ function playActionSound(type) {
         gain.connect(audioCtx.destination);
         osc.start(now);
         osc.stop(now + 0.3);
+    } else if (type === 'checkpoint') {
+        // 8-bit milestone chime: E5 -> A5
+        [659.25, 880].forEach((freq, i) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(freq, now + i * 0.07);
+            gain.gain.setValueAtTime(0.06, now + i * 0.07);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.1);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now + i * 0.07);
+            osc.stop(now + i * 0.07 + 0.1);
+        });
+    } else if (type === 'speed' || type === 'weather' || type === 'ui') {
+        // Short stepped blip; direction by kind.
+        const up = type !== 'weather';
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(up ? 740 : 330, now);
+        osc.frequency.exponentialRampToValueAtTime(up ? 990 : 262, now + 0.06);
+        gain.gain.setValueAtTime(0.05, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.08);
     }
 }
 
@@ -674,6 +876,9 @@ window.FlappyKGame = {
     changeSpeed,
     handleBuy,
     handleSell,
+    toggleSound,
+    isSoundMuted: () => soundMuted,
+    controller: window.FlappyKGameController,
     getState: () => ({
         level,
         dayIndex,

@@ -9,6 +9,7 @@
             LEVEL_DID_START: 'flappyk:level-did-start',
             TICK: 'flappyk:tick',
             TRADE: 'flappyk:trade',
+            LEVEL_WILL_SETTLE: 'flappyk:level-will-settle',
             LEVEL_SETTLED: 'flappyk:level-settled',
             RUN_COMPLETE: 'flappyk:run-complete',
             SPEED_CHANGED: 'flappyk:speed-changed',

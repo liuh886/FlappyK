@@ -123,23 +123,23 @@
         changeSpeed(DEFAULT_SPEED - speedMultiplier);
     }
 
-    const previousStartLevel = startLevel;
-    startLevel = function pacedStartLevel() {
+    const controller = window.FlappyKGameController;
+    controller?.on('level-will-start', () => {
         paused = false;
-        previousStartLevel();
+    });
+    controller?.on('level-did-start', () => {
         setGameActive(true);
         syncPauseControl();
+        syncControlVisibility();
         window.FlappyKUiState?.transition?.(window.FlappyKUiState.STATES.PLAYING, { source: 'pacing' });
-    };
-
-    const previousEndLevel = endLevel;
-    endLevel = function pacedEndLevel() {
+    });
+    controller?.on('level-will-settle', () => {
         paused = false;
-        const result = previousEndLevel();
+    });
+    controller?.on('level-did-settle', () => {
         setGameActive(false);
         syncPauseControl();
-        return result;
-    };
+    });
 
     pauseButton?.addEventListener('click', (event) => {
         event.preventDefault();

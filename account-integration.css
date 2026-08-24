@@ -22,6 +22,7 @@
 }
 
 .home-language-slot,
+.home-skin-slot,
 .home-account-slot,
 .home-account-slot .hao-referral-mount {
     display: inline-flex;
@@ -32,6 +33,7 @@
     gap: 4px;
 }
 
+.home-utility-bar #skin-toggle-btn,
 .home-utility-bar #language-toggle-btn,
 .home-utility-bar .hao-account-trigger,
 .home-utility-bar .hao-referral-trigger {
@@ -51,6 +53,13 @@
     letter-spacing: 0.025em;
     clip-path: none;
     transition: border-color 120ms steps(2, end), background 120ms steps(2, end), color 120ms steps(2, end);
+}
+
+.home-utility-bar #skin-toggle-btn {
+    position: static;
+    min-width: 58px;
+    padding: 0 8px;
+    cursor: pointer;
 }
 
 .home-utility-bar #language-toggle-btn {
@@ -73,6 +82,7 @@
 
 .home-utility-bar .hao-account-trigger:hover,
 .home-utility-bar .hao-referral-trigger:hover,
+.home-utility-bar #skin-toggle-btn:hover,
 .home-utility-bar #language-toggle-btn:hover {
     transform: none;
     border-color: #6a8ca8;
@@ -83,6 +93,7 @@
 
 .home-utility-bar .hao-account-trigger:focus-visible,
 .home-utility-bar .hao-referral-trigger:focus-visible,
+.home-utility-bar #skin-toggle-btn:focus-visible,
 .home-utility-bar #language-toggle-btn:focus-visible {
     outline: 2px solid var(--pixel-cyan, #55e6ff);
     outline-offset: 2px;
@@ -146,6 +157,7 @@ html:not([data-ui-state='home']) .home-utility-bar {
         gap: 3px;
     }
 
+    .home-utility-bar #skin-toggle-btn,
     .home-utility-bar #language-toggle-btn,
     .home-utility-bar .hao-account-trigger,
     .home-utility-bar .hao-referral-trigger {
@@ -168,6 +180,7 @@ html:not([data-ui-state='home']) .home-utility-bar {
         max-width: none;
     }
 
+    .home-utility-bar #skin-toggle-btn,
     .home-utility-bar #language-toggle-btn,
     .home-utility-bar .hao-account-trigger,
     .home-utility-bar .hao-referral-trigger {

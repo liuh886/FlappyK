@@ -73,6 +73,8 @@ GitHub Actions installs Chromium with its Linux dependencies and runs this brows
 | Slow down | `←` | `◀` |
 | Speed up | `→` | `▶` |
 | Pause / resume | `Space` | `Ⅱ / ▶` |
+| Mute / unmute sound | `M` | toolbar 🔊/🔇 on the home screen |
+| Cycle skin palette | home toolbar `ARCADE / POLAR / AMBER` button | same button |
 | Return home | `ESC` | reload / browser navigation |
 
 Playback starts at 15x. Switching away from the browser tab pauses an active game automatically so the hidden market does not continue without the player.
@@ -254,16 +256,19 @@ The bundled data is a historical gameplay snapshot, not a real-time market feed.
 
 - `index.html` — game screens and controls;
 - `style.css` — pixel-arcade layout and card themes;
-- `game.js` — market playback and trading state;
-- `scripts/market-pass-rule.js` — shared Player Return, Market Return, Excess, and pass calculation;
-- `scripts/market-goal-ui.js` — final HUD goal consistency across normal, friend, Daily, and custom modes;
+- `skins.css` — token-only skin palettes (Polar Exchange, Amber Terminal); the default Market Arcade tokens live in `premium-ui.css`;
+- `scripts/skin-system.js` — skin catalog manifest (bilingual names + motion profiles), persistence, home toolbar cycle button, instant canvas re-theming;
+- `game.js` — market playback and trading state; hosts `window.FlappyKGameController`, the authoritative lifecycle hook registry and priority-ranked data-source registry that replaced the old global wrapper chain;
+- `scripts/market-canvas.js` — the only market-chart renderer, including the pooled particle FX layer, candle breathing, milestone flashes, and the two-frame pixel mascot;
+- `scripts/fx-particles.js` / `scripts/haptics.js` — lifecycle-hook bridges for trade bursts and progressive micro-haptics;
+- `scripts/market-pass-rule.js` — shared Player Return, Market Return, Excess, and pass calculation (pure math);
 - `onboarding.js` / `onboarding.css` — one-time first-run explanation and entry preservation;
-- `scripts/game-pacing.js` — 15x default playback, pause/resume controls, and automatic tab-hide pausing;
+- `scripts/game-pacing.js` — 15x default playback, pause/resume controls, automatic tab-hide pausing, and lifecycle subscriptions;
 - `scripts/daily-run-core.js` — deterministic daily descriptors, UTC date helpers, and streak calculations;
-- `daily-run.js` / `daily-run.css` — Daily Run mode, results, sharing bridge, and browser-local daily record UI;
+- `daily-run.js` / `daily-run.css` — Daily Run mode, results, sharing bridge, browser-local daily record UI, and its registered data source;
 - `scripts/player-profile.js` / `local-records.css` — browser-local Personal Best and completed-run UI;
-- `results.js` — settlement metrics and Legend result presentation;
-- `friend-challenge.js` / `friend-challenge.css` — challenge restoration, run recording, and result comparison;
+- `results.js` — legacy cumulative-return global plus Legend result presentation polish;
+- `friend-challenge.js` / `friend-challenge.css` — challenge restoration, run recording, result comparison, and its registered data source;
 - `scripts/friend-challenge-codec.js` — compact versioned challenge encoding and validation;
 - `share-challenge.js` — friend-challenge link sharing plus final Legend PNG saving;
 - `share-challenge.css` — stable off-screen Legend export layout;
@@ -271,10 +276,11 @@ The bundled data is a historical gameplay snapshot, not a real-time market feed.
 - `data/leaderboard.json` — the current maximum ten leaderboard records;
 - `.github/workflows/leaderboard.yml` — Issue validation and automatic Top 10 update;
 - `.github/workflows/validate.yml` — static, data, and Chromium smoke validation;
-- `playwright.config.cjs` / `tests/e2e/product-flow.spec.js` — browser-level onboarding, pacing, Daily Run, and challenge restoration checks;
+- `playwright.config.cjs` / `tests/e2e/` — browser-level onboarding, pacing, Daily Run, challenge restoration, skin switching, mute control, and FX contract checks;
+- `tests/game-controller-contract.test.js` — pins the zero-wrapper lifecycle architecture;
 - `package.json` / `package-lock.json` — pinned Playwright test dependency and scripts;
 - `scripts/leaderboard-ranking.js` — deterministic ranking and one-best-score-per-player rules;
-- `custom-challenge.js` / `custom-challenge.css` — hidden market and asset selector;
+- `custom-challenge.js` / `custom-challenge.css` — hidden market and asset selector with its registered data source;
 - `card-export.js` / `card-export.css` — stable single-card desktop/mobile image generation;
 - `data-loader.js` + `data/markets/*.json` — lazy historical market snapshot;
 - `fetch_all_data.py` — adjusted market-data refresh script;

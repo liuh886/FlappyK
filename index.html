@@ -45,8 +45,10 @@
     <link rel="stylesheet" href="pwa.css">
     <link rel="stylesheet" href="premium-ui.css">
     <link rel="stylesheet" href="https://liuh886.github.io/admin/shared/account-shell.css?v=6">
+    <link rel="stylesheet" href="skins.css">
     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Press+Start+2P&family=ZCOOL+QingKe+HuangYou&display=swap" rel="stylesheet">
     <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"8ddfa35f08814f51af0a4ee625810bea"}'></script>
+    <script defer src="scripts/skin-system.js"></script>
 </head>
 <body>
     <div id="game-container">
@@ -72,6 +74,7 @@
         <div id="game-top-controls" hidden aria-hidden="true">
             <button id="game-back-btn" type="button" aria-label="Return to home" title="Return to home">↩</button>
             <button id="pause-btn" type="button" aria-label="Pause game" aria-pressed="false" title="Pause [Space]">Ⅱ</button>
+            <button id="sound-toggle-btn" type="button" aria-label="Mute sound" aria-pressed="false" title="Mute [M]">🔊</button>
         </div>
 
         <canvas id="game-canvas"></canvas>
@@ -253,5 +256,7 @@
     <script src="scripts/premium-ui.js"></script>
     <script src="scripts/premium-ui-refinement.js"></script>
     <script src="scripts/home-story.js"></script>
+    <script src="scripts/fx-particles.js"></script>
+    <script src="scripts/haptics.js"></script>
 </body>
 </html>
