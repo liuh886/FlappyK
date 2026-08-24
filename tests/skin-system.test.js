@@ -24,7 +24,12 @@ for (const id of CATALOG_IDS) {
         new RegExp(`id: '${id}'`).test(skinSystem),
         `Skin catalog must declare '${id}'.`,
     );
+    assert.ok(
+        new RegExp(`id: '${id}'[\\s\\S]{0,400}?atmosphere: '(none|snow|dust)'`).test(skinSystem),
+        `Skin '${id}' must declare its ambient atmosphere kind.`,
+    );
 }
+assert.ok(skinSystem.includes('getActiveSkin()'), 'The manifest must expose the full active skin profile.');
 assert.ok(/SKIN_STORAGE_KEY = 'flappyk_skin_v1'/.test(skinSystem), 'The skin preference must persist under the stable key.');
 assert.ok(skinSystem.includes('flappyk:skin-changed'), 'Switching skins must publish on the event bus.');
 assert.ok(/root\.dataset\.skin\s*=\s*skin\.id/.test(skinSystem), 'Skins apply through the html data-skin attribute.');

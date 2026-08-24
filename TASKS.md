@@ -7,6 +7,7 @@
 # Tasks: FlappyK Architecture Hardening & Retro Pixel Arcade
 
 ## Task Board
+- [x] 23. Skin depth pass: ambient atmosphere layer (snow/dust) + mascot outfit variants on all three skins
 - [x] 15. GameController kernel: hook registry + data-source registry (priority daily>friend>custom)
 - [x] 16. Migrate 11 wrapper consumers to controller subscriptions; delete monkey-patch chain
 - [x] 17. Persistent mute toggle (button + M key + bilingual labels) and win/fail SFX restore

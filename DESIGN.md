@@ -7,6 +7,7 @@
 # Design: FlappyK Architecture Hardening & Retro Pixel Arcade
 
 ## Decision Log
+- **2026-08-24**: Skin depth pass on the existing three palettes: manifest gained an `atmosphere` field (polar=snowfall, amber=dust motes, arcade=clean) rendered as a capped token-colored backdrop layer behind all game objects; avatar upgraded from single-pixel crests to full in-silhouette outfit variants (polar goggles+scarf, amber visor+chest core, arcade classic).
 - **2026-08-23**: Replaced the load-order-dependent global wrapper chain with `window.FlappyKGameController` (typed hooks via `FlappyKEvents`, priority-ranked data-source registry custom/friend/daily > normal). Eleven feature modules now subscribe instead of monkey-patching `startLevel`/`endLevel`/`pickRandomData`; settlement rendering consolidated into the controller; stale `FlappyKGame` references fixed.
 - **2026-08-23**: Added persistent mute control (`flappyk_sound_muted_v1`, HUD 🔊/🔇 toggle, `M` key) and restored documented stage win/fail chiptune.
 - **2026-08-23**: Sanctioned multi-skin pipeline per ARCADE_VISUAL_DIRECTION.md amendment: `skins.css` token-only sets (arcade/polar 极地冰原/amber 琥珀终端), `scripts/skin-system.js` manifest with motion profiles, toolbar cycle button, instant canvas re-theming.

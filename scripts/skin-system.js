@@ -12,6 +12,7 @@
             nameZh: '像素街机',
             short: 'ARCADE',
             motion: null,
+            atmosphere: 'none',
         }),
         Object.freeze({
             id: 'polar',
@@ -19,6 +20,7 @@
             nameZh: '极地冰原',
             short: 'POLAR',
             motion: { fast: '110ms', base: '190ms', slow: '360ms' },
+            atmosphere: 'snow',
         }),
         Object.freeze({
             id: 'amber',
@@ -26,6 +28,7 @@
             nameZh: '琥珀终端',
             short: 'AMBER',
             motion: { fast: '80ms', base: '150ms', slow: '290ms' },
+            atmosphere: 'dust',
         }),
     ]);
 
@@ -98,6 +101,9 @@
         },
         getActive() {
             return activeSkin;
+        },
+        getActiveSkin() {
+            return findSkin(activeSkin) || SKINS[0];
         },
         setSkin(id) {
             const skin = findSkin(id);

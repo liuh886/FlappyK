@@ -23,6 +23,18 @@ assert.ok(canvas.includes('new Float32Array(PARTICLE_POOL'), 'Particle state mus
 assert.ok(/spawnBurst\(kind[\s\S]{0,200}prefersReducedMotion\(\)\)\s*return;/.test(canvas), 'Particles must be skipped under prefers-reduced-motion.');
 assert.ok(canvas.includes("if (kind !== 'buy' && kind !== 'sell' && kind !== 'checkpoint') return;"), 'Burst kinds are whitelisted.');
 
+// Ambient atmosphere: capped, behind game objects, reduced-motion off switch.
+const ambientBlock = canvas.match(/\/\/ ---------- Ambient atmosphere[\s\S]*?\n    \n/)?.[0] || '';
+assert.ok(canvas.includes('const AMBIENT_POOL = 28;'), 'The atmosphere layer must keep a small fixed pool.');
+assert.ok(canvas.includes('new Float32Array(AMBIENT_POOL'), 'Ambient state must be preallocated.');
+assert.ok(/drawAmbient\(ctx[\s\S]{0,120}prefersReducedMotion\(\)\)\s*return;/.test(canvas), 'Ambient layers must be skipped under prefers-reduced-motion.');
+assert.ok(canvas.includes("getActiveSkin?.()?.atmosphere"), 'Atmosphere kind comes from the skin manifest.');
+assert.ok(
+    canvas.indexOf('drawAmbient(') < canvas.indexOf('drawHairlineGrid(ctx'),
+    'Atmosphere must render before any grid or game object.',
+);
+assert.ok(!canvas.includes('shadowBlur'), 'Canvas FX must never use blurred shadows.');
+
 // --- Haptics: progressive enhancement only -----------------------------------
 
 assert.ok(haptics.includes("navigator.vibrate?.bind(navigator)"), 'Haptics must feature-detect the vibration API.');

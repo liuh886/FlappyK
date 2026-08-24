@@ -86,8 +86,9 @@ Skins are palette-and-rhythm variations of Pixel Market Arcade, never new layout
 
 - `skins.css` is the single owner of non-default token sets; each `html[data-skin]` block must define the complete required token list with concrete hex values;
 - semantic color roles are invariant across skins: yellow-family accent = primary action/focus, system cyan-family = reference state, green/red = market/trade semantics (A-share red-up/green-down included);
-- `scripts/skin-system.js` owns the catalog (ids, bilingual names, motion profile), persistence under `flappyk_skin_v1`, the home toolbar cycle button, and instant canvas re-theming through `FlappyKMarketCanvas.refreshPalette`;
-- the pixel avatar may carry one small identity crest per skin; it may not change silhouette rules or add glow.
+- `scripts/skin-system.js` owns the catalog (ids, bilingual names, motion profile, atmosphere kind), persistence under `flappyk_skin_v1`, the home toolbar cycle button, and instant canvas re-theming through `FlappyKMarketCanvas.refreshPalette`;
+- the pixel avatar may carry one small identity crest per skin; it may not change silhouette rules or add glow;
+- skins may declare an ambient atmosphere (`snow` for Polar Exchange, `dust` for Amber Terminal): a small capped backdrop layer drawn inside `market-canvas.js`, behind all game objects and grid lines, colored only from palette tokens, wrapping at stage edges, and disabled entirely under `prefers-reduced-motion`. Atmosphere never carries gameplay information.
 
 ## Interaction model
 
