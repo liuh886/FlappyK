@@ -160,9 +160,10 @@
         rail.setAttribute('aria-label', isChinese() ? '游戏状态与控制' : 'Game status and controls');
 
         const status = document.getElementById('weather-status');
-        [status, stats, runPanel, topControls].filter(Boolean).forEach((element) => {
+        [stats, runPanel, topControls].filter(Boolean).forEach((element) => {
             if (element.parentElement !== rail) rail.appendChild(element);
         });
+        if (status && status.parentElement !== runPanel) runPanel.prepend(status);
 
         normalizeMetricRows();
         window.FlappyKMarketWeather?.syncWeatherStatusPlacement?.();
@@ -353,6 +354,14 @@
     window.addEventListener('flappyk:layout-state', scheduleComposition);
     window.addEventListener('resize', scheduleComposition);
     window.addEventListener('orientationchange', scheduleComposition);
+
+    // The keyboard hint box dismisses itself after the first unguided trade;
+    // guided first runs keep the hints until the coachmark flow finishes.
+    window.FlappyKGameController?.on('trade', () => {
+        if (!controlsHint || controlsHint.classList.contains('is-dismissed')) return;
+        if (document.querySelector('.game-coachmark[data-active="true"]')) return;
+        controlsHint.classList.add('is-dismissed');
+    });
 
     window.FlappyKPremiumUIRefinement = {
         HUD_RAIL_ID,

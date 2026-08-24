@@ -171,13 +171,19 @@ test('desktop HUD remains one rail while key game state is readable', async ({ p
         document.getElementById('run-progress-panel').parentElement?.id,
         document.getElementById('game-top-controls').parentElement?.id,
       ],
+      weatherInsidePanel: Boolean(
+        document.getElementById('weather-status')?.closest('#run-progress-panel'),
+      ),
       shadow: getComputedStyle(rail).boxShadow,
       totalSize: parseFloat(getComputedStyle(total).fontSize),
       labelSize: parseFloat(getComputedStyle(label).fontSize),
     };
   });
 
-  geometry.parents.forEach((parent) => expect(parent).toBe('game-hud-rail'));
+  // The weather readout nests inside the run-progress strip, still one rail.
+  expect(geometry.parents[0]).toBe('run-progress-panel');
+  expect(geometry.weatherInsidePanel).toBe(true);
+  geometry.parents.slice(1).forEach((parent) => expect(parent).toBe('game-hud-rail'));
   [geometry.weather, geometry.stats, geometry.progress, geometry.controls]
     .forEach((child) => expect(inside(child, geometry.rail)).toBe(true));
   expect(geometry.shadow).not.toBe('none');

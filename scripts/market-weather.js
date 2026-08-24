@@ -123,10 +123,13 @@
     function syncWeatherStatusPlacement() {
         const status = document.getElementById('weather-status');
         if (!status) return;
+        // The weather readout lives at the head of the run-progress strip.
+        const panel = document.getElementById('run-progress-panel');
         const rail = document.getElementById('game-hud-rail');
-        const target = rail || uiLayer || gameContainer;
+        const target = panel || rail || uiLayer || gameContainer;
         if (!target || status.parentElement === target) return;
-        if (rail) rail.prepend(status);
+        if (panel) panel.prepend(status);
+        else if (rail) rail.prepend(status);
         else target.appendChild(status);
     }
 

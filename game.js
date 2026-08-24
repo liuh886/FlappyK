@@ -551,8 +551,6 @@ function endLevel() {
     const mddStr = '-' + (maxDrawdown * 100).toFixed(2) + '%';
 
     document.getElementById('card-return').innerText = cumRetStr;
-    document.getElementById('card-small-return').innerText = cumRetStr;
-    document.getElementById('card-final').innerText = cash.toFixed(2);
 
     const startDate = currentData[0].date;
     const endDate = currentData[dayIndex].date;

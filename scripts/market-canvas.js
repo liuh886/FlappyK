@@ -992,35 +992,6 @@
         }
     }
 
-    function drawLevelStatus(ctx, state, colors, plot) {
-        const day = Math.min(state.dayIndex + 1, 250);
-        const total = Math.max(1, state.currentData?.length || 250);
-        const progress = clamp(day / total, 0, 1);
-        const railWidth = clamp(plot.width * 0.2, 120, 200);
-        const railHeight = 8;
-        const right = plot.right - 8;
-        const top = snap(plot.top) + 9;
-        const left = right - railWidth;
-
-        ctx.save();
-        ctx.font = `700 11px ${FONT_UI}`;
-        ctx.fillStyle = colors.muted;
-        ctx.textAlign = 'right';
-        ctx.textBaseline = 'bottom';
-        ctx.fillText(`DAY ${day} / ${total}`, right, top - 4);
-        drawHardBox(ctx, left, top, railWidth, railHeight, colors.bg, colors.borderStrong, 0, colors.bg);
-        const fillWidth = Math.max(2, snap((railWidth - 4) * progress));
-        ctx.fillStyle = colors.system;
-        ctx.fillRect(snap(left) + 2, snap(top) + 2, fillWidth, railHeight - 4);
-        const checkpointCount = 4;
-        ctx.fillStyle = colors.text;
-        for (let i = 1; i < checkpointCount; i += 1) {
-            const x = snap(left + (railWidth * i) / checkpointCount);
-            ctx.fillRect(x, snap(top) - 2, 2, railHeight + 4);
-        }
-        ctx.restore();
-    }
-
     let lastDrawnDay = -1;
 
     function draw(state) {
@@ -1061,8 +1032,8 @@
         if (!Array.isArray(currentData) || currentData.length === 0 || dayIndex < 0) return;
 
         const topInset = height >= 560
-            ? clamp(height * 0.16, 146, 176)
-            : clamp(height * 0.28, 120, 158);
+            ? clamp(height * 0.14, 122, 150)
+            : clamp(height * 0.28, 108, 150);
         const sideInset = clamp(width * 0.028, 10, 22);
         const returnHeight = clamp(height * 0.18, 86, 138);
         const bottomInset = clamp(height * 0.055, 22, 42);
@@ -1093,7 +1064,6 @@
         drawStageFrame(ctx, returnPlot, colors, skinId);
         drawSectionLabel(ctx, 'MARKET PRICE', pricePlot.left + 8, pricePlot.top + 11, colors);
         drawSectionLabel(ctx, 'PLAYER EQUITY', returnPlot.left + 8, returnPlot.top + 11, colors);
-        drawLevelStatus(ctx, state, colors, pricePlot);
 
         const startDay = Math.max(0, dayIndex - visibleDays + 1);
         let minPrice = Infinity;

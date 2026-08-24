@@ -133,7 +133,6 @@ for (const canvasContract of [
   'drawPriceBadge',
   'drawCheckpointRail',
   'drawPlayerCursor',
-  'drawLevelStatus',
   'ctx.imageSmoothingEnabled = false',
   "cssToken('--game-system'",
   "cssToken('--game-green'",

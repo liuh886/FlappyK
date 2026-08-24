@@ -13,8 +13,6 @@ const experience = read('experience.js');
 const onboarding = read('onboarding.js');
 
 for (const shellContract of [
-    'start-data-ticker',
-    'REAL HISTORICAL K-LINES',
     'id="game-top-controls"',
     'id="pause-btn"',
     'id="game-back-btn"',
