@@ -94,10 +94,7 @@
         burstCursor = (burstCursor + 1) % BURST_SLOTS;
     }
 
-    function stepParticles(now) {
-        let dt = (now - lastFrameAt) / 1000;
-        if (!Number.isFinite(dt) || dt <= 0 || dt > 0.25) dt = 0.016;
-        lastFrameAt = now;
+    function stepParticles(dt) {
         for (let i = 0; i < PARTICLE_POOL; i += 1) {
             const base = i * PARTICLE_FIELDS;
             if (particleData[base + 4] <= 0) continue;
@@ -106,6 +103,60 @@
             particleData[base + 1] += particleData[base + 3] * dt;
             particleData[base + 3] += 190 * dt;
         }
+    }
+
+    // ---------- Ambient atmosphere: skin-scoped backdrop, behind game objects ----------
+    const AMBIENT_POOL = 28;
+    const AMBIENT_FIELDS = 4; // x, y, vy, phase
+    const ambientData = new Float32Array(AMBIENT_POOL * AMBIENT_FIELDS);
+    let ambientKind = '';
+    let ambientSeeded = false;
+
+    function seedAmbient(kind, width, height) {
+        for (let i = 0; i < AMBIENT_POOL; i += 1) {
+            const base = i * AMBIENT_FIELDS;
+            ambientData[base] = Math.random() * width;
+            ambientData[base + 1] = Math.random() * height;
+            ambientData[base + 2] = kind === 'snow' ? 16 + Math.random() * 18 : -(5 + Math.random() * 9);
+            ambientData[base + 3] = Math.random() * Math.PI * 2;
+        }
+        ambientSeeded = true;
+    }
+
+    function drawAmbient(ctx, colors, kind, width, height, dt, now) {
+        if (kind !== 'snow' && kind !== 'dust') return;
+        if (prefersReducedMotion()) return;
+        if (kind !== ambientKind || !ambientSeeded) {
+            ambientKind = kind;
+            seedAmbient(kind, width, height);
+        }
+
+        ctx.save();
+        ctx.fillStyle = kind === 'snow' ? colors.system : colors.accent;
+        for (let i = 0; i < AMBIENT_POOL; i += 1) {
+            const base = i * AMBIENT_FIELDS;
+            let x = ambientData[base];
+            let y = ambientData[base + 1];
+            y += ambientData[base + 2] * dt;
+            x += Math.sin(now / (kind === 'snow' ? 900 : 1300) + ambientData[base + 3]) * 9 * dt;
+            if (y > height + 2) y = -2;
+            if (y < -2) y = height + 2;
+            if (x < -2) x = width + 2;
+            if (x > width + 2) x = -2;
+            ambientData[base] = x;
+            ambientData[base + 1] = y;
+
+            const depthPhase = Math.sin(now / 700 + ambientData[base + 3]);
+            ctx.globalAlpha = kind === 'snow'
+                ? (depthPhase > 0 ? 0.42 : 0.22)
+                : (depthPhase > 0 ? 0.26 : 0.12);
+            if (kind === 'snow') {
+                ctx.fillRect(snap(x), snap(y), depthPhase > 0 ? 2 : 1, 2);
+            } else {
+                ctx.fillRect(snap(x), snap(y), 2, 1);
+            }
+        }
+        ctx.restore();
     }
 
     function drawParticles(ctx, colors) {
@@ -430,19 +481,27 @@
         ctx.fillRect(px - 5, py - 5, 10, 10);
         drawHardBox(ctx, px - 5, py - 5, 10, 10, isHolding ? colors.green : colors.surface, colors.text, 2, colors.bg);
 
-        // Skin identity crest: one hard pixel distinguishing the active skin.
+        // Skin outfit variants stay inside the body silhouette.
         const skinId = window.FlappyKSkins?.getActive?.();
         if (skinId === 'polar') {
+            // Goggle band with two dark lenses; scarf stripe inside the lower body.
             ctx.fillStyle = colors.system;
-            ctx.fillRect(px - 1, py - 8, 2, 3);
-            ctx.fillRect(px - 2, py - 9, 4, 1);
-        } else if (skinId === 'amber') {
+            ctx.fillRect(px - 5, py - 4, 10, 3);
+            ctx.fillStyle = colors.bg;
+            ctx.fillRect(px - 3, py - 4, 2, 3);
+            ctx.fillRect(px + 1, py - 4, 2, 3);
             ctx.fillStyle = colors.accent;
-            ctx.fillRect(px - 4, py - 6, 8, 1);
+            ctx.fillRect(px - 5, py + 2, 10, 2);
+        } else if (skinId === 'amber') {
+            // Visor beam above the body and a chest core instead of the classic eye.
+            ctx.fillStyle = colors.accent;
+            ctx.fillRect(px - 4, py - 7, 8, 2);
+            ctx.fillRect(px - 2, py - 1, 3, 3);
+        } else {
+            // Classic Market Arcade eye.
+            ctx.fillStyle = colors.accent;
+            ctx.fillRect(px + 1, py - 3, 3, 3);
         }
-
-        ctx.fillStyle = colors.accent;
-        ctx.fillRect(px + 1, py - 3, 3, 3);
         ctx.restore();
     }
 
@@ -576,6 +635,10 @@
         if (!ctx || !Number.isFinite(width) || !Number.isFinite(height)) return;
 
         const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+        let frameDt = (now - lastFrameAt) / 1000;
+        if (!Number.isFinite(frameDt) || frameDt <= 0 || frameDt > 0.25) frameDt = 0.016;
+        lastFrameAt = now;
+
         const colors = palette();
         ctx.save();
         ctx.imageSmoothingEnabled = false;
@@ -583,6 +646,9 @@
         ctx.fillStyle = colors.bg;
         ctx.fillRect(0, 0, width, height);
         ctx.restore();
+
+        // Skin atmosphere sits behind every game object and grid line.
+        drawAmbient(ctx, colors, window.FlappyKSkins?.getActiveSkin?.()?.atmosphere || 'none', width, height, frameDt, now);
 
         if (!Array.isArray(currentData) || currentData.length === 0 || dayIndex < 0) return;
 
@@ -637,7 +703,7 @@
         drawReturnPlot(ctx, state, returnPlot, colors, startDay);
 
         // Feedback FX: drain queued bursts at the current-day marker position.
-        stepParticles(now);
+        stepParticles(frameDt);
         for (let i = 0; i < BURST_SLOTS; i += 1) {
             const kind = pendingBursts[i];
             if (!kind) continue;
