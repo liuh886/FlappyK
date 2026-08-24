@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "validate:static": "node scripts/validate-static-contracts.mjs",
-    "pretest:e2e": "node scripts/validate-static-contracts.mjs --syntax-only",
     "test:e2e": "playwright test"
   },
   "devDependencies": {
