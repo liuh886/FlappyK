@@ -20,14 +20,26 @@ var finalReturn = 0;
             if (details && cardData && !details.querySelector('.legend-market-return')) {
                 const row = document.createElement('p');
                 row.className = 'legend-market-return';
-                row.innerHTML = `MARKET RETURN: <span class="highlight">${cardData.marketRetStr || '---%'}</span>`;
+                row.append(
+                    'MARKET RETURN: ',
+                    Object.assign(document.createElement('span'), {
+                        className: 'highlight',
+                        textContent: cardData.marketRetStr || '---%',
+                    }),
+                );
                 details.appendChild(row);
             }
 
             if (details && cardData && !details.querySelector('.legend-excess-return')) {
                 const row = document.createElement('p');
                 row.className = 'legend-excess-return';
-                row.innerHTML = `EXCESS: <span class="highlight">${cardData.excessRetStr || '---%'}</span>`;
+                row.append(
+                    'EXCESS: ',
+                    Object.assign(document.createElement('span'), {
+                        className: 'highlight',
+                        textContent: cardData.excessRetStr || '---%',
+                    }),
+                );
                 details.appendChild(row);
             }
 

@@ -247,7 +247,7 @@ The bundled data is a historical gameplay snapshot, not a real-time market feed.
 - Daily Run consistency assumes players are using the same bundled data snapshot;
 - unsigned friend-challenge target scores;
 - honor-based leaderboard submissions require a GitHub account and one final confirmation;
-- local onboarding, Personal Best, and Daily Streak do not sync across browsers or devices;
+- local onboarding, Personal Best, Daily Streak, and skin choice do not sync across browsers or devices;
 - the browser suite covers critical entry and restoration flows but does not automate a complete three-game trade-through;
 - native link-share behavior still depends on the browser and operating system, with clipboard/prompt fallback;
 - not intended for investment decisions.
