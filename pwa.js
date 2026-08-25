@@ -145,11 +145,6 @@
         console.warn('FlappyK analytics could not be loaded.', error);
     });
 
-    ensureStylesheet('flappyk-market-weather-styles', './market-weather.css');
-    void loadScript('flappyk-market-weather-client', './scripts/market-weather.js').catch((error) => {
-        console.warn('FlappyK market weather could not be loaded. Gameplay is unaffected.', error);
-    });
-
     ensureStylesheet('flappyk-indicator-card-styles', './indicator-cards.css');
     void loadScript('flappyk-indicator-core', './scripts/indicator-core.js')
         .then(() => loadScript('flappyk-indicator-history', './scripts/indicator-history.js'))

@@ -33,7 +33,7 @@ const cardsStyles = fs.readFileSync('indicator-cards.css', 'utf8');
 const dailyRunSource = fs.readFileSync('daily-run.js', 'utf8');
 const auditSource = fs.readFileSync('scripts/audit_bundled_data.py', 'utf8');
 const refreshSource = fs.readFileSync('fetch_all_data.py', 'utf8');
-const weatherStyles = fs.readFileSync('market-weather.css', 'utf8');
+const baseStyles = fs.readFileSync('style.css', 'utf8');
 const pwaSource = fs.readFileSync('pwa.js', 'utf8');
 const serviceWorkerSource = fs.readFileSync('sw.js', 'utf8');
 
@@ -153,8 +153,8 @@ for (const retired of [
 ]) {
   assert.ok(!cardsStyles.includes(retired), `Retired power-up visual path returned: ${retired}`);
 }
-assert.ok(weatherStyles.includes('#game-canvas'));
-assert.ok(weatherStyles.includes('z-index: 8'));
+assert.ok(baseStyles.includes('#game-canvas'));
+assert.ok(baseStyles.includes('z-index: 8'));
 assert.ok(!cardsStyles.includes('.indicator-card.is-locked'), 'Retired guest-card styling must stay deleted.');
 assert.ok(!cardsStyles.includes('width: min(248px, calc(100% - 28px))'), 'The oversized mobile tactical tray must not return.');
 

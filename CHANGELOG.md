@@ -19,8 +19,12 @@ All notable changes to FlappyK will be documented in this file.
 
 ### Changed
 
-- UI simplification pass: the weather readout now lives at the head of the run-progress strip (one status line instead of two separate HUD cells), the canvas no longer duplicates the day-progress rail over the price plot, the desktop keyboard-hint box dismisses itself after the first unguided trade, the home screen drops the scrolling K-lines ticker and console lamps in favor of the footer hint line, and legacy hidden settlement nodes (`card-small-return`, `card-final`) were removed.
-- The gameplay HUD rail is visibly more compact: tighter stats padding and value sizes, a shorter excess meter, slimmer run-progress and weather rows, and 36px command buttons. The market canvas raises its plots to clear the rail and now draws section labels inside the plot area instead of underneath the HUD.
+- Focus pass — the game is now a quiet stage for thinking about trading:
+  - Removed the market weather system (visual layers, status chip, and its SFX); the run-progress strip is the single second-row status line.
+  - Removed the home story slide mode; the home console (bezel, world strip, mode stack, footer) is the whole first screen.
+  - Removed all motion feedback: trade/checkpoint particles, screen shake, score pop, medal drop, settlement roll-up, screen-enter slides, legend ticker marquee, candle breathing, avatar bobbing, and animated skin scenery. Skin scenery remains as a static image that still reflects run progress and the published leading/losing state. Audio (chiptune SFX, muteable) and haptics remain the feedback channels.
+  - `scripts/home-console.js` now owns the home console composition and press feedback (extracted from the retired `market-weather.js`); `scripts/fx-particles.js` is retired.
+- The gameplay HUD rail is visibly more compact: tighter stats padding and value sizes, a shorter excess meter, slimmer run-progress row, and 36px command buttons. The market canvas raises its plots to clear the rail and draws section labels inside the plot area instead of underneath the HUD.
 - Settlement is rendered once by the controller using the shared pass rule; results/legend/custom adjustments are hook subscribers. The pixel avatar now reads palette tokens so every skin re-themes it automatically.
 - The mobile back-to-home flow keeps its in-place reset; the corresponding E2E no longer waits for a page navigation.
 

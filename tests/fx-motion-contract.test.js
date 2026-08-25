@@ -14,65 +14,70 @@ const premiumUiJs = read('scripts/premium-ui.js');
 const premiumUiCss = read('premium-ui.css');
 const serviceWorker = read('sw.js');
 const indexHtml = read('index.html');
-const fxParticles = read('scripts/fx-particles.js');
+const tickerCss = read('legend-ticker.css');
 
-// --- Particle pool: capped, zero-allocation, reduced-motion aware ------------
+// --- Stillness: the market stage is a still image between ticks --------------
 
-assert.ok(canvas.includes('const PARTICLE_POOL = 64'), 'The particle pool must stay capped at 64.');
-assert.ok(canvas.includes('new Float32Array(PARTICLE_POOL'), 'Particle state must live in a preallocated typed array.');
-assert.ok(/spawnBurst\(kind[\s\S]{0,200}prefersReducedMotion\(\)\)\s*return;/.test(canvas), 'Particles must be skipped under prefers-reduced-motion.');
-assert.ok(canvas.includes("if (kind !== 'buy' && kind !== 'sell' && kind !== 'checkpoint') return;"), 'Burst kinds are whitelisted.');
+for (const retired of [
+    'requestBurst',
+    'spawnParticle',
+    'spawnBurst',
+    'drawAmbient',
+    'prefersReducedMotion',
+    'requestAnimationFrame',
+    'PARTICLE_POOL',
+    'AMBIENT_POOL',
+    'flarePulse',
+]) {
+    assert.ok(!canvas.includes(retired), `Canvas must not contain motion machinery: ${retired}`);
+}
 
-// Ambient atmosphere: capped, behind game objects, reduced-motion off switch.
-const ambientBlock = canvas.match(/\/\/ ---------- Ambient atmosphere[\s\S]*?\n    \n/)?.[0] || '';
-assert.ok(canvas.includes('const AMBIENT_POOL = 28;'), 'The atmosphere layer must keep a small fixed pool.');
-assert.ok(canvas.includes('new Float32Array(AMBIENT_POOL'), 'Ambient state must be preallocated.');
-assert.ok(/drawAmbient\(ctx[\s\S]{0,120}prefersReducedMotion\(\)\)\s*return;/.test(canvas), 'Ambient layers must be skipped under prefers-reduced-motion.');
-assert.ok(canvas.includes("getActiveSkin?.()?.atmosphere"), 'Atmosphere kind comes from the skin manifest.');
-assert.ok(
-    canvas.indexOf('drawAmbient(') < canvas.indexOf('drawHairlineGrid(ctx'),
-    'Atmosphere must render before any grid or game object.',
-);
-assert.ok(!canvas.includes('shadowBlur'), 'Canvas FX must never use blurred shadows.');
+assert.ok(canvas.includes('window.FlappyKMarketCanvas'), 'Canvas renderer stays the single market visual owner.');
+assert.ok(canvas.includes('ctx.imageSmoothingEnabled = false'), 'Canvas output stays hard-edged.');
+assert.ok(!canvas.includes('shadowBlur'), 'Canvas must never use blurred shadows.');
+assert.ok(canvas.includes('drawBackdrop'), 'Static skin scenery remains part of the stage.');
 
-// --- Haptics: progressive enhancement only -----------------------------------
+// --- Game core: no screen shake, no burst requests ----------------------------
+
+for (const retired of [
+    'triggerScreenShake',
+    'is-shaking',
+    "requestBurst?.('checkpoint')",
+    "playSfx?.('weather')",
+]) {
+    assert.ok(!game.includes(retired), `Game core must not trigger retired feedback: ${retired}`);
+}
+
+for (const kind of ['checkpoint', 'speed', 'ui']) {
+    assert.ok(game.includes(`type === '${kind}'`), `Missing SFX branch: ${kind}`);
+}
+assert.ok(!game.includes("type === 'weather'"), 'Weather SFX is retired with the weather system.');
+assert.ok(game.includes('0.32 - speedMultiplier * 0.008'), 'Melody tempo must follow playback speed (15x keeps the 200ms step).');
+assert.ok(game.includes("playActionSound('win')") && game.includes("playActionSound('fail')"), 'Stage win/fail chiptune remains.');
+assert.ok(game.includes("playActionSound('checkpoint')"), 'Milestone days chime.');
+assert.ok(game.includes('playSfx(kind)'), 'External modules request audio through controller.playSfx.');
+
+// --- Shared presentation: no keyframes, no shake, no pop ----------------------
+
+assert.ok(!premiumUiCss.includes('@keyframes'), 'Shared presentation must not define keyframe animations.');
+assert.ok(!premiumUiCss.includes('arcade-screen-shake'), 'Screen shake must stay retired.');
+assert.ok(!premiumUiCss.includes('arcade-medal-drop'), 'Medal drop must stay retired.');
+assert.ok(!premiumUiCss.includes('arcade-score-pop'), 'Score pop must stay retired.');
+assert.ok(!premiumUiJs.includes('rollUpExcessSummary'), 'Settlement numbers render statically.');
+assert.ok(!tickerCss.includes('animation:'), 'Legend ticker must not scroll.');
+
+for (const token of ['--motion-step-fast', '--motion-step-base', '--motion-step-slow']) {
+    assert.ok(premiumUiCss.includes(`${token}:`), `Motion tokens remain available to skins: ${token}`);
+}
+
+// --- Haptics: progressive enhancement only -------------------------------------
 
 assert.ok(haptics.includes("navigator.vibrate?.bind(navigator)"), 'Haptics must feature-detect the vibration API.');
 assert.ok(haptics.includes("controller?.on('trade'") && haptics.includes("controller?.on('level-did-settle'"), 'Haptics subscribe through the controller.');
 assert.ok(haptics.includes("flappyk:sound-changed"), 'Haptics respect the mute preference.');
-
-// --- SFX coverage + tempo-following melody ------------------------------------
-
-for (const kind of ['checkpoint', 'speed', 'weather', 'ui']) {
-    assert.ok(game.includes(`type === '${kind}'`), `Missing SFX branch: ${kind}`);
-}
-assert.ok(game.includes('0.32 - speedMultiplier * 0.008'), 'Melody tempo must follow playback speed (15x keeps the 200ms step).');
-assert.ok(game.includes('playActionSound(\'win\')') && game.includes('playActionSound(\'fail\')'), 'Stage win/fail chiptune is part of the documented game feel.');
-assert.ok(game.includes('playActionSound(\'checkpoint\')'), 'Milestone days chime.');
-assert.ok(game.includes('window.FlappyKMarketCanvas?.requestBurst?.(\'checkpoint\')'), 'Milestone days flash on the stage rail.');
-assert.ok(game.includes('playSfx(kind)'), 'External modules request audio through controller.playSfx.');
-
-// --- FX module wiring ----------------------------------------------------------
-
-assert.ok(fxParticles.includes("controller?.on('trade'"), 'fx-particles translates trade hooks into burst requests.');
-assert.ok(indexHtml.includes('<script src="scripts/fx-particles.js"></script>'), 'fx-particles loads with the app shell.');
 assert.ok(indexHtml.includes('<script src="scripts/haptics.js"></script>'), 'haptics loads with the app shell.');
-assert.ok(serviceWorker.includes("'./scripts/fx-particles.js'") && serviceWorker.includes("'./scripts/haptics.js'"), 'The offline shell caches both FX modules.');
+assert.ok(serviceWorker.includes("'./scripts/haptics.js'"), 'The offline shell caches haptics.');
+assert.ok(!indexHtml.includes('fx-particles'), 'Retired fx-particles module must not return.');
+assert.ok(!serviceWorker.includes("'./scripts/fx-particles.js'"), 'Retired fx-particles module must not be cached.');
 
-// --- Motion tokens -------------------------------------------------------------
-
-for (const token of ['--motion-step-fast', '--motion-step-base', '--motion-step-slow']) {
-    assert.ok(premiumUiCss.includes(`${token}:`), `Missing motion token: ${token}`);
-}
-assert.ok(premiumUiCss.includes('arcade-screen-shake var(--motion-step-fast)'), 'Screen shake reads the motion token.');
-assert.ok(premiumUiCss.includes('arcade-medal-drop var(--motion-step-slow)'), 'Medal drop reads the motion token.');
-
-// --- Settlement count-up ---------------------------------------------------------
-
-assert.ok(premiumUiJs.includes('function rollUpExcessSummary'), 'Settlement excess reveals through a stepped roll-up.');
-assert.ok(
-    premiumUiJs.match(/rollUpExcessSummary[\s\S]{0,400}prefers-reduced-motion/s),
-    'The roll-up must bypass animation under prefers-reduced-motion.',
-);
-
-console.log('Feedback FX, motion tokens, and reduced-motion contracts passed.');
+console.log('Stillness contracts passed: a quiet stage, static scenery, audio-only feedback.');

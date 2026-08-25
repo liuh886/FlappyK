@@ -109,15 +109,6 @@ a:focus-visible {
     color: var(--game-text);
 }
 
-.screen.active {
-    animation: market-surface-enter 140ms steps(2, end) both;
-}
-
-@keyframes market-surface-enter {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
 /* ---------- Gameplay: one command surface ---------- */
 
 #ui-layer {
@@ -146,7 +137,7 @@ a:focus-visible {
     grid-template-columns: minmax(320px, 1.5fr) minmax(230px, 0.72fr);
     grid-template-areas:
         'performance controls'
-        'weather progress';
+        'progress progress';
     gap: 0;
     align-items: stretch;
     overflow: hidden;
@@ -180,10 +171,6 @@ a:focus-visible {
     grid-area: controls;
 }
 
-#game-hud-rail .weather-status {
-    grid-area: weather;
-}
-
 #run-progress-panel {
     grid-area: progress;
 }
@@ -191,8 +178,6 @@ a:focus-visible {
 .stats-box,
 .run-progress-panel,
 #game-top-controls,
-#game-hud-rail .weather-status,
-.run-progress-panel .weather-status,
 .controls-hint {
     border: 0;
     border-radius: 0;
@@ -383,44 +368,6 @@ a:focus-visible {
 .hud-details,
 .hud-legacy-goal {
     display: none !important;
-}
-
-#game-hud-rail .weather-status,
-.run-progress-panel .weather-status {
-    position: static !important;
-    grid-column: 1;
-    grid-row: 1;
-    display: inline-flex;
-    align-items: center;
-    min-width: 0;
-    padding: 4px 10px;
-    border: 0;
-    border-right: 1px solid var(--game-border);
-    box-shadow: none;
-    color: var(--game-muted);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-align: left;
-    opacity: 1;
-    transform: none;
-}
-
-#game-hud-rail .weather-status.is-event,
-.run-progress-panel .weather-status.is-event {
-    color: var(--game-text);
-}
-
-#game-hud-rail .weather-status::before,
-.run-progress-panel .weather-status::before {
-    content: '■';
-    margin-right: 7px;
-    color: var(--game-system);
-}
-
-html[data-market-weather='rain'] #game-hud-rail .weather-status::before,
-html[data-market-weather='rain'] .run-progress-panel .weather-status::before {
-    color: var(--game-red);
 }
 
 /* ---------- Unified command buttons ---------- */
@@ -652,7 +599,7 @@ html[data-virtual-controls='true'] #game-skin-toggle-btn {
 
 /* ---------- Home: one continuous terminal ---------- */
 
-html[data-ui-state='home'] #game-container.arcade-weather-ready {
+html[data-ui-state='home'] #game-container {
     width: 100vw;
     height: 100dvh;
     max-width: none;
@@ -1046,226 +993,6 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     margin: 0 !important;
 }
 
-.home-story-navigation {
-    position: absolute;
-    right: max(18px, env(safe-area-inset-right));
-    bottom: max(14px, env(safe-area-inset-bottom));
-    z-index: 8;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.home-story-arrow {
-    min-width: 44px;
-    min-height: 44px;
-    padding: 8px 11px;
-    border: 2px solid var(--game-border-strong);
-    border-radius: 0;
-    background: var(--game-surface-raised);
-    color: var(--game-text);
-    box-shadow: 3px 3px 0 var(--game-depth);
-}
-
-.home-story-arrow:active {
-    transform: translate(2px, 2px);
-    box-shadow: 1px 1px 0 var(--game-depth);
-}
-
-.home-story-page-status {
-    color: var(--game-muted);
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.home-story-page-status strong {
-    color: var(--game-text);
-}
-
-/* ---------- Story: analysis mode, not a second visual world ---------- */
-
-#start-screen.is-story-active .home-console-topline,
-#start-screen.is-story-active .home-console-footer,
-#start-screen.is-story-active .home-console-screen > :not(.home-story-slide):not(.home-story-navigation) {
-    visibility: hidden;
-}
-
-.home-story-slide {
-    position: absolute;
-    inset: 0;
-    z-index: 6;
-    display: grid;
-    grid-template-columns: minmax(260px, 0.7fr) minmax(0, 1.3fr);
-    gap: clamp(24px, 4vw, 56px);
-    align-items: center;
-    padding: clamp(28px, 4.5vw, 58px);
-    overflow: auto;
-    border: 0;
-    border-radius: 0;
-    background: var(--game-bg);
-    color: var(--game-text);
-    box-shadow: none;
-}
-
-.home-story-slide[hidden] {
-    display: none !important;
-}
-
-.home-story-slide::before {
-    content: 'FLAPPY K / MARKET NOTE 001';
-    position: absolute;
-    top: 16px;
-    right: 20px;
-    color: var(--game-muted);
-    font-family: var(--pixel-font-display);
-    font-size: 9px;
-    letter-spacing: 0.08em;
-}
-
-.home-story-copy {
-    display: grid;
-    gap: 16px;
-    min-width: 0;
-}
-
-.home-story-kicker {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    color: var(--game-system);
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-}
-
-.home-story-kicker::before {
-    content: '■';
-}
-
-.home-story-title {
-    margin: 0;
-    color: var(--game-text);
-    font-family: var(--pixel-font-display);
-    font-size: clamp(30px, 4.4vw, 56px);
-    line-height: 1.16;
-    text-shadow: 4px 4px 0 var(--game-depth);
-}
-
-.home-story-lead,
-.home-story-body {
-    margin: 0;
-    color: var(--game-muted);
-    font-size: clamp(17px, 1.55vw, 21px);
-    line-height: 1.55;
-}
-
-.home-story-equation {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr auto 1fr;
-    gap: 10px;
-    align-items: center;
-    margin-top: 8px;
-    padding: 14px;
-    border: 2px solid var(--game-border-strong);
-    background: var(--game-surface);
-    box-shadow: 4px 4px 0 var(--game-depth);
-}
-
-.home-story-equation-term {
-    min-width: 0;
-    text-align: center;
-}
-
-.home-story-equation-term strong {
-    display: block;
-    color: var(--game-text);
-    font-family: var(--pixel-font-display);
-    font-size: clamp(18px, 2.3vw, 28px);
-}
-
-.home-story-equation-term span,
-.home-story-equation-symbol {
-    color: var(--game-muted);
-    font-size: 12px;
-}
-
-.home-story-play {
-    min-height: 58px;
-    border: 3px solid #ffe478;
-    border-radius: 0;
-    background: var(--game-accent);
-    color: var(--game-bg);
-    box-shadow: 5px 5px 0 #8e7520;
-    font-family: var(--pixel-font-display);
-    font-size: 11px;
-}
-
-.home-story-play:active {
-    transform: translate(3px, 3px);
-    box-shadow: 2px 2px 0 #8e7520;
-}
-
-.home-story-tape {
-    min-width: 0;
-    margin: 0;
-    padding: 18px;
-    border: 2px solid var(--game-border-strong);
-    background: var(--game-surface);
-    box-shadow: 6px 6px 0 var(--game-depth);
-}
-
-.home-story-tape-header {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 10px;
-    color: var(--game-muted);
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.home-story-chart {
-    width: 100%;
-    height: auto;
-    color: var(--game-text);
-}
-
-.home-story-chart-grid line {
-    stroke: rgba(167, 180, 194, 0.18);
-}
-
-.home-story-chart-baseline {
-    stroke: rgba(245, 249, 252, 0.32);
-    stroke-dasharray: 4 4;
-}
-
-.home-story-chart-candle,
-.home-story-chart-candle-body,
-.home-story-chart-price {
-    stroke: var(--game-system);
-    fill: none;
-}
-
-.home-story-chart-candle-body {
-    fill: rgba(115, 230, 242, 0.16);
-}
-
-.home-story-marker-line {
-    stroke: var(--game-accent);
-    stroke-dasharray: 3 3;
-}
-
-.home-story-marker-block {
-    fill: var(--game-accent);
-}
-
-.home-story-marker-label,
-.home-story-marker-day {
-    fill: var(--game-muted);
-    font-family: var(--pixel-font-ui);
-    font-size: 12px;
-}
-
 /* ---------- Settlement: same market surface ---------- */
 
 #settlement-screen.active {
@@ -1324,7 +1051,6 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     border: 3px solid var(--game-border-strong);
     background: var(--game-surface-raised);
     box-shadow: 4px 4px 0 var(--game-depth);
-    animation: arcade-medal-drop var(--motion-step-slow) cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
 }
 
 .settlement-medal-icon {
@@ -1339,12 +1065,6 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
     font-family: var(--pixel-font-display);
     font-size: 9px;
     letter-spacing: 0.08em;
-}
-
-@keyframes arcade-medal-drop {
-    0% { transform: translateY(-40px) scale(0.5); opacity: 0; }
-    70% { transform: translateY(4px) scale(1.08); opacity: 1; }
-    100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 
 .settlement-main-result {
@@ -1374,18 +1094,10 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 
 .profit-card[data-result='success'] .settlement-excess-summary {
     color: var(--game-green);
-    animation: arcade-score-pop 210ms steps(3, end) both;
 }
 
 .profit-card[data-result='failure'] .settlement-excess-summary {
     color: var(--game-red);
-    animation: arcade-score-pop 210ms steps(3, end) both;
-}
-
-@keyframes arcade-score-pop {
-    from { opacity: 0; transform: translateY(12px); }
-    66% { opacity: 1; transform: translateY(-3px); }
-    to { opacity: 1; transform: translateY(0); }
 }
 
 .settlement-comparison {
@@ -1834,11 +1546,7 @@ html[data-ui-state='home'] #game-container.arcade-weather-ready {
 
 #btn-buy.is-rejected,
 #btn-sell.is-rejected {
-    animation: terminal-reject 140ms steps(2, end) 2;
-}
-
-@keyframes terminal-reject {
-    50% { border-color: var(--game-red); transform: translateX(3px); }
+    border-color: var(--game-red);
 }
 
 /* ---------- Bilingual typography ---------- */
@@ -1853,7 +1561,6 @@ html[data-flappyk-language='zh'] summary {
 }
 
 html[data-flappyk-language='zh'] #start-screen #game-title,
-html[data-flappyk-language='zh'] .home-story-title,
 html[data-flappyk-language='zh'] .settlement-excess-summary,
 html[data-flappyk-language='zh'] .legend-terminal-head h1,
 html[data-flappyk-language='zh'] .local-records-summary strong {
@@ -1861,9 +1568,7 @@ html[data-flappyk-language='zh'] .local-records-summary strong {
     letter-spacing: 0;
 }
 
-html[data-flappyk-language='zh'] .home-console-intro-copy,
-html[data-flappyk-language='zh'] .home-story-lead,
-html[data-flappyk-language='zh'] .home-story-body {
+html[data-flappyk-language='zh'] .home-console-intro-copy {
     line-height: 1.7;
 }
 
@@ -1881,7 +1586,7 @@ html[data-flappyk-language='zh'] .run-progress-panel .hud-day {
         grid-template-columns: minmax(0, 1fr) auto;
         grid-template-areas:
             'performance controls'
-            'weather progress';
+            'progress progress';
     }
 
     .home-console-screen {
@@ -1893,12 +1598,6 @@ html[data-flappyk-language='zh'] .run-progress-panel .hud-day {
     .home-mode-stack {
         align-self: center;
     }
-
-    .home-story-slide {
-        grid-template-columns: minmax(210px, 0.65fr) minmax(0, 1.35fr);
-        gap: 22px;
-        padding: 28px;
-    }
 }
 
 @media (max-width: 719px) {
@@ -1909,10 +1608,6 @@ html[data-flappyk-language='zh'] .run-progress-panel .hud-day {
             'performance controls'
             'progress progress';
         box-shadow: 4px 4px 0 var(--game-depth);
-    }
-
-    #game-hud-rail .weather-status {
-        display: none;
     }
 
     .stats-box {
@@ -2041,47 +1736,6 @@ html[data-flappyk-language='zh'] .run-progress-panel .hud-day {
         width: 100%;
     }
 
-    .home-story-slide {
-        position: relative;
-        inset: auto;
-        grid-template-columns: 1fr;
-        align-items: start;
-        gap: 22px;
-        min-height: calc(100dvh - 96px);
-        padding: 28px 16px 84px;
-        overflow: visible;
-    }
-
-    .home-story-slide::before {
-        top: 10px;
-        right: 12px;
-        font-size: 8px;
-    }
-
-    .home-story-title {
-        font-size: clamp(30px, 10vw, 44px);
-    }
-
-    .home-story-lead,
-    .home-story-body {
-        font-size: 17px;
-    }
-
-    .home-story-equation {
-        grid-template-columns: 1fr;
-        padding: 14px;
-    }
-
-    .home-story-equation-symbol {
-        transform: rotate(90deg);
-    }
-
-    .home-story-navigation {
-        position: fixed;
-        right: max(12px, env(safe-area-inset-right));
-        bottom: max(12px, env(safe-area-inset-bottom));
-    }
-
     #settlement-screen.active {
         align-content: start;
         padding-top: max(14px, env(safe-area-inset-top));
@@ -2195,23 +1849,6 @@ html[data-flappyk-language='zh'] .run-progress-panel .hud-day {
         min-height: 54px;
         font-size: 16px;
     }
-
-    .home-story-slide {
-        grid-template-columns: minmax(220px, 0.75fr) minmax(0, 1.25fr);
-        padding: 18px 24px 54px;
-    }
-}
-
-@keyframes arcade-screen-shake {
-    0% { transform: translate(0, 0); }
-    25% { transform: translate(-2px, 1px); }
-    50% { transform: translate(2px, -1px); }
-    75% { transform: translate(-1px, 2px); }
-    100% { transform: translate(0, 0); }
-}
-
-#game-container.is-shaking {
-    animation: arcade-screen-shake var(--motion-step-fast) steps(4, end);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -7,7 +7,6 @@ const refinementJs = fs.readFileSync('scripts/premium-ui-refinement.js', 'utf8')
 const canonicalCss = fs.readFileSync('premium-ui.css', 'utf8');
 const mobileCss = fs.readFileSync('mobile-controls.css', 'utf8');
 const baseStyles = fs.readFileSync('style.css', 'utf8');
-const weatherCss = fs.readFileSync('market-weather.css', 'utf8');
 const accountCss = fs.readFileSync('account-integration.css', 'utf8');
 const pwaSource = fs.readFileSync('pwa.js', 'utf8');
 const serviceWorker = fs.readFileSync('sw.js', 'utf8');
@@ -43,12 +42,11 @@ for (const contract of [
   '#game-hud-rail',
   '.hud-metric-label',
   "'performance controls'",
-  "'weather progress'",
+  "'progress progress'",
   'grid-area: performance',
   'grid-area: controls',
-  'grid-area: weather',
   'grid-area: progress',
-  "html[data-ui-state='home'] #game-container.arcade-weather-ready",
+  "html[data-ui-state='home'] #game-container",
   '#start-screen.arcade-home',
   '.home-console-bezel',
   '.home-console-screen',
@@ -57,7 +55,6 @@ for (const contract of [
   '.local-records-summary',
   '.daily-mode-card',
   '.home-secondary-actions button',
-  '.home-story-slide',
   '.settlement-summary',
   '.legend-terminal-head',
   "html[data-flappyk-language='zh']",
@@ -95,14 +92,9 @@ assert.ok(accountCss.includes('.home-utility-bar'));
 assert.ok(accountCss.includes('.home-account-slot .hao-account-trigger'));
 assert.ok(accountCss.includes("html:not([data-ui-state='home']) .home-utility-bar"));
 
-assert.ok(!weatherCss.includes('.home-console-bezel'));
-assert.ok(!weatherCss.includes('.home-primary-actions'));
-assert.ok(weatherCss.includes('.market-weather-layer'));
-assert.ok(weatherCss.includes("[data-weather='rain']"));
-assert.ok(weatherCss.includes('@media (prefers-reduced-motion: reduce)'));
-
 assert.ok(!pwaSource.includes('hud-compact.css'));
 assert.ok(!pwaSource.includes('flappyk-membership-client'));
+assert.ok(!pwaSource.includes('market-weather'));
 assert.ok(serviceWorker.includes("const APP_CACHE = 'flappyk-app'"));
 assert.ok(serviceWorker.includes("const RUNTIME_CACHE = 'flappyk-runtime'"));
 assert.ok(serviceWorker.includes('isCriticalSameOriginAsset'));
@@ -110,10 +102,10 @@ assert.ok(serviceWorker.includes('? networkFirst(request)'));
 assert.ok(serviceWorker.includes("'./account-integration.css'"));
 assert.ok(serviceWorker.includes("'./scripts/account-cloud-sync.js'"));
 assert.ok(serviceWorker.includes("'./premium-ui.css'"));
-assert.ok(serviceWorker.includes("'./scripts/home-story.js'"));
-assert.ok(serviceWorker.includes("'./market-weather.css'"));
-assert.ok(serviceWorker.includes("'./scripts/market-weather.js'"));
+assert.ok(serviceWorker.includes("'./scripts/home-console.js'"));
+assert.ok(!serviceWorker.includes("'./market-weather.css'"));
+assert.ok(!serviceWorker.includes("'./scripts/market-weather.js'"));
 assert.ok(!serviceWorker.includes("'./home-story.css'"));
 assert.ok(!/flappyk-(?:app|runtime)-v\d+/.test(serviceWorker));
 
-console.log('Single-Surface Market OS has one shared CSS owner, dock-contained runtime touch geometry, stable DOM composition, isolated weather, account placement, responsive state, and stable PWA cache contracts.');
+console.log('Single-Surface Market OS has one shared CSS owner, dock-contained runtime touch geometry, stable DOM composition, a quiet stage, account placement, responsive state, and stable PWA cache contracts.');

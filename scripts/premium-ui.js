@@ -433,33 +433,6 @@
         return Number.isFinite(parsed) ? parsed : 0;
     }
 
-    let excessRollFrame = 0;
-
-    function rollUpExcessSummary(targetText) {
-        const summary = document.getElementById('settlement-excess-summary');
-        if (!summary) return;
-        cancelAnimationFrame(excessRollFrame);
-        if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
-            summary.textContent = targetText;
-            return;
-        }
-        const target = parsePercent(targetText);
-        const steps = 8;
-        let step = 0;
-        const tick = () => {
-            step += 1;
-            if (step >= steps) {
-                summary.textContent = targetText;
-                return;
-            }
-            const eased = 1 - Math.pow(1 - step / steps, 3);
-            const value = target * eased;
-            summary.textContent = `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
-            excessRollFrame = requestAnimationFrame(tick);
-        };
-        excessRollFrame = requestAnimationFrame(tick);
-    }
-
     function renderSettlement() {
         const playerText = document.getElementById('card-level-return')?.textContent || '---%';
         const marketText = document.getElementById('card-market-return')?.textContent || '---%';
@@ -479,7 +452,7 @@
         const medalBox = document.getElementById('settlement-medal-box');
 
         if (verdict) verdict.textContent = success ? copy.success : copy.failure;
-        rollUpExcessSummary(excessText);
+        if (excessSummary) excessSummary.textContent = excessText;
         if (playerSummary) playerSummary.textContent = playerText;
         if (marketSummary) marketSummary.textContent = marketText;
         if (playerBar) playerBar.style.width = `${Math.max(4, Math.abs(player) / scale * 100)}%`;

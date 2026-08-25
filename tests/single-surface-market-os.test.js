@@ -10,10 +10,9 @@ const index = fs.readFileSync('index.html', 'utf8');
 const game = fs.readFileSync('game.js', 'utf8');
 const marketCanvas = fs.readFileSync('scripts/market-canvas.js', 'utf8');
 const sw = fs.readFileSync('sw.js', 'utf8');
-const weather = fs.readFileSync('scripts/market-weather.js', 'utf8');
+const homeConsole = fs.readFileSync('scripts/home-console.js', 'utf8');
 const premiumUi = fs.readFileSync('scripts/premium-ui.js', 'utf8');
 const refinement = fs.readFileSync('scripts/premium-ui-refinement.js', 'utf8');
-const story = fs.readFileSync('scripts/home-story.js', 'utf8');
 const i18n = fs.readFileSync('scripts/i18n.js', 'utf8');
 const direction = fs.readFileSync('docs/ARCADE_VISUAL_DIRECTION.md', 'utf8');
 
@@ -29,12 +28,12 @@ for (const contract of [
   '#game-hud-rail',
   '#game-hud-rail::before',
   "'performance controls'",
-  "'weather progress'",
+  "'progress progress'",
   ".stats-box[data-composition='returns-only']",
   '.excess-meter-track',
   '#btn-buy',
   '#btn-sell',
-  "html[data-ui-state='home'] #game-container.arcade-weather-ready",
+  "html[data-ui-state='home'] #game-container",
   '#start-screen.arcade-home',
   '.home-console-bezel',
   '.home-console-screen',
@@ -44,11 +43,8 @@ for (const contract of [
   '.home-primary-actions #start-btn',
   'box-shadow: 7px 7px 0 #8e7520',
   '.home-world-strip',
-  'Story: analysis mode, not a second visual world',
-  '.home-story-slide',
   'Settlement: same market surface',
   '.profit-card',
-  '@keyframes arcade-score-pop',
   'Run complete: no separate celebration skin',
   '.legend-terminal-head',
   "html[data-flappyk-language='zh']",
@@ -71,8 +67,6 @@ for (const contract of [
 }
 
 assert.ok(!css.includes('#mobile-controls:not([hidden]) {'), 'Shared theme must not take ownership of mobile dock geometry.');
-assert.ok(base.includes('.home-story-equation'));
-assert.ok(base.includes('pointer-events: none;'));
 
 for (const retired of [
   'Settlement as a score receipt',
@@ -162,7 +156,7 @@ assert.ok(game.includes('window.FlappyKMarketCanvas'));
 assert.ok(game.includes('renderer.draw({'));
 assert.ok(!game.includes('function getY(price)'));
 
-assert.ok(weather.includes('function installHomeConsole()'));
+assert.ok(homeConsole.includes('function installHomeConsole()'));
 assert.ok(premiumUi.includes('function installHomeHierarchy()'));
 assert.ok(premiumUi.includes('function installHud()'));
 assert.ok(premiumUi.includes('function installMobileControls()'));
@@ -170,8 +164,6 @@ assert.ok(premiumUi.includes('function installSettlementSummary()'));
 assert.ok(refinement.includes("const HUD_RAIL_ID = 'game-hud-rail'"));
 assert.ok(!refinement.includes('style.textContent = `'));
 assert.ok(!refinement.includes("button.textContent = ''"));
-assert.ok(story.includes("startScreen.classList.toggle('is-story-active'"));
-assert.ok(story.includes('最好的交易，往往很安静。'));
 assert.ok(i18n.includes('document.documentElement.dataset.flappykLanguage = language'));
 
 for (const principle of [

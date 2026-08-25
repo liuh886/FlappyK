@@ -46,7 +46,6 @@ for (const shellAsset of [
     'scripts/market-canvas.js',
     'scripts/ui-state.js',
     'scripts/premium-ui.js',
-    'scripts/home-story.js',
     'scripts/account-cloud-sync.js',
     'pwa.js',
 ]) {
@@ -85,9 +84,6 @@ for (const cachedAsset of [
     "'./scripts/market-canvas.js'",
     "'./scripts/ui-state.js'",
     "'./scripts/premium-ui.js'",
-    "'./scripts/home-story.js'",
-    "'./market-weather.css'",
-    "'./scripts/market-weather.js'",
     "'./indicator-cards.css'",
     "'./scripts/indicator-cards.js'",
     "'./account-integration.css'",
@@ -98,6 +94,10 @@ for (const cachedAsset of [
 }
 
 for (const retiredCachedAsset of [
+    "'./market-weather.css'",
+    "'./scripts/market-weather.js'",
+    "'./experience.css'",
+    "'./scripts/fx-particles.js'",
     "'./data.js'",
     "'./premium-ui-refinement.css'",
     "'./home-story.css'",

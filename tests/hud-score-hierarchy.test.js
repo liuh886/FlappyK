@@ -19,7 +19,7 @@ for (const contract of [
   '#game-top-controls',
   '.controls-hint',
   "'performance controls'",
-  "'weather progress'",
+  "'progress progress'",
   '--game-green:',
   '--game-red:',
   '--game-accent:',

@@ -169,17 +169,13 @@ BOLL and MACD are tactical power-ups, not analytical cards.
 
 `indicator-cards.css` owns this presentation. It does not move the mobile command dock or create a second HUD.
 
-## Weather semantics
+## Stillness
 
-Weather remains functional feedback and keeps the existing scoring semantics:
+The stage is a still image between ticks. The game's purpose is to provoke thought about trading itself, so the presentation is deliberately quiet:
 
-| State | Rule | Meaning |
-| --- | --- | --- |
-| Clear | player return is non-negative and Excess Return is non-negative | player is ahead of the market |
-| Cloudy | player return is non-negative but Excess Return is negative | player is profitable, but the market is ahead |
-| Rain | player return is negative | player is underwater |
-
-Weather stays subordinate to the K-line, Return, Excess, trade markers, and controls. On compact mobile layouts its textual strip may disappear when space is constrained; run progress keeps the rail slot.
+- no particles, screen shake, score pops, medal drops, or celebration volleys;
+- skin scenery (starfield, skyline, aurora, ice ridge, sun, dunes) is drawn once per tick as a static image; it may reflect run progress and the published leading/losing state, but nothing animates;
+- feedback is informational: chiptune SFX, haptics, trade markers on the chart, and the excess meter. Audio respects the mute preference.
 
 ## Settlement
 
@@ -231,7 +227,7 @@ Chinese and English are one product, not two layouts.
 
 `scripts/premium-ui-refinement.js` owns HUD rail composition and DOM normalization. It must not inject presentation styles or erase semantic control content.
 
-`market-weather.css` and `scripts/market-weather.js` own weather semantics and environmental feedback only.
+`scripts/home-console.js` owns the home console composition (bezel, topline, world strip, footer, utility-bar placement, press feedback). `scripts/premium-ui-refinement.js` owns HUD rail composition and DOM normalization. It must not inject presentation styles or erase semantic control content.
 
 Core game data, scoring, pass rules, account/cloud history, Daily Run, friend challenge, leaderboard, sharing, PWA behavior, and market loading are unchanged by this visual evolution.
 

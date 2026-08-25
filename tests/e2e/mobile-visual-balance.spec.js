@@ -41,7 +41,6 @@ test('mobile home keeps PLAY first and settlement remains contained in the same 
       worlds: box('.home-world-strip'),
       play: box('#start-btn'),
       modeStack: box('.home-mode-stack'),
-      navigation: box('.home-story-navigation'),
       titleSize: parseFloat(getComputedStyle(document.getElementById('game-title')).fontSize),
       playSize: parseFloat(getComputedStyle(document.getElementById('start-btn')).fontSize),
       horizontalOverflow: screenNode.scrollWidth > screenNode.clientWidth + 1,
@@ -56,7 +55,6 @@ test('mobile home keeps PLAY first and settlement remains contained in the same 
   expect(home.titleSize).toBeGreaterThanOrEqual(52);
   expect(home.playSize).toBeGreaterThanOrEqual(20);
   expect(home.play.top).toBeLessThan(home.modeStack.top);
-  expect(home.modeStack.bottom).toBeLessThan(home.navigation.top);
 
   await page.evaluate(() => {
     document.documentElement.dataset.uiState = 'settlement';

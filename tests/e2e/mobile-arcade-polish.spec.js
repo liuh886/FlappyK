@@ -74,16 +74,6 @@ test('360px short phone keeps the console, account toolbar, and primary actions 
   await expect(page.locator('#mobile-controls')).toBeVisible();
   await expect(page.locator('#home-utility-bar')).toBeHidden();
 
-  await page.evaluate(() => {
-    window.FlappyKMarketWeather.applyMetrics(
-      { playerReturn: 0.02, marketReturn: 0.01, excess: 0.01 },
-      { silent: true },
-    );
-    window.FlappyKMarketWeather.applyMetrics(
-      { playerReturn: -0.01, marketReturn: -0.02, excess: 0.01 },
-    );
-  });
-
   const game = await page.evaluate(() => {
     const box = (selector) => {
       const rect = document.querySelector(selector).getBoundingClientRect();
@@ -91,14 +81,12 @@ test('360px short phone keeps the console, account toolbar, and primary actions 
     };
     return {
       viewport: { left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight },
-      weatherDisplay: getComputedStyle(document.getElementById('weather-status')).display,
       topControls: box('#game-top-controls'),
       mobileControls: box('#mobile-controls'),
       rail: box('#game-hud-rail'),
     };
   });
 
-  expect(game.weatherDisplay).toBe('none');
   expect(inside(game.topControls, game.rail, 2)).toBe(true);
   expect(inside(game.rail, game.viewport, 2)).toBe(true);
   expect(inside(game.mobileControls, game.viewport, 2)).toBe(true);

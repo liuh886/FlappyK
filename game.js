@@ -493,7 +493,6 @@ function gameTick() {
 
     if (dayIndex % 50 === 0) {
         playActionSound('checkpoint');
-        window.FlappyKMarketCanvas?.requestBurst?.('checkpoint');
     }
 }
 
@@ -624,14 +623,6 @@ function endLevel() {
         days: currentData.length,
     });
 }
-function triggerScreenShake() {
-    const container = document.getElementById('game-container');
-    if (!container) return;
-    container.classList.remove('is-shaking');
-    void container.offsetWidth;
-    container.classList.add('is-shaking');
-}
-
 function handleBuy() {
     if (!isPlaying) return;
     // Buy $1000
@@ -641,7 +632,6 @@ function handleBuy() {
         actions.push({ type: 'buy', day: dayIndex, price: currentPrice });
         playActionSound('buy');
         emitHook('trade', { type: 'buy', day: dayIndex, price: currentPrice });
-        triggerScreenShake();
         updateUI();
         draw();
     }
@@ -657,7 +647,6 @@ function handleSell() {
         actions.push({ type: 'sell', day: dayIndex, price: currentPrice });
         playActionSound('sell');
         emitHook('trade', { type: 'sell', day: dayIndex, price: currentPrice });
-        triggerScreenShake();
         updateUI();
         draw();
     } else if (assetValue > FEE) {
@@ -667,7 +656,6 @@ function handleSell() {
         actions.push({ type: 'sell', day: dayIndex, price: currentPrice });
         playActionSound('sell');
         emitHook('trade', { type: 'sell', day: dayIndex, price: currentPrice });
-        triggerScreenShake();
         updateUI();
         draw();
     }
@@ -813,14 +801,13 @@ function playActionSound(type) {
             osc.start(now + i * 0.07);
             osc.stop(now + i * 0.07 + 0.1);
         });
-    } else if (type === 'speed' || type === 'weather' || type === 'ui') {
-        // Short stepped blip; direction by kind.
-        const up = type !== 'weather';
+    } else if (type === 'speed' || type === 'ui') {
+        // Short stepped blip.
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = 'square';
-        osc.frequency.setValueAtTime(up ? 740 : 330, now);
-        osc.frequency.exponentialRampToValueAtTime(up ? 990 : 262, now + 0.06);
+        osc.frequency.setValueAtTime(740, now);
+        osc.frequency.exponentialRampToValueAtTime(990, now + 0.06);
         gain.gain.setValueAtTime(0.05, now);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
         osc.connect(gain);

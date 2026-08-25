@@ -114,8 +114,6 @@ for (const contract of [
 
 for (const retainedRuntime of [
   "loadScript('flappyk-analytics-loader'",
-  "ensureStylesheet('flappyk-market-weather-styles'",
-  "loadScript('flappyk-market-weather-client'",
   "ensureStylesheet('flappyk-indicator-card-styles'",
   "loadScript('flappyk-indicator-core'",
   "loadScript('flappyk-indicator-history'",
@@ -143,10 +141,8 @@ for (const retainedAsset of [
   "'./membership-config.js'",
   "'./account-integration.css'",
   "'./scripts/account-cloud-sync.js'",
-  "'./market-weather.css'",
-  "'./scripts/market-weather.js'",
+  "'./scripts/home-console.js'",
   "'./premium-ui.css'",
-  "'./scripts/home-story.js'",
   "'./indicator-cards.css'",
   "'./scripts/indicator-core.js'",
   "'./scripts/indicator-history.js'",
@@ -164,8 +160,11 @@ for (const retiredAsset of [
   "'./membership.css'",
   "'./membership-sync.css'",
   "'./scripts/cloud-run-sync-core.js'",
+  "'./market-weather.css'",
+  "'./scripts/market-weather.js'",
+  "'./scripts/fx-particles.js'",
 ]) {
-  assert.ok(!serviceWorkerSource.includes(retiredAsset), `Offline shell still caches retired account code: ${retiredAsset}`);
+  assert.ok(!serviceWorkerSource.includes(retiredAsset), `Offline shell still caches retired code: ${retiredAsset}`);
 }
 
 for (const retiredFile of [

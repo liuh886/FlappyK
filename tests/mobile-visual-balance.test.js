@@ -31,7 +31,6 @@ for (const retiredCrossOwner of [
 }
 
 assert.ok(premium.includes('#game-hud-rail'));
-assert.ok(premium.includes("#game-hud-rail .weather-status"));
 assert.ok(premium.includes('.profit-card'));
 assert.ok(
   !mobile.includes(":has(#indicator-card-deck:not([hidden])) #game-canvas"),

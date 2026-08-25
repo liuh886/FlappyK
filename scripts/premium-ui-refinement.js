@@ -159,14 +159,11 @@
         runPanel.setAttribute('aria-label', isChinese() ? '本局进度' : 'Run progress');
         rail.setAttribute('aria-label', isChinese() ? '游戏状态与控制' : 'Game status and controls');
 
-        const status = document.getElementById('weather-status');
         [stats, runPanel, topControls].filter(Boolean).forEach((element) => {
             if (element.parentElement !== rail) rail.appendChild(element);
         });
-        if (status && status.parentElement !== runPanel) runPanel.prepend(status);
 
         normalizeMetricRows();
-        window.FlappyKMarketWeather?.syncWeatherStatusPlacement?.();
     }
 
     function refineDesktopControls() {

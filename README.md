@@ -259,8 +259,9 @@ The bundled data is a historical gameplay snapshot, not a real-time market feed.
 - `skins.css` — token-only skin palettes (Polar Exchange, Amber Terminal); the default Market Arcade tokens live in `premium-ui.css`;
 - `scripts/skin-system.js` — skin catalog manifest (bilingual names + motion profiles), persistence, home toolbar cycle button, instant canvas re-theming;
 - `game.js` — market playback and trading state; hosts `window.FlappyKGameController`, the authoritative lifecycle hook registry and priority-ranked data-source registry that replaced the old global wrapper chain;
-- `scripts/market-canvas.js` — the only market-chart renderer, including the pooled particle FX layer, candle breathing, milestone flashes, and the two-frame pixel mascot;
-- `scripts/fx-particles.js` / `scripts/haptics.js` — lifecycle-hook bridges for trade bursts and progressive micro-haptics;
+- `scripts/market-canvas.js` — the only market-chart renderer: static per-skin scenery, candlesticks, trade markers, and the pixel mascot avatar;
+- `scripts/home-console.js` — home console composition, bilingual labels, and press feedback;
+- `scripts/haptics.js` — progressive micro-haptics;
 - `scripts/market-pass-rule.js` — shared Player Return, Market Return, Excess, and pass calculation (pure math);
 - `onboarding.js` / `onboarding.css` — one-time first-run explanation and entry preservation;
 - `scripts/game-pacing.js` — 15x default playback, pause/resume controls, automatic tab-hide pausing, and lifecycle subscriptions;

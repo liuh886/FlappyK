@@ -25,8 +25,26 @@ body {
 
 #game-canvas {
     display: block;
+    position: relative;
+    z-index: 8;
     width: 100%;
     height: 100%;
+    background: rgba(7, 14, 24, 0.58);
+}
+
+#ui-layer,
+#run-progress-panel,
+#game-top-controls,
+.controls-hint {
+    z-index: 40;
+}
+
+#start-screen {
+    overflow: hidden;
+}
+
+.mobile-btn {
+    touch-action: manipulation;
 }
 
 .screen {
@@ -60,11 +78,6 @@ button {
 :where(button, select, summary, a[href], input, textarea):focus-visible {
     outline: 2px solid var(--game-accent, #f0c94b);
     outline-offset: 2px;
-}
-
-/* The equation is explanatory content, never an interaction layer. */
-.home-story-equation {
-    pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

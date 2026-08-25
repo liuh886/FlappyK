@@ -66,7 +66,7 @@ test('desktop keeps the chart dominant with one readable two-row Market Arcade c
 
   await page.getByRole('button', { name: 'PLAY', exact: true }).click();
 
-  for (const selector of ['#game-hud-rail', '#game-top-controls', '#run-progress-panel', '.stats-box', '#weather-status', '.controls-hint']) {
+  for (const selector of ['#game-hud-rail', '#game-top-controls', '#run-progress-panel', '.stats-box', '.controls-hint']) {
     await expect(page.locator(selector)).toBeVisible();
   }
   await expect(page.locator('#game-top-controls > .desktop-speed-control')).toHaveCount(1);
@@ -80,7 +80,7 @@ test('desktop keeps the chart dominant with one readable two-row Market Arcade c
       return { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom, width: rect.width, height: rect.height };
     };
     const rail = box('#game-hud-rail');
-    const children = ['.stats-box', '#game-top-controls', '#weather-status', '#run-progress-panel'].map(box);
+    const children = ['.stats-box', '#game-top-controls', '#run-progress-panel'].map(box);
     const hint = box('.controls-hint');
     const viewport = { left: 0, top: 0, right: innerWidth, bottom: innerHeight, width: innerWidth, height: innerHeight };
     const metricNodes = Array.from(document.querySelectorAll('.hud-total, .hud-return, #excess-meter'));

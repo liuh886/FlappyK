@@ -10,7 +10,7 @@ for (const structuralContract of [
   'grid-template-rows: minmax(0, 1fr)',
   'min-height: 0 !important',
   "'performance controls'",
-  "'weather progress'",
+  "'progress progress'",
   '#game-hud-rail',
 ]) {
   assert.ok(canonical.includes(structuralContract), `Missing canonical HUD geometry contract: ${structuralContract}`);
@@ -24,8 +24,7 @@ for (const visualContract of [
   'box-shadow: 7px 7px 0 #8e7520',
   'box-shadow: 5px 5px 0 var(--game-depth)',
   'border-right: 1px solid var(--game-border)',
-  '@keyframes arcade-score-pop',
-  'steps(3, end)',
+  'steps(2, end)',
 ]) {
   assert.ok(canonical.includes(visualContract), `Missing hard-edged Pixel Market Arcade visual contract: ${visualContract}`);
 }
@@ -49,7 +48,7 @@ assert.ok(!canonical.includes('--pixel-cut:'), 'Decorative clipped-corner geomet
 assert.ok(!canonical.includes('shadowBlur'), 'Canvas-era neon glow language must not enter shared CSS.');
 assert.ok(!canonical.includes('radial-gradient('), 'Ambient radial lighting must not return to the canonical pixel-game surface.');
 assert.ok(!canonical.includes('linear-gradient('), 'Gradient decoration must not replace hard pixel structure.');
-assert.ok(!canonical.includes('@keyframes arcade-rail-scan'), 'Terminal scan-line motion must stay retired.');
+assert.ok(!canonical.includes('@keyframes'), 'Shared presentation must stay free of keyframe motion.');
 assert.ok(!canonical.includes('0 18px 46px'), 'Soft dashboard elevation must stay retired.');
 assert.ok(!canonical.includes('0 14px 34px'), 'Soft HUD shadow must stay retired.');
 assert.ok(!base.includes('html body #game-container #game-hud-rail'), 'style.css must not regain HUD-specific high-specificity rules.');
