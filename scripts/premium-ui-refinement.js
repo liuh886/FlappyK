@@ -51,13 +51,18 @@
 
     function normalizeMetricRows() {
         const labels = isChinese()
-            ? { total: '总资产', returns: '收益', run: '世界', day: '天数' }
-            : { total: 'TOTAL', returns: 'RETURN', run: 'WORLD', day: 'DAY' };
+            ? { total: '总资产', cash: '现金', returns: '收益', run: '世界', day: '天数' }
+            : { total: 'TOTAL', cash: 'CASH', returns: 'RETURN', run: 'WORLD', day: 'DAY' };
 
         normalizeMetricRow(
             document.querySelector('.hud-total'),
             document.getElementById('total-display'),
             labels.total,
+        );
+        normalizeMetricRow(
+            document.querySelector('.hud-cash'),
+            document.getElementById('cash-display'),
+            labels.cash,
         );
         normalizeMetricRow(
             document.querySelector('.hud-return'),
@@ -299,7 +304,7 @@
     syncSettlementComparison();
 
     observeTextNodes(
-        ['total-display', 'return-display', 'level-display', 'day-display'],
+        ['total-display', 'cash-display', 'return-display', 'level-display', 'day-display'],
         () => {
             normalizeMetricRows();
             syncLiveExcess();

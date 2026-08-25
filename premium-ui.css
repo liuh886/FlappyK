@@ -176,14 +176,15 @@ a:focus-visible {
     position: static !important;
     width: auto;
     min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    align-items: end;
     padding: 4px 12px 2px;
 }
 
 .hud-main {
-    display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1.2fr);
-    gap: 16px;
-    align-items: end;
+    display: contents;
 }
 
 .hud-stat-row {
@@ -203,11 +204,13 @@ a:focus-visible {
 }
 
 .hud-total,
+.hud-cash,
 .hud-return {
     color: #fff;
 }
 
 .hud-total > span:last-child,
+.hud-cash > span:last-child,
 .hud-return > span:last-child {
     display: block;
     overflow: hidden;
@@ -1569,6 +1572,12 @@ html[data-flappyk-language='zh'] .home-console-intro-copy {
 }
 
 html[data-flappyk-language='zh'] .hud-metric-label,
+html[data-flappyk-language='zh'] .run-progress-panel .hud-game,
+html[data-flappyk-language='zh'] .run-progress-panel .hud-day {
+    font-family: 'ZCOOL QingKe HuangYou', var(--pixel-font-ui);
+}
+
+html[data-flappyk-language='zh'] .hud-metric-label,
 html[data-flappyk-language='zh'] .excess-meter-label,
 html[data-flappyk-language='zh'] .run-progress-panel .hud-game,
 html[data-flappyk-language='zh'] .run-progress-panel .hud-day {
@@ -1607,11 +1616,9 @@ html[data-flappyk-language='zh'] .run-progress-panel .hud-day {
     }
 
     .stats-box {
-        padding: 5px 8px 4px;
-    }
-
-    .hud-main {
+        grid-template-columns: 1fr 1fr;
         gap: 8px;
+        padding: 5px 8px 4px;
     }
 
     .hud-metric-label {
@@ -1620,6 +1627,7 @@ html[data-flappyk-language='zh'] .run-progress-panel .hud-day {
     }
 
     .hud-total > span:last-child,
+    .hud-cash > span:last-child,
     .hud-return > span:last-child {
         font-size: clamp(16px, 4.2vw, 19px);
     }

@@ -19,7 +19,7 @@ All notable changes to FlappyK will be documented in this file.
 
 ### Changed
 
-- Super Mario Bros.-style HUD: the boxed rail is gone — white Press Start 2P text with a hard black outline now floats directly over the stage, laid out like the SMB1 top bar (TOTAL / RETURN / EXCESS with a × multiplier / WORLD / zero-padded DAY counter plus a thin white-bordered progress strip). Command buttons became NES tiles (black fill, white 2px border, invert on hover) across the whole UI, and the keyboard-hint card matches.
+- Super Mario Bros.-style HUD: the boxed rail is gone — white Press Start 2P text with a hard black outline now floats directly over the stage, laid out like the SMB1 top bar (TOTAL / CASH / RETURN / EXCESS with a × multiplier / WORLD / zero-padded DAY counter plus a thin white-bordered progress strip). Cash was promoted from the hidden details drawer to its own always-visible column. Command buttons became NES tiles (black fill, white 2px border, invert on hover) across the whole UI, and the keyboard-hint card matches.
 - Focus pass — the game is now a quiet stage for thinking about trading:
   - Removed the market weather system (visual layers, status chip, and its SFX); the run-progress strip is the single second-row status line.
   - Removed the home story slide mode; the home console (bezel, world strip, mode stack, footer) is the whole first screen.

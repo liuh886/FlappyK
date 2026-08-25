@@ -98,7 +98,7 @@
             .forEach((row) => row.classList.add('hud-stat-row'));
         gameRow?.classList.add('hud-game');
         dayRow?.classList.add('hud-day');
-        cashRow?.classList.add('hud-detail-row');
+        cashRow?.classList.add('hud-cash');
         assetRow?.classList.add('hud-detail-row');
         totalRow?.classList.add('hud-total');
         returnRow?.classList.add('hud-return');
@@ -110,7 +110,7 @@
 
         const main = document.createElement('div');
         main.className = 'hud-main';
-        [totalRow, returnRow].filter(Boolean).forEach((row) => main.appendChild(row));
+        [totalRow, cashRow, returnRow].filter(Boolean).forEach((row) => main.appendChild(row));
 
         const progress = document.createElement('div');
         progress.className = 'day-progress';
@@ -134,7 +134,7 @@
         const details = document.createElement('details');
         details.className = 'hud-details';
         details.innerHTML = `<summary aria-label="${t('Show cash and position details', '显示现金与持仓详情')}">•••</summary>`;
-        [cashRow, assetRow].filter(Boolean).forEach((row) => details.appendChild(row));
+        [assetRow].filter(Boolean).forEach((row) => details.appendChild(row));
 
         refs.stats.replaceChildren(header, main, progress, meter, details);
     }

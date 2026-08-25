@@ -54,8 +54,6 @@ assert.ok(cssSource.includes("'Microsoft YaHei UI'"));
 assert.ok(cssSource.includes("'Noto Sans CJK SC'"));
 assert.ok(cssSource.includes("html[lang='zh-CN'] #game-title"));
 assert.ok(cssSource.includes("html[lang='zh-CN'] .stats-box"));
-assert.ok(cssSource.includes('font-size: 15px !important'));
-assert.ok(cssSource.includes('font-size: 12px !important'));
 assert.ok(cssSource.includes('font-family: var(--font-zh-unified) !important'));
 assert.ok(!cssSource.includes('--font-zh-ui'));
 assert.ok(!cssSource.includes('--font-zh-display'));
@@ -71,6 +69,8 @@ assert.ok(pixelSource.includes('--game-accent:'));
 assert.ok(pixelSource.includes('--game-system:'));
 assert.ok(pixelSource.includes('backdrop-filter: none'));
 assert.ok(pixelSource.includes("html[data-flappyk-language='zh']"));
+assert.ok(pixelSource.includes("html[data-flappyk-language='zh'] .hud-metric-label"),
+    'Chinese HUD labels must use the pixel-flavored CJK typeface.');
 assert.ok(!pixelSource.includes('--pixel-cut:'), 'Chinese and English must share the simplified geometry without retired clipped-corner styling.');
 
 console.log('Chinese-English i18n, unified typography, and canonical single-surface visual ownership checks passed');

@@ -125,12 +125,6 @@ html[lang='zh-CN'] #start-screen > p {
     line-height: 1.7;
 }
 
-html[lang='zh-CN'] .stats-box {
-    min-width: 224px;
-    font-size: 15px !important;
-    line-height: 1.55;
-}
-
 html[lang='zh-CN'] .controls-hint {
     font-size: 14px;
     line-height: 1.55;
@@ -214,11 +208,6 @@ html[lang='zh-CN'] #speed-btn {
         line-height: 1.6;
     }
 
-    html[lang='zh-CN'] .stats-box {
-        font-size: 12px !important;
-        line-height: 1.5;
-    }
-
     html[lang='zh-CN'] .local-records-summary,
     html[lang='zh-CN'] .daily-run-summary,
     html[lang='zh-CN'] .friend-challenge-invite,
@@ -256,10 +245,6 @@ html[lang='zh-CN'] #speed-btn {
 @media (max-width: 380px) {
     html[lang='zh-CN'] #start-screen > p {
         font-size: 13px;
-    }
-
-    html[lang='zh-CN'] .stats-box {
-        font-size: 12px !important;
     }
 
     html[lang='zh-CN'] .screen button,
