@@ -151,7 +151,7 @@ test('mobile command dock centers tactile trade actions while the HUD stays one 
       railBackground: getComputedStyle(rail).backgroundColor,
       statsBackground: getComputedStyle(stats).backgroundColor,
       runBackground: getComputedStyle(run).backgroundColor,
-      railShadow: getComputedStyle(rail).boxShadow,
+      labelOutline: getComputedStyle(document.querySelector('.hud-metric-label')).textShadow,
       buyShadow: getComputedStyle(buyNode).boxShadow,
       sellShadow: getComputedStyle(sellNode).boxShadow,
       buyFont: parseFloat(getComputedStyle(buyNode).fontSize),
@@ -163,10 +163,8 @@ test('mobile command dock centers tactile trade actions while the HUD stays one 
   expect(layout.bollRight).toBeLessThan(layout.buyLeft);
   expect(layout.macdLeft).toBeGreaterThan(layout.sellRight);
   expect(layout.powerVerticalDelta).toBeLessThan(20);
-  expect(alphaFromCssColor(layout.railBackground)).toBeGreaterThan(0.8);
-  expect(alphaFromCssColor(layout.statsBackground)).toBeLessThan(0.1);
-  expect(alphaFromCssColor(layout.runBackground)).toBeLessThan(0.1);
-  expect(layout.railShadow).not.toBe('none');
+  expect(alphaFromCssColor(layout.railBackground)).toBeLessThan(0.1);
+  expect(layout.labelOutline).toContain('rgb(0, 0, 0)');
   expect(layout.buyShadow).not.toBe('none');
   expect(layout.sellShadow).not.toBe('none');
   expect(layout.buyFont).toBeGreaterThanOrEqual(17);

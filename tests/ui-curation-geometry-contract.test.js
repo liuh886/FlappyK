@@ -23,7 +23,7 @@ for (const visualContract of [
   'backdrop-filter: none',
   'box-shadow: 7px 7px 0 #8e7520',
   'box-shadow: 5px 5px 0 var(--game-depth)',
-  'border-right: 1px solid var(--game-border)',
+  'text-shadow: var(--pixel-outline)',
   'steps(2, end)',
 ]) {
   assert.ok(canonical.includes(visualContract), `Missing hard-edged Pixel Market Arcade visual contract: ${visualContract}`);

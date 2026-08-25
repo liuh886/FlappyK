@@ -716,7 +716,7 @@ function updateUI() {
     const total = cash + assetValue;
     const ret = (total - INITIAL_CASH) / INITIAL_CASH * 100;
 
-    if (dayDisp) dayDisp.innerText = (dayIndex + 1);
+    if (dayDisp) dayDisp.innerText = String(dayIndex + 1).padStart(3, '0');
     cashDisp.innerText = cash.toFixed(2);
     assetDisp.innerText = assetValue.toFixed(2);
     totalDisp.innerText = total.toFixed(2);

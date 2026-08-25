@@ -141,21 +141,8 @@ a:focus-visible {
     gap: 0;
     align-items: stretch;
     overflow: hidden;
-    border: 2px solid var(--game-border-strong);
-    background: var(--game-bg);
-    box-shadow: 5px 5px 0 var(--game-depth);
-    pointer-events: none;
-}
-
-#game-hud-rail::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 2;
-    width: 84px;
-    height: 4px;
-    background: var(--game-system);
+    --pixel-outline: 2px 0 0 #000, -2px 0 0 #000, 0 2px 0 #000, 0 -2px 0 #000,
+        1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000;
     pointer-events: none;
 }
 
@@ -189,15 +176,13 @@ a:focus-visible {
     position: static !important;
     width: auto;
     min-width: 0;
-    padding: 6px 10px 5px;
-    border-right: 1px solid var(--game-border);
-    border-bottom: 1px solid var(--game-border);
+    padding: 4px 12px 2px;
 }
 
 .hud-main {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 18px;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: 16px;
     align-items: end;
 }
 
@@ -207,30 +192,33 @@ a:focus-visible {
 
 .hud-metric-label {
     display: block;
-    margin-bottom: 2px;
-    color: var(--game-muted);
+    margin-bottom: 3px;
+    color: #fff;
+    font-family: var(--pixel-font-display);
     font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.11em;
+    font-weight: 400;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
+    text-shadow: var(--pixel-outline);
 }
 
 .hud-total,
 .hud-return {
-    color: var(--game-text);
+    color: #fff;
 }
 
 .hud-total > span:last-child,
 .hud-return > span:last-child {
     display: block;
     overflow: hidden;
-    color: var(--game-text);
+    color: #fff;
     font-family: var(--pixel-font-display);
     font-size: clamp(18px, 1.45vw, 21px);
     line-height: 1.1;
     text-overflow: ellipsis;
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
+    text-shadow: var(--pixel-outline);
 }
 
 .hud-return .positive,
@@ -254,10 +242,12 @@ a:focus-visible {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    color: var(--game-muted);
+    color: #fff;
+    font-family: var(--pixel-font-display);
     font-size: 10px;
-    font-weight: 700;
+    font-weight: 400;
     letter-spacing: 0.08em;
+    text-shadow: var(--pixel-outline);
 }
 
 .excess-meter-label strong {
@@ -266,6 +256,11 @@ a:focus-visible {
     font-size: 11px;
     font-weight: 400;
     font-variant-numeric: tabular-nums;
+}
+
+.excess-meter-label strong::before {
+    content: '×';
+    margin-right: 2px;
 }
 
 .excess-meter[data-leading='true'] .excess-meter-label strong {
@@ -277,8 +272,8 @@ a:focus-visible {
     height: 8px;
     margin-top: 4px;
     overflow: hidden;
-    border: 2px solid var(--game-border-strong);
-    background: #030507;
+    border: 2px solid #fff;
+    background: #000;
 }
 
 .excess-meter-negative,
@@ -297,7 +292,7 @@ a:focus-visible {
     position: absolute;
     inset: -2px auto -2px 50%;
     width: 2px;
-    background: var(--game-text);
+    background: #fff;
 }
 
 .excess-meter-indicator {
@@ -306,7 +301,7 @@ a:focus-visible {
     left: 50%;
     width: 8px;
     height: 13px;
-    border: 2px solid var(--game-bg);
+    border: 2px solid #000;
     background: var(--game-red);
     transform: translate(-50%, -50%);
     transition: left 120ms linear, background 70ms linear;
@@ -320,10 +315,10 @@ a:focus-visible {
     position: static !important;
     display: grid;
     grid-template-columns: auto auto minmax(100px, 1fr) auto;
-    gap: 6px;
+    gap: 10px;
     align-items: center;
     min-width: 0;
-    padding: 4px 10px;
+    padding: 2px 12px 4px;
 }
 
 .run-progress-panel .hud-header {
@@ -335,10 +330,12 @@ a:focus-visible {
     display: flex;
     align-items: baseline;
     gap: 6px;
-    color: var(--game-text);
+    color: #fff;
+    font-family: var(--pixel-font-display);
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 400;
     white-space: nowrap;
+    text-shadow: var(--pixel-outline);
 }
 
 .run-progress-panel .hud-metric-label {
@@ -353,15 +350,15 @@ a:focus-visible {
     grid-row: 1;
     height: 7px;
     overflow: hidden;
-    border: 2px solid var(--game-border);
-    background: #030507;
+    border: 2px solid #fff;
+    background: #000;
 }
 
 .day-progress-fill {
     display: block;
     width: 0;
     height: 100%;
-    background: var(--game-system);
+    background: #fff;
     transition: width 120ms linear;
 }
 
@@ -370,16 +367,15 @@ a:focus-visible {
     display: none !important;
 }
 
-/* ---------- Unified command buttons ---------- */
+/* ---------- Unified command buttons: NES tiles ---------- */
 
 #game-top-controls {
     position: static !important;
     display: grid;
     grid-template-columns: minmax(132px, 1fr) 48px 48px 56px 48px;
-    gap: 0;
+    gap: 4px;
     align-items: stretch;
-    padding: 0;
-    border-bottom: 1px solid var(--game-border);
+    padding: 4px 0 0 12px;
 }
 
 #game-top-controls[hidden] {
@@ -390,7 +386,7 @@ a:focus-visible {
 .mobile-speed-control {
     display: grid;
     grid-template-columns: 40px minmax(52px, 1fr) 40px;
-    gap: 0;
+    gap: 4px;
     align-items: stretch;
 }
 
@@ -408,11 +404,10 @@ a:focus-visible {
 .settlement-actions button,
 .legend-actions button {
     min-width: 0;
-    border: 0;
-    border-left: 1px solid var(--game-border);
+    border: 2px solid #fff;
     border-radius: 0;
-    background: transparent;
-    color: var(--game-muted);
+    background: #000;
+    color: #fff;
 }
 
 .speed-step,
@@ -424,11 +419,12 @@ a:focus-visible {
     padding: 0;
     font-family: var(--pixel-font-display);
     font-size: 11px;
+    text-shadow: none;
 }
 
 #game-skin-toggle-btn {
     overflow: hidden;
-    color: var(--game-accent);
+    color: #fff;
     font-size: 8px;
     letter-spacing: 0.02em;
     text-overflow: ellipsis;
@@ -448,16 +444,16 @@ a:focus-visible {
 .onboarding-panel button:hover,
 .settlement-actions button:hover,
 .legend-actions button:hover {
-    background: var(--game-surface-active);
-    color: var(--game-text);
+    background: #fff;
+    color: #000;
 }
 
 .speed-readout {
     display: grid;
     place-items: center;
-    border-left: 1px solid var(--game-border);
-    background: var(--game-surface);
-    color: var(--game-accent);
+    border: 2px solid #fff;
+    background: #000;
+    color: #fff;
     font-family: var(--pixel-font-display);
     font-size: 11px;
     font-variant-numeric: tabular-nums;
@@ -471,8 +467,8 @@ a:focus-visible {
     display: grid;
     width: 240px;
     overflow: hidden;
-    border: 2px solid var(--game-border-strong);
-    background: var(--game-bg);
+    border: 2px solid #fff;
+    background: #000;
     box-shadow: 4px 4px 0 var(--game-depth);
     transition: opacity var(--motion-step-base) steps(2, end);
 }
@@ -495,27 +491,27 @@ a:focus-visible {
     gap: 8px;
     min-width: 0;
     padding: 8px 9px;
-    color: var(--game-muted);
+    color: #fff;
     font-size: 12px;
     white-space: nowrap;
 }
 
 .trade-key-hint + .trade-key-hint {
-    border-left: 1px solid var(--game-border);
+    border-left: 1px solid #fff;
 }
 
 .trade-key-hint .key {
     min-width: 30px;
     padding: 3px 4px;
-    border: 2px solid var(--game-border-strong);
-    background: var(--game-surface-raised);
-    color: var(--game-text);
+    border: 2px solid #fff;
+    background: #000;
+    color: #fff;
     box-shadow: 2px 2px 0 var(--game-depth);
     text-align: center;
 }
 
 .desktop-speed-control {
-    border-top: 1px solid var(--game-border);
+    border-top: 0;
 }
 
 #speed-btn[hidden] {

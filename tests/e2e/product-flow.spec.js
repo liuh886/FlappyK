@@ -103,7 +103,7 @@ test('first launch teaches by doing, exposes Excess, and pause freezes progressi
   await expect(page.locator('#pause-btn')).toHaveAttribute('aria-pressed', 'true');
   const pausedDay = Number(await page.locator('#day-display').textContent());
   await page.waitForTimeout(750);
-  await expect(page.locator('#day-display')).toHaveText(String(pausedDay));
+  await expect(page.locator('#day-display')).toHaveText(String(pausedDay).padStart(3, '0'));
   await expect(page.locator('html')).toHaveAttribute('data-ui-state', 'paused');
 
   await page.locator('#pause-btn').click();

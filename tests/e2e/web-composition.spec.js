@@ -93,8 +93,10 @@ test('desktop keeps the chart dominant with one readable two-row Market Arcade c
       metricsFit: metricNodes.every((node) => node.scrollWidth <= node.clientWidth + 1),
       statsRadius: style('.stats-box').borderRadius,
       statsBackdrop: style('.stats-box').backdropFilter,
-      railShadow: style('#game-hud-rail').boxShadow,
+      railBackground: style('#game-hud-rail').backgroundColor,
+      labelOutline: style('.hud-metric-label').textShadow,
       controlRadius: style('#pause-btn').borderRadius,
+      controlBorder: style('#pause-btn').borderColor,
       hintRadius: style('.controls-hint').borderRadius,
       hintShadow: style('.controls-hint').boxShadow,
       labelSize: parseFloat(style('.hud-metric-label').fontSize),
@@ -111,8 +113,10 @@ test('desktop keeps the chart dominant with one readable two-row Market Arcade c
   expect(layout.metricsFit).toBe(true);
   expect(layout.statsRadius).toBe('0px');
   expect(layout.statsBackdrop).toBe('none');
-  expect(layout.railShadow).not.toBe('none');
+  expect(layout.railBackground).toBe('rgba(0, 0, 0, 0)');
+  expect(layout.labelOutline).toContain('rgb(0, 0, 0)');
   expect(layout.controlRadius).toBe('0px');
+  expect(layout.controlBorder).toBe('rgb(255, 255, 255)');
   expect(layout.hintRadius).toBe('0px');
   expect(layout.hintShadow).not.toBe('none');
   expect(layout.labelSize).toBeGreaterThanOrEqual(11);

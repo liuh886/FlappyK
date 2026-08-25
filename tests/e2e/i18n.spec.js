@@ -175,7 +175,7 @@ test('Chinese mobile gameplay keeps one typeface and readable controls', async (
   await expect(page.locator('#game-back-btn')).toHaveText('↩');
   await expect(page.locator('#game-back-btn')).toHaveAttribute('aria-label', '返回首页');
 
-  await expect(page.locator('.hud-game .hud-metric-label')).toHaveText('局数');
+  await expect(page.locator('.hud-game .hud-metric-label')).toHaveText('世界');
   await expect(page.locator('.hud-day .hud-metric-label')).toHaveText('天数');
   await expect(page.locator('#level-display')).toHaveText(/^1$/);
   await expect(page.locator('#run-progress-panel')).not.toContainText('局数：');

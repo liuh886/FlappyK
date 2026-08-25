@@ -51,8 +51,8 @@
 
     function normalizeMetricRows() {
         const labels = isChinese()
-            ? { total: '总资产', returns: '收益', run: '局数', day: '天数' }
-            : { total: 'TOTAL', returns: 'RETURN', run: 'RUN', day: 'DAY' };
+            ? { total: '总资产', returns: '收益', run: '世界', day: '天数' }
+            : { total: 'TOTAL', returns: 'RETURN', run: 'WORLD', day: 'DAY' };
 
         normalizeMetricRow(
             document.querySelector('.hud-total'),

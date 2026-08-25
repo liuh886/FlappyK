@@ -98,7 +98,7 @@ html[data-virtual-controls='true'] #game-top-controls {
     align-self: start;
     justify-self: end;
     grid-template-columns: 44px 44px 44px;
-    width: 132px;
+    width: 140px;
     height: 44px;
     min-height: 44px;
 }

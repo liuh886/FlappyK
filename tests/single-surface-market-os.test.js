@@ -26,7 +26,6 @@ for (const contract of [
   '--game-system:',
   '--game-depth:',
   '#game-hud-rail',
-  '#game-hud-rail::before',
   "'performance controls'",
   "'progress progress'",
   ".stats-box[data-composition='returns-only']",

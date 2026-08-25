@@ -29,7 +29,6 @@ for (const contract of [
 }
 
 assert.ok(canonicalUi.includes('gap: 0;'), 'The HUD should read as one continuous command surface.');
-assert.ok(canonicalUi.includes('border-right: 1px solid var(--game-border);'), 'HUD hierarchy should use separators rather than independent cards.');
 assert.ok(!canonicalUi.includes('--game-yellow:'), 'The retired generic yellow token must not return; primary action uses --game-accent.');
 
 assert.ok(refinementJs.includes("rail.appendChild(element)"), 'HUD must keep the existing shared rail composition.');
