@@ -56,7 +56,11 @@ test('phone gameplay reserves the command dock and one tap creates one trade', a
   expect(geometry.soundDisplay).not.toBe('missing');
   expect(geometry.skinDisplay).toBe('none');
 
-  const before = await page.evaluate(() => window.FlappyKGame.getState());
+  const before = await page.evaluate(() => {
+    const state = window.FlappyKGame.getState();
+    window.FlappyKGame.changeSpeed(1 - state.speedMultiplier);
+    return window.FlappyKGame.getState();
+  });
   await page.locator('#btn-buy').click();
   const afterBuy = await page.evaluate(() => window.FlappyKGame.getState());
   expect(afterBuy.cash).toBeCloseTo(before.cash - 1001, 6);
