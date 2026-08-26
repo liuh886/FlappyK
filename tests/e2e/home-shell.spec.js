@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const { mockSharedAccount } = require('./account-fixture');
 
 async function preparePage(page) {
   await page.route('https://fonts.googleapis.com/**', (route) => route.abort());
@@ -9,15 +10,11 @@ async function preparePage(page) {
     contentType: 'application/javascript',
     body: 'window.html2canvas = async () => document.createElement("canvas");',
   }));
-
+  await mockSharedAccount(page);
   await page.addInitScript(() => {
     window.localStorage.setItem('flappyk_onboarding_seen_v1', '1');
     class SilentAudioContext {
-      constructor() {
-        this.currentTime = 0;
-        this.state = 'running';
-        this.destination = {};
-      }
+      constructor() { this.currentTime = 0; this.state = 'running'; this.destination = {}; }
       createOscillator() {
         return {
           type: 'square',
@@ -119,22 +116,44 @@ for (const viewport of [
     expect(home.playRadius).toBe('0px');
     expect(home.playShadow).not.toBe('none');
     expect(home.playBackground).not.toBe('rgba(0, 0, 0, 0)');
-    expect(home.playFont).toBeGreaterThanOrEqual(viewport.name === 'mobile' ? 20 : 20);
+    expect(home.playFont).toBeGreaterThanOrEqual(20);
 
     await page.getByRole('button', { name: 'PLAY', exact: true }).click();
     await expect(page.locator('html')).toHaveAttribute('data-ui-state', 'playing');
     await expect(page.locator('#game-hud-rail')).toBeVisible();
-    await expect.poll(() => page.locator('#game-canvas').getAttribute('width')).toBe(String(viewport.width));
-    await expect.poll(() => page.locator('#game-canvas').getAttribute('height')).toBe(String(viewport.height));
+
+    await expect.poll(() => page.evaluate(() => {
+      const canvas = document.getElementById('game-canvas');
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.max(1, Number(window.devicePixelRatio) || 1);
+      return {
+        width: canvas.width,
+        height: canvas.height,
+        expectedWidth: Math.round(rect.width * dpr),
+        expectedHeight: Math.round(rect.height * dpr),
+      };
+    })).toEqual(expect.objectContaining({
+      width: viewport.width,
+      expectedWidth: viewport.width,
+    }));
 
     const gameplay = await page.evaluate(() => {
       const container = document.getElementById('game-container').getBoundingClientRect();
+      const canvas = document.getElementById('game-canvas');
+      const canvasRect = canvas.getBoundingClientRect();
+      const dock = document.getElementById('mobile-controls');
+      const dockRect = dock && !dock.hidden ? dock.getBoundingClientRect() : null;
+      const dpr = Math.max(1, Number(window.devicePixelRatio) || 1);
       return {
         left: container.left,
         top: container.top,
         width: container.width,
         height: container.height,
         border: getComputedStyle(document.getElementById('game-container')).borderTopWidth,
+        canvasHeight: canvas.height,
+        expectedCanvasHeight: Math.round(canvasRect.height * dpr),
+        canvasBottom: canvasRect.bottom,
+        dockTop: dockRect?.top ?? null,
       };
     });
 
@@ -143,5 +162,13 @@ for (const viewport of [
     expect(Math.abs(gameplay.width - viewport.width)).toBeLessThanOrEqual(1);
     expect(Math.abs(gameplay.height - viewport.height)).toBeLessThanOrEqual(1);
     expect(gameplay.border).toBe('0px');
+    expect(gameplay.canvasHeight).toBe(gameplay.expectedCanvasHeight);
+    if (viewport.name === 'desktop') {
+      expect(gameplay.canvasHeight).toBe(viewport.height);
+    } else {
+      expect(gameplay.canvasHeight).toBeLessThan(viewport.height);
+      expect(gameplay.dockTop).not.toBeNull();
+      expect(gameplay.canvasBottom).toBeLessThanOrEqual(gameplay.dockTop + 2);
+    }
   });
 }

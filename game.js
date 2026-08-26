@@ -685,28 +685,28 @@ soundToggleBtn?.addEventListener('click', () => toggleSound());
 document.addEventListener('flappyk:language-changed', applySoundControl);
 applySoundControl();
 
-// Mobile / Virtual Buttons Handling
+// Virtual controls use one activation path for touch, mouse and keyboard.
 const btnBuy = document.getElementById('btn-buy');
 const btnSell = document.getElementById('btn-sell');
 const btnSpeedUp = document.getElementById('btn-speed-up');
 const btnSpeedDown = document.getElementById('btn-speed-down');
 
-if (btnBuy) {
-    btnBuy.addEventListener('touchstart', (e) => { e.preventDefault(); handleBuy(); });
-    btnBuy.addEventListener('mousedown', (e) => { e.preventDefault(); handleBuy(); });
-}
-if (btnSell) {
-    btnSell.addEventListener('touchstart', (e) => { e.preventDefault(); handleSell(); });
-    btnSell.addEventListener('mousedown', (e) => { e.preventDefault(); handleSell(); });
-}
-if (btnSpeedUp) {
-    btnSpeedUp.addEventListener('touchstart', (e) => { e.preventDefault(); changeSpeed(1); });
-    btnSpeedUp.addEventListener('mousedown', (e) => { e.preventDefault(); changeSpeed(1); });
-}
-if (btnSpeedDown) {
-    btnSpeedDown.addEventListener('touchstart', (e) => { e.preventDefault(); changeSpeed(-1); });
-    btnSpeedDown.addEventListener('mousedown', (e) => { e.preventDefault(); changeSpeed(-1); });
-}
+btnBuy?.addEventListener('click', (event) => {
+    event.preventDefault();
+    handleBuy();
+});
+btnSell?.addEventListener('click', (event) => {
+    event.preventDefault();
+    handleSell();
+});
+btnSpeedUp?.addEventListener('click', (event) => {
+    event.preventDefault();
+    changeSpeed(1);
+});
+btnSpeedDown?.addEventListener('click', (event) => {
+    event.preventDefault();
+    changeSpeed(-1);
+});
 
 function updateUI() {
     if (!currentData || !currentData[dayIndex]) return;
