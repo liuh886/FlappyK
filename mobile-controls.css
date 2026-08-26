@@ -105,17 +105,29 @@ html[data-virtual-controls='true'] #game-top-controls {
 
 html[data-virtual-controls='true'] #game-top-controls #game-back-btn,
 html[data-virtual-controls='true'] #game-top-controls #pause-btn,
-html[data-virtual-controls='true'] #game-top-controls #game-skin-toggle-btn {
+html[data-virtual-controls='true'] #game-top-controls #sound-toggle-btn {
     width: 44px;
     min-width: 44px;
     height: 44px;
     min-height: 44px;
 }
 
+/* On touch, keep the three controls that affect the current run. Skin switching is secondary. */
+html[data-virtual-controls='true'] body #game-container #game-top-controls #sound-toggle-btn {
+    display: block !important;
+}
+
+html[data-virtual-controls='true'] body #game-container #game-top-controls #game-skin-toggle-btn {
+    display: none !important;
+}
+
+/*
+ * The command dock owns the bottom strip. Shrink the canvas instead of adding a margin:
+ * margins do not reduce the canvas drawing box and allowed PLAYER EQUITY to render behind the dock.
+ */
 html[data-virtual-controls='true'][data-ui-state='playing'] #game-canvas,
 html[data-virtual-controls='true'][data-ui-state='paused'] #game-canvas {
-    margin-bottom: 102px;
-    margin-bottom: calc(102px + env(safe-area-inset-bottom));
+    height: calc(100% - 102px - env(safe-area-inset-bottom));
 }
 
 @media (max-width: 1024px) {
@@ -180,8 +192,7 @@ html[data-virtual-controls='true'][data-ui-state='paused'] #game-canvas {
 
     html[data-virtual-controls='true'][data-ui-state='playing'] #game-canvas,
     html[data-virtual-controls='true'][data-ui-state='paused'] #game-canvas {
-        margin-bottom: 94px;
-        margin-bottom: calc(94px + env(safe-area-inset-bottom));
+        height: calc(100% - 94px - env(safe-area-inset-bottom));
     }
 }
 
@@ -224,7 +235,6 @@ html[data-virtual-controls='true'][data-ui-state='paused'] #game-canvas {
 
     html[data-virtual-controls='true'][data-ui-state='playing'] #game-canvas,
     html[data-virtual-controls='true'][data-ui-state='paused'] #game-canvas {
-        margin-bottom: 86px;
-        margin-bottom: calc(86px + env(safe-area-inset-bottom));
+        height: calc(100% - 86px - env(safe-area-inset-bottom));
     }
 }
