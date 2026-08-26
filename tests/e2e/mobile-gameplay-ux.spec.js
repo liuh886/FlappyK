@@ -1,6 +1,8 @@
 const { test, expect } = require('@playwright/test');
 const { mockSharedAccount } = require('./account-fixture');
 
+test.use({ hasTouch: true });
+
 async function preparePage(page) {
   await page.route('https://fonts.googleapis.com/**', (route) => route.abort());
   await page.route('https://fonts.gstatic.com/**', (route) => route.abort());
@@ -35,7 +37,7 @@ test('phone gameplay reserves the command dock and one tap creates one trade', a
   await page.setViewportSize({ width: 390, height: 844 });
   await preparePage(page);
   await page.goto('/');
-  await page.getByRole('button', { name: 'PLAY', exact: true }).click();
+  await page.getByRole('button', { name: 'PLAY', exact: true }).tap();
   await expect(page.locator('#mobile-controls')).toBeVisible();
 
   const geometry = await page.evaluate(() => {
@@ -61,12 +63,12 @@ test('phone gameplay reserves the command dock and one tap creates one trade', a
     window.FlappyKGame.changeSpeed(1 - state.speedMultiplier);
     return window.FlappyKGame.getState();
   });
-  await page.locator('#btn-buy').click();
+  await page.locator('#btn-buy').tap();
   const afterBuy = await page.evaluate(() => window.FlappyKGame.getState());
   expect(afterBuy.cash).toBeCloseTo(before.cash - 1001, 6);
   expect(afterBuy.shares).toBeGreaterThan(before.shares);
 
-  await page.locator('#btn-sell').click();
+  await page.locator('#btn-sell').tap();
   const afterSell = await page.evaluate(() => window.FlappyKGame.getState());
   expect(afterSell.cash).toBeCloseTo(before.cash - 2, 6);
   expect(afterSell.shares).toBeCloseTo(before.shares, 6);
