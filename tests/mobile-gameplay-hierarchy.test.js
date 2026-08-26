@@ -32,7 +32,7 @@ for (const contract of [
   'width: 44px',
   'height: 44px',
   "data-ui-state='playing'",
-  'margin-bottom: 102px',
+  'height: calc(100% - 102px - env(safe-area-inset-bottom))',
 ]) {
   assert.ok(mobile.includes(contract), `Missing mobile gameplay hierarchy contract: ${contract}`);
 }
@@ -43,6 +43,7 @@ assert.ok(premium.includes('#btn-sell'));
 assert.ok(!mobile.includes('opacity: 0.68'), 'Mobile geometry must not encode visual hierarchy through opacity.');
 assert.ok(!mobile.includes('background: rgba(6, 12, 20'), 'Mobile geometry must not own HUD translucency.');
 assert.ok(!mobile.includes('top: calc(max(6px, env(safe-area-inset-top)) + 88px)'), 'Speed must not float over the market canvas.');
+assert.ok(!mobile.includes('margin-bottom: 102px'), 'The fixed dock must reduce the canvas drawing box instead of overlaying a full-height stage.');
 
 for (const contract of [
   'right: max(6px, env(safe-area-inset-right))',
@@ -72,4 +73,4 @@ assert.ok(!mobile.includes('grid-template-columns: 88px minmax(106px, 1fr) 88px'
 assert.ok(!mobile.includes(":has(#indicator-card-deck:not([hidden])) #game-canvas"), 'Power-ups must not reserve a separate tray above the mobile command dock.');
 assert.ok(!cards.includes('width: min(248px, calc(100% - 28px))'), 'The previous oversized mobile tactical tray must not return.');
 
-console.log('State-driven touch geometry, dock-contained speed, 44px navigation, tactile pixel power-ups, and always-visible settlement identity contracts passed.');
+console.log('State-driven touch geometry, dock-contained speed, reserved canvas stage, 44px navigation, tactile pixel power-ups, and always-visible settlement identity contracts passed.');
