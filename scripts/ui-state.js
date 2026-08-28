@@ -8,9 +8,6 @@
         PAUSED: 'paused',
         SETTLEMENT: 'settlement',
         RUN_COMPLETE: 'run-complete',
-        LEADERBOARD: 'leaderboard',
-        ACCOUNT: 'account',
-        CUSTOM_SELECT: 'custom-select',
     });
 
     const root = document.documentElement;
@@ -76,38 +73,13 @@
         });
     }
 
-    function isActive(selector) {
-        return document.querySelector(selector)?.classList.contains('active') || false;
-    }
+    const controller = window.FlappyKGameController;
+    controller?.on('level-did-start', () => transition(STATES.PLAYING, { source: 'controller' }));
+    controller?.on('level-will-settle', () => transition(STATES.SETTLEMENT, { source: 'controller' }));
 
-    function inferFromDom() {
-        const accountBackdrop = document.querySelector('.membership-backdrop');
-        if (accountBackdrop && !accountBackdrop.hidden) return transition(STATES.ACCOUNT, { source: 'dom' });
-        if (document.querySelector('.game-coachmark[data-active="true"]')) {
-            return transition(STATES.ONBOARDING, { source: 'dom' });
-        }
-        if (isActive('#leaderboard-screen')) return transition(STATES.LEADERBOARD, { source: 'dom' });
-        if (isActive('#custom-challenge-screen')) return transition(STATES.CUSTOM_SELECT, { source: 'dom' });
-        if (isActive('#settlement-screen')) return transition(STATES.SETTLEMENT, { source: 'dom' });
-        if (isActive('#champagne-screen')) return transition(STATES.RUN_COMPLETE, { source: 'dom' });
-
-        const pacing = window.FlappyKPacing;
-        if (pacing?.paused) return transition(STATES.PAUSED, { source: 'pacing' });
-        if (pacing?.active || container?.classList.contains('game-active')) {
-            return transition(STATES.PLAYING, { source: 'pacing' });
-        }
-        return transition(STATES.HOME, { source: 'dom' });
-    }
-
-    const observer = new MutationObserver(() => {
-        computeLayout();
-        inferFromDom();
-    });
-    observer.observe(document.body, {
-        subtree: true,
-        childList: true,
-        attributes: true,
-        attributeFilter: ['class', 'hidden', 'aria-pressed', 'data-active'],
+    window.addEventListener('flappyk:game-reset', () => transition(STATES.HOME, { source: 'controller' }));
+    document.getElementById('champagne-btn')?.addEventListener('click', () => {
+        transition(STATES.RUN_COMPLETE, { source: 'run-complete-action' });
     });
 
     if (window.ResizeObserver && container) {
@@ -118,7 +90,7 @@
     window.visualViewport?.addEventListener('resize', computeLayout);
 
     computeLayout();
-    inferFromDom();
+    transition(STATES.HOME, { source: 'init' });
 
     window.FlappyKUiState = {
         STATES,
@@ -127,7 +99,6 @@
         get input() { return input; },
         get virtualControls() { return virtualControls; },
         transition,
-        sync: inferFromDom,
         refreshLayout: computeLayout,
     };
 })();
