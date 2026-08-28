@@ -3,7 +3,8 @@ const fs = require('node:fs');
 
 const hardeningJs = fs.readFileSync('core-hardening.js', 'utf8');
 const gameJs = fs.readFileSync('game.js', 'utf8');
-const refinementJs = fs.readFileSync('scripts/premium-ui-refinement.js', 'utf8');
+const index = fs.readFileSync('index.html', 'utf8');
+const premiumUi = fs.readFileSync('scripts/premium-ui.js', 'utf8');
 const canonicalCss = fs.readFileSync('premium-ui.css', 'utf8');
 const mobileCss = fs.readFileSync('mobile-controls.css', 'utf8');
 const baseStyles = fs.readFileSync('style.css', 'utf8');
@@ -18,16 +19,21 @@ assert.ok(!gameJs.includes('`${level}/3`'));
 // Settlement title normalization now lives in the hardening subscriber.
 assert.ok(hardeningJs.includes("title.textContent = 'PROFIT CARD'"));
 
-assert.ok(!refinementJs.includes('canvasElement.width ='));
-assert.ok(!refinementJs.includes('canvasElement.height ='));
-assert.ok(!refinementJs.includes('syncCanvasLayout'));
 assert.ok(gameJs.includes('window.devicePixelRatio'));
 assert.ok(gameJs.includes('ctx.setTransform(dpr, 0, 0, dpr, 0, 0)'));
-assert.ok(refinementJs.includes("const HUD_RAIL_ID = 'game-hud-rail'"));
-assert.ok(refinementJs.includes('function ensureHudRail()'));
-assert.ok(refinementJs.includes("runPanel.id = 'run-progress-panel'"));
-assert.ok(refinementJs.includes('usesVirtualControls()'));
-assert.ok(!refinementJs.includes('style.textContent = `'));
+for (const sourceContract of [
+  'id="game-hud-rail"',
+  'id="run-progress-panel"',
+  'id="game-top-controls"',
+  'id="mobile-controls"',
+]) {
+  assert.ok(index.includes(sourceContract), `Canonical source composition is missing ${sourceContract}`);
+}
+assert.ok(!index.includes('premium-ui-refinement.js'));
+for (const retiredRuntimePath of ['ensureHudRail', 'syncCanvasLayout', 'installPixelCompatibilityStyles']) {
+  assert.ok(!premiumUi.includes(retiredRuntimePath), `Runtime composition path must stay deleted: ${retiredRuntimePath}`);
+}
+assert.ok(!premiumUi.includes('style.textContent = `'));
 
 for (const contract of [
   'FLAPPY K / SINGLE-SURFACE MARKET OS',
@@ -72,6 +78,7 @@ for (const mobileContract of [
   'grid-template-columns: minmax(36px, 1fr) 78px 108px 78px minmax(36px, 1fr);',
   'grid-column: 3;',
   'grid-template-columns: 44px 44px 44px;',
+  '@media (orientation: landscape) and (max-height: 500px)',
 ]) {
   assert.ok(mobileCss.includes(mobileContract), `Missing mobile feature geometry contract: ${mobileContract}`);
 }
@@ -108,4 +115,4 @@ assert.ok(!serviceWorker.includes("'./scripts/market-weather.js'"));
 assert.ok(!serviceWorker.includes("'./home-story.css'"));
 assert.ok(!/flappyk-(?:app|runtime)-v\d+/.test(serviceWorker));
 
-console.log('Single-Surface Market OS has one shared CSS owner, dock-contained runtime touch geometry, stable DOM composition, a quiet stage, account placement, responsive state, and stable PWA cache contracts.');
+console.log('Single-Surface Market OS has source-owned DOM, one shared CSS owner, dock-contained touch geometry, account placement, responsive state, and stable PWA cache contracts.');
