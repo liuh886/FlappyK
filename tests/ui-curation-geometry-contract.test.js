@@ -4,7 +4,8 @@ const fs = require('node:fs');
 const canonical = fs.readFileSync('premium-ui.css', 'utf8');
 const mobile = fs.readFileSync('mobile-controls.css', 'utf8');
 const base = fs.readFileSync('style.css', 'utf8');
-const refinementJs = fs.readFileSync('scripts/premium-ui-refinement.js', 'utf8');
+const index = fs.readFileSync('index.html', 'utf8');
+const premiumUi = fs.readFileSync('scripts/premium-ui.js', 'utf8');
 
 for (const structuralContract of [
   'grid-template-rows: minmax(0, 1fr)',
@@ -39,8 +40,18 @@ for (const mobileContract of [
   'grid-template-columns: minmax(36px, 1fr) 78px 108px 78px minmax(36px, 1fr);',
   'grid-column: 3;',
   'grid-template-columns: 44px 44px 44px;',
+  '@media (orientation: landscape) and (max-height: 500px)',
 ]) {
   assert.ok(mobile.includes(mobileContract), `Missing feature-owned mobile geometry contract: ${mobileContract}`);
+}
+
+for (const sourceContract of [
+  'id="game-hud-rail"',
+  'id="run-progress-panel"',
+  'id="game-top-controls"',
+  'id="mobile-controls"',
+]) {
+  assert.ok(index.includes(sourceContract), `Canonical geometry structure must live in index.html: ${sourceContract}`);
 }
 
 assert.ok(!canonical.includes('#mobile-controls:not([hidden]) {'), 'premium-ui.css must not take over command-dock positioning.');
@@ -57,7 +68,8 @@ assert.ok(!base.includes('.profit-card'), 'Base CSS must not regain settlement p
 assert.ok(!mobile.includes('#settlement-screen.active'), 'Mobile geometry must not own settlement composition.');
 assert.ok(!mobile.includes('#game-hud-rail .weather-status'), 'Mobile geometry must not own HUD/weather presentation.');
 assert.ok(!mobile.includes('top: calc(max(6px, env(safe-area-inset-top)) + 88px)'), 'Mobile speed control must stay out of the market canvas.');
-assert.ok(!refinementJs.includes('style.textContent = `'));
-assert.ok(!refinementJs.includes('installPixelCompatibilityStyles'));
+assert.ok(!index.includes('premium-ui-refinement.js'), 'The retired runtime geometry layer must stay deleted.');
+assert.ok(!premiumUi.includes('style.textContent = `'));
+assert.ok(!premiumUi.includes('installPixelCompatibilityStyles'));
 
-console.log('Single-owner Pixel Market Arcade presentation, minimal base styles, hard game depth, and dock-contained state-driven mobile command geometry remain separated.');
+console.log('Single-owner Pixel Market Arcade presentation, source-owned geometry, and state-driven mobile command layout remain separated.');
