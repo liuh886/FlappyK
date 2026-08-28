@@ -113,7 +113,7 @@ for (const canonicalDom of [
   'id="run-progress-panel"',
   'data-composition="returns-only"',
   'class="home-mode-stack"',
-  'class="home-primary-actions"',
+  'home-primary-actions',
   'id="settlement-summary"',
   'id="mobile-controls" data-premium="true"',
   'class="mobile-speed-control"',
