@@ -24,19 +24,16 @@ test('rounded +0.00% excess keeps the authoritative successful verdict', async (
     document.getElementById('card-excess-return').textContent = '+0.00%';
 
     window.FlappyKPremiumUI.renderSettlement();
-    const roundedTextResult = document.getElementById('profit-card').dataset.result;
-
-    window.FlappyKPremiumUIRefinement.syncSettlementComparison();
     return {
-      roundedTextResult,
-      correctedResult: document.getElementById('profit-card').dataset.result,
+      result: document.getElementById('profit-card').dataset.result,
       verdict: document.getElementById('settlement-verdict').textContent,
+      medal: document.getElementById('settlement-medal-box').dataset.medal,
     };
   });
 
-  expect(result.roundedTextResult).toBe('failure');
-  expect(result.correctedResult).toBe('success');
+  expect(result.result).toBe('success');
   expect(result.verdict).toBe('MARKET BEATEN');
+  expect(result.medal).toBe('gold');
 });
 
 test('wide short desktop guide highlights visible keyboard controls', async ({ page }) => {

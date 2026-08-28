@@ -6,7 +6,7 @@ const fs = require('node:fs');
 const index = fs.readFileSync('index.html', 'utf8');
 const game = fs.readFileSync('game.js', 'utf8');
 const i18nCore = fs.readFileSync('scripts/i18n-core.js', 'utf8');
-const refinement = fs.readFileSync('scripts/premium-ui-refinement.js', 'utf8');
+const premiumUi = fs.readFileSync('scripts/premium-ui.js', 'utf8');
 const premiumCss = fs.readFileSync('premium-ui.css', 'utf8');
 
 for (const contract of [
@@ -49,9 +49,10 @@ for (const entry of [
 }
 
 assert.ok(
-    refinement.includes("document.getElementById('sound-toggle-btn')"),
-    'HUD normalization must own the bilingual relabel of the sound control.',
+    premiumUi.includes("document.getElementById('sound-toggle-btn')"),
+    'Premium behavior must own the bilingual relabel of the sound control.',
 );
+assert.ok(premiumUi.includes('function syncTopControls()'), 'Sound relabeling must stay behavior-only.');
 
 assert.ok(premiumCss.includes('#sound-toggle-btn'), 'The canonical stylesheet must present the sound control.');
 assert.ok(

@@ -56,7 +56,6 @@ const APP_SHELL = [
     './pwa.js',
     './scripts/ui-state.js',
     './scripts/premium-ui.js',
-    './scripts/premium-ui-refinement.js',
     './skins.css',
     './scripts/skin-system.js',
     './scripts/haptics.js',

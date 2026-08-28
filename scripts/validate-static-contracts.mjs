@@ -77,6 +77,41 @@ for (const criticalId of ['mobile-controls', 'pause-btn', 'game-back-btn', 'onbo
   if (!ids.includes(criticalId)) throw new Error(`Missing critical gameplay control: #${criticalId}`);
 }
 
+for (const canonicalSurface of [
+  'id="game-hud-rail"',
+  'id="run-progress-panel"',
+  'class="home-mode-stack"',
+  'id="settlement-summary"',
+  'class="mobile-speed-control"',
+]) {
+  if (!index.includes(canonicalSurface)) {
+    throw new Error(`Canonical gameplay DOM is missing ${canonicalSurface}`);
+  }
+}
+const retiredRefinementPath = join(root, 'scripts/premium-ui-refinement.js');
+if (existsSync(retiredRefinementPath) || index.includes('premium-ui-refinement.js')) {
+  throw new Error('Runtime HUD composition refinement must remain deleted.');
+}
+
+const uiStateSource = readFileSync(join(root, 'scripts/ui-state.js'), 'utf8');
+for (const retiredStatePath of ['inferFromDom', 'new MutationObserver']) {
+  if (uiStateSource.includes(retiredStatePath)) {
+    throw new Error(`Core UI lifecycle must not infer state from DOM: ${retiredStatePath}`);
+  }
+}
+const premiumUiSource = readFileSync(join(root, 'scripts/premium-ui.js'), 'utf8');
+for (const retiredInstaller of [
+  'installHomeHierarchy',
+  'installHud',
+  'installDesktopControls',
+  'installMobileControls',
+  'installSettlementSummary',
+]) {
+  if (premiumUiSource.includes(retiredInstaller)) {
+    throw new Error(`Premium UI must remain behavior-only; found ${retiredInstaller}`);
+  }
+}
+
 const serviceWorker = readFileSync(join(root, 'sw.js'), 'utf8');
 for (const asset of ['./manifest.webmanifest', './index.html', './pwa.js', './membership-config.js', './scripts/account-cloud-sync.js']) {
   if (!serviceWorker.includes(asset)) throw new Error(`Service worker does not retain required offline asset ${asset}`);
@@ -96,10 +131,8 @@ if (!dataLoader.includes('window.FlappyKData') || !dataLoader.includes('loadMark
   throw new Error('Lazy market loader contract is missing.');
 }
 const gameSource = readFileSync(join(root, 'game.js'), 'utf8');
-const refinementSource = readFileSync(join(root, 'scripts/premium-ui-refinement.js'), 'utf8');
-const canvasWrites = [...gameSource.matchAll(/canvas\.(?:width|height)\s*=/g)].length
-  + [...refinementSource.matchAll(/canvasElement\.(?:width|height)\s*=/g)].length;
-if (canvasWrites !== 2 || refinementSource.includes('syncCanvasLayout')) {
+const canvasWrites = [...gameSource.matchAll(/canvas\.(?:width|height)\s*=/g)].length;
+if (canvasWrites !== 2) {
   throw new Error(`Canvas backing store must have one owner in game.js; found ${canvasWrites} writes.`);
 }
 if (!gameSource.includes('window.devicePixelRatio') || !gameSource.includes('ctx.setTransform(dpr, 0, 0, dpr, 0, 0)')) {
@@ -156,4 +189,4 @@ for (const forbidden of [/sk_(live|test)_/, /whsec_/, /sb_secret_/, /service_rol
 
 requireFile('data/leaderboard.json');
 requireFile('.github/workflows/leaderboard.yml');
-console.log('Structured gameplay, PWA, GA4 product events, Cloudflare RUM, canonical Account Shell v7, immutable referral v5, cloud-history, and asset contracts passed.');
+console.log('Structured gameplay, canonical UI lifecycle/DOM, PWA, analytics, Account Shell, cloud-history, and asset contracts passed.');

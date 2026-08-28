@@ -27,7 +27,7 @@
     }
 
     function ensureInstallButton() {
-        const actions = document.querySelector('#start-screen .start-actions');
+        const actions = document.querySelector('#start-screen .home-secondary-actions');
         if (!actions || document.getElementById('pwa-install-btn')) {
             return document.getElementById('pwa-install-btn');
         }
@@ -76,10 +76,8 @@
     }
 
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js', { scope: './' }).catch((error) => {
-                console.warn('FlappyK service worker registration failed:', error);
-            });
+        void navigator.serviceWorker.register('./sw.js', { scope: './' }).catch((error) => {
+            console.warn('FlappyK service worker registration failed:', error);
         });
     }
 
