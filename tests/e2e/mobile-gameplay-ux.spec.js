@@ -73,3 +73,43 @@ test('phone gameplay reserves the command dock and one tap creates one trade', a
   expect(afterSell.cash).toBeCloseTo(before.cash - 2, 6);
   expect(afterSell.shares).toBeCloseTo(before.shares, 6);
 });
+
+test('short landscape keeps full chart height beside a reachable command rail', async ({ page }) => {
+  await page.setViewportSize({ width: 844, height: 390 });
+  await preparePage(page);
+  await page.goto('/');
+  await page.getByRole('button', { name: 'PLAY', exact: true }).tap();
+  await expect(page.locator('#mobile-controls')).toBeVisible();
+
+  const geometry = await page.evaluate(() => {
+    const rect = (selector) => {
+      const box = document.querySelector(selector).getBoundingClientRect();
+      return { left: box.left, top: box.top, right: box.right, bottom: box.bottom, width: box.width, height: box.height };
+    };
+    return {
+      canvas: rect('#game-canvas'),
+      dock: rect('#mobile-controls'),
+      buy: rect('#btn-buy'),
+      sell: rect('#btn-sell'),
+    };
+  });
+
+  expect(geometry.canvas.right).toBeLessThanOrEqual(geometry.dock.left + 2);
+  expect(Math.abs(geometry.canvas.height - 390)).toBeLessThanOrEqual(2);
+  expect(geometry.canvas.width).toBeGreaterThan(700);
+  expect(geometry.dock.width).toBeGreaterThanOrEqual(90);
+  expect(geometry.buy.left).toBeGreaterThanOrEqual(geometry.dock.left - 1);
+  expect(geometry.buy.right).toBeLessThanOrEqual(geometry.dock.right + 1);
+  expect(geometry.sell.left).toBeGreaterThanOrEqual(geometry.dock.left - 1);
+  expect(geometry.sell.right).toBeLessThanOrEqual(geometry.dock.right + 1);
+
+  const before = await page.evaluate(() => {
+    const state = window.FlappyKGame.getState();
+    window.FlappyKGame.changeSpeed(1 - state.speedMultiplier);
+    return window.FlappyKGame.getState();
+  });
+  await page.locator('#btn-buy').tap();
+  const afterBuy = await page.evaluate(() => window.FlappyKGame.getState());
+  expect(afterBuy.cash).toBeCloseTo(before.cash - 1001, 6);
+  expect(afterBuy.shares).toBeGreaterThan(before.shares);
+});
