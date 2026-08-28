@@ -56,8 +56,8 @@ const RUNTIME_FILES = [
     'scripts/market-pass-rule.js',
     'scripts/market-goal-ui.js',
     'scripts/game-pacing.js',
+    'scripts/ui-state.js',
     'scripts/premium-ui.js',
-    'scripts/premium-ui-refinement.js',
     'scripts/market-canvas.js',
 ];
 
@@ -91,6 +91,7 @@ const SUBSCRIBERS = {
         "on('level-will-settle'",
         "on('level-did-settle'",
     ],
+    'scripts/ui-state.js': ["on('level-did-start'", "on('level-will-settle'"],
     'scripts/premium-ui.js': ["on('level-did-start'", "on('level-did-settle'"],
 };
 
@@ -114,4 +115,4 @@ const customAt = indexSource.indexOf('custom-challenge.js');
 assert.ok(goalAt >= 0 && dailyAt > goalAt, 'market-goal-ui.js must load before daily-run.js so DAILY can override the goal label.');
 assert.ok(customAt >= 0 && goalAt > customAt, 'custom-challenge.js must load before market-goal-ui.js to keep the documented label precedence.');
 
-console.log('GameController lifecycle, data-source registry, and zero-wrapper contracts passed.');
+console.log('GameController lifecycle, explicit UI state, data-source registry, and zero-wrapper contracts passed.');
