@@ -51,22 +51,46 @@
 </head>
 <body>
     <div id="game-container">
-        <div id="ui-layer">
-            <div class="stats-box">
-                <div>GAME: <span id="level-display">1/3</span></div>
-                <div>DAY: <span id="day-display">1</span> / 250</div>
-                <div>CASH: $<span id="cash-display">10000.00</span></div>
-                <div>ASSET: $<span id="asset-display">0.00</span></div>
-                <div>TOTAL: $<span id="total-display">10000.00</span></div>
-                <div>RETURN: <span id="return-display" class="neutral">0.00%</span></div>
-                <div>GOAL: <span id="target-return-display">BEAT THE MARKET</span></div>
-            </div>
-            <div class="controls-hint">
-                <div class="key-hint"><span class="key">UP</span> BUY $1K · $1 FEE</div>
-                <div class="key-hint"><span class="key">DOWN</span> SELL $1K · $1 FEE</div>
-                <div class="key-hint">
-                    SPEED: <button id="speed-btn">15x [←/→]</button>
+        <div id="ui-layer" hidden aria-hidden="true">
+            <div class="stats-box" data-premium="true">
+                <div class="hud-header">
+                    <div class="hud-stat-row hud-game">GAME: <span id="level-display">1/3</span></div>
+                    <div class="hud-stat-row hud-day">DAY: <span id="day-display">001</span> / 250</div>
                 </div>
+                <div class="hud-main">
+                    <div class="hud-stat-row hud-total">TOTAL: $<span id="total-display">10000.00</span></div>
+                    <div class="hud-stat-row hud-cash">CASH: $<span id="cash-display">10000.00</span></div>
+                    <div class="hud-stat-row hud-return">RETURN: <span id="return-display" class="neutral">0.00%</span></div>
+                </div>
+                <div class="day-progress" role="progressbar" aria-valuemin="1" aria-valuemax="250" aria-valuenow="1">
+                    <span class="day-progress-fill"></span>
+                </div>
+                <div id="excess-meter" class="excess-meter" data-leading="false">
+                    <div class="excess-meter-label"><span>EXCESS</span><strong id="live-excess-display">+0.00%</strong></div>
+                    <div class="excess-meter-track" aria-hidden="true">
+                        <span class="excess-meter-negative"></span>
+                        <span class="excess-meter-positive"></span>
+                        <span class="excess-meter-zero"></span>
+                        <span class="excess-meter-indicator"></span>
+                    </div>
+                </div>
+                <details class="hud-details">
+                    <summary aria-label="Show cash and position details">•••</summary>
+                    <div class="hud-stat-row hud-detail-row">ASSET: $<span id="asset-display">0.00</span></div>
+                    <div class="hud-stat-row hud-legacy-goal" hidden>GOAL: <span id="target-return-display">BEAT THE MARKET</span></div>
+                </details>
+            </div>
+            <div class="controls-hint" data-premium="true">
+                <div class="trade-key-hints">
+                    <div class="trade-key-hint trade-hint-buy"><span class="key">↑</span><span>BUY $1K</span></div>
+                    <div class="trade-key-hint trade-hint-sell"><span class="key">↓</span><span>SELL $1K</span></div>
+                </div>
+                <div class="game-speed-control desktop-speed-control">
+                    <button type="button" class="speed-step speed-step-minus" aria-label="Slow down">−</button>
+                    <output id="desktop-speed-readout" class="speed-readout">15×</output>
+                    <button type="button" class="speed-step speed-step-plus" aria-label="Speed up">+</button>
+                </div>
+                <button id="speed-btn" type="button" hidden tabindex="-1" aria-hidden="true">15x [←/→]</button>
             </div>
         </div>
 
@@ -82,19 +106,25 @@
             <h1 id="game-title">FLAPPY K</h1>
             <p>Trade 3 hidden historical markets.</p>
             <p>Beat the market to pass each game.</p>
-            <div class="start-actions">
+            <div class="start-actions home-primary-actions">
                 <button id="start-btn">PLAY</button>
-                <button id="daily-run-btn">DAILY RUN</button>
-                <button id="leaderboard-open-btn" class="leaderboard-home-btn">LEADERBOARD</button>
             </div>
             <div id="personal-profile-summary" class="local-records-summary" aria-live="polite">
                 <span>YOUR BEST <strong>---%</strong></span>
                 <span>RUNS 0</span>
             </div>
-            <div id="daily-run-summary" class="daily-run-summary" aria-live="polite">
-                <strong>DAILY RUN</strong>
-                <span>SAME MARKETS FOR EVERYONE</span>
-                <small>DAILY STREAK 0</small>
+            <div class="home-mode-stack">
+                <section class="daily-mode-card">
+                    <div id="daily-run-summary" class="daily-run-summary" aria-live="polite">
+                        <strong>DAILY RUN</strong>
+                        <span>SAME MARKETS FOR EVERYONE</span>
+                        <small>DAILY STREAK 0</small>
+                    </div>
+                    <button id="daily-run-btn">DAILY RUN</button>
+                </section>
+                <div class="home-secondary-actions">
+                    <button id="leaderboard-open-btn" class="leaderboard-home-btn">RANKINGS</button>
+                </div>
             </div>
         </div>
 
@@ -143,8 +173,30 @@
         </div>
 
         <div id="settlement-screen" class="screen">
-            <div class="profit-card" id="profit-card">
+            <div class="profit-card" id="profit-card" data-details-expanded="false">
                 <h2 id="card-title">PROFIT CARD</h2>
+                <section id="settlement-summary" class="settlement-summary">
+                    <div id="settlement-medal-box" class="settlement-medal-box">
+                        <span class="settlement-medal-icon">🏅</span>
+                        <strong class="settlement-medal-title">MEDAL</strong>
+                    </div>
+                    <div class="settlement-main-result">
+                        <div id="settlement-verdict" class="settlement-verdict"></div>
+                        <div id="settlement-excess-summary" class="settlement-excess-summary">---%</div>
+                    </div>
+                    <div class="settlement-comparison">
+                        <div class="settlement-comparison-row">
+                            <span>YOU</span>
+                            <div class="settlement-comparison-track"><i id="settlement-player-bar"></i></div>
+                            <strong id="settlement-player-summary">---%</strong>
+                        </div>
+                        <div class="settlement-comparison-row">
+                            <span>MARKET</span>
+                            <div class="settlement-comparison-track"><i id="settlement-market-bar"></i></div>
+                            <strong id="settlement-market-summary">---%</strong>
+                        </div>
+                    </div>
+                </section>
                 <div class="settlement-comparison settlement-market-identity" aria-label="Revealed market identity">
                     <div class="settlement-verdict">ASSET · <span id="card-asset" class="highlight">???</span></div>
                     <div class="settlement-verdict">PERIOD · <span id="card-period" class="highlight">???</span></div>
@@ -156,6 +208,7 @@
                     <p>MARKET RETURN: <span id="card-market-return" class="highlight">---%</span></p>
                     <p>EXCESS: <span id="card-excess-return" class="highlight">---%</span></p>
                 </div>
+                <button id="settlement-details-toggle" type="button" class="settlement-details-toggle" aria-expanded="false">VIEW DETAILS</button>
                 <div class="big-return" id="card-return">---%</div>
                 <div class="card-return-caption">TOTAL RETURN</div>
                 <div id="card-status" class="status-msg"></div>
@@ -172,14 +225,17 @@
             </div>
         </div>
 
-        <div id="mobile-controls" hidden aria-hidden="true">
-            <div class="dpad-left"><button id="btn-speed-down" class="mobile-btn small-btn">◀</button></div>
-            <div class="dpad-center">
-                <button id="btn-buy" class="mobile-btn action-btn buy-btn" aria-label="Buy one thousand dollars"><span>BUY</span></button>
-                <button id="btn-sell" class="mobile-btn action-btn sell-btn" aria-label="Sell one thousand dollars"><span>SELL</span></button>
+        <div id="mobile-controls" data-premium="true" hidden aria-hidden="true">
+            <button id="btn-buy" class="mobile-btn action-btn buy-btn mobile-trade-primary" aria-label="Buy one thousand dollars"><span>BUY</span></button>
+            <div class="mobile-speed-control">
+                <button id="btn-speed-down" class="mobile-btn small-btn" aria-label="Slow down">−</button>
+                <output id="mobile-speed-readout" class="speed-readout">15×</output>
+                <button id="btn-speed-up" class="mobile-btn small-btn" aria-label="Speed up">+</button>
             </div>
-            <div class="dpad-right"><button id="btn-speed-up" class="mobile-btn small-btn">▶</button></div>
+            <button id="btn-sell" class="mobile-btn action-btn sell-btn mobile-trade-primary" aria-label="Sell one thousand dollars"><span>SELL</span></button>
         </div>
+
+        <div id="game-feedback-toast" class="game-feedback-toast" role="status" aria-live="polite" hidden></div>
     </div>
 
     <div id="champagne-screen" class="screen">
