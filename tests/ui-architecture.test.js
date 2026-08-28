@@ -7,7 +7,8 @@ const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 
 const index = read('index.html');
 const i18n = read('i18n.css');
-const pixelRuntime = read('scripts/premium-ui-refinement.js');
+const premiumUi = read('scripts/premium-ui.js');
+const uiState = read('scripts/ui-state.js');
 const architecture = read('docs/UI_ARCHITECTURE.md');
 
 assert.ok(
@@ -18,22 +19,33 @@ assert.ok(
   !i18n.includes('visual-polish.css'),
   'Feature stylesheets must not reintroduce the obsolete visual layer through hidden imports.',
 );
+assert.ok(!index.includes('premium-ui-refinement.js'), 'The retired runtime composition layer must remain deleted.');
 
 for (const assignment of ['updateUI =', 'startLevel =', 'endLevel =']) {
   assert.ok(
-    !pixelRuntime.includes(assignment),
-    `The pixel runtime must observe canonical state instead of re-wrapping ${assignment.replace(' =', '')}.`,
+    !premiumUi.includes(assignment),
+    `Premium behavior must subscribe to canonical state instead of re-wrapping ${assignment.replace(' =', '')}.`,
   );
 }
 
+for (const retiredStatePath of ['inferFromDom', 'new MutationObserver']) {
+  assert.ok(!uiState.includes(retiredStatePath), `Core lifecycle must not infer state from DOM: ${retiredStatePath}`);
+}
 assert.ok(
-  pixelRuntime.includes("attributeFilter: ['class']"),
-  'Settlement synchronization must observe the authoritative status class.',
+  uiState.includes("controller?.on('level-did-start'"),
+  'Playing state must derive from the GameController lifecycle.',
 );
 assert.ok(
-  pixelRuntime.includes("window.FlappyKUiState.virtualControls"),
-  'Responsive targeting must use the shared virtual-controls state.',
+  uiState.includes("controller?.on('level-will-settle'"),
+  'Settlement state must derive from the GameController lifecycle.',
 );
+assert.ok(
+  premiumUi.includes('window.FlappyKUiState?.virtualControls'),
+  'Responsive guide targeting must use the shared virtual-controls state.',
+);
+for (const canonicalDom of ['id="game-hud-rail"', 'id="run-progress-panel"', 'id="mobile-controls"']) {
+  assert.ok(index.includes(canonicalDom), `Source markup must own ${canonicalDom}`);
+}
 assert.ok(
   architecture.includes('One component has one structural owner.'),
   'The UI ownership contract must remain documented.',
@@ -43,4 +55,4 @@ assert.ok(
   'The architecture document must prohibit new inline-style debt.',
 );
 
-console.log('UI architecture ownership and anti-layering contracts passed.');
+console.log('UI architecture uses explicit lifecycle state and canonical source DOM ownership.');
