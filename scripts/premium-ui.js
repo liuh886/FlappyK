@@ -304,7 +304,8 @@
         const excess = parsePercent(excessText);
         const player = parsePercent(playerText);
         const market = parsePercent(marketText);
-        const success = excess > 0;
+        // Game core owns pass/fail. The displayed excess is rounded and must never become another authority.
+        const success = document.getElementById('card-status')?.classList.contains('card-positive') === true;
         const scale = Math.max(1, Math.abs(player), Math.abs(market));
         const strings = copy();
 
@@ -328,7 +329,7 @@
                 if (icon) icon.textContent = '🏆';
                 if (medalTitle) medalTitle.textContent = t('LEGEND', '传奇金杯');
                 medalBox.dataset.medal = 'legend';
-            } else if (excess > 0) {
+            } else if (success) {
                 if (icon) icon.textContent = '🥇';
                 if (medalTitle) medalTitle.textContent = t('GOLD', '通关金牌');
                 medalBox.dataset.medal = 'gold';
