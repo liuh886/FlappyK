@@ -13,10 +13,12 @@ const experience = read('experience.js');
 const onboarding = read('onboarding.js');
 
 for (const shellContract of [
+    'id="game-hud-rail"',
+    'id="run-progress-panel"',
     'id="game-top-controls"',
     'id="pause-btn"',
     'id="game-back-btn"',
-    'id="mobile-controls" hidden',
+    'id="mobile-controls"',
     'id="onboarding-screen"',
     'id="daily-run-btn"',
     'id="personal-profile-summary"',
@@ -32,26 +34,34 @@ for (const shellContract of [
 assert.equal(index.includes('NOT LIVE DATA'), false);
 assert.equal(index.includes('ESC = RETURN HOME'), false);
 assert.equal(index.includes('id="btn-pause"'), false);
+assert.equal(index.includes('premium-ui-refinement.js'), false);
 assert.ok(index.indexOf('pwa.js') < index.indexOf('scripts/ui-state.js'));
 assert.ok(index.indexOf('scripts/ui-state.js') < index.indexOf('scripts/premium-ui.js'));
 
 for (const stateContract of [
     "PLAYING: 'playing'",
     "PAUSED: 'paused'",
+    "SETTLEMENT: 'settlement'",
     'root.dataset.layout = layout',
     'root.dataset.virtualControls',
+    "controller?.on('level-did-start'",
+    "controller?.on('level-will-settle'",
 ]) {
     assert.ok(uiState.includes(stateContract), `Missing shared UI-state contract: ${stateContract}`);
 }
+assert.ok(!uiState.includes('inferFromDom'));
+assert.ok(!uiState.includes('new MutationObserver'));
 
 for (const presentationContract of [
-    'installHomeHierarchy',
-    'installMobileControls',
-    'installSettlementSummary',
-    "meter.id = 'excess-meter'",
+    'function renderHud()',
+    'function renderSettlement()',
     'playerReturn - marketReturn',
+    'function syncTopControls()',
 ]) {
-    assert.ok(premiumUi.includes(presentationContract), `Missing canonical UI composition contract: ${presentationContract}`);
+    assert.ok(premiumUi.includes(presentationContract), `Missing behavior-only UI contract: ${presentationContract}`);
+}
+for (const retiredInstaller of ['installHomeHierarchy', 'installMobileControls', 'installSettlementSummary', "meter.id = 'excess-meter'"]) {
+    assert.ok(!premiumUi.includes(retiredInstaller), `Runtime composition must stay retired: ${retiredInstaller}`);
 }
 
 for (const cssContract of [
@@ -68,6 +78,7 @@ for (const mobileContract of [
     '#mobile-controls[hidden]',
     '#mobile-controls:not([hidden])',
     'Runtime state decides whether this dock exists; viewport width does not.',
+    '@media (orientation: landscape) and (max-height: 500px)',
 ]) {
     assert.ok(mobileCss.includes(mobileContract), `Missing touch geometry contract: ${mobileContract}`);
 }
@@ -102,4 +113,4 @@ assert.ok(onboarding.includes('function consumePending()'));
 assert.equal(onboarding.includes('event.stopImmediatePropagation()'), false);
 assert.equal(onboarding.includes('button?.click()'), false);
 
-console.log('Product shell, canonical presentation owner, semantic bilingual pause control, responsive touch dock, UI state, onboarding, and manual navigation contracts passed.');
+console.log('Product shell, source-owned composition, explicit lifecycle, responsive touch geometry, onboarding, and manual navigation contracts passed.');
