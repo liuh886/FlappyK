@@ -27,7 +27,7 @@
     }
 
     function ensureInstallButton() {
-        const actions = document.querySelector('#start-screen .start-actions');
+        const actions = document.querySelector('#start-screen .home-secondary-actions');
         if (!actions || document.getElementById('pwa-install-btn')) {
             return document.getElementById('pwa-install-btn');
         }
