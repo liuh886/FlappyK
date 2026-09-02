@@ -1,0 +1,218 @@
+/* Decision Engine — verdicts + counterfactuals + ghost overlay */
+.decision-verdicts {
+    display: grid;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 2px solid var(--game-border);
+    border-bottom: 2px solid var(--game-border);
+    background: var(--game-surface-raised);
+}
+
+.decision-verdict {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 8px 14px;
+    align-items: center;
+    min-height: 52px;
+    padding: 10px 12px;
+    border: 2px solid var(--game-border-strong);
+    background: var(--game-bg);
+    box-shadow: 3px 3px 0 var(--game-depth);
+    font-family: var(--pixel-font-display);
+}
+
+.decision-verdict-title {
+    color: var(--game-accent);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    line-height: 1.2;
+}
+
+.decision-verdict-body {
+    color: var(--game-text);
+    font-size: 11px;
+    line-height: 1.3;
+    font-family: var(--pixel-font-ui);
+    font-weight: 700;
+}
+
+.decision-verdict-sub {
+    grid-column: 2;
+    color: var(--game-muted);
+    font-size: 10px;
+    font-family: var(--pixel-font-ui);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+.decision-verdict--dodged_the_crash .decision-verdict-title { color: var(--game-green); }
+.decision-verdict--paper_hands .decision-verdict-title { color: var(--game-red); }
+.decision-verdict--overtrader .decision-verdict-title { color: var(--game-red); }
+.decision-verdict--missed_the_dip .decision-verdict-title { color: var(--game-system); }
+.decision-verdict--diamond_hands_level .decision-verdict-title { color: var(--game-green); }
+
+.decision-counterfactuals-wrap {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--game-border);
+    background: var(--game-bg);
+}
+
+.decision-cf-title {
+    margin-bottom: 8px;
+    color: var(--game-muted);
+    font-family: var(--pixel-font-display);
+    font-size: 8px;
+    letter-spacing: 0.08em;
+}
+
+.decision-counterfactuals {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.decision-cf-row {
+    display: grid;
+    gap: 4px;
+    padding: 8px;
+    border: 2px solid var(--game-border);
+    background: var(--game-surface);
+    text-align: center;
+}
+
+.decision-cf-row--you { border-color: var(--game-text); }
+.decision-cf-row--market { border-color: var(--game-system); }
+.decision-cf-row--hold { border-color: var(--game-muted); }
+.decision-cf-row--first { border-color: var(--game-accent); }
+
+.decision-cf-label {
+    color: var(--game-muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+}
+
+.decision-cf-value {
+    color: var(--game-text);
+    font-family: var(--pixel-font-display);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+}
+
+.decision-cf-value.positive { color: var(--game-green); }
+.decision-cf-value.negative { color: var(--game-red); }
+
+#ghost-replay-btn {
+    min-height: 50px;
+    padding: 0 18px;
+    border: 2px solid var(--game-accent) !important;
+    background: var(--game-accent) !important;
+    color: var(--game-bg) !important;
+    box-shadow: 4px 4px 0 #8e7520 !important;
+    font-weight: 700;
+}
+
+#ghost-replay-btn:hover {
+    background: #ffe474 !important;
+}
+
+/* Ghost overlay */
+#ghost-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(2, 4, 5, 0.78);
+    backdrop-filter: blur(2px);
+}
+
+.ghost-panel {
+    display: grid;
+    gap: 0;
+    width: min(860px, calc(100vw - 24px));
+    max-height: calc(100dvh - 40px);
+    overflow: hidden;
+    border: 3px solid var(--game-border-strong);
+    background: var(--game-bg);
+    box-shadow: 8px 8px 0 var(--game-depth);
+}
+
+.ghost-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 14px;
+    border-bottom: 2px solid var(--game-border);
+    background: var(--game-surface);
+}
+
+.ghost-header strong {
+    color: var(--game-system);
+    font-family: var(--pixel-font-display);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+}
+
+.ghost-header span {
+    overflow: hidden;
+    color: var(--game-muted);
+    font-size: 11px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ghost-close-btn {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 2px solid var(--game-border-strong);
+    background: var(--game-bg);
+    color: var(--game-text);
+    font-size: 14px;
+    line-height: 1;
+}
+
+.ghost-canvas {
+    display: block;
+    width: 100%;
+    height: 380px;
+    background: var(--game-bg);
+    image-rendering: pixelated;
+}
+
+.ghost-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    padding: 10px;
+    border-top: 2px solid var(--game-border);
+    background: var(--game-surface);
+}
+
+.ghost-controls button {
+    min-height: 44px;
+    border: 2px solid var(--game-border-strong);
+    background: var(--game-surface-raised);
+    color: var(--game-text);
+    font-weight: 700;
+    box-shadow: 3px 3px 0 var(--game-depth);
+}
+
+.ghost-controls button:first-child {
+    background: var(--game-accent);
+    color: var(--game-bg);
+    border-color: #ffe478;
+}
+
+@media (max-width: 560px) {
+    .decision-verdict { grid-template-columns: 1fr; }
+    .decision-verdict-sub { grid-column: 1; }
+    .decision-counterfactuals { grid-template-columns: repeat(2, 1fr); }
+    .ghost-panel { width: calc(100vw - 16px); }
+    .ghost-header { grid-template-columns: 1fr auto; }
+    .ghost-header span { grid-column: 1 / -1; }
+}

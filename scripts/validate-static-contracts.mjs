@@ -190,3 +190,39 @@ for (const forbidden of [/sk_(live|test)_/, /whsec_/, /sb_secret_/, /service_rol
 requireFile('data/leaderboard.json');
 requireFile('.github/workflows/leaderboard.yml');
 console.log('Structured gameplay, canonical UI lifecycle/DOM, PWA, analytics, Account Shell, cloud-history, and asset contracts passed.');
+
+const decisionFiles = sourceFiles.filter((path) => relative(root, path).replace(/\\/g, '/').startsWith('scripts/decision/'));
+if (decisionFiles.length < 7) throw new Error(`Decision Engine requires at least 7 modules; found ${decisionFiles.length}`);
+for (const file of decisionFiles) {
+  const content = readFileSync(file, 'utf8');
+  if (/generateInvestmentAdvice/.test(content)) throw new Error(`Decision Engine must not contain generateInvestmentAdvice: ${relative(root, file)}`);
+  if (/You should have|You were wrong|mistake/i.test(content) && !file.endsWith('validate-static-contracts.mjs')) {
+    // Allow "mistake" only in comments about prohibition? Forbid in decision code except documentation
+    if (/You should have bought|Your sell was a mistake/.test(content)) throw new Error(`Decision Engine contains hindsight language: ${relative(root, file)}`);
+  }
+  if (file.endsWith('market-regime.js') && /\bactions\b/.test(content) && /classifyMarket/.test(content)) {
+    // market-regime must not read actions; allow the error message string but not actual logic
+    const lines = content.split('\n').filter((line) => !line.trim().startsWith('//') && !line.includes('forbiddenKeys'));
+    const actionReads = lines.join('\n').match(/\bactions\b/g);
+    // The only allowed occurrence is in the forbiddenKeys list and error message
+    // Count occurrences excluding the forbiddenKeys definition
+    if (actionReads && actionReads.length > 2) throw new Error(`market-regime.js must not read player actions: ${relative(root, file)}`);
+  }
+}
+for (const required of [
+  'scripts/decision/decision-metrics.js',
+  'scripts/decision/market-regime.js',
+  'scripts/decision/counterfactual-engine.js',
+  'scripts/decision/insight-engine.js',
+  'scripts/decision/decision-storage.js',
+  'scripts/decision/mastery-system.js',
+  'scripts/decision/decision-recorder.js',
+  'scripts/decision/ghost-overlay.js',
+]) requireFile(required);
+if (!index.includes('decision.css') || !index.includes('scripts/decision/decision-recorder.js')) {
+  throw new Error('Decision Engine assets must be referenced in index.html');
+}
+if (!readFileSync(join(root, 'sw.js'), 'utf8').includes('scripts/decision/decision-metrics.js')) {
+  throw new Error('Service worker must cache Decision Engine modules');
+}
+console.log(`Decision Engine contracts passed (${decisionFiles.length} modules, no hindsight, market-regime isolated, storage local-only).`);

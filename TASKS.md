@@ -7,6 +7,9 @@
 # Tasks: FlappyK Architecture Hardening & Retro Pixel Arcade
 
 ## Task Board
+- [x] 30. Decision Engine Slice 3 — Ghost Replay surface: settlement GHOST REPLAY button -> 5-8s overlay (YOU vs MARKET vs BUY_AND_HOLD + ▲BUY/▼SELL ghost canvas), i18n FACT copy, prefers-reduced-motion static fallback, fail-open
+- [x] 29. Decision Engine Slice 2 — Counterfactual + Insight: counterfactual-engine (buyAndHold/firstEntryHold/noTrade curves) + insight-engine (whitelisted PAPER_HANDS/DODGED_THE_CRASH/MISSED_THE_DIP/OVERTRADER/DIAMOND_HANDS_LEVEL, max 2, traceable thresholds) + mastery-system reducer-only + golden tests for decision-ready payload (no DOM)
+- [x] 28. Decision Engine Slice 1 — Foundation (pure facts, no UI): decision-recorder + decision-metrics + market-regime + decision-storage (versioned, capped 50, fail-open) + unit/static tests, game remains winnable when decision scripts blocked
 - [x] 27. Living-world skin pass: progress/mood-reactive scenery (city lights-up, aurora vigor, sun arc), per-skin checkpoint celebrations, mascot identities (bird/penguin/scarab), per-skin particle shapes and frame chrome
 - [x] 24. HUD compaction pass: tighter rail metrics, in-plot section labels/day rail, canvas plots raised to clear the rail
 - [x] 25. In-game skin cycle button on the command rail (desktop 56px accent slot; touch dock back/pause/skin, mute stays keyboard-owned)

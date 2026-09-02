@@ -145,7 +145,21 @@
         'Copy this challenge link:': '复制挑战链接：',
         'ANY PROFIT': '任意正收益',
         'SUCCESS! TARGET BEATEN.': '挑战成功！已跑赢目标。',
-        'FAILED TO BEAT TARGET.': '挑战失败，未跑赢目标。'
+        'FAILED TO BEAT TARGET.': '挑战失败，未跑赢目标。',
+        'PAPER HANDS': '拿不住',
+        'DODGED THE CRASH': '躲过暴跌',
+        'MISSED THE DIP': '错过抄底',
+        'OVERTRADER': '过度交易',
+        'DIAMOND HANDS': '钻石手',
+        'GHOST REPLAY': '幽灵回放',
+        'COUNTERFACTUALS — LABELED PARALLEL UNIVERSES': '反事实 · 已标注的平行宇宙',
+        'YOU': '你',
+        'MARKET': '市场',
+        'HOLD': '持有',
+        'FIRST BUY HOLD': '首买后持有',
+        'REPLAY': '重播',
+        'CLOSE': '关闭',
+        'GHOST REPLAY — MARKET / YOU / BUY & HOLD': '幽灵回放 — 市场 / 你 / 持有不动'
     };
 
     const zhPatterns = [

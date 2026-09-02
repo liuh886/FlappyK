@@ -34,11 +34,37 @@ PR #48 removes the obsolete `visual-polish.css` layer and stops `premium-ui-refi
 - `visual-polish.css` is retained only as historical source and is not loaded.
 - New visual directions must edit the owning stylesheet. Do not add `*-polish.css`, `*-fix.css`, or another final override sheet.
 
+### Decision Engine (second kernel)
+
+FlappyK has two kernels that must stay strictly separated per `PRODUCT_PHILOSOPHY.md`:
+
+- `Market Engine` — `game.js` + `scripts/market-pass-rule.js` + `data-loader.js`. The only writer of `cash/shares/currentData/currentPrice/settlement` and the only authority for `EXCESS > 0` win/lose.
+- `Decision Engine` — `scripts/decision/*`. The only reader that turns decisions into learning. It subscribes to `FlappyKGameController` hooks (`data-resolved`, `tick`, `trade`, `level-did-settle`) and to `FlappyKEvents`; it never wraps, replaces, or reorders `startLevel`/`endLevel`/`handleBuy`/`handleSell`/`pickNormalData`.
+
+Ownership inside `scripts/decision/`:
+
+- `decision-recorder.js` owns the append-only `Decision Timeline` (facts only, in-memory per level, flushed on `level-did-settle`).
+- `decision-metrics.js` owns pure `analyzeRun({ currentData, actions, totalHistory, levelStartCash }) -> DecisionReport` (no DOM, no I/O).
+- `counterfactual-engine.js` owns pure counterfactual simulations `simulateBuyAndHold / simulateFirstEntryHold / simulateNoTrade` (labeled parallel universes, never presented as advice).
+- `market-regime.js` owns pure market description `classifyMarket(window) -> { regime, volatility, drawdown, shape }` and must not read player actions or results.
+- `insight-engine.js` owns `facts -> game verdict` mapping (e.g. `PAPER_HANDS` when `firstEntryHoldReturn - playerReturn > threshold`). It must not recompute facts and must emit only whitelisted verdict ids with traceable inputs.
+- `mastery-system.js` owns cross-run achievements/traits (`DIAMOND HANDS`, `DIP BUYER`, etc.) derived from thresholded facts over many runs, never from a single run.
+- `decision-storage.js` owns persistence of Decision Reports and mastery (local-only, fail-open, versioned keys).
+
+Prohibited for Decision Engine:
+
+- mutating `cash/shares/currentData` or blocking trades
+- recomputing `EXCESS` with a different formula or introducing a second win condition
+- `generateInvestmentAdvice()` or `if/else -> personality label` classifiers
+- hindsight strings: `You should have bought on Day X` / `Your sell was a mistake` / `You are a Trend Rider`
+- market-regime code that branches on player return or trade count
+
 ### Remote and optional services
 
 - `pwa.js` keeps analytics and membership loading non-blocking so guest gameplay remains available.
 - `analytics.js` may observe gameplay but must never change game outcomes.
 - `membership.js` may queue and synchronize completed-run summaries but must never block local play or treat personal history as trusted leaderboard evidence.
+- `Decision Engine` is optional for play: if any `scripts/decision/*` module fails to load, the core three-market run, Daily Run, friend challenge, custom challenge, and settlement must remain fully playable.
 
 ## Required rules
 
@@ -50,6 +76,10 @@ PR #48 removes the obsolete `visual-polish.css` layer and stops `premium-ui-refi
 6. New lifecycle wrappers require an architecture review. The pixel runtime must remain wrapper-free.
 7. Inline styles in `index.html` are legacy debt. New inline styles are prohibited; touched elements should move to owning classes.
 8. Every architecture change must keep desktop, short-desktop, coarse-pointer mobile, Chinese UI, settlement, and offline PWA browser tests green.
+9. Market Engine is the sole authority for `EXCESS > 0` win/lose. Decision Engine is read-only: it subscribes to `FlappyKGameController` hooks, never wraps `startLevel`/`endLevel`/`handleBuy`/`handleSell`.
+10. Decision Engine v0.1 outputs only FACT and labeled COUNTERFACTUAL. `INTERPRETATION` and `generateInvestmentAdvice()` are prohibited. All verdict strings must be traceable to a `DecisionReport` field.
+11. `market-regime.js` must not read player actions or results. Hindsight-bullshit strings (`You should have ... on Day X`) are prohibited in every language.
+12. Decision storage is local-only, versioned, and fail-open. It must never be used as trusted leaderboard evidence and must never block settlement or replay.
 
 ## Remaining debt
 
