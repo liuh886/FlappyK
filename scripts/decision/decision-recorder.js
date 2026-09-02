@@ -207,13 +207,12 @@
                 }
 
                 // Emit decision-ready for UI layers (ghost, insights)
+                // Single authoritative channel: FlappyKEvents. It already mirrors to window via event-bus.js:31,
+                // so subscribers must use FlappyKEvents.on only to avoid duplicate handling.
                 try {
                     const eventDetail = { report, counterfactuals, regime, verdicts, level: report.level, market: report.market, asset: report.asset };
-                    // Emit via both channels for compatibility
                     if (window.FlappyKEvents?.emit) window.FlappyKEvents.emit('flappyk:decision-ready', eventDetail);
-                    window.dispatchEvent(new CustomEvent('flappyk:decision-ready', { detail: eventDetail }));
-                    // Also emit controller hook? Use events bus
-                    if (controller && controller._emit) controller._emit('decision-ready', eventDetail);
+                    else window.dispatchEvent(new CustomEvent('flappyk:decision-ready', { detail: eventDetail }));
                 } catch (e) {
                     console.warn('FlappyK decision-ready emit failed', e);
                 }

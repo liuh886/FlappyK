@@ -59,16 +59,18 @@
     }
 
     if (typeof window !== 'undefined') {
-        window.addEventListener('flappyk:decision-ready', handleDecisionReady);
+        // Single channel: FlappyKEvents. Window mirror exists for external compat
+        // but internal modules must not double-subscribe (event-bus already mirrors to window).
         if (window.FlappyKEvents?.on) {
             try { window.FlappyKEvents.on('flappyk:decision-ready', handleDecisionReady); } catch {}
-        }
-        const clearOnNewRun = () => { clearDecisionLayer(); lastPayload = null; };
-        window.addEventListener('flappyk:level-will-start', clearOnNewRun);
-        window.addEventListener('flappyk:game-reset', clearOnNewRun);
-        if (window.FlappyKEvents?.on) {
+            const clearOnNewRun = () => { clearDecisionLayer(); lastPayload = null; };
             try { window.FlappyKEvents.on('flappyk:level-will-start', clearOnNewRun); } catch {}
             try { window.FlappyKEvents.on('flappyk:game-reset', clearOnNewRun); } catch {}
+        } else {
+            window.addEventListener('flappyk:decision-ready', handleDecisionReady);
+            const clearOnNewRun = () => { clearDecisionLayer(); lastPayload = null; };
+            window.addEventListener('flappyk:level-will-start', clearOnNewRun);
+            window.addEventListener('flappyk:game-reset', clearOnNewRun);
         }
         window.FlappyKGhostOverlay = {
             _handleDecisionReady: handleDecisionReady,

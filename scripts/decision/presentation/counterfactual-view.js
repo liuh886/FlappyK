@@ -70,7 +70,7 @@
     }
 
     function renderSummary(payload) {
-        // P1: compact Decision Summary ≤3 lines — YOU/HOLD + BIGGEST MOMENT
+        // P1: compact Decision Summary ≤3 lines — YOU/HOLD + BIGGEST MOMENT (engine-owned)
         const card = typeof document !== 'undefined' ? document.getElementById('profit-card') : null;
         if (!card) return null;
         const report = payload.report;
@@ -93,6 +93,7 @@
 
         const vs = document.createElement('span');
         vs.className = 'decision-summary-vs';
+        // Gap is derived from engine fact: hold - you == -excessReturn (traceable, not view logic beyond formatting)
         const gap = cf.buyAndHold.return - report.playerReturn;
         vs.textContent = gap > 0 ? `HOLD +${(gap * 100).toFixed(1)}% ahead` : gap < 0 ? `YOU +${(-gap * 100).toFixed(1)}% ahead` : 'EVEN';
 
@@ -100,12 +101,17 @@
 
         const moment = document.createElement('div');
         moment.className = 'decision-summary-moment';
-        if (report.lastSellDay !== null && Number.isFinite(report.returnAfterLastSell)) {
-            moment.textContent = `BIGGEST MOMENT · SOLD DAY ${String(report.lastSellDay + 1).padStart(3, '0')} · AFTER ${formatPercent(report.returnAfterLastSell)}`;
-        } else if (Number.isFinite(report.marketMaxDrawdown) && report.marketMaxDrawdown > 0.15) {
-            moment.textContent = `BIGGEST MOMENT · MARKET DD ${formatPercent(-report.marketMaxDrawdown)} · YOU ${formatPercent(report.excessReturn)} EXCESS`;
+        const hm = report.highlightMoment;
+        if (hm && hm.type === 'SOLD_AFTER') {
+            moment.textContent = `BIGGEST MOMENT · SOLD DAY ${String(hm.day + 1).padStart(3, '0')} · AFTER ${formatPercent(hm.value)}`;
+        } else if (hm && hm.type === 'MARKET_DD') {
+            moment.textContent = `BIGGEST MOMENT · MARKET DD ${formatPercent(-hm.value)} · YOU ${formatPercent(report.excessReturn)} EXCESS`;
+        } else if (hm && hm.type === 'FEE_DRAG') {
+            moment.textContent = `BIGGEST MOMENT · ${report.tradeCount} TRADES · FEE ${formatPercent(-hm.value)}`;
+        } else if (hm) {
+            moment.textContent = `MOMENT · ${hm.type} ${formatPercent(hm.value)}`;
         } else {
-            moment.textContent = `BIGGEST MOMENT · ${report.tradeCount} TRADES · FEE ${formatPercent(-report.feeDrag)}`;
+            moment.textContent = `MOMENT · ${report.tradeCount} TRADES · FEE ${formatPercent(-report.feeDrag)}`;
         }
 
         wrap.append(row, moment);

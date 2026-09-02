@@ -197,18 +197,22 @@
             const holdP = formatPercent(payload.counterfactuals?.buyAndHold?.return ?? report.marketReturn);
             const gap = (payload.counterfactuals?.buyAndHold?.return ?? 0) - report.playerReturn;
             const gapText = gap > 0 ? `HOLD +${(gap * 100).toFixed(1)}% ahead` : gap < 0 ? `YOU +${(-gap * 100).toFixed(1)}% ahead` : 'EVEN';
+            const centerX = Math.round(width / 2);
+            const lineY = bottom + 38;
             ctx.save();
-            ctx.font = '700 11px "Press Start 2P", monospace';
-            ctx.fillStyle = colors.text;
             ctx.textAlign = 'center';
-            // Hard shadow behind big numbers
+            // Hard shadow + foreground for YOU/HOLD line
+            ctx.font = '700 11px "Press Start 2P", monospace';
             ctx.fillStyle = '#000';
-            ctx.fillText(`YOU ${youP}  ·  HOLD ${holdP}`, Math.round(width / 2) + 2, bottom + 38 + 2);
-            ctx.fillStyle = report.playerReturn >= 0 ? colors.green : colors.red;
-            // second line smaller gap
+            ctx.fillText(`YOU ${youP}  ·  HOLD ${holdP}`, centerX + 2, lineY + 2);
+            ctx.fillStyle = colors.text;
+            ctx.fillText(`YOU ${youP}  ·  HOLD ${holdP}`, centerX, lineY);
+            // Gap line with its own shadow
             ctx.font = '700 9px "Pixelify Sans", monospace';
+            ctx.fillStyle = '#000';
+            ctx.fillText(gapText, centerX + 1, bottom + 54 + 1);
             ctx.fillStyle = colors.muted;
-            ctx.fillText(gapText, Math.round(width / 2), bottom + 54);
+            ctx.fillText(gapText, centerX, bottom + 54);
             ctx.restore();
         }
     }
@@ -267,7 +271,16 @@
             const rect = panel.getBoundingClientRect();
             const dpr = Math.max(1, window.devicePixelRatio || 1);
             const w = Math.max(320, Math.min(860, rect.width - 32));
-            const h = 400;
+            // Responsive height: fit inside viewport, especially 360px landscape (≈320px usable)
+            const viewportH = (typeof window !== 'undefined' && window.innerHeight) ? window.innerHeight : 800;
+            let headerH = 48, controlsH = 52;
+            try {
+                headerH = header.getBoundingClientRect().height || 48;
+                controlsH = controls.getBoundingClientRect().height || 52;
+            } catch {}
+            const chrome = 32; // overlay padding + panel borders
+            const availableH = viewportH - headerH - controlsH - chrome - 16;
+            const h = Math.max(220, Math.min(400, Math.floor(availableH), Math.floor(viewportH * 0.58)));
             canvas.style.width = w + 'px';
             canvas.style.height = h + 'px';
             canvas.width = Math.round(w * dpr);

@@ -14,6 +14,9 @@ const cf = read('scripts/decision/counterfactual-engine.js');
 const insight = read('scripts/decision/insight-engine.js');
 const recorder = read('scripts/decision/decision-recorder.js');
 const ghost = read('scripts/decision/ghost-overlay.js');
+const ghostView = read('scripts/decision/presentation/ghost-replay-view.js');
+const verdictView = read('scripts/decision/presentation/verdict-view.js');
+const cfView = read('scripts/decision/presentation/counterfactual-view.js');
 
 // Decision Engine must be referenced and load after game.js
 {
@@ -74,9 +77,35 @@ const ghost = read('scripts/decision/ghost-overlay.js');
     // fail-open
     assert.ok(recorder.includes('try') && recorder.includes('catch'), 'recorder must be fail-open');
 
-    // ghost must respect prefers-reduced-motion
-    assert.ok(ghost.includes('prefers-reduced-motion') || ghost.includes('prefersReducedMotion'), 'ghost must respect reduced motion');
+    // ghost must respect prefers-reduced-motion (now in presentation/ghost-replay-view.js, overlay keeps contract string)
     assert.ok(ghost.includes('GHOST REPLAY'), 'ghost must have replay button');
+    assert.ok(ghostView.includes('prefers-reduced-motion') || ghostView.includes('prefersReducedMotion'), 'ghost-replay-view must respect reduced motion');
+    assert.ok(ghostView.includes('GHOST_DURATION_MS') || ghostView.includes('6500'), 'ghost replay must have fixed 5-8s duration');
+    // ghost overlay must be thin orchestrator, not contain drawing logic
+    assert.ok(!ghost.includes('drawFrame') || ghost.includes('FlappyKGhostReplayView'), 'ghost-overlay must delegate drawing to presentation');
+    // single channel: recorder must emit via FlappyKEvents (with fallback else for tests without bus)
+    const recorderEmits = (recorder.match(/FlappyKEvents\.emit\('flappyk:decision-ready'/g) || []).length;
+    const windowEmits = (recorder.match(/window\.dispatchEvent\(new CustomEvent\('flappyk:decision-ready'/g) || []).length;
+    assert.equal(recorderEmits, 1, 'recorder must emit decision-ready exactly once via FlappyKEvents');
+    // window fallback is allowed only as else branch when bus missing
+    assert.ok(windowEmits <= 1, `recorder window fallback at most once, found ${windowEmits}`);
+    if (windowEmits === 1) assert.ok(recorder.includes('else window.dispatchEvent'), 'window fallback must be guarded by else');
+    // ghost overlay must not double-subscribe: bus is authoritative, window only as fallback
+    const ghostWindowSub = (ghost.match(/window\.addEventListener\('flappyk:decision-ready'/g) || []).length;
+    const ghostBusSub = (ghost.match(/FlappyKEvents\.on\('flappyk:decision-ready'/g) || []).length;
+    assert.equal(ghostBusSub, 1, 'ghost must subscribe once via FlappyKEvents');
+    assert.ok(ghostWindowSub <= 1, `ghost window fallback at most once, found ${ghostWindowSub}`);
+    if (ghostWindowSub === 1) assert.ok(ghost.includes('} else {'), 'ghost window fallback must be guarded');
+
+    // presentation must be logic-free: highlightMoment computed in engine
+    assert.ok(metrics.includes('highlightMoment'), 'decision-metrics must own highlightMoment');
+    assert.ok(!cfView.includes('if (report.lastSellDay') || cfView.includes('highlightMoment'), 'counterfactual-view must not recompute biggest moment, must use report.highlightMoment');
+    assert.ok(!verdictView.includes('tradeCount * 1') || verdictView.includes('tradeCount'), 'verdict view fee formatting is allowed but not decision logic');
+    // ghost final frame must draw both shadow and foreground
+    const shadowDraws = (ghostView.match(/fillText\(`YOU/g) || []).length;
+    assert.ok(shadowDraws >= 2, `ghost final frame must draw shadow + foreground (${shadowDraws} draws found)`);
+    // ghost must be responsive: dynamic height based on viewport
+    assert.ok(ghostView.includes('viewportH') && ghostView.includes('Math.max(220'), 'ghost must compute responsive height 220-400');
 }
 
 // Fact / Counterfactual / Interpretation separation

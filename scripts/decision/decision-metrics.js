@@ -299,6 +299,56 @@
         const periodStart = currentData[0] && currentData[0].date ? String(currentData[0].date) : '';
         const periodEnd = currentData[currentData.length - 1] && currentData[currentData.length - 1].date ? String(currentData[currentData.length - 1].date) : '';
 
+        // Highlight moment — true biggest fact, computed in engine, view only renders.
+        // Candidates: SOLD_AFTER (|returnAfterLastSell|), MARKET_DD (marketMaxDrawdown), FEE_DRAG (feeDrag).
+        // Choose max magnitude; traceable, no view logic.
+        let highlightMoment = null;
+        {
+            const candidates = [];
+            if (lastSellDay !== null && Number.isFinite(returnAfterLastSell)) {
+                candidates.push({
+                    type: 'SOLD_AFTER',
+                    magnitude: Math.abs(returnAfterLastSell),
+                    day: lastSellDay,
+                    value: returnAfterLastSell,
+                    fact: { lastSellDay, returnAfterLastSell, missedUpside, maxFavorableAfterLastSell },
+                });
+            }
+            if (Number.isFinite(marketMaxDrawdown) && marketMaxDrawdown > 0) {
+                candidates.push({
+                    type: 'MARKET_DD',
+                    magnitude: marketMaxDrawdown,
+                    day: null,
+                    value: marketMaxDrawdown,
+                    fact: { marketMaxDrawdown, marketReturn, excessReturn },
+                });
+            }
+            if (Number.isFinite(feeDrag) && feeDrag > 0) {
+                candidates.push({
+                    type: 'FEE_DRAG',
+                    magnitude: feeDrag,
+                    day: null,
+                    value: feeDrag,
+                    fact: { feeDrag, tradeCount, turnover },
+                });
+            }
+            if (candidates.length) {
+                candidates.sort((a, b) => b.magnitude - a.magnitude);
+                const best = candidates[0];
+                // Only emit if magnitude is meaningful (>0.5% for fee, >2% for others? Keep 1% floor for DD/sold to avoid trivial)
+                const floor = best.type === 'FEE_DRAG' ? 0.005 : 0.01;
+                if (best.magnitude >= floor) {
+                    highlightMoment = Object.freeze({
+                        type: best.type,
+                        magnitude: best.magnitude,
+                        day: best.day,
+                        value: best.value,
+                        fact: Object.freeze({ ...best.fact }),
+                    });
+                }
+            }
+        }
+
         const report = Object.freeze({
             version: VERSION,
             level: Number(level),
@@ -339,6 +389,7 @@
             avoidedDownside,
             bestPossibleTrade,
             buyAndHoldReturn,
+            highlightMoment: highlightMoment ? Object.freeze(highlightMoment) : null,
             closes: Object.freeze([...closes]),
             equityCurve: Object.freeze([...equityCurve]),
             actions: Object.freeze(actions.map((a) => Object.freeze({ type: a.type, day: Number(a.day), price: Number(a.price) }))),
