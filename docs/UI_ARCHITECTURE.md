@@ -51,6 +51,13 @@ Ownership inside `scripts/decision/`:
 - `mastery-system.js` owns cross-run achievements/traits (`DIAMOND HANDS`, `DIP BUYER`, etc.) derived from thresholded facts over many runs, never from a single run.
 - `decision-storage.js` owns persistence of Decision Reports and mastery (local-only, fail-open, versioned keys).
 
+Presentation inside `scripts/decision/presentation/` (thin views, no logic):
+
+- `verdict-view.js` owns settlement verdict cards (max 2, fact lines only).
+- `counterfactual-view.js` owns the compact Decision Summary (`YOU/HOLD + BIGGEST MOMENT` ≤3 lines, replaces the 4-column bar).
+- `ghost-replay-view.js` owns the 5-8s Ghost canvas (`YOU vs HOLD`, `▲BUY/▼SELL`, progress strip, final `YOU/HOLD` compare, `prefers-reduced-motion` static).
+- `ghost-overlay.js` is the thin orchestrator: listens to `flappyk:decision-ready`, calls presentation views, and owns `GHOST REPLAY` button injection. It must not contain drawing or metric logic. No presentation file may import decision_metrics or mutate `cash/shares`.
+
 Prohibited for Decision Engine:
 
 - mutating `cash/shares/currentData` or blocking trades
